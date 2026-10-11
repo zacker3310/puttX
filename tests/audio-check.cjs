@@ -21,6 +21,27 @@ const { check, done, open, fresh } = require('./lib.cjs');
   check('quiet mode zeroes the master gain and saves', q.g === 0 && q.saved === false, JSON.stringify(q));
   await page.evaluate(() => setSound(true));
 
+  /* a ball riding a wall or a mover logs a hit every physics step; the speaker must not machine-gun */
+  const spam = await page.evaluate(() => {
+    startHole('1-1'); loopPaused = true;
+    const before = sfxLog.length;
+    for (let f = 0; f < 60; f++) { for (let i = 0; i < 4; i++) play.ball.hits.push(['wall', 0.5], ['mover', 0.5]); advance(1 / 60); }
+    const loud = sfxLog.slice(before), mid = sfxLog.length;
+    for (let f = 0; f < 60; f++) { for (let i = 0; i < 4; i++) play.ball.hits.push(['wall', 0.05], ['mover', 0.05]); advance(1 / 60); }
+    return { clonk: loud.filter(n => n === 'clonk').length, boing: loud.filter(n => n === 'boing').length, grazes: sfxLog.length - mid };
+  });
+  check('sustained contact plays at most ~16 clonks and boings a second', spam.clonk >= 1 && spam.clonk <= 17 && spam.boing >= 1 && spam.boing <= 17, JSON.stringify(spam));
+  check('grazing contacts stay silent', spam.grazes === 0, JSON.stringify(spam));
+
+  const next = await page.evaluate(() => {
+    startHole('1-1'); loopPaused = true; for (let f = 0; f < 300; f++) advance(1 / 60);
+    play.ball.hits.push(['wall', 0.5]); advance(1 / 60);
+    startHole('1-2'); loopPaused = true; const n = sfxLog.length;
+    play.ball.hits.push(['wall', 0.5]); advance(1 / 60);
+    return sfxLog.slice(n);
+  });
+  check('the first wall hit on the next hole still clonks', next.includes('clonk'), JSON.stringify(next));
+
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

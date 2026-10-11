@@ -14,12 +14,27 @@ const clearOfMovers = (h, [x, z]) => h.movers.every(m => m.kind === 'spin'
   ? Math.hypot(x - m.x, z - m.z) > m.len + R
   : (() => { const p = S.closestOnSeg(m.ax, m.az, m.bx, m.bz, x, z); return Math.hypot(x - p[0], z - p[1]) > m.r + S.BALL_R; })());
 
+const ptSeg = (x, z, sg) => { const p = S.closestOnSeg(sg[0], sg[1], sg[2], sg[3], x, z); return Math.hypot(x - p[0], z - p[1]); };
+const cross = (ax, az, bx, bz, cx, cz) => (bx - ax) * (cz - az) - (bz - az) * (cx - ax);
+const segSeg = (a, b) => {
+  const d1 = cross(...a, b[0], b[1]), d2 = cross(...a, b[2], b[3]), d3 = cross(...b, a[0], a[1]), d4 = cross(...b, a[2], a[3]);
+  if (d1 * d2 < 0 && d3 * d4 < 0) return 0;
+  return Math.min(ptSeg(a[0], a[1], b), ptSeg(a[2], a[3], b), ptSeg(b[0], b[1], a), ptSeg(b[2], b[3], a));
+};
 const worlds = S.WORLD_ORDER.filter(w => S.WORLDS[w]);
 if (STRICT) check('all three worlds are registered', worlds.length === 3, worlds.join());
 for (const w of worlds) {
   const holes = S.WORLDS[w].holes;
   check(`world ${w}: 9 holes`, holes.length === 9);
   for (const h of holes) {
+    /* a mover must never pinch a resting ball against a wall: its sweep keeps a whole ball (plus
+       the wall's collision margin) clear of every wall line, or it shoves the ball through */
+    const pinch = [];
+    for (const m of h.movers) for (const sg of h.segs) {
+      const room = m.kind === 'spin' ? ptSeg(m.x, m.z, sg) - m.len - 2 * R : segSeg([m.ax, m.az, m.bx, m.bz], sg) - m.r - S.BALL_R - R;
+      if (room < -1e-9) pinch.push(m.kind + '@' + sg.map(v => +v.toFixed(2)).join(',') + ' short by ' + (-room).toFixed(3));
+    }
+    check(`${h.key}: movers never pinch a ball against a wall`, pinch.length === 0, pinch.slice(0, 2).join(' | '));
     const okShape = h.par >= 2 && h.par <= 4 && S.onFloor(h, ...h.tee) && S.onFloor(h, ...h.cup) && clearOfWalls(h, h.tee) && clearOfWalls(h, h.cup) && clearOfMovers(h, h.tee);
     check(`${h.key}: well formed`, okShape, JSON.stringify({ par: h.par, tee: h.tee, cup: h.cup }));
 

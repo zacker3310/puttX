@@ -36,7 +36,7 @@ registerWorld(7, { holes: [
     zones: [{ surf: 'sand', poly: rect(2.6, 4.2, 3.8, 4.6) }, { surf: 'sand', poly: rect(2.6, 5.4, 3.8, 5.8) }],
     movers: [C7_GHOST(1.4, 4.55, 1.4, 5.45, 2.6, 0), C7_GHOST(2.4, 5.45, 2.4, 4.55, 2.0, 0.7)] },
   /* 7: jump the moat off the drawbridge ramp, or tiptoe the narrow side bridge; the courtyard tilts */
-  { par: 2, sol: [[6,0.68,0]], tee: [0, 0.5], cup: [0.5, 5.9], shape: rect(-1.4, 0, 1.4, 7),
+  { par: 2, sol: [[6,0.76,0]], tee: [0, 0.5], cup: [0.5, 5.9], shape: rect(-1.4, 0, 1.4, 7),
     ramps: [{ x0: -0.3, z0: 2.3, x1: 0.3, z1: 3.0, axis: 'z', h0: 0, h1: 0.18 }],
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 7), h: 0.045, sx: 0.03 }],
     zones: [C7_MOAT(rect(-0.95, 3.0, 1.4, 3.6))] },
@@ -51,7 +51,7 @@ registerWorld(7, { holes: [
     zones: [C7_MOAT(rect(-1.3, 7.0, 1.3, 7.5))],
     posts: [C7_GARG(0.6, 5.2), C7_GARG(-0.35, 5.25)] },
   /* 10: the drop deck: two secret passages and a daring jump down to the crypt green */
-  { par: 3, sol: [[0,0.7,0],[12,0.35,0]], tee: [0, 0.5], cup: [-0.7, 7.2], floors: [rect(-1, 0, 1, 3.4), rect(-1.4, 4.2, 1.4, 8)],
+  { par: 3, sol: [[2,0.84,0]], tee: [0, 0.5], cup: [-0.7, 7.2], floors: [rect(-1, 0, 1, 3.4), rect(-1.4, 4.2, 1.4, 8)],
     tiers: [{ poly: rect(-1, 0, 1, 3.4), h: 0.35 }],
     walls: [[[-0.2, 3.4], [-1, 3.4], [-1, 0], [1, 0], [1, 3.4], [0.2, 3.4]], [[-0.4, 4.2], [-1.4, 4.2], [-1.4, 8], [1.4, 8], [1.4, 4.2], [0.4, 4.2]]],
     tubes: [{ a: [0.62, 2.9], b: [1.0, 4.7], dir: 0 }, { a: [-0.62, 2.9], b: [-0.7, 0.4], dir: 0 }],

@@ -32,7 +32,7 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   await page.evaluate(() => holePath.querySelectorAll('.node')[4].click());
   await page.evaluate(() => worldTabs.children[9].click());
   const boink = await page.evaluate(() => ({ scene: currentScene, world: mapWorld, log: sfxLog.slice(-2).join() }));
-  check('locked hole and locked course boink and stay put', boink.scene === 'map' && boink.world === playable()[0] && boink.log === 'boink,boink', JSON.stringify(boink));
+  check('locked hole and locked course boink and stay put', boink.scene === 'map' && boink.world === first && boink.log === 'boink,boink', JSON.stringify(boink));
 
   await page.evaluate(() => holePath.querySelectorAll('.node')[0].click());
   check('hole 1 opens the hole scene', await page.evaluate(f => currentScene === 'hole' && play.key === f + '-1', first));

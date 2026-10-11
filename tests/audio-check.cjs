@@ -15,7 +15,7 @@ const { check, done, open, fresh } = require('./lib.cjs');
   check('first touch creates the audio context', ctx === 'running' || ctx === 'suspended', String(ctx));
 
   const all = await page.evaluate(() => { const bad = []; for (const k of Object.keys(SFX)) { try { sfx(k, 0.5); } catch (e) { bad.push(k + ': ' + e.message); } } try { setRoll(2); setRoll(0); } catch (e) { bad.push('roll: ' + e.message); } return { bad, n: Object.keys(SFX).length }; });
-  check('every SFX plays without throwing (17 sounds + roll)', all.bad.length === 0 && all.n === 17, JSON.stringify(all));
+  check('every SFX plays without throwing (16 sounds + roll)', all.bad.length === 0 && all.n === 16, JSON.stringify(all));
 
   const q = await page.evaluate(() => { setSound(false); return { g: master.gain.value, saved: JSON.parse(localStorage.getItem('puttx.v2')).sound }; });
   check('quiet mode zeroes the master gain and saves', q.g === 0 && q.saved === false, JSON.stringify(q));

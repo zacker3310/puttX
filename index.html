@@ -359,7 +359,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = 'ee14b2565831';
+const BUILD_ID = '552af1998225';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1998,7 +1998,7 @@ registerWorld(10, { holes: [
     tubes: [{ a: [0.5, 5.6], b: [-0.8, 7.0], dir: 25 }] },
   /* 18. the crown kingdom: tube or windy rainbow to the windmill isle, off the kicker onto the
      cloud-ice court past the golden gate, then up the royal ramp to the crater cup on the crown */
-  { par: 5, sol: [[3,0.9,0],[0,0.55,0]], tee: [0, 0.6], cup: [0.3, 11.8],
+  { par: 5, sol: [[4,0.72,0],[2,0.84,0.5]], tee: [0, 0.6], cup: [0.3, 11.8],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.6, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
     walls: [[[-0.22, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.22, 2.2]], [[-1, 11], [-1, 12.6], [1, 12.6], [1, 11]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }, { poly: rect(-1.6, 7.6, 1.6, 10), h: 0.1 }, { poly: C10_PAD(-1, 11, 1, 12.6), h: 0.45 }],
@@ -2830,7 +2830,7 @@ function c4Lift(m) {
   return g;
 }
 WORLD_LOOK[4] = {
-  felt: '#438a3b', wall: '#6fc0df', ground: C4_SNOW, sky: ['#9fcde6', '#f4f8fa'], fog: true, flag: '#ef7d6d', icon: C4_FLAKE_SVG,
+  felt: '#3c7f35', wall: '#6fc0df', ground: C4_SNOW, sky: ['#9fcde6', '#f4f8fa'], fog: true, flag: '#ef7d6d', icon: C4_FLAKE_SVG,
   ice: '#4a94b5', water: '#24507e', skirt: '#d5e6ef', jingle: [659, 784, 988, 1175, 1319],
   prop: r => { const k = r(); return k < 0.6 ? c4Pine(r) : k < 0.8 ? c4Drift(r) : c4Snowman({ r: 0.13 + r() * 0.07 }); },
   post: (p, look) => p.look === 'snowman' ? c4Snowman(p) : defaultPost(p, look),
@@ -3562,7 +3562,7 @@ function c10Mover(m) {
   return defaultMover(m, lookOf(10));
 }
 WORLD_LOOK[10] = {
-  felt: '#3a8a45', wall: C10_CLOUD, ground: null, fog: true, sky: ['#4fa8ec', '#f4fbff'], flag: C10_GOLD, icon: C10_CROWN_SVG,
+  felt: '#317a3b', wall: C10_CLOUD, ground: null, fog: true, sky: ['#4fa8ec', '#f4fbff'], flag: C10_GOLD, icon: C10_CROWN_SVG,
   ice: '#3f8fbf', fast: '#c0569e', push: '#5b7fd6', sand: '#8a6236', skirt: '#8a6538',
   jingle: [784, 988, 1175, 1568, 1976],
   prop: c10Prop,

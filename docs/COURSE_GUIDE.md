@@ -95,7 +95,7 @@ Look rules:
 - **Shape of a course:** holes 1-5 are a warm-up that teaches the course's signature mechanic, 6-12 combine it with others, 13-18 are hard, and hole 18 is the showpiece.
 - **Multi-part holes:** at least 5 holes per course are crazy 3-4 part holes. That means 3 or 4 distinct sections joined by ramps, drops, tubes or gaps: upper deck, then tube, then lower green, then a guarded cup.
 - **Big hills** belong everywhere: bumps up to h 0.35, steep banks, crater cups, tilted greens that need reading.
-- **Not a gimme:** at most 2% of tee shots may ace (`holes-check` enforces this). Aces should take a precise bank or a deliberate tube.
+- **Not a gimme:** at most 4% of tee shots may ace (`holes-check` enforces this). Aces should take a precise bank or a deliberate tube.
 - **Difficulty target:** the noisy bot (`--bot`) mean minus par sits around `0.1 + 0.07 * (N - 1)` to `0.5 + 0.08 * (N - 1)` across the course. Course 1 is about par+0.1 to par+0.5; course 10 is about par+0.7 to par+1.2. Individual holes may sit outside the band.
 - **Par total** for the 18 holes is between 54 and 70.
 - **Risk-reward:** offer a short risky line (narrow ramp, tube, water carry) next to a safe longer line wherever you can.

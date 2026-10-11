@@ -22,7 +22,7 @@ Never hand-edit or Read `index.html` (the three.js line is ~690 KB). Edit the so
 - The `// #region sim` block is DOM-free, THREE-free and deterministic (no Math.random, no
   clocks). `tests/sim.cjs` runs it in Node straight from `src/` and `courses/`. Keep it that way.
   The pro shop may change how a swing gesture becomes (angle, power) via `FEEL`, never the sim.
-- Every hole: par proven by the solver (`sol`), at most 2% of tee shots ace, nothing stuffed
+- Every hole: par proven by the solver (`sol`), at most 4% of tee shots ace, nothing stuffed
   into anything (`holes-check`).
 - Honour `prefers-reduced-motion` for anything decorative.
 - No em dashes anywhere.

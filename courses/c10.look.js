@@ -55,7 +55,7 @@ function c10Mover(m) {
   return defaultMover(m, lookOf(10));
 }
 WORLD_LOOK[10] = {
-  felt: '#3a8a45', wall: C10_CLOUD, ground: null, fog: true, sky: ['#4fa8ec', '#f4fbff'], flag: C10_GOLD, icon: C10_CROWN_SVG,
+  felt: '#317a3b', wall: C10_CLOUD, ground: null, fog: true, sky: ['#4fa8ec', '#f4fbff'], flag: C10_GOLD, icon: C10_CROWN_SVG,
   ice: '#3f8fbf', fast: '#c0569e', push: '#5b7fd6', sand: '#8a6236', skirt: '#8a6538',
   jingle: [784, 988, 1175, 1568, 1976],
   prop: c10Prop,

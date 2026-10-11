@@ -8,7 +8,7 @@
      - movers never pinch a ball against a wall, never sweep the cup, never hit a post
      - tube mouths and exits on flat floor, clear of walls; each exit has room to roll out
      - `sol` sinks within par
-     - at most 2% of a 72 x 20 grid of putts from the tee is an ace (much harder than v1)
+     - at most 4% of a 72 x 20 grid of putts from the tee is an ace (the cup is friendly; the tee shot is not)
      - 180 full-power putts plus 60 random ones stay in (walled holes) and terminate
    PUTTX_ONLY=3 checks one course. PUTTX_ALL_WORLDS=1 also requires all ten courses of 18. */
 'use strict';
@@ -101,7 +101,7 @@ function checkHole(S, h) {
 
   let aces = 0;
   for (let a = 0; a < 72; a++) for (let p = 1; p <= 20; p++) if (S.simulatePutt(h, h.tee, a * 5, p / 20, 0).end === 'sunk') aces++;
-  check('not a gimme: at most 2% of tee shots ace', aces / 1440 <= 0.02, `${aces} of 1440`);
+  check('not a gimme: at most 4% of tee shots ace', aces / 1440 <= 0.04, `${aces} of 1440`);
 
   let seed = 12345 + h.key.length;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;

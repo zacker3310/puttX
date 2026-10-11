@@ -77,7 +77,7 @@ const { check, done, open } = require('./lib.cjs');
   const looks = await page.evaluate(() => {
     const lum = p => { const c = [0, 1, 2].map(i => { const s = p[i] / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
     return playable().map(w => {
-      startHole(w + '-1'); loopPaused = true; snapCamera(); renderFrame(0.016); renderer.render(scene, camera);
+      startHole(w + '-1'); loopPaused = true; snapCamera(); renderFrame(0.016); putter.visible = false; aimGroup.visible = false; renderer.render(scene, camera);
       const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
       const at = (x, y, z) => { const v = new THREE.Vector3(x, y, z).project(camera), px = new Uint8Array(4); gl.readPixels(Math.round((v.x + 1) / 2 * W), Math.round((v.y + 1) / 2 * H), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return [...px]; };
       const b = play.ball, ball = at(b.x, b.y + BALL_R * 1.7, b.z);

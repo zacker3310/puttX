@@ -67,8 +67,8 @@ registerWorld(3, { holes: [
   /* 13: three temple terraces, each ramp on the other side, a boulder guarding the top */
   { par: 4, sol: [[44,1,0],[0,0.52,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: [[-1.2, 0], [1.2, 0], [1.2, 2.5], [1.2, 5], [1.2, 7], [1.2, 9], [-1.2, 9], [-1.2, 7], [-1.2, 5], [-1.2, 2.5]],
     ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.15, h1: 0.3 },
-      { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.45 }],
-    tiers: [{ poly: rect(-1.2, 2.5, 1.2, 5), h: 0.15 }, { poly: rect(-1.2, 5, 1.2, 7), h: 0.3 }, { poly: rect(-1.2, 7, 1.2, 9), h: 0.45 }],
+      { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.42 }],
+    tiers: [{ poly: rect(-1.2, 2.5, 1.2, 5), h: 0.15 }, { poly: rect(-1.2, 5, 1.2, 7), h: 0.3 }, { poly: rect(-1.2, 7, 1.2, 9), h: 0.42 }],
     zones: [J3_MUD(rect(-0.2, 3.3, 1.2, 3.9)), J3_MUD(rect(0.5, 5.6, 1.2, 6.3))], posts: [J3_IDOL(-0.6, 5.9), J3_IDOL(0.75, 4.6)],
     movers: [J3_ROCK(-0.8, 7.75, 0.8, 7.75, 2.4)], bumps: [{ x: 0.5, z: 8.4, r: 0.45, h: -0.08 }] },
   /* 14: down the river bank: a skinny bridge early, a wide one late behind the boulder */

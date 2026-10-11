@@ -13,7 +13,7 @@ async function run(reduced) {
     let trail = 0, squash = 1, flag = 0, conf = 0;
     const frames = n => { for (let i = 0; i < n; i++) { advance(1 / 60); renderFrame(1 / 60); trail = Math.max(trail, visibleTrail()); squash = Math.min(squash, ballMesh.scale.y); flag = Math.max(flag, flagGroup.rotation.y); conf = Math.max(conf, activeConfetti()); } };
     beginPutt(45, 1); frames(90);
-    startHole('97-1'); loopPaused = true; play.ball = newBall(play.hole, 0, 3.1); beginPutt(0, 0); frames(200);
+    startHole('97-1'); loopPaused = true; play.ball = newBall(play.hole, 0, 3.2); beginPutt(0, 0.02); frames(200);
     return { trail, squash, flag, conf, phase: play.phase };
   });
   await browser.close();

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* run-all: the canonical runner (`npm test`). Builds the sources to preview/test.html and serves
+/* run-all: the canonical runner (`npm test`). Builds the sources to test-build.html and serves
    the repo root on a free port (or honours PUTTX_URL), resolves a Chromium (CHROMIUM env, else playwright-core's download), runs every
    tests/*-check.cjs in turn, prints a table and exits non-zero when anything fails.
    Node-only suites (physics, round, holes) simply ignore the URL.
@@ -57,11 +57,10 @@ function run(name, env) {
   const exe = chromium();
   let srv = null, url = process.env.PUTTX_URL;
   if (!url) {
-    /* test the sources as they stand: a fresh build to preview/test.html (index.html is build-check's business) */
+    /* test the sources as they stand: a fresh build (index.html is build-check's business) */
     const { build } = require('../scripts/build.cjs');
-    fs.mkdirSync(path.join(ROOT, 'preview'), { recursive: true });
-    fs.writeFileSync(path.join(ROOT, 'preview', 'test.html'), build());
-    srv = await serve(); url = `http://127.0.0.1:${srv.address().port}/preview/test.html`;
+    fs.writeFileSync(path.join(ROOT, 'test-build.html'), build());   /* at the root, so the manifest and icons resolve */
+    srv = await serve(); url = `http://127.0.0.1:${srv.address().port}/test-build.html`;
   }
   console.log(`puttx tests | ${SUITES.length} suites | ${url}\n`);
   const env = { ...process.env, CHROMIUM: exe, PUTTX_URL: url };

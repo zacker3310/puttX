@@ -38,7 +38,7 @@ registerWorld(4, { holes: [
     movers: [{ kind: 'gate', ax: -0.44, az: 3.1, bx: 0.44, bz: 3.1, len: 0.35, ang: 90, period: 3.2, phase: 0, look: 'lift' }],
     ramps: [{ x0: -1, z0: 3.8, x1: 1, z1: 4.8, axis: 'z', h0: 0, h1: 0.25 }], tiers: [{ poly: rect(-1, 4.8, 1, 7), h: 0.25 }], posts: [C4_MAN(-0.3, 5.6)] },
   /* 9. avalanche bowl: off the tee deck into an icy bowl, up a narrow ramp to the cup shelf */
-  { par: 4, sol: [[355,0.94,0]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.3, 0, 1.3, 8.2),
+  { par: 4, sol: [[357,0.96,0],[6,0.44,0]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.3, 0, 1.3, 8.2),
     tiers: [{ poly: rect(-1.3, 0, 1.3, 2), h: 0.3 }, { poly: rect(-1.3, 6.4, 1.3, 8.2), h: 0.2 }], ramps: [{ x0: -0.4, z0: 5.6, x1: 0.4, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: 0, z: 4.1, r: 1.0, h: -0.35 }], zones: [{ surf: 'ice', poly: C4_POOL(0, 4.1, 1.1, 1.1, 12) }], posts: [C4_MAN(0.05, 7.3)] },
   /* 10. slalom: down the ski slope between snowmen, open water past the cup */
@@ -84,7 +84,7 @@ registerWorld(4, { holes: [
     posts: [C4_MAN(0.1, 9.3)], bumps: [{ x: 0.6, z: 8.9, r: 0.55, h: 0.08 }] },
   /* 18. the peak: tee off the summit, down the ice chute, across the mogul terrace, drop to the
      ice shelf and drop again to the cup by the lake. Off-floor tiers keep the outline walls level. */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [4.3, 1.2], aim0: 0,
+  { par: 5, sol: [[168,0.76,0],[36,0.92,0],[18,0.6,0]], tee: [0, 0.5], cup: [4.3, 1.2], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 5.2], [1.9, 5.2], [1.9, 4.0], [1.9, 0], [5, 0], [5, 2.6], [3.3, 2.6], [3.3, 4.0], [3.3, 6.8], [-0.7, 6.8]],
     tiers: [{ poly: rect(-1.2, -0.2, 1.3, 2.4), h: 0.9 }, { poly: rect(-1.2, 5.2, 3.8, 7.3), h: 0.55 }, { poly: rect(1.3, 2.6, 3.8, 5.2), h: 0.25 }],
     ramps: [{ x0: -1.2, z0: 2.4, x1: 1.3, z1: 5.2, axis: 'z', h0: 0.9, h1: 0.55 }],

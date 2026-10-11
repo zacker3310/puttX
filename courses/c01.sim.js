@@ -55,9 +55,9 @@ registerWorld(1, { holes: [
   /* 10: scaffold climb (3 parts). Ramp to the first lift, cross the belt that wants you off the edge, ramp to the top deck */
   { par: 4, sol: [[320,0.92,0],[34,1,0],[8,0.8,0]], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
     shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6.2], [1.4, 9], [-1.4, 9], [-1.4, 6.2], [-1.4, 3.4]],
-    tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.42 }],
+    tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.41 }],
     ramps: [{ x0: -1.4, z0: 2.2, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 },
-            { x0: 0.6, z0: 5, x1: 1.4, z1: 6.2, axis: 'z', h0: 0.22, h1: 0.42 }],
+            { x0: 0.6, z0: 5, x1: 1.4, z1: 6.2, axis: 'z', h0: 0.22, h1: 0.41 }],
     inner: [[[0.6, 5], [0.6, 6.2]], [[1.4, 7.1], [-0.5, 7.1]], [[-0.6, 3.4], [1.4, 3.4]], [[-1.4, 6.2], [0.6, 6.2]]],
     zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
     bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
@@ -69,7 +69,7 @@ registerWorld(1, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.5, 5.2, -1, 7.2) }],
     bumps: [{ x: 0.3, z: 6.1, r: 0.35, h: 0.1 }] },
   /* 12: gap jump (3 parts, open). Launch off the plank ramp over the trench, or creep round the side plank */
-  { par: 3, sol: [[8,0.8,0]], tee: [0, 0.5], cup: [0, 7.2],
+  { par: 3, sol: [[357.5,0.85,0]], tee: [0, 0.5], cup: [0, 7.2],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 8)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 8], [0.8, 8], [0.8, 5.3]]],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.5, axis: 'z', h0: 0, h1: 0.22 }],

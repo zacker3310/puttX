@@ -69,7 +69,13 @@ function makeHole(def) {
      so the renderer and the physics agree on how tall a wall stands over hills and tiers */
   const R = BALL_R + WALL_HALF + 0.01;
   h.segBox = h.segs.map(([ax, az, bx, bz]) => [Math.min(ax, bx) - R, Math.max(ax, bx) + R, Math.min(az, bz) - R, Math.max(az, bz) + R]);
-  h.segTop = h.segs.map(([ax, az, bx, bz]) => {
+  /* computed on first use: sampling every wall over every hole at boot costs seconds */
+  let tops = null;
+  Object.defineProperty(h, 'segTop', { enumerable: false, get: () => tops || (tops = wallTops(h)) });
+  return h;
+}
+function wallTops(h) {
+  return h.segs.map(([ax, az, bx, bz]) => {
     const n = Math.max(2, Math.ceil(Math.hypot(bx - ax, bz - az) / 0.05));
     let hi = -Infinity, lo = Infinity;
     for (let i = 0; i <= n; i++) {
@@ -79,7 +85,6 @@ function makeHole(def) {
     }
     return [hi + WALL_TOP, lo];
   });
-  return h;
 }
 function inPoly(poly, x, z) {
   let inside = false;

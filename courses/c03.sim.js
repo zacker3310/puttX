@@ -6,7 +6,7 @@ const J3_WATER = poly => ({ surf: 'water', poly });
 const J3_MUD = poly => ({ surf: 'mud', poly });
 registerWorld(3, { holes: [
   /* 1: the stream. A stone bridge off to the left, the cup back on the right behind a mound */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.25, 5.3], aim0: 4, shape: rect(-0.8, 0, 0.8, 6),
+  { par: 2, sol: [[2,0.8,0]], tee: [0, 0.5], cup: [-0.25, 5.3], aim0: 4, shape: rect(-0.8, 0, 0.8, 6),
     zones: [J3_WATER(rect(-0.8, 2.6, 0, 3.2)), J3_WATER(rect(0.45, 2.6, 0.8, 3.2))],
     bumps: [{ x: 0.1, z: 4.4, r: 0.45, h: 0.12 }], posts: [J3_IDOL(0.45, 4.9, 0.12)] },
   /* 2: temple steps: a narrow ramp to the first terrace, a side ramp to the second */
@@ -93,7 +93,7 @@ registerWorld(3, { holes: [
     tubes: [{ a: [2.6, 3.0], b: [2.6, 2.0], dir: 180, keep: 0, add: 0.5 }],
     posts: [J3_IDOL(3.1, 3.4), J3_IDOL(2.1, 3.4), J3_IDOL(2.15, 0.8)] },
   /* 17: the boulder gauntlet down the temple corridor */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-1.4, 7.6], aim0: 0,
+  { par: 4, sol: [[352,0.96,0]], tee: [0, 0.5], cup: [-1.4, 7.6], aim0: 0,
     shape: [[-0.6, 0], [0.6, 0], [0.6, 8.4], [-2.0, 8.4], [-2.0, 6.8], [-0.6, 6.8]],
     zones: [J3_MUD(rect(-0.6, 1.8, -0.15, 2.4)), J3_MUD(rect(0.15, 3.6, 0.6, 4.2)), J3_WATER(rect(-2.0, 6.8, -1.0, 7.1))],
     movers: [J3_ROCK(-0.27, 2.9, 0.27, 2.9, 1.8, 0, 0.16), J3_ROCK(0.27, 4.9, -0.27, 4.9, 2.2, 1, 0.16), J3_ROCK(0, 6.3, 0, 7.9, 2.6, 0, 0.16)],

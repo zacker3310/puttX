@@ -62,16 +62,18 @@ registerWorld(7, { holes: [
     inner: [[[1.7, 3], [2.15, 3]], [[2.65, 3], [3.1, 3]]],
     bumps: [{ x: -0.1, z: 4.85, r: 0.5, h: 0.2 }],
     movers: [C7_GHOST(1.2, 4.45, 1.2, 5.15, 2.2, 0), C7_GATE(2.4, 3, 2.85, 3, 0.25, 90, 2.8, 0)] },
-  /* 12: the ghost ballroom: a polished floor and two dancing ghosts */
-  { par: 3, sol: [[12,0.81,0]], tee: [0, 0.5], cup: [0.45, 6.9], shape: rect(-1.3, 0, 1.3, 7.6),
-    zones: [{ surf: 'fast', poly: rect(-1.3, 1.5, 1.3, 6.0) }],
-    posts: [C7_GARG(0.3, 6.05), C7_GARG(0.85, 6.45)],
+  /* 12: the ghost ballroom: two dancing ghosts on a polished floor, the cup up on the stage */
+  { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 7.05], shape: rect(-1.3, 0, 1.3, 7.6),
+    zones: [{ surf: 'fast', poly: rect(-1.3, 1.5, 1.3, 5.8) }],
+    tiers: [{ poly: rect(-1.3, 6.4, 1.3, 7.6), h: 0.15 }],
+    ramps: [{ x0: -0.25, z0: 5.8, x1: 0.25, z1: 6.4, axis: 'z', h0: 0, h1: 0.15 }],
+    posts: [C7_GARG(-0.5, 6.05), C7_GARG(0.5, 6.05), C7_GARG(0.25, 6.8)],
     movers: [C7_GHOST(-0.75, 3.0, 0.75, 3.0, 3.0, 0), C7_GHOST(0.75, 4.5, -0.75, 4.5, 2.4, 1.2)] },
   /* 13: windmill ramp to the rampart, down the narrow drawbridge (or jump the moat), then the tilted courtyard */
-  { par: 4, sol: [[332,1,0],[36,0.69,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
-    ramps: [{ x0: -1.2, z0: 2.6, x1: 1.2, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.55, z0: 5.4, x1: 1.05, z1: 6.5, axis: 'z', h0: 0.3, h1: 0 }],
-    tiers: [{ poly: rect(-1.2, 3.6, 1.2, 5.4), h: 0.3 }, { poly: rect(-1.2, 6.5, 1.2, 9.6), h: 0.045, sx: -0.03 }],
-    zones: [C7_MOAT(rect(-1.2, 5.4, 0.55, 6.5)), C7_MOAT(rect(1.05, 5.4, 1.2, 6.5))],
+  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
+    ramps: [{ x0: -1.2, z0: 2.6, x1: 1.2, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.55, z0: 5.4, x1: 1.05, z1: 6.5, axis: 'z', h0: 0.3, h1: 0.07 }],
+    tiers: [{ poly: rect(-1.2, 3.6, 1.2, 5.4), h: 0.3 }, { poly: rect(-1.2, 6.5, 1.2, 9.6), h: 0.2, sz: -0.02 }],
+    zones: [C7_MOAT(rect(-1.2, 5.4, 0.55, 6.5)), C7_MOAT(rect(1.05, 5.4, 1.2, 6.5)), C7_MOAT(rect(-1.2, 9.25, 1.2, 9.6))],
     posts: [C7_GARG(-0.1, 8.1), C7_GARG(-0.9, 8.15)],
     movers: [C7_MILL(0, 2.0, 0.6, 1.5, 0), C7_GHOST(-0.85, 7.35, 0.6, 7.35, 2.6, 0)] },
   /* 14: three dungeon rooms joined by secret passages; pick the right mouths */
@@ -87,7 +89,7 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(0.15, 7.7), C7_GARG(1.25, 7.5)],
     movers: [C7_GHOST(-1.0, 4.2, 1.0, 4.2, 3.2, 0), C7_GHOST(-0.3, 7.2, 0.9, 7.2, 2.4, 1.5)] },
   /* 16: graveyard switchbacks: hills in the turns, a ghost in the middle aisle, the old well before the cup */
-  { par: 4, sol: [], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
+  { par: 4, sol: [[340,1,0],[204,1,0],[8,0.75,0]], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
     inner: [[[-0.7, 0], [-0.7, 5.6]], [[0.7, 7], [0.7, 1.4]]],
     bumps: [{ x: -0.7, z: 6.4, r: 0.45, h: 0.25 }, { x: 0.7, z: 0.6, r: 0.45, h: 0.25 }, { x: 1.4, z: 4.6, r: 0.45, h: -0.22 }],
     posts: [C7_GARG(1.05, 5.6)],

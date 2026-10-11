@@ -16,7 +16,7 @@ registerWorld(6, { holes: [
     zones: [V6_LAVA(rect(-1.2, 3, 0.55, 3.7)), V6_MUD(rect(0.55, 3.7, 1.2, 4.2))],
     bumps: [{ x: -0.1, z: 5.1, r: 0.45, h: 0.18 }] },
   /* 3: first crater cup, lava behind it */
-  { par: 3, sol: [[46,0.8,0],[82,0.44,0]], tee: [0, 0.5], cup: [2.2, 4.8], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 3.2], [3.6, 3.2], [3.6, 6.4], [-0.7, 6.4]],
+  { par: 2, sol: [[46,0.8,0],[82,0.44,0]], tee: [0, 0.5], cup: [2.2, 4.8], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 3.2], [3.6, 3.2], [3.6, 6.4], [-0.7, 6.4]],
     bumps: V6_CRATER(2.2, 4.8, 0.9), zones: [V6_LAVA(rect(3.2, 3.2, 3.6, 6.4)), V6_LAVA(rect(0.7, 3.2, 1.3, 3.7)), V6_LAVA(rect(1.3, 6, 3.2, 6.4))] },
   /* 4: volcano feeder intro: the gap on the right, or the crater tube on the left */
   { par: 3, sol: [[338,0.96,0],[50,0.76,0]], tee: [0, 0.5], cup: [-0.8, 6.2], aim0: 0, shape: rect(-1.4, 0, 1.4, 7.4),
@@ -24,7 +24,7 @@ registerWorld(6, { holes: [
     bumps: V6_CRATER(-0.6, 2.1, 0.8), tubes: [{ a: [-0.6, 2.1], b: [-0.1, 4.2], dir: 0 }],
     zones: [V6_LAVA(rect(0.3, 4.7, 1.4, 5.4)), V6_MUD(rect(-0.6, 4.9, 0.3, 5.5))] },
   /* 5: tilted mud flats */
-  { par: 3, sol: [[8,0.84,0]], tee: [0, 0.5], cup: [-0.4, 6.6], shape: rect(-1.3, 0, 1.3, 7.5),
+  { par: 2, sol: [[8,0.84,0]], tee: [0, 0.5], cup: [-0.4, 6.6], shape: rect(-1.3, 0, 1.3, 7.5),
     tiers: [{ poly: rect(-1.4, -0.1, 1.4, 7.6), h: 0.1, sx: 0.06 }],
     zones: [V6_LAVA(rect(-1.3, 1.5, -1.1, 7.5)), V6_MUD(rect(-1.1, 2.4, 0.2, 3)), V6_MUD(rect(-0.2, 4.4, 1.3, 5))],
     bumps: [{ x: 0.6, z: 3.7, r: 0.5, h: 0.25 }] },
@@ -49,11 +49,11 @@ registerWorld(6, { holes: [
     bumps: V6_CRATER(0, 3.8, 1.2), tubes: [{ a: [0, 3.8], b: [1.05, 6.6], dir: 270 }], posts: [V6_COL(-0.25, 6.3), V6_COL(-0.6, 6.1)],
     zones: [V6_LAVA(rect(-1.6, 2.5, -1.15, 5.5)), V6_LAVA(rect(1.15, 2.5, 1.6, 5.5)), V6_LAVA(rect(-1.6, 7.6, 1.6, 8)), V6_MUD(rect(0, 6.35, 0.75, 6.85))] },
   /* 10: twin cones and a crater cup behind the saddle */
-  { par: 3, sol: [[6,0.68,0]], tee: [0, 0.5], cup: [-0.7, 6.2], shape: rect(-1.5, 0, 1.5, 7.5),
+  { par: 2, sol: [[6,0.68,0]], tee: [0, 0.5], cup: [-0.7, 6.2], shape: rect(-1.5, 0, 1.5, 7.5),
     bumps: [{ x: -0.6, z: 3.5, r: 0.55, h: 0.33 }, { x: 0.6, z: 3.5, r: 0.55, h: 0.33 }, ...V6_CRATER(-0.7, 6.2, 0.85)], posts: [V6_COL(-0.4, 5)],
     zones: [V6_LAVA(rect(-1.5, 7.1, 1.5, 7.5)), V6_MUD(rect(-1.5, 4.6, -0.9, 5.4)), V6_MUD(rect(0.9, 4.6, 1.5, 5.4))] },
   /* 11: lava tube ride: ramp to a plateau, then the crater tube or a drop over the lava (crazy, 3 parts) */
-  { par: 4, sol: [[348,1,0],[22,0.84,0]], tee: [0, 0.5], cup: [2, 8.9], aim0: 0,
+  { par: 3, sol: [[348,1,0],[22,0.84,0]], tee: [0, 0.5], cup: [2, 8.9], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 3], [0.7, 4.2], [2.6, 4.2], [2.6, 6.2], [2.6, 9.5], [-0.7, 9.5], [-0.7, 6.2], [-0.7, 3]],
     ramps: [{ x0: -0.7, z0: 3, x1: 0.7, z1: 4.2, axis: 'z', h0: 0, h1: 0.35 }],
     tiers: [{ poly: rect(-0.9, 4.2, 2.8, 6.2), h: 0.35 }],
@@ -69,7 +69,7 @@ registerWorld(6, { holes: [
     bumps: V6_CRATER(0.3, 8.9, 0.9),
     zones: [V6_LAVA(rect(-1, 3.3, 1, 4.3)), V6_LAVA(rect(-1, 6.6, 1, 7.4))] },
   /* 14: switchback up the flank: three legs, two ramps, ash and lava */
-  { par: 4, sol: [[42,1,0],[288,0.8,0]], tee: [0, 0.5], cup: [1.2, 7.2], shape: [[-1.8, 0], [1.8, 0], [1.8, 2.7], [1.8, 5.3], [1.8, 8], [-1.8, 8], [-1.8, 5.3], [-1.8, 2.7]],
+  { par: 3, sol: [[42,1,0],[288,0.8,0]], tee: [0, 0.5], cup: [1.2, 7.2], shape: [[-1.8, 0], [1.8, 0], [1.8, 2.7], [1.8, 5.3], [1.8, 8], [-1.8, 8], [-1.8, 5.3], [-1.8, 2.7]],
     inner: [[[-1.8, 2.7], [1, 2.7]], [[-1, 5.3], [1.8, 5.3]]],
     tiers: [{ poly: rect(-1.9, 2.7, 1.9, 5.3), h: 0.2 }, { poly: rect(-1.9, 5.3, 1.9, 8.1), h: 0.4 }],
     ramps: [{ x0: 1, z0: 2.2, x1: 1.8, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.8, z0: 4.8, x1: -1, z1: 5.8, axis: 'z', h0: 0.2, h1: 0.4 }],

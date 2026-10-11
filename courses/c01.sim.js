@@ -21,6 +21,7 @@ registerWorld(1, { holes: [
   { par: 3, sol: [], tee: [0, 0.5], cup: [0.55, 6.6], shape: rect(-1, 0, 1, 7.4),
     tiers: [{ poly: rect(-1, 4.6, 1, 7.4), h: 0.25 }],
     ramps: [{ x0: -0.65, z0: 3.3, x1: 0.05, z1: 4.6, axis: 'z', h0: 0, h1: 0.25 }],
+    inner: [[[-1, 4.6], [-0.65, 4.6]], [[0.05, 4.6], [1, 4.6]]],
     bumps: [{ x: 0.1, z: 5.8, r: 0.35, h: 0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.15, 7, 1, 7.4) }, { surf: 'sand', poly: rect(-1, 1.6, -0.2, 2.4) }] },
   /* 5: boom gate. A barrier slides across the gap in the girder; an against-you belt guards the cup */
@@ -57,7 +58,7 @@ registerWorld(1, { holes: [
     tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.44 }],
     ramps: [{ x0: -1.4, z0: 2.2, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 },
             { x0: 0.6, z0: 5, x1: 1.4, z1: 6.2, axis: 'z', h0: 0.22, h1: 0.44 }],
-    inner: [[[0.6, 5], [0.6, 6.2]], [[1.4, 7.1], [-0.5, 7.1]]],
+    inner: [[[0.6, 5], [0.6, 6.2]], [[1.4, 7.1], [-0.5, 7.1]], [[-0.6, 3.4], [1.4, 3.4]], [[-1.4, 6.2], [0.6, 6.2]]],
     zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
     bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
   /* 11: the tilted slab. A poured slab leans to the right; read the break through the girder posts */
@@ -75,12 +76,12 @@ registerWorld(1, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.8, 7.6, 0.8, 8) }],
     bumps: [{ x: -0.35, z: 5.6, r: 0.35, h: 0.1 }] },
   /* 13: cement mixer (3 parts). Up the narrow ramp under the crane or the long side ramp, then into the crater */
-  { par: 3, sol: [[336,0.92,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
+  { par: 3, sol: [[338,0.84,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
     tiers: [{ poly: rect(-1.5, 5, 1.5, 8.5), h: 0.3 }],
     ramps: [{ x0: -0.3, z0: 3.8, x1: 0.3, z1: 5, axis: 'z', h0: 0, h1: 0.3 },
             { x0: -1.5, z0: 2.8, x1: -0.8, z1: 5, axis: 'z', h0: 0, h1: 0.3 }],
     movers: [{ kind: 'spin', x: 0, z: 5.95, len: 0.55, w: 1.6, phase: 0, look: 'crane' }],
-    inner: [[[0.3, 7], [1.5, 7]]],
+    inner: [[[0.3, 7], [1.5, 7]], [[-0.8, 5], [-0.3, 5]], [[0.3, 5], [1.5, 5]]],
     bumps: [{ x: 0.85, z: 7.6, r: 0.5, h: -0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.45, 3.2, 1.5, 5) }, { surf: 'sand', poly: rect(-1.5, 8.1, 1.5, 8.5) }] },
   /* 14: belt yard. A three-lane serpentine; the belts in the back lanes run against you */
@@ -93,7 +94,7 @@ registerWorld(1, { holes: [
   { par: 3, sol: [[-1,0.94,1.5]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.4, 0, 1.4, 9.6),
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.4), h: 0.35 }],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.6, axis: 'z', h0: 0, h1: 0.35 }],
-    inner: [[[-1.4, 4.6], [-0.3, 4.6]], [[0.3, 4.6], [1.4, 4.6]], [[-1.4, 6.4], [-0.45, 6.4]], [[0.35, 6.4], [1.4, 6.4]]],
+    inner: [[[-1.4, 3.6], [-0.35, 3.6]], [[0.35, 3.6], [1.4, 3.6]], [[-1.4, 4.6], [-0.3, 4.6]], [[0.3, 4.6], [1.4, 4.6]], [[-1.4, 6.4], [-0.45, 6.4]], [[0.35, 6.4], [1.4, 6.4]]],
     movers: [{ kind: 'gate', ax: -0.62, az: 4.6, bx: 0, bz: 4.6, len: 0.31, ang: 90, period: 2.8, look: 'boom' }],
     tubes: [{ a: [1, 5.6], b: [1, 7.4], dir: 0 }],
     bumps: [{ x: -0.2, z: 7.8, r: 0.45, h: 0.18 }],
@@ -105,7 +106,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
+  { par: 3, sol: [[26,1,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],
     walls: [[[-0.7, 4.6], [-0.7, 0], [0.7, 0], [0.7, 6], [-2, 6]], [[-0.7, 4.6], [-3.6, 4.6], [-3.6, 6]],
             [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]]],

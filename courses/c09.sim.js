@@ -23,7 +23,7 @@ registerWorld(9, { holes: [
     bumps: [{ x: 0, z: 3, r: 0.7, h: 0.32 }],
     zones: [{ surf: 'mud', poly: rect(-1, 4.9, -0.25, 6.5) }, { surf: 'mud', poly: rect(0.25, 4.9, 1, 6.5) }, { surf: 'mud', poly: rect(-0.25, 6.1, 0.25, 6.5) }] },
   /* 5: the lollipop guards the only bridge over the chocolate */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.4, 6.2], shape: rect(-1, 0, 1, 7),
+  { par: 4, sol: [[27.5, 0.59, 1]], tee: [0, 0.5], cup: [-0.4, 6.2], shape: rect(-1, 0, 1, 7),
     zones: [{ surf: 'water', poly: rect(-1, 3, 0.2, 3.7) }, { surf: 'water', poly: rect(0.65, 3, 1, 3.7) }],
     movers: [C9_POP(0, 4.8, 0.6, 1.6, 0, 2)] },
   /* 6: up the ramp to the wafer deck, down the candy-cane pipe to the taffy green */
@@ -36,7 +36,7 @@ registerWorld(9, { holes: [
     posts: [C9_GUM(0.9, 6.9)],
     tubes: [C9_PIPE([1.9, 3.8], [0.0, 6.3], 0)] },
   /* 7: two candy presses slam across the lane */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.3, 7.2], shape: rect(-1, 0, 1, 8),
+  { par: 2, sol: [[12, 0.9, 0]], tee: [0, 0.5], cup: [0.3, 7.2], shape: rect(-1, 0, 1, 8),
     movers: [C9_PRESS(-0.55, 3, 0.55, 3, 0.55, 90, 3), C9_PRESS(0.55, 5, -0.55, 5, 0.55, 90, 3.4)],
     bumps: [{ x: -0.4, z: 6.3, r: 0.4, h: 0.12 }] },
   /* 8: the chocolate river: a thin wafer bridge straight on, or the wide bridge the long way */
@@ -60,12 +60,12 @@ registerWorld(9, { holes: [
     zones: [C9_BELT(rect(-1.5, 0, 1.5, 2.5), -1.2, 0), C9_BELT(rect(-1.5, 2.5, 1.5, 5), -1.6, 0), C9_BELT(rect(-1.5, 5.6, 1.5, 6.6), 1.5, 0)],
     posts: [C9_GUM(0, 3.7)] },
   /* 12: candy-cane pipes link three pads */
-  { par: 3, sol: [[345, 1, 0], [12, 0.65, 0]], tee: [0, 0.5], cup: [0, 8.6], aim0: 0,
+  { par: 4, sol: [], tee: [0, 0.5], cup: [0, 8.6], aim0: 20,
     floors: [rect(-0.8, 0, 0.8, 2.6), rect(1.6, 3.4, 3.6, 6.2), rect(-0.8, 7, 0.8, 9.2)],
     walls: [ring(rect(-0.8, 0, 0.8, 2.6)), ring(rect(1.6, 3.4, 3.6, 6.2)), ring(rect(-0.8, 7, 0.8, 9.2))],
     zones: [{ surf: 'fast', poly: rect(1.6, 3.4, 3.6, 6.2) }, { surf: 'mud', poly: rect(-0.8, 8.0, -0.3, 9.2) }, { surf: 'mud', poly: rect(0.3, 8.0, 0.8, 9.2) }, { surf: 'mud', poly: rect(-0.3, 8.0, 0.3, 8.2) }],
     posts: [C9_GUM(2.4, 4.7), C9_GUM(3.0, 5.3)],
-    tubes: [C9_PIPE([0.4, 2.1], [2.0, 3.8], 30), C9_PIPE([-0.4, 2.1], [0.45, 7.35], 300), C9_PIPE([3.1, 5.7], [-0.45, 7.35], 0)] },
+    tubes: [C9_PIPE([0.4, 2.1], [2.0, 3.8], 30), C9_PIPE([3.1, 5.7], [-0.45, 7.35], 0)] },
   /* 13: a hard-candy causeway through the chocolate */
   { par: 3, sol: [], tee: [0, 0.5], cup: [0.3, 6.4], shape: rect(-1.5, 0, 1.5, 7),
     zones: [{ surf: 'water', poly: rect(-1.5, 1.6, -0.8, 6) }, { surf: 'water', poly: rect(0.8, 1.6, 1.5, 6) }, { surf: 'fast', poly: rect(-0.8, 1.6, 0.8, 6) }],

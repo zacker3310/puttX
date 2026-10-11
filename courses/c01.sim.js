@@ -2,17 +2,17 @@
    Each hole's `sol` is printed by scripts/solve.cjs; holes-check replays it. */
 registerWorld(1, { holes: [
   /* 1: the belt. A cross conveyor shoves the ball toward a dirt pocket short of the cup */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.3, 6.6], shape: rect(-0.75, 0, 0.75, 7.4),
+  { par: 2, sol: [[8,1,0]], tee: [0, 0.5], cup: [-0.3, 6.6], shape: rect(-0.75, 0, 0.75, 7.4),
     zones: [{ push: [1.6, 0], poly: rect(-0.75, 3, 0.75, 4.2) }, { surf: 'sand', poly: rect(0.2, 4.9, 0.75, 6) }],
     bumps: [{ x: -0.45, z: 2, r: 0.4, h: 0.1 }] },
   /* 2: girder dogleg. Bank off the back girder past a dirt mound in the corner */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-3.4, 3.9], aim0: 0,
+  { par: 3, sol: [[36,0.96,0],[4,0.48,0]], tee: [0, 0.5], cup: [-3.4, 3.9], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 4.6], [-4, 4.6], [-4, 3.2], [-0.7, 3.2]],
     inner: [[[-1.9, 4.6], [-1.9, 4.05]], [[-2.7, 3.2], [-2.7, 3.7]]],
     bumps: [{ x: 0.1, z: 3.95, r: 0.45, h: 0.16 }],
     zones: [{ surf: 'sand', poly: rect(-4, 4.25, -3, 4.6) }] },
   /* 3: crane arm. Time the jib, then crest the dirt mound in front of the cup */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [0.35, 6.3], shape: rect(-1.1, 0, 1.1, 7),
+  { par: 2, sol: [[338,0.96,0]], tee: [0, 0.5], cup: [0.35, 6.3], shape: rect(-1.1, 0, 1.1, 7),
     inner: [[[0, 5.75], [0.75, 5.75]]],
     movers: [{ kind: 'spin', x: 0, z: 3.2, len: 0.8, w: 1.3, phase: 0, look: 'crane' }],
     bumps: [{ x: 0.05, z: 5.2, r: 0.45, h: 0.16 }],
@@ -24,30 +24,30 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.1, z: 5.8, r: 0.35, h: 0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.15, 7, 1, 7.4) }, { surf: 'sand', poly: rect(-1, 1.6, -0.2, 2.4) }] },
   /* 5: boom gate. A barrier slides across the gap in the girder; an against-you belt guards the cup */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.2),
+  { par: 3, sol: [[180,1,1.5]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.2),
     inner: [[[-1, 3.5], [-0.25, 3.5]], [[0.25, 3.5], [1, 3.5]]],
     movers: [{ kind: 'gate', ax: 0.5, az: 3.5, bx: 0, bz: 3.5, len: 0.26, ang: 90, period: 3.2, look: 'boom' }],
     zones: [{ push: [0, -1.2], poly: rect(-1, 4.4, 1, 5.2) }],
     bumps: [{ x: -0.4, z: 5.9, r: 0.35, h: 0.12 }] },
   /* 6: pipe run (3 parts). Scaffold deck, then a drop or the pipe, then a girder and a crane on the yard */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.6, 8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[318,0.96,0]], tee: [0, 0.5], cup: [-0.6, 8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 3.6), h: 0.4 }],
     tubes: [{ a: [0.8, 3], b: [-0.85, 5.75], dir: 90 }],
     inner: [[[-1.2, 5.2], [0.3, 5.2]]],
     movers: [{ kind: 'spin', x: 0.15, z: 7, len: 0.6, w: 1.5, phase: 1, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 8.5, 1.2, 9) }] },
   /* 7: the big dirt mound. Over the top or round the dry side, then down into the crater cup */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [0.5, 6.6], shape: rect(-1.3, 0, 1.3, 8),
+  { par: 2, sol: [[2,0.68,0]], tee: [0, 0.5], cup: [0.5, 6.6], shape: rect(-1.3, 0, 1.3, 8),
     bumps: [{ x: 0, z: 3.6, r: 0.9, h: 0.35 }, { x: 0.5, z: 6.6, r: 0.5, h: -0.06 }],
     inner: [[[0, 5.6], [0.95, 5.6]]],
     zones: [{ surf: 'sand', poly: rect(0.65, 2.8, 1.3, 4.4) }] },
   /* 8: switchback. Up the left lane, round the top, then down against the belt to the cup */
-  { par: 3, sol: [], tee: [0.8, 0.5], cup: [-0.8, 1], aim0: 0, shape: rect(-1.6, 0, 1.6, 6.4),
+  { par: 3, sol: [[352,0.92,0],[134,0.88,0]], tee: [0.8, 0.5], cup: [-0.8, 1], aim0: 0, shape: rect(-1.6, 0, 1.6, 6.4),
     inner: [[[0, 0], [0, 5]]],
     zones: [{ push: [0, 1.1], poly: rect(-1.6, 2, 0, 4) }],
     bumps: [{ x: 0, z: 5.75, r: 0.4, h: 0.14 }] },
   /* 9: twin cranes. A four-arm tower crane, then a single jib turning the other way */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.5, 7.3], shape: rect(-1.2, 0, 1.2, 8),
+  { par: 3, sol: [[170,1,0]], tee: [0, 0.5], cup: [0.5, 7.3], shape: rect(-1.2, 0, 1.2, 8),
     movers: [{ kind: 'spin', x: 0, z: 3, len: 0.7, w: 1.1, phase: 0, blades: 2, look: 'crane' },
              { kind: 'spin', x: -0.1, z: 5.5, len: 0.7, w: -1.4, phase: 0.5, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 6.6, -0.3, 8) }] },
@@ -61,21 +61,21 @@ registerWorld(1, { holes: [
     zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
     bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
   /* 11: the tilted slab. A poured slab leans to the right; read the break through the girder posts */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
+  { par: 2, sol: [[0,0.84,0]], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 7.2), h: 0.1, sx: 0.045 }],
     posts: [{ x: -0.35, z: 3.2, r: 0.09, look: 'girder' }, { x: 0.45, z: 3.6, r: 0.09, look: 'girder' }, { x: -0.9, z: 4.4, r: 0.09, look: 'girder' },
             { x: 0.05, z: 4.8, r: 0.09, look: 'girder' }],
     zones: [{ surf: 'sand', poly: rect(-1.5, 5.2, -1, 7.2) }],
     bumps: [{ x: 0.3, z: 6.1, r: 0.35, h: 0.1 }] },
   /* 12: gap jump (3 parts, open). Launch off the plank ramp over the trench, or creep round the side plank */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0, 7.2],
+  { par: 3, sol: [[8,0.8,0]], tee: [0, 0.5], cup: [0, 7.2],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 8)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 8], [0.8, 8], [0.8, 5.3]]],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.5, axis: 'z', h0: 0, h1: 0.22 }],
     zones: [{ surf: 'sand', poly: rect(-0.8, 7.6, 0.8, 8) }],
     bumps: [{ x: -0.35, z: 5.6, r: 0.35, h: 0.1 }] },
   /* 13: cement mixer (3 parts). Up the narrow ramp under the crane or the long side ramp, then into the crater */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
+  { par: 3, sol: [[336,0.92,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
     tiers: [{ poly: rect(-1.5, 5, 1.5, 8.5), h: 0.3 }],
     ramps: [{ x0: -0.3, z0: 3.8, x1: 0.3, z1: 5, axis: 'z', h0: 0, h1: 0.3 },
             { x0: -1.5, z0: 2.8, x1: -0.8, z1: 5, axis: 'z', h0: 0, h1: 0.3 }],
@@ -84,12 +84,12 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.85, z: 7.6, r: 0.5, h: -0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.45, 3.2, 1.5, 5) }, { surf: 'sand', poly: rect(-1.5, 8.1, 1.5, 8.5) }] },
   /* 14: belt yard. Three belts run alternate ways between the girders */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-1, 7.3], shape: rect(-1.8, 0, 1.8, 8),
+  { par: 3, sol: [[48.75,0.99,0]], tee: [0, 0.5], cup: [-1, 7.3], shape: rect(-1.8, 0, 1.8, 8),
     inner: [[[-1.8, 3.3], [0.4, 3.3]], [[-0.4, 5.1], [1.8, 5.1]]],
     zones: [{ push: [1.5, 0], poly: rect(-1.8, 2, 1.8, 2.8) }, { push: [-1.5, 0], poly: rect(-1.8, 3.8, 1.8, 4.6) },
             { push: [1.5, 0], poly: rect(-1.8, 5.6, 1.8, 6.4) }, { surf: 'sand', poly: rect(-0.2, 6.8, 0.6, 8) }] },
   /* 15: boom gate climb (3 parts). Ramp to the deck, beat the barrier, then the chute or the pipe to the green */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.4, 0, 1.4, 9.6),
+  { par: 3, sol: [[-1,0.94,1.5]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.4, 0, 1.4, 9.6),
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.4), h: 0.35 }],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.6, axis: 'z', h0: 0, h1: 0.35 }],
     inner: [[[-1.4, 4.6], [-0.3, 4.6]], [[0.3, 4.6], [1.4, 4.6]], [[-1.4, 6.4], [-0.45, 6.4]], [[0.35, 6.4], [1.4, 6.4]]],
@@ -104,7 +104,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
+  { par: 4, sol: [[22,0.96,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],
     walls: [[[-0.7, 4.6], [-0.7, 0], [0.7, 0], [0.7, 6], [-2, 6]], [[-0.7, 4.6], [-3.6, 4.6], [-3.6, 6]],
             [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]]],
@@ -114,7 +114,7 @@ registerWorld(1, { holes: [
     movers: [{ kind: 'spin', x: -1.6, z: 8.2, len: 0.45, w: 1.4, phase: 0, look: 'crane' }],
     bumps: [{ x: -2.2, z: 9, r: 0.45, h: -0.08 }] },
   /* 18: topping out (4 parts, open). The belt ramp, the boom gate on the deck, the chute or the pipe, the crane green */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
+  { par: 4, sol: [[202,1,0],[137,0.97,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
     floors: [rect(-1, 0, 1, 3.05), rect(-0.45, 3, 0.45, 4.45), rect(-1.2, 4.4, 3.4, 6), rect(-0.2, 5.99, 3.6, 10.2)],
     walls: [[[-0.45, 3.05], [-1, 3.05], [-1, 0], [1, 0], [1, 3.05], [0.45, 3.05]],
             [[-0.45, 4.4], [-1.2, 4.4], [-1.2, 6], [2, 6]], [[0.45, 4.4], [3.4, 4.4], [3.4, 6], [3.6, 6], [3.6, 10.2], [-0.2, 10.2], [-0.2, 6]],

@@ -46,7 +46,7 @@ registerWorld(7, { holes: [
     tiers: [{ poly: [[-0.8, 3.5], [0.8, 3.5], [0.8, 4.6], [3.8, 4.6], [3.8, 6.4], [-0.8, 6.4]], h: 0.25 }],
     movers: [C7_MILL(0, 1.9, 0.55, 1.8, 0), C7_MILL(2.2, 5.5, 0.55, -1.4, 0.5)] },
   /* 9: over the big hill, past the gargoyles, onto the bell-tower mound */
-  { par: 2, sol: [[40,0.88,0]], tee: [0, 0.5], cup: [0.2, 6.0], shape: rect(-1.3, 0, 1.3, 7.5),
+  { par: 2, sol: [[40,0.875,0]], tee: [0, 0.5], cup: [0.2, 6.0], shape: rect(-1.3, 0, 1.3, 7.5),
     bumps: [{ x: 0, z: 3.0, r: 0.75, h: 0.34 }, { x: 0.2, z: 6.0, r: 0.6, h: 0.13 }],
     zones: [C7_MOAT(rect(-1.3, 7.0, 1.3, 7.5))],
     posts: [C7_GARG(0.6, 5.2), C7_GARG(-0.35, 5.25)] },
@@ -58,17 +58,17 @@ registerWorld(7, { holes: [
     bumps: [{ x: 0.3, z: 5.5, r: 0.5, h: 0.2 }],
     movers: [C7_MILL(0.1, 6.2, 0.5, 1.5, 0)] },
   /* 11: down the dungeon and back through the portcullis, a ghost on patrol */
-  { par: 3, sol: [[332,0.94,0],[12,1,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
+  { par: 3, sol: [[332,0.9375,0],[12,1,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
     inner: [[[1.7, 3], [2.15, 3]], [[2.65, 3], [3.1, 3]]],
     bumps: [{ x: -0.1, z: 4.85, r: 0.5, h: 0.2 }],
     movers: [C7_GHOST(1.2, 4.45, 1.2, 5.15, 2.2, 0), C7_GATE(2.4, 3, 2.85, 3, 0.25, 90, 2.8, 0)] },
   /* 12: the ghost ballroom: a polished floor and two dancing ghosts */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.45, 6.9], shape: rect(-1.3, 0, 1.3, 7.6),
+  { par: 3, sol: [[12,0.81,0]], tee: [0, 0.5], cup: [0.45, 6.9], shape: rect(-1.3, 0, 1.3, 7.6),
     zones: [{ surf: 'fast', poly: rect(-1.3, 1.5, 1.3, 6.0) }],
     posts: [C7_GARG(0.3, 6.05), C7_GARG(0.85, 6.45)],
     movers: [C7_GHOST(-0.75, 3.0, 0.75, 3.0, 3.0, 0), C7_GHOST(0.75, 4.5, -0.75, 4.5, 2.4, 1.2)] },
   /* 13: windmill ramp to the rampart, down the narrow drawbridge (or jump the moat), then the tilted courtyard */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
+  { par: 4, sol: [[332,1,0],[36,0.69,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
     ramps: [{ x0: -1.2, z0: 2.6, x1: 1.2, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.55, z0: 5.4, x1: 1.05, z1: 6.5, axis: 'z', h0: 0.3, h1: 0 }],
     tiers: [{ poly: rect(-1.2, 3.6, 1.2, 5.4), h: 0.3 }, { poly: rect(-1.2, 6.5, 1.2, 9.6), h: 0.045, sx: -0.03 }],
     zones: [C7_MOAT(rect(-1.2, 5.4, 0.55, 6.5)), C7_MOAT(rect(1.05, 5.4, 1.2, 6.5))],
@@ -82,7 +82,7 @@ registerWorld(7, { holes: [
       { a: [0.6, 6.0], b: [-0.6, 7.5], dir: 0 }, { a: [-0.6, 6.0], b: [0.7, 0.45], dir: -20 }],
     movers: [C7_GATE(0, 5, -0.5, 5, 0.25, 90, 2.6, 0), C7_MILL(0.0, 8.5, 0.5, 1.6, 0)] },
   /* 15: bridge, island and bridge across the moat while ghosts patrol */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 18, shape: rect(-1.6, 0, 1.6, 9),
+  { par: 4, sol: [[164,0.5625,0],[348,0.3125,0],[280,0.5,0],[28,0.4375,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 18, shape: rect(-1.6, 0, 1.6, 9),
     zones: [C7_MOAT(rect(-1.6, 1.8, 0.6, 3.6)), C7_MOAT(rect(1.1, 1.8, 1.6, 3.6)), C7_MOAT(rect(-0.6, 4.8, 1.6, 6.6)), C7_MOAT(rect(-1.6, 4.8, -1.1, 6.6))],
     posts: [C7_GARG(0.15, 7.7), C7_GARG(1.25, 7.5)],
     movers: [C7_GHOST(-1.0, 4.2, 1.0, 4.2, 3.2, 0), C7_GHOST(-0.3, 7.2, 0.9, 7.2, 2.4, 1.5)] },

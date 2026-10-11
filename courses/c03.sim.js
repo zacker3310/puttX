@@ -44,7 +44,7 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-0.9, 2.0, -0.2, 4.2)), J3_WATER(rect(0.3, 2.0, 0.9, 4.2))],
     bumps: [{ x: 0, z: 4.6, r: 0.45, h: 0.18 }], posts: [J3_IDOL(-1.0, 4.7)] },
   /* 9: the boulder run: downhill, over the bridge, past two rolling boulders */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
+  { par: 3, sol: [[4.5,1,1]], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
     tiers: [{ poly: rect(-0.9, 0, 0.9, 9), h: 0.4, sz: -0.04 }],
     zones: [J3_WATER(rect(-0.9, 5, 0.25, 5.5)), J3_WATER(rect(0.65, 5, 0.9, 5.5)), J3_MUD(rect(-0.9, 2.4, 0.3, 2.9))],
     movers: [J3_ROCK(-0.55, 3.7, 0.55, 3.7, 2.2), J3_ROCK(0.55, 6.6, -0.55, 6.6, 3.0)], bumps: [{ x: -0.3, z: 7.6, r: 0.4, h: 0.12 }] },

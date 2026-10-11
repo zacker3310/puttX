@@ -405,14 +405,278 @@ function loadProgress() {
 }
 function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {} }
 
+/* ============ 5. RENDER ============ */
+/* World looks register into WORLD_LOOK[w]; anything a pack leaves out falls back to DEFAULT_LOOK. */
+const WORLD_LOOK = {};
+const DEFAULT_LOOK = { felt: '#74c465', wall: '#ffd66e', ground: '#c9a476', sky: ['#9fd8ef', '#fff1d6'], fog: true,
+  sand: '#d9b77a', ice: '#bfe6f5', flag: '#ef7d6d', jingle: [523, 659, 784, 1047], icon: '' };
+const lookOf = w => Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[w]);
+let renderer = null, scene, camera, sun, holeGroup = null, ballMesh, flagGroup, moverMeshes = [];
+const camNow = { pos: null, look: null };
+const play = { key: null, hole: null, round: null, ball: null, phase: 'idle', time: 0, from: null, t0: 0, drag: null, cam: { yaw: 0, dist: 3 }, fx: {} };
+
+function initRenderer() {
+  renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true, powerPreference: 'high-performance' });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(40, 1200 / 700, 0.05, 120);
+  scene.add(new THREE.HemisphereLight(0xfff4e0, 0x8a7360, 1.4));
+  sun = new THREE.DirectionalLight(0xffe2b8, 2.4);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.radius = 4;
+  sun.shadow.bias = -0.0004;
+  scene.add(sun, sun.target);
+  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.32 }));
+  ballMesh.castShadow = true;
+  scene.add(ballMesh);
+  resizeRenderer();
+}
+function resizeRenderer() {
+  if (!renderer) return;
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio * stageScale));
+  renderer.setSize(1200, 700, false);
+}
+const mat = (color, o) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.8 }, o));
+/* seeded so props and textures look the same every visit */
+function rng32(seed) { let s = seed >>> 0 || 1; return () => (s = Math.imul(s ^ (s >>> 15), 2246822519) + 0x6d2b79f5 >>> 0) / 4294967296; }
+function canvasTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'));
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function feltTexture(hex) {
+  const t = canvasTex(128, 128, x => {
+    const r = rng32(7); x.fillStyle = hex; x.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 2600; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'; x.fillRect(r() * 128, r() * 128, 1.5, 1.5); }
+  });
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
+}
+/* white toy ball with a yellow band and a red star, so the roll reads */
+function ballTexture() {
+  return canvasTex(256, 128, x => {
+    x.fillStyle = '#fffdf7'; x.fillRect(0, 0, 256, 128);
+    x.fillStyle = '#ffd66e'; x.fillRect(0, 54, 256, 20);
+    x.fillStyle = '#ef7d6d'; x.beginPath();
+    for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, r = i % 2 ? 9 : 20; x.lineTo(64 + Math.cos(a) * r, 30 + Math.sin(a) * r); }
+    x.fill();
+  });
+}
+function skyTexture(top, bottom) {
+  return canvasTex(2, 256, x => { const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, top); g.addColorStop(1, bottom); x.fillStyle = g; x.fillRect(0, 0, 2, 256); });
+}
+/* a grid over the hole's bounding box keeping cells whose centre passes `keep`; vertex heights
+   follow groundH so bumps, bowls and ramps are real geometry */
+function gridGeometry(h, keep, lift = 0, C = 0.05) {
+  const pts = h.floors.flat(), xs = pts.map(p => p[0]), zs = pts.map(p => p[1]);
+  const x0 = Math.min(...xs), z0 = Math.min(...zs);
+  const nx = Math.ceil((Math.max(...xs) - x0) / C), nz = Math.ceil((Math.max(...zs) - z0) / C);
+  const pos = [], uv = [], idx = [];
+  for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
+    const x = x0 + i * C, z = z0 + j * C;
+    pos.push(x, groundH(h, x, z) + lift, z); uv.push(x * 1.5, z * 1.5);
+  }
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    if (!keep(x0 + (i + 0.5) * C, z0 + (j + 0.5) * C)) continue;
+    const a = j * (nx + 1) + i, b = a + 1, c = a + nx + 1, d = c + 1;
+    idx.push(a, c, b, b, c, d);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+function wallGroup(h, m) {
+  const g = new THREE.Group(); g.name = 'walls';
+  for (const [ax, az, bx, bz] of h.segs) {
+    const len = Math.hypot(bx - ax, bz - az), top = WALL_TOP + Math.max(groundH(h, ax, az), groundH(h, bx, bz));
+    const w = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, top, len), m);
+    w.position.set((ax + bx) / 2, top / 2, (az + bz) / 2);
+    w.rotation.y = Math.atan2(bx - ax, bz - az);
+    w.castShadow = w.receiveShadow = true;
+    g.add(w);
+  }
+  for (const wl of h.walls) for (const [x, z] of wl) {
+    const top = WALL_TOP + groundH(h, x, z), c = new THREE.Mesh(new THREE.CylinderGeometry(WALL_HALF, WALL_HALF, top + 0.01, 16), m);
+    c.position.set(x, top / 2, z); c.castShadow = true; g.add(c);
+  }
+  return g;
+}
+function cupGroup(h, look) {
+  const g = new THREE.Group(), y = groundH(h, h.cup[0], h.cup[1]);
+  g.name = 'cup'; g.position.set(h.cup[0], y, h.cup[1]);
+  const dark = mat('#3a2c1e', { roughness: 1, side: THREE.BackSide });
+  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, 0.12, 32, 1, true), dark); liner.position.y = -0.06;
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, 32), mat('#2a1f15', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -0.12;
+  const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.004, CUP_R + 0.04, 48), mat('#ffffff', { roughness: 0.5 })); rim.rotation.x = -Math.PI / 2; rim.position.y = 0.004;
+  flagGroup = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.7, 8), mat('#fffdf7', { roughness: 0.4 })); pole.position.y = 0.35; pole.castShadow = true;
+  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(0.22, -0.07); shape.lineTo(0, -0.14);
+  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape), mat(look.flag, { side: THREE.DoubleSide, roughness: 0.7 })); flag.position.set(0.008, 0.69, 0); flag.castShadow = true;
+  flagGroup.add(pole, flag);
+  g.add(liner, bottom, rim, flagGroup);
+  return g;
+}
+function defaultPost(p, look) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(p.r, p.r * 1.08, 0.22, 24), mat(look.wall, { roughness: 0.5 }));
+  m.position.y = 0.11; m.castShadow = true;
+  const g = new THREE.Group(); g.add(m); return g;
+}
+function defaultMover(m, look) {
+  const g = new THREE.Group();
+  if (m.kind === 'spin') {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, 0.1, m.len * 2), mat(look.wall, { roughness: 0.5 })); arm.position.y = 0.09;
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.24, 20), mat('#ef7d6d', { roughness: 0.5 })); hub.position.y = 0.12;
+    arm.castShadow = hub.castShadow = true; g.add(arm, hub);
+  } else {
+    const s = new THREE.Mesh(new THREE.SphereGeometry(m.r, 24, 16), mat('#fffdf7', { roughness: 0.6 })); s.castShadow = true; g.add(s);
+  }
+  return g;
+}
+function scatterProps(group, h, look) {
+  const pts = h.floors.flat(), xs = pts.map(p => p[0]), zs = pts.map(p => p[1]);
+  const x0 = Math.min(...xs) - 3, x1 = Math.max(...xs) + 3, z0 = Math.min(...zs) - 3, z1 = Math.max(...zs) + 3;
+  const r = rng32([...h.key].reduce((a, c) => a * 31 + c.charCodeAt(0), 7));
+  for (let n = 0, tries = 0; n < 26 && tries < 400; tries++) {
+    const x = x0 + r() * (x1 - x0), z = z0 + r() * (z1 - z0);
+    if (h.floors.some(f => inPoly(f, x, z)) || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < 0.5; })) continue;
+    const o = look.prop(r); o.position.set(x, 0, z); o.rotation.y = r() * Math.PI * 2; group.add(o); n++;
+  }
+}
+function disposeGroup(g) {
+  g.traverse(o => {
+    if (o.geometry) o.geometry.dispose();
+    const ms = o.material ? [].concat(o.material) : [];
+    for (const m of ms) { if (m.map) m.map.dispose(); m.dispose(); }
+  });
+}
+const holeWorld = h => Number(h.key.split('-')[0]);
+function buildHoleScene(h) {
+  if (holeGroup) { scene.remove(holeGroup); disposeGroup(holeGroup); }
+  if (scene.background && scene.background.dispose) scene.background.dispose();
+  const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= CUP_R;
+  holeGroup = new THREE.Group(); moverMeshes = [];
+  const floor = new THREE.Mesh(gridGeometry(h, (x, z) => onFloor(h, x, z) && off(x, z)), mat('#ffffff', { map: feltTexture(look.felt), roughness: 0.95 }));
+  floor.name = 'floor'; floor.receiveShadow = true; holeGroup.add(floor);
+  for (const zn of h.zones) {
+    const m = zn.surf === 'ice' ? mat(look.ice, { roughness: 0.1, metalness: 0.05, transparent: true, opacity: 0.88 }) : mat(look.sand, { roughness: 1 });
+    const z = new THREE.Mesh(gridGeometry(h, (x, zz) => inPoly(zn.poly, x, zz) && onFloor(h, x, zz) && off(x, zz), 0.004), m);
+    z.receiveShadow = true; holeGroup.add(z);
+  }
+  holeGroup.add(wallGroup(h, mat(look.wall, { roughness: 0.55 })), cupGroup(h, look));
+  for (const p of h.posts) { const o = (look.post || defaultPost)(p, look); o.position.set(p.x, groundH(h, p.x, p.z), p.z); holeGroup.add(o); }
+  for (const mv of h.movers) { const o = (look.mover || defaultMover)(mv, look); o.userData.mover = mv; moverMeshes.push(o); holeGroup.add(o); }
+  if (look.ground) {
+    const gr = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), mat(look.ground, { roughness: 1 }));
+    gr.rotation.x = -Math.PI / 2; gr.position.y = -0.03; gr.receiveShadow = true; holeGroup.add(gr);
+  }
+  if (look.prop) scatterProps(holeGroup, h, look);
+  if (look.decor) look.decor(holeGroup, h);
+  scene.background = skyTexture(look.sky[0], look.sky[1]);
+  scene.fog = look.fog ? new THREE.Fog(look.sky[1], 14, 45) : null;
+  const pts = h.floors.flat(), xs = pts.map(p => p[0]), zs = pts.map(p => p[1]);
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cz = (Math.min(...zs) + Math.max(...zs)) / 2;
+  const ext = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...zs) - Math.min(...zs)) / 2 + 1.5;
+  sun.position.set(cx + 3, 7, cz - 2.5); sun.target.position.set(cx, 0, cz);
+  Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 0.5, far: 20 });
+  sun.shadow.camera.updateProjectionMatrix();
+  scene.add(holeGroup);
+  updateMovers(play.time);
+}
+function updateMovers(t) {
+  for (const o of moverMeshes) {
+    const m = o.userData.mover, s = moverState(m, t);
+    if (m.kind === 'spin') { o.position.set(m.x, groundH(play.hole, m.x, m.z), m.z); o.rotation.y = s.th; }
+    else { o.position.set(s.x, groundH(play.hole, s.x, s.z) + m.r, s.z); o.rotation.y = t * 0.8; }
+  }
+}
+const _axis = new THREE.Vector3(), _q = new THREE.Quaternion();
+function syncBall(dt) {
+  const b = play.ball, p = ballMesh.position, dx = b.x - p.x, dz = b.z - p.z, d = Math.hypot(dx, dz);
+  if (d > 1e-6 && d < 0.5) { _axis.set(dz / d, 0, -dx / d); _q.setFromAxisAngle(_axis, d / BALL_R); ballMesh.quaternion.premultiply(_q); }
+  p.set(b.x, b.y + BALL_R, b.z);
+}
+/* aiming: a 3/4 view from behind the ball toward the cup, framing both. Rolling: follow the ball. */
+function cameraGoal() {
+  const h = play.hole, b = play.ball;
+  let look;
+  if (play.phase === 'aim' || play.phase === 'idle') {
+    const dx = h.cup[0] - b.x, dz = h.cup[1] - b.z, d = Math.hypot(dx, dz);
+    if (d > 0.05) play.cam.yaw = Math.atan2(dx, dz);
+    play.cam.dist = Math.min(4.2, Math.max(1.6, 1.3 + d * 0.55));
+    look = new THREE.Vector3(b.x + dx * 0.35, b.y, b.z + dz * 0.35);
+  } else look = new THREE.Vector3(b.x, b.y, b.z);
+  const { yaw, dist } = play.cam;
+  return { pos: new THREE.Vector3(look.x - Math.sin(yaw) * dist, look.y + dist * 0.8, look.z - Math.cos(yaw) * dist), look };
+}
+function applyCamera() { camera.position.copy(camNow.pos); camera.lookAt(camNow.look); }
+function snapCamera() { const g = cameraGoal(); camNow.pos = g.pos; camNow.look = g.look; applyCamera(); }
+function updateCamera(dt) {
+  const g = cameraGoal(), k = 1 - Math.exp(-4 * dt);
+  camNow.pos.lerp(g.pos, k); camNow.look.lerp(g.look, k); applyCamera();
+}
+function renderFrame(dt) {
+  if (!play.hole || currentScene === 'map') return;
+  updateMovers(play.time);
+  syncBall(dt);
+  updateCamera(dt);
+  renderer.render(scene, camera);
+}
+
+/* ---- 5b. world looks ---- */
+const CONE_SVG = '<svg viewBox="0 0 64 64"><path d="M32 6 L48 54 H16 Z" fill="#ef7d6d"/><path d="M26 24 H38 L41 33 H23 Z M21 40 H43 L45 46 H19 Z" fill="#fff8ec"/><rect x="10" y="52" width="44" height="7" rx="3" fill="#c95a4c"/></svg>';
+function trafficCone() {
+  const g = new THREE.Group();
+  const c = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.26, 20), mat('#ef7d6d', { roughness: 0.5 })); c.position.y = 0.15;
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.062, 0.04, 20), mat('#fff8ec', { roughness: 0.5 })); band.position.y = 0.15;
+  const base = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.025, 0.2), mat('#c95a4c')); base.position.y = 0.012;
+  c.castShadow = base.castShadow = true; g.add(c, band, base); return g;
+}
+function girderStack(r) {
+  const g = new THREE.Group(), n = 1 + Math.floor(r() * 3);
+  for (let i = 0; i < n; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.08, 0.12), mat('#ef7d6d', { roughness: 0.6 })); b.position.set(0, 0.04 + i * 0.08, (i % 2) * 0.05); b.castShadow = true; g.add(b); }
+  return g;
+}
+WORLD_LOOK[1] = {
+  felt: '#74c465', wall: '#ffd66e', ground: '#c9a476', sky: ['#9fd8ef', '#fff1d6'], flag: '#ef7d6d', icon: CONE_SVG,
+  jingle: [523, 659, 784, 659, 1047],
+  prop: r => r() < 0.6 ? trafficCone() : girderStack(r),
+};
+
+/* ============ 6. PLAY ============ */
+let loopPaused = false, lastNow = 0;
+function startHole(key) {
+  const h = holeAt(key);
+  if (!h) return false;
+  Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, drag: null, fx: {} });
+  buildHoleScene(h);
+  syncBall(0);
+  showScene('hole');
+  snapCamera();
+  return true;
+}
+/* one animation frame: dt is clamped so a backgrounded tab never jumps */
+function stepFrame(now) {
+  const dt = lastNow ? Math.min(0.1, Math.max(0, (now - lastNow) / 1000)) : 0;
+  lastNow = now;
+  renderFrame(dt);
+  return dt;
+}
+function frame(now) { stepFrame(now); requestAnimationFrame(frame); }
+
 /* ============ 9. BOOT ============ */
 function boot() {
   progress = loadProgress();
   fit();
-  addEventListener('resize', fit);
+  initRenderer();
+  addEventListener('resize', () => { fit(); resizeRenderer(); });
   addEventListener('orientationchange', () => { fit(); setTimeout(fit, 350); });
   if (window.visualViewport) visualViewport.addEventListener('resize', fit);
   showScene('title');
+  requestAnimationFrame(frame);
   window.booted = true;
 }
 addEventListener('DOMContentLoaded', boot);

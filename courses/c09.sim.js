@@ -79,9 +79,10 @@ registerWorld(9, { holes: [
     zones: [{ surf: 'mud', poly: rect(0.35, 7.3, 1.2, 7.5) }, { surf: 'mud', poly: rect(0.15, 7.3, 0.35, 8.6) }],
     movers: [C9_POP(0, 4, 0.5, 1.5, 0, 2)] },
   /* 15: lollipop, press, taffy: the packing line */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.4, 8.3], shape: rect(-1, 0, 1, 9),
+  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 8.3], shape: rect(-1, 0, 1, 9),
     movers: [C9_POP(0, 2.8, 0.55, -1.7, 0.4, 2), C9_PRESS(-0.55, 5.4, 0.55, 5.4, 0.55, 90, 2.6)],
-    zones: [{ surf: 'mud', poly: rect(-1, 4.0, -0.1, 4.4) }, { surf: 'mud', poly: rect(0.1, 6.6, 1, 7.0) }],
+    zones: [{ surf: 'mud', poly: rect(-1, 4.0, -0.1, 4.4) }, { surf: 'mud', poly: rect(0.05, 7.6, 0.75, 7.8) }, { surf: 'mud', poly: rect(-0.15, 7.6, 0.05, 9) },
+      { surf: 'mud', poly: rect(0.75, 7.6, 1, 9) }],
     bumps: [{ x: -0.3, z: 7.6, r: 0.4, h: 0.15 }] },
   /* 16: a tilted hard-candy slab with gumdrops */
   { par: 3, sol: [[6, 0.85, 0]], tee: [0, 0.5], cup: [-0.8, 6.2], shape: rect(-1.5, 0, 1.5, 7),

@@ -97,11 +97,12 @@ registerWorld(1, { holes: [
     tubes: [{ a: [1, 5.6], b: [1, 7.4], dir: 0 }],
     bumps: [{ x: -0.2, z: 7.8, r: 0.45, h: 0.18 }],
     zones: [{ surf: 'sand', poly: rect(-1.4, 8.9, -0.3, 9.6) }] },
-  /* 16: dirt mounds. Thread four mounds on a slab that climbs toward the cup */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.9, 7.2], shape: rect(-1.6, 0, 1.6, 8),
-    tiers: [{ poly: rect(-1.6, 0, 1.6, 8), h: 0, sz: 0.02 }],
-    bumps: [{ x: 0.6, z: 2.6, r: 0.5, h: 0.25 }, { x: -0.7, z: 3.8, r: 0.55, h: 0.3 }, { x: 0.5, z: 5.2, r: 0.5, h: 0.28 }, { x: -0.5, z: 6.5, r: 0.4, h: 0.2 }],
-    zones: [{ surf: 'sand', poly: rect(-1.6, 4.6, -0.6, 5.6) }, { surf: 'sand', poly: rect(1.1, 3.6, 1.6, 4.6) }] },
+  /* 16: dirt mounds. Thread big mounds on a leaning slab, past the dirt, into the girder pocket */
+  { par: 3, sol: [], tee: [0, 0.5], cup: [1, 7.3], shape: rect(-1.6, 0, 1.6, 8),
+    tiers: [{ poly: rect(-1.6, 0, 1.6, 8), h: 0.08, sx: -0.035 }],
+    inner: [[[1.6, 6.5], [0.45, 6.5]]],
+    bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
+    zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
   { par: 4, sol: [], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],

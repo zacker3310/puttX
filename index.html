@@ -319,10 +319,76 @@ function simulatePutt(h, from, angleDeg, power, t0 = 0) {
   }
   return { end, x: b.x, z: b.z, t, steps: n, hits: b.hits };
 }
+/* ---- 2e. rounds and scoring ---- */
+const capOf = h => h.par + 3;
+const starsFor = (score, par) => score < par ? 3 : score === par ? 2 : 1;
+function newRound(h) { return { hole: h, strokes: 0, at: h.tee.slice(), done: false, score: null, auto: false }; }
+/* a putt finished: count it, move the ball, and finish the hole at the cup or the cap */
+function resolvePutt(round, result, from) {
+  round.strokes++;
+  if (result.end === 'sunk') { round.done = true; round.score = round.strokes; round.at = round.hole.cup.slice(); return 'sunk'; }
+  if (result.end === 'oob') { round.strokes++; round.at = from.slice(); } else round.at = [result.x, result.z];
+  if (round.strokes >= capOf(round.hole)) { round.done = true; round.auto = true; round.score = capOf(round.hole); return 'auto'; }
+  return result.end === 'oob' ? 'oob' : 'stop';
+}
+/* a mover pushed a resting ball: never the kid's fault, so no stroke and no penalty */
+function resolveDrift(round, result, from) {
+  if (result.end === 'sunk') { round.done = true; round.score = Math.max(1, round.strokes); round.at = round.hole.cup.slice(); return 'sunk'; }
+  round.at = result.end === 'oob' ? from.slice() : [result.x, result.z];
+  return result.end === 'oob' ? 'oob' : 'stop';
+}
+
+/* ---- 2f. worlds ---- */
+const WORLD_ORDER = [1, 5, 8];     /* vroom's construction day, snow, space */
+const WORLDS = {};
+function registerWorld(w, def) {
+  const g = def.g || 1, feltMu = def.feltMu || SURF.felt.mu;
+  WORLDS[w] = { g, holes: def.holes.map((d, i) => Object.assign(makeHole(Object.assign({ g, feltMu }, d)), { key: w + '-' + (i + 1) })) };
+}
+function holeAt(key) {
+  const [w, n] = String(key).split('-').map(Number);
+  return WORLDS[w] ? WORLDS[w].holes[n - 1] : undefined;
+}
+function nextKey(key) { const [w, n] = key.split('-').map(Number); return n < 9 ? w + '-' + (n + 1) : null; }
+
+/* ---- 2g. progress (pure; section 3 stores it) ---- */
+function freshProgress() { return { v: 1, holes: {}, worlds: [WORLD_ORDER[0]], sound: true }; }
+function recordHole(p, key, score, par) {
+  const prev = p.holes[key];
+  const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, starsFor(score, par)) };
+  p.holes[key] = rec;
+  const [w, n] = key.split('-').map(Number), i = WORLD_ORDER.indexOf(w);
+  if (n === 9 && i >= 0 && i + 1 < WORLD_ORDER.length && !p.worlds.includes(WORLD_ORDER[i + 1])) p.worlds.push(WORLD_ORDER[i + 1]);
+  return rec;
+}
+function holeUnlocked(p, key) {
+  const [w, n] = key.split('-').map(Number);
+  return p.worlds.includes(w) && (n === 1 || !!p.holes[w + '-' + (n - 1)]);
+}
 // #endregion sim
+
+/* ============ 3. SAVE ============ */
+const SAVE_KEY = 'puttx.v1';
+let progress = freshProgress();
+function loadProgress() {
+  try {
+    const p = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (!p || p.v !== 1 || typeof p.holes !== 'object' || !Array.isArray(p.worlds)) return freshProgress();
+    const worlds = p.worlds.filter(w => WORLD_ORDER.includes(w));
+    if (!worlds.includes(WORLD_ORDER[0])) return freshProgress();
+    const holes = {};
+    for (const [k, r] of Object.entries(p.holes)) {
+      if (/^\d+-[1-9]$/.test(k) && r && Number.isInteger(r.best) && r.best >= 1 && [1, 2, 3].includes(r.stars)) holes[k] = { best: r.best, stars: r.stars };
+    }
+    if (Object.keys(holes).length !== Object.keys(p.holes).length) return freshProgress();
+    return { v: 1, holes, worlds, sound: p.sound !== false };
+  } catch (e) { return freshProgress(); }
+}
+function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {} }
 
 /* ============ 9. BOOT ============ */
 function boot() {
+  progress = loadProgress();
   fit();
   addEventListener('resize', fit);
   addEventListener('orientationchange', () => { fit(); setTimeout(fit, 350); });

@@ -116,6 +116,168 @@ function showScene(id) {
 
 /* ============ 2. SIM ============ */
 // #region sim
+/* Everything between these markers is deterministic and touches neither the page nor the
+   renderer: tests/sim.cjs runs it in Node. Units are metres and seconds; y is up; a hole lies in the x-z plane. */
+
+/* ---- 2a. constants ---- */
+const SIM_DT = 1 / 240;          /* fixed physics step */
+const BALL_R = 0.06;             /* toy-sized ball: bigger than real (0.021) so a kid can see it */
+const CUP_R = 0.11;
+const CAPTURE_V = 1.6;           /* slower than this over the cup drops in; faster lips out */
+const MIN_V = 0.5, MAX_V = 5.5;  /* putt speed at power 0 and power 1 */
+const V_CAP = 6;                 /* bumpers never push a ball past this: 0.025 m per step < BALL_R */
+const STOP_V = 0.04;
+const STATIC_MU = 0.1;           /* a stopped ball stays put on slopes gentler than this */
+const MAX_SIM_T = 20;
+const G = 9.8;
+const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slope */
+const SURF = { felt: { mu: 0.08 }, ice: { mu: 0.025 }, sand: { mu: 0.35 } };
+const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.75;
+const DROP = 0.03;               /* ground falling away faster than this per step = airborne */
+const OOB_Y = -1;
+const LAND_KEEP = 0.85;
+const LIP_TURN = 0.5, LIP_KEEP = 0.6, LIP_PULL = 1.5, LIP_PULL_R = 0.1;
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+/* ---- 2b. hole geometry ---- */
+const rect = (x0, z0, x1, z1) => [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
+const ring = pts => pts.concat([pts[0]]);
+/* A walled hole passes `shape` (one floor, closed outline wall). An open hole (space gaps)
+   passes `floors` and `walls` itself. `inner` adds wall polylines (girders, dividers). */
+function makeHole(def) {
+  const h = Object.assign({ par: 2, g: 1, feltMu: SURF.felt.mu, bumps: [], ramps: [], zones: [], posts: [], movers: [], inner: [] }, def);
+  h.open = !def.shape;
+  if (!h.floors) h.floors = [h.shape];
+  if (!h.walls) h.walls = [ring(h.shape)];
+  h.walls = h.walls.concat(h.inner);
+  h.segs = [];
+  for (const w of h.walls) for (let i = 0; i + 1 < w.length; i++) h.segs.push([w[i][0], w[i][1], w[i + 1][0], w[i + 1][1]]);
+  return h;
+}
+function inPoly(poly, x, z) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], zi = poly[i][1], xj = poly[j][0], zj = poly[j][1];
+    if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) inside = !inside;
+  }
+  return inside;
+}
+const onFloor = (h, x, z) => h.floors.some(p => inPoly(p, x, z));
+function surfMu(h, x, z) {
+  for (const zn of h.zones) if (inPoly(zn.poly, x, z)) return SURF[zn.surf].mu;
+  return h.feltMu;
+}
+/* height: gaussian bumps (h > 0 hills, h < 0 bowls) plus ramps rising 0 -> h along +axis */
+function groundH(h, x, z) {
+  let y = 0;
+  for (const b of h.bumps) { const dx = x - b.x, dz = z - b.z; y += b.h * Math.exp(-(dx * dx + dz * dz) / (b.r * b.r)); }
+  for (const r of h.ramps) if (x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1)
+    y += r.h * (r.axis === 'x' ? (x - r.x0) / (r.x1 - r.x0) : (z - r.z0) / (r.z1 - r.z0));
+  return y;
+}
+function groundGrad(h, x, z) {
+  let gx = 0, gz = 0;
+  for (const b of h.bumps) {
+    const dx = x - b.x, dz = z - b.z, k = -2 * b.h * Math.exp(-(dx * dx + dz * dz) / (b.r * b.r)) / (b.r * b.r);
+    gx += k * dx; gz += k * dz;
+  }
+  for (const r of h.ramps) if (x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1) {
+    if (r.axis === 'x') gx += r.h / (r.x1 - r.x0); else gz += r.h / (r.z1 - r.z0);
+  }
+  return [gx, gz];
+}
+
+/* ---- 2c. collisions ---- */
+function closestOnSeg(ax, az, bx, bz, x, z) {
+  const ex = bx - ax, ez = bz - az, L2 = ex * ex + ez * ez;
+  const t = L2 ? clamp(((x - ax) * ex + (z - az) * ez) / L2, 0, 1) : 0;
+  return [ax + ex * t, az + ez * t];
+}
+/* reflect off a surface with normal n moving at (svx, svz); returns the impact speed */
+function bounce(b, nx, nz, e, svx, svz) {
+  const rvx = b.vx - svx, rvz = b.vz - svz, vn = rvx * nx + rvz * nz;
+  if (vn >= 0) return 0;
+  const tx = rvx - vn * nx, tz = rvz - vn * nz;
+  b.vx = svx + tx * 0.97 - e * vn * nx;
+  b.vz = svz + tz * 0.97 - e * vn * nz;
+  const s = Math.hypot(b.vx, b.vz);
+  if (s > V_CAP) { b.vx *= V_CAP / s; b.vz *= V_CAP / s; }
+  return -vn;
+}
+function hitSeg(b, ax, az, bx, bz, e, svx = 0, svz = 0) {
+  const [px, pz] = closestOnSeg(ax, az, bx, bz, b.x, b.z), R = BALL_R + WALL_HALF;
+  let nx = b.x - px, nz = b.z - pz;
+  const d = Math.hypot(nx, nz);
+  if (d >= R || d < 1e-9) return 0;
+  nx /= d; nz /= d;
+  b.x = px + nx * R; b.z = pz + nz * R;
+  return bounce(b, nx, nz, e, svx, svz);
+}
+function collideAll(h, b, t) {
+  for (const s of h.segs) { const v = hitSeg(b, s[0], s[1], s[2], s[3], WALL_E); if (v) b.hits.push(['wall', v]); }
+}
+
+/* ---- 2d. the ball ---- */
+function newBall(h, x, z) { return { x, z, y: groundH(h, x, z), vx: 0, vz: 0, vy: 0, air: false, inCup: false, hits: [] }; }
+function puttVelocity(angleDeg, power) {
+  const a = angleDeg * Math.PI / 180, v = MIN_V + (MAX_V - MIN_V) * clamp(power, 0, 1);
+  return [Math.sin(a) * v, Math.cos(a) * v];
+}
+function launch(b, angleDeg, power) { const v = puttVelocity(angleDeg, power); b.vx = v[0]; b.vz = v[1]; return b; }
+
+/* one fixed step at hole time t. Returns null while the putt is live, else how it ended. */
+function stepBall(h, b, t) {
+  const dt = SIM_DT, g = G * h.g;
+  if (b.air) {
+    b.vy -= g * dt;
+    b.x += b.vx * dt; b.z += b.vz * dt; b.y += b.vy * dt;
+    if (b.y < WALL_TOP) collideAll(h, b, t);
+    if (onFloor(h, b.x, b.z)) {
+      const gh = groundH(h, b.x, b.z);
+      if (b.y <= gh) { b.y = gh; b.vy = 0; b.air = false; b.vx *= LAND_KEEP; b.vz *= LAND_KEEP; b.hits.push(['land', 1]); }
+    } else if (b.y < OOB_Y) return 'oob';
+    return null;
+  }
+  const grad = groundGrad(h, b.x, b.z), sax = -ROLL * g * grad[0], saz = -ROLL * g * grad[1];
+  let vx = b.vx + sax * dt, vz = b.vz + saz * dt;
+  const mu = surfMu(h, b.x, b.z), s0 = Math.hypot(vx, vz), s1 = Math.max(0, s0 - mu * g * dt);
+  if (s0 > 0) { vx *= s1 / s0; vz *= s1 / s0; }
+  b.vx = vx; b.vz = vz;
+  b.x += vx * dt; b.z += vz * dt;
+  collideAll(h, b, t);
+  if (!onFloor(h, b.x, b.z)) { b.air = true; return null; }
+  const gh = groundH(h, b.x, b.z);
+  if (gh < b.y - DROP) { b.air = true; return null; }
+  b.vy = (gh - b.y) / dt; b.y = gh;
+
+  const s = Math.hypot(b.vx, b.vz), dx = b.x - h.cup[0], dz = b.z - h.cup[1], dc = Math.hypot(dx, dz);
+  if (dc < CUP_R) {
+    if (s < CAPTURE_V) return 'sunk';
+    if (!b.inCup) {
+      const a = (b.vx * dz - b.vz * dx) > 0 ? LIP_TURN : -LIP_TURN, c = Math.cos(a), sn = Math.sin(a);
+      const nvx = (b.vx * c - b.vz * sn) * LIP_KEEP, nvz = (b.vx * sn + b.vz * c) * LIP_KEEP;
+      b.vx = nvx; b.vz = nvz; b.hits.push(['lip', s]);
+    }
+    b.inCup = true;
+  } else {
+    b.inCup = false;
+    if (dc < CUP_R + LIP_PULL_R && s < CAPTURE_V) { b.vx -= LIP_PULL * dt * dx / dc; b.vz -= LIP_PULL * dt * dz / dc; }
+  }
+  /* stopped when slow and the slope cannot beat whichever holds harder: static grip or rolling friction */
+  if (s < STOP_V && Math.hypot(sax, saz) < Math.max(STATIC_MU, mu) * g) { b.vx = 0; b.vz = 0; return 'stop'; }
+  return null;
+}
+function simulatePutt(h, from, angleDeg, power, t0 = 0) {
+  const b = launch(newBall(h, from[0], from[1]), angleDeg, power);
+  let t = t0, n = 0, end = null;
+  while (!end) {
+    end = stepBall(h, b, t);
+    t += SIM_DT;
+    if (!end && ++n * SIM_DT > MAX_SIM_T) end = 'timeout';
+  }
+  return { end, x: b.x, z: b.z, t, steps: n, hits: b.hits };
+}
 // #endregion sim
 
 /* ============ 9. BOOT ============ */

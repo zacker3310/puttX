@@ -8,7 +8,7 @@
   "repository": { "type": "git", "url": "git+https://github.com/zacker3310/puttX.git" },
   "engines": { "node": ">=20" },
   "scripts": {
-    "test": "node tests/run-all.cjs",
+    "test": "PUTTX_ALL_WORLDS=1 node tests/run-all.cjs",
     "lint": "node tests/lint.cjs",
     "serve": "python3 -m http.server 4173",
     "vendor": "node scripts/vendor-three.cjs",

@@ -30,15 +30,19 @@ const { check, done, open } = require('./lib.cjs');
   const b = await page.evaluate(() => ({ m: ballMesh.position.toArray(), x: play.ball.x, y: play.ball.y + BALL_R, z: play.ball.z }));
   check('ball mesh sits on the physics ball', Math.abs(b.m[0] - b.x) < 1e-6 && Math.abs(b.m[1] - b.y) < 1e-6 && Math.abs(b.m[2] - b.z) < 1e-6, JSON.stringify(b));
 
-  for (const key of ['1-1', '1-9']) {
-    const f = await page.evaluate(k => {
-      startHole(k); snapCamera(); camera.updateMatrixWorld();
-      const p = v => v.project(camera), h = play.hole;
-      const ball = p(new THREE.Vector3(h.tee[0], groundH(h, ...h.tee), h.tee[1])), cup = p(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup), h.cup[1]));
-      return [ball.x, ball.y, cup.x, cup.y].map(v => +v.toFixed(2));
-    }, key);
-    check(`aim camera frames ball and cup on ${key}`, f.every(v => Math.abs(v) < 0.95), JSON.stringify(f));
-  }
+  /* every hole, from the tee: the aim camera keeps the ball and the cup on screen */
+  const framing = await page.evaluate(() => {
+    const bad = [];
+    for (const w of WORLD_ORDER) for (const h of (WORLDS[w] ? WORLDS[w].holes : [])) {
+      startHole(h.key); snapCamera(); camera.updateMatrixWorld();
+      const p = v => v.project(camera);
+      const ball = p(new THREE.Vector3(h.tee[0], groundH(h, ...h.tee) + BALL_R, h.tee[1])), cup = p(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup), h.cup[1]));
+      const f = [ball.x, ball.y, cup.x, cup.y].map(v => +v.toFixed(2));
+      if (!f.every(v => Math.abs(v) < 0.9)) bad.push(h.key + ' ' + f.join());
+    }
+    return bad;
+  });
+  check('aim camera frames ball and cup from every tee', framing.length === 0, framing.join(' | '));
 
   const rot = await page.evaluate(() => { startHole('1-8'); updateMovers(0); const a = moverMeshes[0].rotation.y; updateMovers(1); return [a, moverMeshes[0].rotation.y]; });
   check('crane arm turns with hole time', Math.abs(rot[0] - rot[1]) > 0.5, JSON.stringify(rot));
@@ -78,6 +82,9 @@ const { check, done, open } = require('./lib.cjs');
     return { shown, hidden };
   });
   check('a bowl below ground level still shows its felt', bowl.shown.join() === bowl.hidden.join(), JSON.stringify(bowl));
+
+  const space = await page.evaluate(() => { const ok = startHole('8-2'); renderFrame(0.016); return { ok, g: play.hole.g, open: play.hole.open, stars: !!holeGroup.userData.stars, fog: scene.fog }; });
+  check('space builds open, low gravity, starfield, no fog', space.ok && space.g === 0.427 && space.open && space.stars && space.fog === null, JSON.stringify(space));
 
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();

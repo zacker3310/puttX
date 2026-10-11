@@ -362,8 +362,8 @@ function showScene(id) {
 const SIM_DT = 1 / 240;          /* fixed physics step */
 const BALL_R = 0.051;            /* toy-sized ball, about 2.4x a real one (0.021) like the whole course */
 const CUP_R = 0.11, CUP_DEPTH = 0.12;
-const CAP_V0 = 1.45;             /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
-const CAP_CREEP = 0.22;          /* anything this slow with its centre over the hole drops, whatever the line */
+const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
+const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
 const MIN_V = 0.35, MAX_V = 5;   /* putt speed at power 0 and power 1: full power rolls about 14.5 m of felt */
 const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step < BALL_R */
 const STOP_V = 0.03;
@@ -382,7 +382,8 @@ const STEP_MAX = 0.03;           /* ground rising more than this under the ball'
 const CLIFF_E = 0.45;
 const BOUNCE_VY = 1.1, BOUNCE_E = 0.35;  /* a landing faster than BOUNCE_VY hops back up */
 const OOB_Y = -1;
-const LIP_TURN = 0.55, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 1.2, LIP_PULL_R = 0.08;
+/* the cup sits in a slight funnel: inside LIP_PULL_R of the rim a slow ball is drawn in, harder the closer it gets */
+const LIP_TURN = 0.5, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 2.6, LIP_PULL_R = 0.25;
 const TUBE_R = 0.12, TUBE_T = 0.45;   /* a tube mouth swallows a rolling ball whose centre comes this close; transit time */
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -652,7 +653,7 @@ function stepBall(h, b, t) {
   const s = Math.hypot(b.vx, b.vz), dx = b.x - h.cup[0], dz = b.z - h.cup[1], dc = Math.hypot(dx, dz);
   if (dc < CUP_R) {
     /* how far the ball's line passes from the cup centre sets the chord it crosses, and so the capture speed */
-    const off = s > 1e-6 ? Math.abs(b.vx * dz - b.vz * dx) / s : 0, chord = Math.sqrt(Math.max(0, 1 - (off / CUP_R) ** 2));
+    const off = s > 1e-6 ? Math.abs(b.vx * dz - b.vz * dx) / s : 0, chord = Math.max(0, 1 - (off / CUP_R) ** 2) ** 0.25;   /* gentle: an edge ball still gets a fair chance */
     /* one capture decision per pass over the hole: a ball that hopped or lipped stays out unless it is crawling */
     if (s < CAP_CREEP || (!b.inCup && s < CAP_V0 * chord)) return 'sunk';
     if (!b.inCup) {
@@ -666,7 +667,7 @@ function stepBall(h, b, t) {
     b.inCup = true;
   } else {
     b.inCup = false;
-    if (dc < CUP_R + LIP_PULL_R && s < CAP_V0 * 0.6) { b.vx -= LIP_PULL * dt * dx / dc; b.vz -= LIP_PULL * dt * dz / dc; }
+    if (dc < CUP_R + LIP_PULL_R && s < CAP_V0 * 0.75) { const k = LIP_PULL * (1 - (dc - CUP_R) / LIP_PULL_R) * dt / dc; b.vx -= k * dx; b.vz -= k * dz; }
   }
   /* stopped when slow and the slope cannot beat whichever holds harder: static grip or rolling friction */
   const pushA = zn && zn.push ? Math.hypot(zn.push[0], zn.push[1]) : 0;
@@ -801,7 +802,7 @@ registerWorld(1, { holes: [
     zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
     bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
   /* 11: the tilted slab. A poured slab leans to the right; read the break through the girder posts */
-  { par: 2, sol: [[0,0.84,0]], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
+  { par: 2, sol: [[0,0.88,0]], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 7.2), h: 0.1, sx: 0.045 }],
     posts: [{ x: -0.35, z: 3.2, r: 0.09, look: 'girder' }, { x: 0.45, z: 3.6, r: 0.09, look: 'girder' }, { x: -0.9, z: 4.4, r: 0.09, look: 'girder' },
             { x: 0.05, z: 4.8, r: 0.09, look: 'girder' }],
@@ -1041,7 +1042,7 @@ registerWorld(3, { holes: [
     zones: [J3_MUD(rect(-0.3, 2.4, 1.1, 3.1)), J3_MUD(rect(-1.1, 4.0, 0.2, 4.6))],
     posts: [J3_IDOL(-0.5, 3.3), J3_IDOL(0.6, 4.4), J3_IDOL(0.1, 5.2)], bumps: [{ x: -0.6, z: 5.6, r: 0.5, h: 0.14 }] },
   /* 5: the boulder rolls across the far bank of the river */
-  { par: 3, sol: [[0,0.84,0]], tee: [0, 0.5], cup: [0.3, 5.9], shape: rect(-1, 0, 1, 6.6),
+  { par: 3, sol: [[0,0.88,0]], tee: [0, 0.5], cup: [0.3, 5.9], shape: rect(-1, 0, 1, 6.6),
     zones: [J3_WATER(rect(-1, 2.6, -0.22, 3.5)), J3_WATER(rect(0.22, 2.6, 1, 3.5))],
     movers: [J3_ROCK(-0.6, 4.4, 0.6, 4.4, 2.6)], bumps: [{ x: -0.5, z: 1.6, r: 0.5, h: 0.12 }] },
   /* 6: the waterfall. Jump the plunge pool off the upper deck, or take the side tunnel down */
@@ -1767,7 +1768,7 @@ registerWorld(9, { holes: [
     zones: [C9_BELT(rect(-0.7, 2.4, 2.1, 4.2), 1.4, 0)],
     posts: [C9_GUM(1.4, 6.4), C9_GUM(0.8, 5.9)] },
   /* 10: over the frosting hills to a cup ringed by frosting, open only at the back */
-  { par: 2, sol: [[6, 0.88, 0]], tee: [0, 0.5], cup: [0.3, 6.6], shape: rect(-1.5, 0, 1.5, 8.6),
+  { par: 2, sol: [[16,0.76,0]], tee: [0, 0.5], cup: [0.3, 6.6], shape: rect(-1.5, 0, 1.5, 8.6),
     bumps: [{ x: -0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: 0.7, z: 3.0, r: 0.55, h: 0.3 }, { x: -0.2, z: 4.4, r: 0.5, h: -0.22 },
       { x: 1.04, z: 7.03, r: 0.35, h: 0.28 }, { x: 1.04, z: 6.18, r: 0.35, h: 0.28 }, { x: 0.3, z: 5.75, r: 0.35, h: 0.28 },
       { x: -0.44, z: 6.18, r: 0.35, h: 0.28 }, { x: -0.44, z: 7.03, r: 0.35, h: 0.28 }, { x: -0.9, z: 8.0, r: 0.4, h: -0.18 }] },
@@ -3607,7 +3608,7 @@ WORLD_LOOK[10] = {
 const SWING_FULL = 320, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 /* how forgiving the stroke is. The equipped putter sets these (the pro shop's applyGear); they shape
    only how a gesture becomes (angle, power), never the physics, so every hole's proof still holds. */
-const FEEL_BASE = { sweet: 0.12, tempoDead: 0.1, tempoK: 0.22, pathK: 0.4, toeLoss: 0.22, twist: 3 };
+const FEEL_BASE = { sweet: 0.25, tempoDead: 0.22, tempoK: 0.18, pathK: 0.22, toeLoss: 0.15, twist: 1.8 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;

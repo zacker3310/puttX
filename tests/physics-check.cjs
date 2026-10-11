@@ -26,7 +26,7 @@ check('soft putt stops on the felt', soft.end === 'stop' && soft.z > 0.55 && sof
 const longCup = S.makeHole({ tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 12) });
 const over = (x, v) => { const b = S.newBall(longCup, x, 3.5 - S.CUP_R - 0.01); b.vz = v; let t = 0, end = null; for (let i = 0; i < 400 && !end; i++) { end = S.stepBall(longCup, b, t); t += S.SIM_DT; } return { end, hits: b.hits.map(h => h[0]) }; };
 check('a slow ball over the cup is sunk', over(0, 0.5).end === 'sunk');
-check('dead centre at 1.3 m/s drops, but 1.3 m/s along the edge lips out', over(0, 1.3).end === 'sunk' && over(0.085, 1.3).hits.includes('lip'), JSON.stringify([over(0, 1.3), over(0.085, 1.3)]));
+check('dead centre at 1.9 m/s drops, but 1.9 m/s along the edge lips out', over(0, 1.9).end === 'sunk' && over(0.085, 1.9).hits.includes('lip'), JSON.stringify([over(0, 1.9), over(0.085, 1.9)]));
 check('dead centre at 2.2 m/s hops the cup', over(0, 2.2).hits.includes('lip') && over(0, 2.2).end !== 'sunk');
 check('a crawling ball at the very edge still drops', over(0.1, 0.15).end === 'sunk');
 

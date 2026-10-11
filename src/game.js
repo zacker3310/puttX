@@ -22,8 +22,8 @@ function showScene(id) {
 const SIM_DT = 1 / 240;          /* fixed physics step */
 const BALL_R = 0.051;            /* toy-sized ball, about 2.4x a real one (0.021) like the whole course */
 const CUP_R = 0.11, CUP_DEPTH = 0.12;
-const CAP_V0 = 1.45;             /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
-const CAP_CREEP = 0.22;          /* anything this slow with its centre over the hole drops, whatever the line */
+const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
+const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
 const MIN_V = 0.35, MAX_V = 5;   /* putt speed at power 0 and power 1: full power rolls about 14.5 m of felt */
 const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step < BALL_R */
 const STOP_V = 0.03;
@@ -42,7 +42,8 @@ const STEP_MAX = 0.03;           /* ground rising more than this under the ball'
 const CLIFF_E = 0.45;
 const BOUNCE_VY = 1.1, BOUNCE_E = 0.35;  /* a landing faster than BOUNCE_VY hops back up */
 const OOB_Y = -1;
-const LIP_TURN = 0.55, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 1.2, LIP_PULL_R = 0.08;
+/* the cup sits in a slight funnel: inside LIP_PULL_R of the rim a slow ball is drawn in, harder the closer it gets */
+const LIP_TURN = 0.5, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 2.6, LIP_PULL_R = 0.25;
 const TUBE_R = 0.12, TUBE_T = 0.45;   /* a tube mouth swallows a rolling ball whose centre comes this close; transit time */
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -312,7 +313,7 @@ function stepBall(h, b, t) {
   const s = Math.hypot(b.vx, b.vz), dx = b.x - h.cup[0], dz = b.z - h.cup[1], dc = Math.hypot(dx, dz);
   if (dc < CUP_R) {
     /* how far the ball's line passes from the cup centre sets the chord it crosses, and so the capture speed */
-    const off = s > 1e-6 ? Math.abs(b.vx * dz - b.vz * dx) / s : 0, chord = Math.sqrt(Math.max(0, 1 - (off / CUP_R) ** 2));
+    const off = s > 1e-6 ? Math.abs(b.vx * dz - b.vz * dx) / s : 0, chord = Math.max(0, 1 - (off / CUP_R) ** 2) ** 0.25;   /* gentle: an edge ball still gets a fair chance */
     /* one capture decision per pass over the hole: a ball that hopped or lipped stays out unless it is crawling */
     if (s < CAP_CREEP || (!b.inCup && s < CAP_V0 * chord)) return 'sunk';
     if (!b.inCup) {
@@ -326,7 +327,7 @@ function stepBall(h, b, t) {
     b.inCup = true;
   } else {
     b.inCup = false;
-    if (dc < CUP_R + LIP_PULL_R && s < CAP_V0 * 0.6) { b.vx -= LIP_PULL * dt * dx / dc; b.vz -= LIP_PULL * dt * dz / dc; }
+    if (dc < CUP_R + LIP_PULL_R && s < CAP_V0 * 0.75) { const k = LIP_PULL * (1 - (dc - CUP_R) / LIP_PULL_R) * dt / dc; b.vx -= k * dx; b.vz -= k * dz; }
   }
   /* stopped when slow and the slope cannot beat whichever holds harder: static grip or rolling friction */
   const pushA = zn && zn.push ? Math.hypot(zn.push[0], zn.push[1]) : 0;
@@ -889,7 +890,7 @@ function renderFrame(dt) {
 const SWING_FULL = 320, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 /* how forgiving the stroke is. The equipped putter sets these (the pro shop's applyGear); they shape
    only how a gesture becomes (angle, power), never the physics, so every hole's proof still holds. */
-const FEEL_BASE = { sweet: 0.12, tempoDead: 0.1, tempoK: 0.22, pathK: 0.4, toeLoss: 0.22, twist: 3 };
+const FEEL_BASE = { sweet: 0.25, tempoDead: 0.22, tempoK: 0.18, pathK: 0.22, toeLoss: 0.15, twist: 1.8 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;

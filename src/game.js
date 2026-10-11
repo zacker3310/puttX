@@ -255,12 +255,18 @@ function stepBall(h, b, t) {
     return null;
   }
   if (b.air) {
+    const px = b.x, pz = b.z, py = b.y;
     b.vy -= g * dt;
     b.x += b.vx * dt; b.z += b.vz * dt; b.y += b.vy * dt;
     collideAll(h, b, t);
     if (onFloor(h, b.x, b.z)) {
       const gh = groundH(h, b.x, b.z);
-      if (b.y <= gh) {
+      /* already below this floor's surface last step: it came in from the side, under the edge, so it hits the slab's face */
+      if (py < gh - STEP_MAX && b.y <= gh) {
+        const s = Math.hypot(b.vx, b.vz) || 1;
+        b.x = px; b.z = pz;
+        if (bounce(b, -b.vx / s, -b.vz / s, CLIFF_E, 0, 0)) b.hits.push(['wall', s]);
+      } else if (b.y <= gh) {
         const imp = -b.vy;
         b.y = gh;
         if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.9; b.vz *= 0.9; }

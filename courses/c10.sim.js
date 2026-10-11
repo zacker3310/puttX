@@ -65,7 +65,7 @@ registerWorld(10, { holes: [
     movers: [{ kind: 'spin', x: 0, z: 3.7, len: 0.36, w: 1.9, phase: 0.5, blades: 2, look: 'windmill' }] },
   /* 9. twin tubes: the walled high tee has no way out but two tubes; gold lands by the windmill
      on the cup island, blue on a side island with a ramp bridge down */
-  { par: 3, tee: [0, 0.5], cup: [-0.4, 6.4], aim0: 20,
+  { par: 3, sol: [[222,0.85,0],[15,0.95,0]], tee: [0, 0.5], cup: [-0.4, 6.4], aim0: 20,
     floors: [rect(-1, 0, 1, 1.8), rect(-1.2, 3.6, 1.2, 7.2), rect(-3.2, 1, -1.8, 5), rect(-1.8, 4.1, -1.2, 4.8)],
     walls: [ring(rect(-1, 0, 1, 1.8)), [[-1.8, 4.1], [-1.8, 1], [-3.2, 1], [-3.2, 5], [-1.8, 5], [-1.8, 4.8]], [[-1.2, 6.2], [-1.2, 7.2], [1.2, 7.2], [1.2, 6.4]]],
     tiers: [{ poly: C10_PAD(-1, 0, 1, 1.8), h: 0.4 }, { poly: C10_PAD(-3.2, 1, -1.8, 5), h: 0.25 }],
@@ -139,7 +139,7 @@ registerWorld(10, { holes: [
       { surf: 'fast', push: [-0.9, 0], poly: rect(2.85, 5.6, 3.35, 6.8) }, { surf: 'fast', poly: rect(2.85, 5.2, 3.35, 5.6) }, { surf: 'fast', poly: rect(2.85, 6.8, 3.35, 7.2) }],
     bumps: [{ x: 3.3, z: 8.2, r: 0.35, h: -0.05 }] },
   /* 17. sky locks: two gates lock the bare neck; then the windmill-guarded tube, or the kicker jump, to the fan-swept cup island */
-  { par: 4, tee: [0, 0.6], cup: [0.6, 8.3],
+  { par: 4, sol: [[180,0.85,2],[0,0.45,0]], tee: [0, 0.6], cup: [0.6, 8.3],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.3, 2, 0.3, 4), rect(-1.3, 4, 1.3, 6), rect(-1.4, 6.8, 1.4, 9)],
     walls: [[[-0.3, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.3, 2]], [[1.4, 8.4], [1.4, 9], [-1.4, 9], [-1.4, 6.8]]],
     ramps: [{ x0: -1.0, z0: 5.6, x1: -0.2, z1: 6, axis: 'z', h0: 0, h1: 0.12 }],

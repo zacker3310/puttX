@@ -33,7 +33,8 @@ srv.listen(0, '127.0.0.1', async () => {
   tab.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
   tab.on('pageerror', e => errors.push(String(e)));
   await tab.goto(`http://127.0.0.1:${srv.address().port}/${page}?hole=${course}-1`);
-  await tab.waitForFunction(() => window.booted === true, null, { timeout: 30000 });
+  await tab.waitForFunction(() => window.booted === true, null, { timeout: 300000 });
+  tab.setDefaultTimeout(300000);
   const keys = await tab.evaluate(c => WORLDS[c] ? WORLDS[c].holes.map(h => h.key) : [], course);
   const files = [];
   for (const key of keys) {

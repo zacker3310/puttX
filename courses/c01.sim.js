@@ -37,7 +37,7 @@ registerWorld(1, { holes: [
     movers: [{ kind: 'spin', x: 0.15, z: 7, len: 0.6, w: 1.5, phase: 1, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 8.5, 1.2, 9) }] },
   /* 7: the big dirt mound. Over the top or round the dry side, then down into the crater cup */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.5, 6.6], shape: rect(-1.3, 0, 1.3, 8),
+  { par: 2, sol: [], tee: [0, 0.5], cup: [0.5, 6.6], shape: rect(-1.3, 0, 1.3, 8),
     bumps: [{ x: 0, z: 3.6, r: 0.9, h: 0.35 }, { x: 0.5, z: 6.6, r: 0.5, h: -0.06 }],
     inner: [[[0, 5.6], [0.95, 5.6]]],
     zones: [{ surf: 'sand', poly: rect(0.65, 2.8, 1.3, 4.4) }] },

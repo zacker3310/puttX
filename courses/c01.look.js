@@ -64,11 +64,10 @@ function c01Crane(m) {
   g.add(hub, c01Box(0.12, 0.1, 0.12, C01.cream, 0, 0.31, 0), c01Box(0.13, 0.03, 0.13, C01.redDown, 0, 0.375, 0));
   return g;
 }
-/* boom barrier: a red and white striped bar */
+/* boom barrier: a red and white striped bar, slimmer and taller than the girder it slides into */
 function c01Boom(m) {
-  const g = new THREE.Group(), L = m.len * 2, n = Math.max(3, Math.round(L / 0.12));
-  for (let k = 0; k < n; k++) g.add(c01Box(0.1, 0.14, L / n, k % 2 ? C01.cream : C01.red, 0, 0.08, -L / 2 + (k + 0.5) * L / n));
-  g.add(c01Box(0.12, 0.04, L, C01.redDown, 0, 0.165, 0));
+  const g = new THREE.Group(), L = m.len * 2, n = Math.max(3, Math.round(L / 0.12) | 1);
+  for (let k = 0; k < n; k++) g.add(c01Box(0.084, 0.24, L / n, k % 2 ? C01.cream : C01.red, 0, 0.12, -L / 2 + (k + 0.5) * L / n));
   return g;
 }
 WORLD_LOOK[1] = {

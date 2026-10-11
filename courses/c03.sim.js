@@ -33,7 +33,7 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-1, 3, 1, 3.7)), J3_MUD(rect(-0.5, 3.7, 0.5, 4.4))], tubes: [{ a: [0.75, 2.6], b: [-0.75, 4.1], dir: 0 }],
     posts: [J3_IDOL(0.45, 5.45), J3_IDOL(-0.4, 6.1)], bumps: [{ x: 0, z: 4.9, r: 0.5, h: 0.16 }] },
   /* 7: switchback. Up the ramp, round the terrace, up the back stair to the cup; or the tunnel by the pool */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [2.4, 0.8], aim0: 0,
+  { par: 3, sol: [], tee: [0, 0.5], cup: [2.4, 0.8], aim0: 0,
     shape: [[-0.6, 0], [0.6, 0], [0.6, 4.2], [1.8, 4.2], [1.8, 0], [3.0, 0], [3.0, 5.6], [-0.6, 5.6]],
     ramps: [{ x0: -0.6, z0: 3.2, x1: 0.6, z1: 4.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 1.8, z0: 2.4, x1: 3.0, z1: 3.4, axis: 'z', h0: 0.4, h1: 0.2 }],
     tiers: [{ poly: [[-0.6, 4.2], [3.0, 4.2], [3.0, 5.6], [-0.6, 5.6]], h: 0.2 }, { poly: rect(1.8, 3.4, 3.0, 4.2), h: 0.2 }, { poly: rect(1.8, 0, 3.0, 2.4), h: 0.4 }],

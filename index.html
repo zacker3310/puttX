@@ -98,15 +98,48 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #doneNext { right: 60px; bottom: 36px; width: 140px; }
 @keyframes popIn { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { #holeDone, #holeDone .star.on { animation: none; } }
+/* ---------- 7. TITLE, MAP, CARD ---------- */
+#titleLogo { position: absolute; left: 420px; top: 120px; width: 360px; animation: popIn .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+#titleGo { animation: popIn .5s .2s cubic-bezier(.3, 1.6, .5, 1) both; }
+#map { background: var(--v-surface); background-image: var(--v-dots); background-size: var(--v-dots-size); }
+#worldTabs { position: absolute; left: 24px; top: 24px; display: flex; gap: 16px; }
+#worldTabs .btn { position: relative; width: 104px; height: 104px; }
+#worldTabs .btn.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#worldTabs .btn .lock, #holePath .lock { position: absolute; right: -8px; bottom: -8px; width: 40px; height: 40px; }
+#soundBtn { right: 24px; top: 24px; }
+#soundBtn .cross, #soundBtn.off .wave { display: none; }
+#soundBtn.off .cross { display: inline; }
+#pathLine { position: absolute; inset: 0; width: 1200px; height: 700px; pointer-events: none; }
+#holePath .node { width: 104px; height: 104px; margin: -52px 0 0 -52px; border-radius: 50%; animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#holePath .node .n { font-size: 44px; line-height: 1; }
+#holePath .node .stars { position: absolute; top: -30px; display: flex; gap: 2px; }
+#holePath .node .star { width: 26px; height: 26px; fill: var(--v-mute); }
+#holePath .node .star.on { fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 4; }
+#holePath .node .best { position: absolute; bottom: -34px; font-size: 26px; color: var(--v-ink-soft); }
+#card { background: var(--v-scrim); }
+#cardPanel { position: absolute; left: 110px; top: 90px; width: 980px; height: 520px; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .4s cubic-bezier(.3, 1.6, .5, 1) both; }
+#cardRow { position: absolute; left: 40px; right: 40px; top: 50px; display: grid; grid-template-columns: repeat(9, 1fr); gap: 10px; }
+#cardRow .cell { height: 150px; border-radius: var(--v-r-md); background: var(--v-surface-2); display: grid; place-items: center; font: 800 54px var(--v-font); color: var(--v-ink-strong); }
+#cardRow .cell small { font-size: 22px; color: var(--v-ink-soft); }
+#cardRow .cell.under { background: var(--v-accent-green); color: #fff; }
+#cardRow .cell.par { background: var(--v-accent-yellow); }
+#cardSum { position: absolute; left: 0; right: 0; top: 240px; display: flex; justify-content: center; align-items: center; gap: 40px; font: 800 96px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+#cardDiff { font-size: 60px; color: var(--v-ink-soft); }
+#cardStars { display: flex; align-items: center; gap: 8px; font-size: 60px; }
+#cardStars svg { width: 64px; height: 64px; fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 3; }
+#cardMap { left: 60px; bottom: 40px; }
+#cardNext { right: 60px; bottom: 40px; width: 140px; }
+@media (prefers-reduced-motion: reduce) { #titleLogo, #titleGo, #holePath .node, #cardPanel { animation: none; } }
 </style>
 </head>
 <body>
 <div id="stage">
   <canvas id="view" aria-label="golf course"></canvas>
   <section class="scene" id="title">
+    <div id="titleLogo" aria-label="puttx"><svg viewBox="0 0 240 160"><ellipse cx="120" cy="140" rx="100" ry="14" fill="rgba(74,53,35,.18)"/><circle cx="92" cy="86" r="52" fill="#fffdf7" stroke="#e6d2ab" stroke-width="6"/><path d="M40 86 H144" stroke="#ffd66e" stroke-width="14"/><path d="M170 140 V22" stroke="#8a7360" stroke-width="8" stroke-linecap="round"/><path d="M174 22 L222 38 L174 54 Z" fill="#ef7d6d"/></svg></div>
     <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
   </section>
-  <section class="scene panel" id="map"></section>
   <section class="scene" id="hole">
     <button class="btn" id="homeBtn" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
     <div class="chip" id="hudHole" aria-label="hole"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#fffdf7" stroke="#e6d2ab" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#e6d2ab"/></svg><span id="hudHoleN">1</span></div>
@@ -119,7 +152,20 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     </div>
   </section>
-  <section class="scene" id="card"></section>
+  <section class="scene panel" id="map">
+    <div id="worldTabs"></div>
+    <button class="btn" id="soundBtn" aria-label="sound"><svg viewBox="0 0 64 64"><path d="M10 24 H22 L36 12 V52 L22 40 H10 Z" fill="#8a7360"/><path class="wave" d="M44 22 Q52 32 44 42 M50 16 Q62 32 50 48" fill="none" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path class="cross" d="M44 24 L58 40 M58 24 L44 40" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></button>
+    <svg id="pathLine" viewBox="0 0 1200 700" aria-hidden="true"></svg>
+    <div id="holePath"></div>
+  </section>
+  <section class="scene panel" id="card">
+    <div id="cardPanel">
+      <div id="cardRow"></div>
+      <div id="cardSum"><span id="cardTotal">0</span><span id="cardDiff">0</span><span id="cardStars"></span></div>
+      <button class="btn" id="cardMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+      <button class="btn go" id="cardNext" aria-label="next world"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+    </div>
+  </section>
 </div>
 <div id="rotate" aria-label="turn sideways"><svg viewBox="0 0 64 64"><rect x="20" y="8" width="24" height="40" rx="5" fill="none" stroke="#fff8ec" stroke-width="4"/><path d="M14 52 A22 22 0 0 0 50 52" fill="none" stroke="#ffd66e" stroke-width="4"/><path d="M50 44 L50 53 L41 53" fill="none" stroke="#ffd66e" stroke-width="4"/></svg></div>
 <script id="three">/* three:begin */
@@ -694,6 +740,11 @@ function syncBall(dt) {
 }
 /* aiming: a 3/4 view from behind the ball toward the cup, framing both. Rolling: follow the ball. */
 function cameraGoal() {
+  if (play.phase === 'title') {
+    const pts = play.hole.floors.flat(), cx = pts.reduce((a, p) => a + p[0], 0) / pts.length, cz = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+    const yaw = play.time * 0.15, look = new THREE.Vector3(cx, 0, cz);
+    return { pos: new THREE.Vector3(cx - Math.sin(yaw) * 5, 3.2, cz - Math.cos(yaw) * 5), look };
+  }
   const h = play.hole, b = play.ball;
   let look;
   if (play.phase === 'aim' || play.phase === 'idle') {
@@ -856,6 +907,7 @@ function drainHits() {
 }
 function advance(dt) {
   if (!play.hole || play.phase === 'idle') return;
+  if (play.phase === 'title') { play.time += dt; return; }
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
   while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }
   drainHits();
@@ -896,6 +948,69 @@ function stepFrame(now) {
 }
 function frame(now) { stepFrame(now); requestAnimationFrame(frame); }
 
+/* ============ 7. SCENES ============ */
+const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
+const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
+const NODE_POS = [[150, 560], [300, 470], [450, 560], [600, 470], [750, 560], [900, 470], [1050, 540], [1000, 320], [820, 260]];
+let mapWorld = 1;
+
+function showTitle() {
+  if (!play.hole || play.key !== '1-1') startHole('1-1');
+  play.phase = 'title';
+  showScene('title');
+}
+function showMap(w) {
+  if (w) mapWorld = w;
+  play.drag = null; hideAim();
+  showScene('map');
+  renderMap();
+}
+function renderMap() {
+  worldTabs.innerHTML = '';
+  for (const w of WORLD_ORDER) {
+    const open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
+    b.className = 'btn' + (w === mapWorld ? ' on' : '') + (open ? '' : ' locked');
+    b.setAttribute('aria-label', 'world ' + w);
+    b.innerHTML = lookOf(w).icon + (open ? '' : LOCK_SVG);
+    b.onclick = () => { if (open) { mapWorld = w; sfx('tap'); renderMap(); } else sfx('boink'); };
+    worldTabs.append(b);
+  }
+  pathLine.innerHTML = `<path d="M${NODE_POS.map(p => p.join(' ')).join(' L')}" fill="none" stroke="var(--v-surface-line)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 34"/>`;
+  holePath.innerHTML = '';
+  NODE_POS.forEach(([x, y], i) => {
+    const key = mapWorld + '-' + (i + 1), rec = progress.holes[key], open = !!WORLDS[mapWorld] && holeUnlocked(progress, key);
+    const b = document.createElement('button');
+    b.className = 'btn node' + (open ? (rec ? '' : ' go') : ' locked');
+    b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.animationDelay = (i * 0.04) + 's';
+    b.setAttribute('aria-label', 'hole ' + (i + 1));
+    b.innerHTML = `<span class="n">${i + 1}</span>` + (rec ? `<span class="stars">${[0, 1, 2].map(k => STAR_SVG.replace('class="star"', `class="star${k < rec.stars ? ' on' : ''}"`)).join('')}</span><span class="best">${rec.best}</span>` : '') + (open ? '' : LOCK_SVG);
+    b.onclick = () => open ? goHole(key) : sfx('boink');
+    holePath.append(b);
+  });
+  soundBtn.classList.toggle('off', !progress.sound);
+}
+function showCard(w) {
+  const holes = WORLDS[w].holes;
+  cardRow.innerHTML = '';
+  let total = 0, par = 0, stars = 0;
+  holes.forEach((h, i) => {
+    const r = progress.holes[h.key], c = document.createElement('div');
+    total += r.best; par += h.par; stars += r.stars;
+    c.className = 'cell' + (r.best < h.par ? ' under' : r.best === h.par ? ' par' : '');
+    c.innerHTML = `<small>${i + 1}</small>${r.best}`;
+    cardRow.append(c);
+  });
+  const diff = total - par;
+  cardTotal.textContent = total;
+  cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
+  cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
+  const next = WORLD_ORDER[WORLD_ORDER.indexOf(w) + 1];
+  cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
+  cardNext.onclick = () => { sfx('tap'); showMap(next); };
+  showScene('card');
+  sfx('fanfare');
+}
+
 /* ============ 9. BOOT ============ */
 function boot() {
   progress = loadProgress();
@@ -906,11 +1021,16 @@ function boot() {
   addEventListener('pointermove', onMove);
   addEventListener('pointerup', onUp);
   addEventListener('pointercancel', onCancel);
-  homeBtn.addEventListener('click', () => { sfx('tap'); showScene('title'); });
-  doneMap.addEventListener('click', () => { sfx('tap'); showScene('title'); });
-  doneNext.addEventListener('click', () => { const k = nextKey(play.key); if (k) goHole(k); else showScene('title'); });
+  homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
+  doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
+  titleGo.addEventListener('click', () => { sfx('tap'); showMap(); });
+  cardMap.addEventListener('click', () => { sfx('tap'); showMap(); });
+  soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
+  doneNext.addEventListener('click', () => { const k = nextKey(play.key); if (k) goHole(k); else { sfx('tap'); showCard(Number(play.key.split('-')[0])); } });
   const q = new URLSearchParams(location.search);
-  if (q.has('hole') && holeAt(q.get('hole'))) startHole(q.get('hole')); else showScene('title');
+  if (q.has('hole') && holeAt(q.get('hole'))) startHole(q.get('hole'));
+  else if (q.has('map')) { showTitle(); showMap(); }
+  else showTitle();
   addEventListener('resize', () => { fit(); resizeRenderer(); });
   addEventListener('orientationchange', () => { fit(); setTimeout(fit, 350); });
   if (window.visualViewport) visualViewport.addEventListener('resize', fit);

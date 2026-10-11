@@ -46,10 +46,14 @@ const visibleLetters = page => page.evaluate(() => {
   }
   return out;
 });
-/* visible buttons smaller than 64 rendered px on either side */
-const smallTargets = page => page.evaluate(() => [...document.querySelectorAll('button')]
+/* visible buttons smaller than 64 rendered px on either side, measured at rest: entrance
+   animations (popIn starts at scale .4) are finished first, as vroom's suites do */
+const smallTargets = page => page.evaluate(() => {
+  for (const a of document.getAnimations()) { try { a.finish(); } catch (e) { /* infinite loops stay */ } }
+  return [...document.querySelectorAll('button')]
   .filter(b => b.getClientRects().length && getComputedStyle(b).visibility !== 'hidden')
   .map(b => { const r = b.getBoundingClientRect(); return { id: b.id || b.className, s: Math.round(Math.min(r.width, r.height)) }; })
-  .filter(t => t.s < 64));
+  .filter(t => t.s < 64);
+});
 
 module.exports = { URL, check, done, open, fresh, visibleLetters, smallTargets };

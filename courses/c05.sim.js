@@ -53,19 +53,19 @@ registerWorld(5, (() => {
       tiers: [{ poly: rect(-1.6, 6, 1.6, 9), h: 0.3 }], ramps: [{ x0: -0.3, z0: 4.8, x1: 0.3, z1: 6, axis: 'z', h0: 0, h1: 0.3 }],
       inner: [[[-1.6, 6], [-0.3, 6]], [[0.3, 6], [1.6, 6]]], posts: [BARREL(0.3, 7.6), ANCHOR(-0.8, 7.4)] },
     /* 10 barrel bank: the whole green leans toward the lagoon; barrels bounce */
-    { par: 3, tee: [0.3, 0.5], cup: [-0.2, 5.5], shape: rect(-1.5, 0, 1.5, 6.4),
+    { par: 3, sol: [[21,0.7,0]], tee: [0.3, 0.5], cup: [-0.2, 5.5], shape: rect(-1.5, 0, 1.5, 6.4),
       tiers: [{ poly: rect(-1.6, -0.1, 1.6, 6.5), h: 0.2, sx: 0.08 }],
       zones: [lagoon(rect(-1.5, 2.0, -0.95, 3.8))],
       posts: [BUMPER(0.6, 2.2), BUMPER(-0.4, 3.0), BUMPER(0.4, 3.9), BUMPER(-0.9, 4.3), BUMPER(0.95, 4.6), BARREL(-0.2, 4.8), BARREL(-0.78, 5.25), BARREL(0.38, 5.25)] },
     /* 11 smuggler's caves: zig-zag through the hideout, or find the cave on the dune */
-    { par: 4, tee: [0, 0.6], cup: [1.2, 7.4], aim0: 30, shape: rect(-2, 0, 2, 8.4),
+    { par: 4, sol: [[147,0.9,0],[285,1,0]], tee: [0, 0.6], cup: [1.2, 7.4], aim0: 30, shape: rect(-2, 0, 2, 8.4),
       inner: [[[-2, 2.8], [1.2, 2.8]], [[-1.2, 5.6], [2, 5.6]], [[0.5, 8.4], [0.5, 6.9]]],
       bumps: [{ x: 1.55, z: 5.05, r: 0.4, h: 0.16 }, { x: 0, z: 4.2, r: 0.5, h: 0.22 }],
       tubes: [{ a: [1.55, 5.05], b: [-1.5, 6.3], dir: 90 }],
       zones: [sand(rect(1.2, 3.3, 2, 4.3)), lagoon(rect(-2, 3.6, -1.3, 4.6)), sand(rect(0, 6.8, 0.6, 8.4))],
       posts: [BARREL(1.2, 6.6)] },
     /* 12 walk the plank or jump the lagoon off the gangplank */
-    { par: 4, tee: [0, 0.5], cup: [-0.6, 8.6], shape: [[-1.4, 0], [1.4, 0], [1.4, 4.8], [1.4, 9.4], [-1.4, 9.4], [-1.4, 4.8]],
+    { par: 4, sol: [[18,1,0],[69,0.55,0]], tee: [0, 0.5], cup: [-0.6, 8.6], shape: [[-1.4, 0], [1.4, 0], [1.4, 4.8], [1.4, 9.4], [-1.4, 9.4], [-1.4, 4.8]],
       ramps: [{ x0: -0.4, z0: 2.4, x1: 0.4, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }],
       zones: [lagoon(rect(-1.4, 3.6, 1.0, 4.8)), sand(rect(-1.4, 4.8, 1.0, 6.4))],
       bumps: [{ x: 0.4, z: 7.0, r: 0.5, h: 0.25 }], posts: [BARREL(-0.1, 7.8), ANCHOR(1.15, 6.6)] },

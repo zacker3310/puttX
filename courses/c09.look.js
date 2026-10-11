@@ -99,6 +99,19 @@
           if (o.position.x > B.x0 - pad - 0.4 && o.position.x < B.x1 + pad + 0.4 && o.position.z > B.z0 - pad - 0.4 && o.position.z < B.z1 + pad + 0.4) { group.remove(o); disposeGroup(o); }
         }
       }
+      /* a press that slides through a side wall parks inside a chocolate housing */
+      for (const m of h.movers) {
+        if (m.look !== 'press') continue;
+        const a = (m.ang || 0) * Math.PI / 180, dx = Math.sin(a) * m.len, dz = Math.cos(a) * m.len;
+        for (const [px, pz] of [[m.ax, m.az], [m.bx, m.bz]]) for (const s of [-1, 1]) {
+          const ex = px + s * dx, ez = pz + s * dz;
+          if (onFloor(h, ex, ez)) continue;
+          const box = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.3), mat('#5a3420', { roughness: 0.5 }));
+          box.position.set(ex, groundH(h, ex - s * dx * 0.3, ez - s * dz * 0.3) + 0.13, ez); box.rotation.y = a; box.castShadow = true;
+          const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.03, 0.32), mat('#f29ac0', { roughness: 0.5 }));
+          cap.position.y = 0.14; box.add(cap); group.add(box);
+        }
+      }
       /* the lollipop discs in the props turn slowly */
       group.traverse(o => { if (o.name === 'lollyDisc') group.userData.lolly = (group.userData.lolly || []).concat(o); });
     },

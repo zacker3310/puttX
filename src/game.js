@@ -1117,6 +1117,7 @@ function strike(st) {
   const s = play.swing;
   play.swing = null;
   play.lastShot = st;
+  play.lastPath = { samples: s.samples.slice(), clean: st.clean };
   const a = play.aim * Math.PI / 180;
   if (putter && putter.visible) play.fx.follow = { t: 0, x: putter.position.x, y: putter.position.y, z: putter.position.z, ux: Math.sin(a), uz: Math.cos(a),
     dist: Math.min(0.14, (MIN_V + (MAX_V - MIN_V) * st.power) * 0.05) };
@@ -1124,17 +1125,26 @@ function strike(st) {
   drawPad(); drawShot(st);
   return s;
 }
-/* the swing pad: the address line, the backswing fill against power ticks, last stroke's length as a ghost */
+/* the swing pad shows only the path your finger drew: where you touched (dot and dashed line),
+   the pull back (yellow) and the push through (green, red when the stroke was off). The last
+   stroke stays on the pad until the next touch; before the first one, an up-down hint. */
 function drawPad() {
-  const s = play.swing, top = 110;
-  padBall.style.top = (s ? s.sy - top : 120) + 'px';
-  padHead.style.top = (s ? Math.min(560, s.sy - top + s.back) : 120 + 16) + 'px';
-  padHead.style.left = (s ? clamp(s.x - s.sx, -60, 60) + 90 : 90) + 'px';
-  padFill.style.top = (s ? s.sy - top : 120) + 'px';
-  padFill.style.height = (s ? Math.min(SWING_FULL, s.back) : 0) + 'px';
-  padTicks.style.top = (s ? s.sy - top : 120) + 'px';
+  const s = play.swing, path = s ? { samples: s.samples, clean: true } : play.lastPath;
+  padPath.classList.toggle('old', !s && !!path);
   swingPad.classList.toggle('swinging', !!s);
-  if (play.lastShot) { padGhost.style.display = 'block'; padGhost.style.top = ((s ? s.sy : 230) - top + Math.min(SWING_FULL, play.lastShot.length)) + 'px'; }
+  padHint.style.display = path ? 'none' : '';
+  if (!path || path.samples.length < 1) { padBack.setAttribute('points', ''); padFwd.setAttribute('points', ''); padStart.setAttribute('cx', -50); padLine.setAttribute('y1', -50); padLine.setAttribute('y2', -50); return; }
+  /* stage px -> the pad's own picture: the pad's inner box sits at its border plus 4 px */
+  const r = padPath.getBoundingClientRect(), st = stage.getBoundingClientRect();
+  const ox = (r.left - st.left) / stageScale, oy = (r.top - st.top) / stageScale, sx = 172 / (r.width / stageScale || 172), sy = 562 / (r.height / stageScale || 562);
+  const pt = q => `${((q.x - ox) * sx).toFixed(1)},${((q.y - oy) * sy).toFixed(1)}`;
+  const sm = path.samples, s0 = sm[0];
+  let k = 0; for (let i = 1; i < sm.length; i++) if (sm[i].y > sm[k].y) k = i;   /* the bottom of the backswing */
+  padBack.setAttribute('points', sm.slice(0, k + 1).map(pt).join(' '));
+  padFwd.setAttribute('points', sm.slice(k).map(pt).join(' '));
+  padFwd.classList.toggle('off', !path.clean);
+  padStart.setAttribute('cx', ((s0.x - ox) * sx).toFixed(1)); padStart.setAttribute('cy', ((s0.y - oy) * sy).toFixed(1));
+  padLine.setAttribute('y1', ((s0.y - oy) * sy).toFixed(1)); padLine.setAttribute('y2', ((s0.y - oy) * sy).toFixed(1));
 }
 /* the shot readout: path arrow, strike dot on the face, tempo needle; green when clean */
 function drawShot(st) {
@@ -1159,7 +1169,7 @@ function startHole(key) {
   buildHoleScene(h);
   hideAim();
   for (const m of trailDots.concat(confetti)) m.visible = false;
-  holeDone.classList.remove('show'); shotPanel.classList.remove('show'); padGhost.style.display = 'none'; holeBanner.classList.remove('show');
+  holeDone.classList.remove('show'); shotPanel.classList.remove('show'); play.lastPath = null; holeBanner.classList.remove('show');
   setRead(false); initGhost(h); updateMulligan();
   for (const p of puffs) p.visible = false;
   syncBall(0);

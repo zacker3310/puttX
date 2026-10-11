@@ -12,7 +12,7 @@ registerWorld(10, { holes: [
     tiers: [{ poly: rect(-1.2, 3.6, 1.2, 6.4), h: 0.3 }],
     bumps: [{ x: 0.55, z: 5.4, r: 0.4, h: -0.05 }, { x: 0.1, z: 4.6, r: 0.4, h: 0.1 }] },
   /* 2. rainbow fan: a narrow fast bridge with a crosswind fan; aim into the wind */
-  { par: 2, sol: [[0,0.64,0]], tee: [0, 0.6], cup: [-0.4, 6.6],
+  { par: 3, sol: [[0,0.64,0]], tee: [0, 0.6], cup: [-0.4, 6.6],
     floors: [rect(-0.7, 0, 0.7, 1.6), rect(-0.25, 1.6, 0.25, 5.2), rect(-1, 5.2, 1, 7.4)],
     walls: [[[-0.25, 1.6], [-0.7, 1.6], [-0.7, 0], [0.7, 0], [0.7, 1.6], [0.25, 1.6]], [[1, 6.2], [1, 7.4], [-1, 7.4], [-1, 6.6]]],
     zones: [{ surf: 'fast', push: [1.4, 0], poly: rect(-0.25, 2.6, 0.25, 4.2) }, { surf: 'fast', poly: rect(-0.25, 1.6, 0.25, 2.6) }, { surf: 'fast', poly: rect(-0.25, 4.2, 0.25, 5.2) }] },
@@ -151,7 +151,7 @@ registerWorld(10, { holes: [
     tubes: [{ a: [0.5, 5.6], b: [-0.8, 7.0], dir: 25 }] },
   /* 18. the crown kingdom: tube or windy rainbow to the windmill isle, off the kicker onto the
      cloud-ice court past the golden gate, then up the royal ramp to the crater cup on the crown */
-  { par: 4, sol: [[3,0.9,0],[0,0.55,0]], tee: [0, 0.6], cup: [0.3, 11.8],
+  { par: 5, sol: [[3,0.9,0],[0,0.55,0]], tee: [0, 0.6], cup: [0.3, 11.8],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.6, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
     walls: [[[-0.22, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.22, 2.2]], [[-1, 11], [-1, 12.6], [1, 12.6], [1, 11]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }, { poly: rect(-1.6, 7.6, 1.6, 10), h: 0.1 }, { poly: C10_PAD(-1, 11, 1, 12.6), h: 0.45 }],

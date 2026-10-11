@@ -90,7 +90,7 @@ registerWorld(6, { holes: [
     posts: [V6_COL(2.6, 1.1)],
     zones: [V6_LAVA(rect(2.2, 2.4, 2.6, 3.2)), V6_LAVA(rect(3.2, 3.6, 3.6, 5))] },
   /* 17: crater moat: a narrow ramp over the lava moat to the island crater (crazy, 3 parts) */
-  { par: 4, sol: [[44,0.84,0],[2,0.44,0]], tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
+  { par: 4, sol: [[206,0.68,0],[330,0.4,0]], tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
     ramps: [{ x0: 0.5, z0: 3.7, x1: 1.1, z1: 4.5, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.2, 4.5, 1.2, 7.5), h: 0.25 }],
     bumps: [...V6_CRATER(-0.4, 6.5, 0.85), ...V6_CRATER(-1.5, 2, 0.7)], tubes: [{ a: [-1.5, 2], b: [0.6, 5.1], dir: 340 }], posts: [V6_COL(0.1, 5.8)],

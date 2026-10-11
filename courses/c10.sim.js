@@ -127,7 +127,7 @@ registerWorld(10, { holes: [
     posts: [{ x: -0.6, z: 4.6, r: 0.15, e: 1.15, look: 'cloud' }, { x: 0.5, z: 5.2, r: 0.15, e: 1.15, look: 'cloud' }, { x: -0.2, z: 6.3, r: 0.15, e: 1.15, look: 'cloud' },
       { x: 1.0, z: 6.6, r: 0.15, e: 1.15, look: 'cloud' }, { x: -0.9, z: 7.3, r: 0.15, e: 1.15, look: 'cloud' }, { x: 0.1, z: 7.85, r: 0.15, e: 1.15, look: 'cloud' }] },
   /* 16. rainbow relay: three bare rainbows between three tiny islands, each with its own crosswind */
-  { par: 4, sol: [[54,0.96,0],[62,0.97,0]], tee: [0, 0.6], cup: [3.3, 8.2],
+  { par: 4, sol: [[180,0.9,0],[69,0.4,0],[0,0.8,0]], tee: [0, 0.6], cup: [3.3, 8.2],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(0.6, 3.85, 2.6, 4.35), rect(2.6, 3.4, 3.6, 5.2),
       rect(2.85, 5.2, 3.35, 7.2), rect(2.0, 7.2, 4.4, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[0.6, 4.6], [-0.6, 4.6], [-0.6, 3.6]],
@@ -139,7 +139,7 @@ registerWorld(10, { holes: [
       { surf: 'fast', push: [-0.9, 0], poly: rect(2.85, 5.6, 3.35, 6.8) }, { surf: 'fast', poly: rect(2.85, 5.2, 3.35, 5.6) }, { surf: 'fast', poly: rect(2.85, 6.8, 3.35, 7.2) }],
     bumps: [{ x: 3.3, z: 8.2, r: 0.35, h: -0.05 }] },
   /* 17. sky locks: two gates lock the bare neck; then the windmill-guarded tube, or the kicker jump, to the fan-swept cup island */
-  { par: 4, sol: [[180,0.85,2],[0,0.45,0]], tee: [0, 0.6], cup: [0.6, 8.3],
+  { par: 4, sol: [[180,0.85,2],[72,0.25,0]], tee: [0, 0.6], cup: [0.6, 8.3],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.3, 2, 0.3, 4), rect(-1.3, 4, 1.3, 6), rect(-1.4, 6.8, 1.4, 9)],
     walls: [[[-0.3, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.3, 2]], [[1.4, 8.4], [1.4, 9], [-1.4, 9], [-1.4, 6.8]]],
     ramps: [{ x0: -1.0, z0: 5.6, x1: -0.2, z1: 6, axis: 'z', h0: 0, h1: 0.12 }],

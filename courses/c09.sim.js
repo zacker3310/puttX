@@ -60,7 +60,7 @@ registerWorld(9, { holes: [
     zones: [C9_BELT(rect(-1.5, 0, 1.5, 2.5), -1.2, 0), C9_BELT(rect(-1.5, 2.5, 1.5, 5), -1.6, 0), C9_BELT(rect(-1.5, 5.6, 1.5, 6.6), 1.5, 0)],
     posts: [C9_GUM(0, 3.7)] },
   /* 12: candy-cane pipes link three pads */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0, 8.6], aim0: 20,
+  { par: 3, sol: [[9, 0.95, 0], [48, 0.85, 0], [15, 0.65, 0]], tee: [0, 0.5], cup: [0, 8.6], aim0: 20,
     floors: [rect(-0.8, 0, 0.8, 2.6), rect(1.6, 3.4, 3.6, 6.2), rect(-0.8, 7, 0.8, 9.2)],
     walls: [ring(rect(-0.8, 0, 0.8, 2.6)), ring(rect(1.6, 3.4, 3.6, 6.2)), ring(rect(-0.8, 7, 0.8, 9.2))],
     zones: [{ surf: 'fast', poly: rect(1.6, 3.4, 3.6, 6.2) }, { surf: 'mud', poly: rect(-0.8, 8.0, -0.3, 9.2) }, { surf: 'mud', poly: rect(0.3, 8.0, 0.8, 9.2) }, { surf: 'mud', poly: rect(-0.3, 8.0, 0.3, 8.2) }],

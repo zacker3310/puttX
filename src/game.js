@@ -517,7 +517,7 @@ function initRenderer() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(40, 1200 / 700, 0.05, 160);
   /* the swing pad covers the right edge, so the picture's centre sits left of the stage's */
-  camera.setViewOffset(1200, 700, 90, 0, 1200, 700);
+  camera.setViewOffset(1200, 700, 60, 0, 1200, 700);
   scene.add(new THREE.HemisphereLight(0xfff4e0, 0x8a7360, 1.4));
   sun = new THREE.DirectionalLight(0xffe2b8, 2.4);
   sun.castShadow = true;
@@ -890,7 +890,7 @@ function renderFrame(dt) {
      contact = where the face meets the ball: the sideways offset of the crossing from the touch
                point. Off the sweet spot loses energy (quadratic) and twists the face.
    The aim itself is set by dragging the course, nudging with the arrow buttons. */
-const SWING_FULL = 320, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
+const SWING_FULL = 240, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 /* how forgiving the stroke is. The equipped putter sets these (the pro shop's applyGear); they shape
    only how a gesture becomes (angle, power), never the physics, so every hole's proof still holds. */
 const FEEL_BASE = { sweet: 0.25, tempoDead: 0.22, tempoK: 0.18, pathK: 0.22, toeLoss: 0.15, twist: 1.8 };
@@ -1112,7 +1112,7 @@ function setHand(h) {
   if (putter) putter.scale.x = progress.hand === 'L' ? -1 : 1;
   document.getElementById('hole').classList.toggle('lefty', progress.hand === 'L');
   handBtn.classList.toggle('on', progress.hand === 'L');
-  if (camera) camera.setViewOffset(1200, 700, progress.hand === 'L' ? -90 : 90, 0, 1200, 700);
+  if (camera) camera.setViewOffset(1200, 700, progress.hand === 'L' ? -60 : 60, 0, 1200, 700);
 }
 function setOverview(on) { play.overview = on; viewBtn.classList.toggle('on', on); }
 /* the putter meets the ball */
@@ -1139,7 +1139,7 @@ function drawPad() {
   if (!path || path.samples.length < 1) { padBack.setAttribute('points', ''); padFwd.setAttribute('points', ''); padStart.setAttribute('cx', -50); padLine.setAttribute('y1', -50); padLine.setAttribute('y2', -50); return; }
   /* stage px -> the pad's own picture: the pad's inner box sits at its border plus 4 px */
   const r = padPath.getBoundingClientRect(), st = stage.getBoundingClientRect();
-  const ox = (r.left - st.left) / stageScale, oy = (r.top - st.top) / stageScale, sx = 172 / (r.width / stageScale || 172), sy = 562 / (r.height / stageScale || 562);
+  const ox = (r.left - st.left) / stageScale, oy = (r.top - st.top) / stageScale, sx = 112 / (r.width / stageScale || 112), sy = 352 / (r.height / stageScale || 352);
   const pt = q => `${((q.x - ox) * sx).toFixed(1)},${((q.y - oy) * sy).toFixed(1)}`;
   const sm = path.samples, s0 = sm[0];
   let k = 0; for (let i = 1; i < sm.length; i++) if (sm[i].y > sm[k].y) k = i;   /* the bottom of the backswing */

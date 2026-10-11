@@ -37,8 +37,8 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
     };
     const ideal = L => L / TEMPO_T;
     return {
-      smooth: stroke(160, ideal(160)), full: stroke(320, ideal(320)), slow: stroke(160, ideal(160) / 2), fast: stroke(160, ideal(160) * 2),
-      right: stroke(160, ideal(160), 40), toe: stroke(160, ideal(160), 0, 30), heel: stroke(160, ideal(160), 0, -30), tiny: stroke(10, 200),
+      smooth: stroke(120, ideal(120)), full: stroke(240, ideal(240)), slow: stroke(120, ideal(120) / 2), fast: stroke(120, ideal(120) * 2),
+      right: stroke(120, ideal(120), 40), toe: stroke(120, ideal(120), 0, 30), heel: stroke(120, ideal(120), 0, -30), tiny: stroke(10, 200),
       letGo: computeStroke([{ t: 0, x: 0, y: 0 }, { t: 0.2, x: 0, y: 100 }, { t: 0.4, x: 0, y: 30 }]),
     };
   });

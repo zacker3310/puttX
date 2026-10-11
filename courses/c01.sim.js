@@ -52,14 +52,14 @@ registerWorld(1, { holes: [
              { kind: 'spin', x: -0.1, z: 5.5, len: 0.7, w: -1.4, phase: 0.5, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 6.6, -0.3, 8) }] },
   /* 10: scaffold climb (3 parts). Ramp to the first lift, cross the belt that wants you off the edge, ramp to the top deck */
-  { par: 3, sol: [], tee: [0.6, 0.5], cup: [0.7, 8.1], aim0: -20,
+  { par: 3, sol: [], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
     shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6.2], [1.4, 9], [-1.4, 9], [-1.4, 6.2], [-1.4, 3.4]],
     tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.44 }],
     ramps: [{ x0: -1.4, z0: 2.2, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 },
             { x0: 0.6, z0: 5, x1: 1.4, z1: 6.2, axis: 'z', h0: 0.22, h1: 0.44 }],
-    inner: [[[0.6, 5], [0.6, 6.2]]],
-    zones: [{ push: [0, -0.9], poly: rect(-0.5, 3.4, 0.5, 6.2) }],
-    bumps: [{ x: -0.3, z: 8, r: 0.4, h: 0.12 }] },
+    inner: [[[0.6, 5], [0.6, 6.2]], [[1.4, 7.1], [-0.5, 7.1]]],
+    zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
+    bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
   /* 11: the tilted slab. A poured slab leans to the right; read the break through the girder posts */
   { par: 2, sol: [], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 7.2), h: 0.1, sx: 0.045 }],

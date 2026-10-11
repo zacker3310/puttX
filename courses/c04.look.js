@@ -56,7 +56,7 @@ function c4Lift(m) {
 }
 WORLD_LOOK[4] = {
   felt: '#438a3b', wall: '#6fc0df', ground: C4_SNOW, sky: ['#9fcde6', '#f4f8fa'], fog: true, flag: '#ef7d6d', icon: C4_FLAKE_SVG,
-  ice: '#3f83a2', water: '#2a5d8a', skirt: '#d5e6ef', jingle: [659, 784, 988, 1175, 1319],
+  ice: '#4a94b5', water: '#24507e', skirt: '#d5e6ef', jingle: [659, 784, 988, 1175, 1319],
   prop: r => { const k = r(); return k < 0.6 ? c4Pine(r) : k < 0.8 ? c4Drift(r) : c4Snowman({ r: 0.13 + r() * 0.07 }); },
   post: (p, look) => p.look === 'snowman' ? c4Snowman(p) : defaultPost(p, look),
   mover: (m, look) => m.look === 'snowball' ? c4Snowball(m) : m.look === 'lift' ? c4Lift(m) : defaultMover(m, look),

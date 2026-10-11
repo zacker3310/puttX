@@ -9,8 +9,8 @@ const V6_COL = (x, z, r = 0.12) => ({ x, z, r, top: 0.3, look: 'basalt' });
 const V6_ROCK = (ax, az, bx, bz, period, phase = 0, r = 0.18) => ({ kind: 'slide', ax, az, bx, bz, r, period, phase, look: 'boulder' });
 registerWorld(6, { holes: [
   /* 1: a cinder cone square in the line */
-  { par: 2, sol: [[12,0.64,0]], tee: [0, 0.5], cup: [0.45, 5.7], shape: rect(-1, 0, 1, 6.4),
-    bumps: [{ x: 0.1, z: 3, r: 0.65, h: 0.3 }, { x: 0.6, z: 4.4, r: 0.35, h: 0.15 }], zones: [V6_LAVA(rect(-1, 6.05, 1, 6.4))] },
+  { par: 2, sol: [[40,0.84,0]], tee: [0, 0.5], cup: [0.3, 5.4], shape: rect(-1, 0, 1, 6.4),
+    bumps: [{ x: 0.1, z: 3, r: 0.65, h: 0.3 }, { x: 0.6, z: 4.4, r: 0.35, h: 0.15 }], zones: [V6_LAVA(rect(-1, 6.1, 1, 6.4))] },
   /* 2: lava creek with one bridge */
   { par: 3, sol: [[28.5,0.97,0]], tee: [0, 0.5], cup: [-0.6, 6.2], shape: rect(-1.2, 0, 1.2, 7.2),
     zones: [V6_LAVA(rect(-1.2, 3, 0.55, 3.7)), V6_MUD(rect(0.55, 3.7, 1.2, 4.2))],
@@ -45,7 +45,7 @@ registerWorld(6, { holes: [
     posts: [V6_COL(0.2, 7.6), V6_COL(1.0, 7.6)],
     zones: [V6_LAVA(rect(0.2, 4.2, 1.2, 4.8)), V6_LAVA(rect(-1.2, 8.6, -0.2, 9)), V6_MUD(rect(-1.2, 3.6, -0.5, 4.4))] },
   /* 9: volcano feeder: skirt the lava round the cone, or climb into the crater tube */
-  { par: 3, tee: [0, 0.5], cup: [-0.9, 7], aim0: 0, shape: rect(-1.6, 0, 1.6, 8),
+  { par: 3, sol: [[356,0.98,0]], tee: [0, 0.5], cup: [-0.9, 7], aim0: 0, shape: rect(-1.6, 0, 1.6, 8),
     bumps: V6_CRATER(0, 3.8, 1.2), tubes: [{ a: [0, 3.8], b: [1.05, 6.6], dir: 270 }], posts: [V6_COL(-0.25, 6.3), V6_COL(-0.6, 6.1)],
     zones: [V6_LAVA(rect(-1.6, 2.5, -1.15, 5.5)), V6_LAVA(rect(1.15, 2.5, 1.6, 5.5)), V6_LAVA(rect(-1.6, 7.6, 1.6, 8)), V6_MUD(rect(0, 6.35, 0.75, 6.85))] },
   /* 10: twin cones and a crater cup behind the saddle */
@@ -90,7 +90,7 @@ registerWorld(6, { holes: [
     posts: [V6_COL(2.6, 1.1)],
     zones: [V6_LAVA(rect(2.2, 2.4, 2.6, 3.2)), V6_LAVA(rect(3.2, 3.6, 3.6, 5))] },
   /* 17: crater moat: a narrow ramp over the lava moat to the island crater (crazy, 3 parts) */
-  { par: 4, tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
+  { par: 4, sol: [[44,0.84,0],[2,0.44,0]], tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
     ramps: [{ x0: 0.5, z0: 3.7, x1: 1.1, z1: 4.5, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.2, 4.5, 1.2, 7.5), h: 0.25 }],
     bumps: [...V6_CRATER(-0.4, 6.5, 0.85), ...V6_CRATER(-1.5, 2, 0.7)], tubes: [{ a: [-1.5, 2], b: [0.6, 5.1], dir: 340 }], posts: [V6_COL(0.1, 5.8)],

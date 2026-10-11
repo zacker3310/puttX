@@ -19,19 +19,16 @@ function c01Girders(r) {
   return g;
 }
 function c01Digger(r) {
-  const g = new THREE.Group(), s = 0.8 + r() * 0.4, ink = mat(C01.inkStrong, { roughness: 0.9 });
-  for (const z of [-0.13, 0.13]) {
-    const track = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.08, 12), ink); track.rotation.x = Math.PI / 2; track.scale.set(1, 1, 1);
-    const tr = new THREE.Group(); tr.add(track); tr.scale.set(1, 1, 3.4); tr.rotation.y = Math.PI / 2; tr.position.set(0, 0.06, z); g.add(tr);
-  }
-  g.add(c01Box(0.36, 0.14, 0.3, C01.yellow, 0, 0.19, 0), c01Box(0.16, 0.16, 0.2, C01.yellowDown, -0.08, 0.34, 0.03));
-  const win = c01Box(0.01, 0.09, 0.14, '#6fc0df', 0.005, 0.36, 0.03); g.add(win);
-  const arm = new THREE.Group();
-  arm.add(c01Box(0.34, 0.05, 0.05, C01.yellow, 0.17, 0, 0));
-  const fore = new THREE.Group(); fore.position.x = 0.34; fore.rotation.z = -1.1; fore.add(c01Box(0.24, 0.045, 0.045, C01.yellowDown, 0.12, 0, 0));
-  fore.add(c01Box(0.08, 0.07, 0.1, C01.ink, 0.25, -0.02, 0));
-  arm.add(fore); arm.position.set(0.12, 0.28, -0.08); arm.rotation.z = 0.55; g.add(arm);
-  g.scale.setScalar(s); return g;
+  const g = new THREE.Group();
+  g.add(c01Box(0.42, 0.09, 0.09, C01.inkStrong, 0, 0.045, 0.13), c01Box(0.42, 0.09, 0.09, C01.inkStrong, 0, 0.045, -0.13));
+  g.add(c01Box(0.34, 0.12, 0.32, C01.yellow, 0, 0.15, 0), c01Box(0.16, 0.17, 0.2, C01.yellowDown, -0.07, 0.295, 0.04));
+  g.add(c01Box(0.012, 0.09, 0.15, '#6fc0df', 0.012, 0.31, 0.04), c01Box(0.06, 0.05, 0.3, C01.ink, -0.17, 0.2, 0));
+  const boom = new THREE.Group(); boom.position.set(0.12, 0.24, -0.08); boom.rotation.z = 0.6;
+  boom.add(c01Box(0.34, 0.07, 0.07, C01.yellow, 0.17, 0, 0));
+  const stick = new THREE.Group(); stick.position.x = 0.33; stick.rotation.z = -1.7;
+  stick.add(c01Box(0.26, 0.06, 0.06, C01.yellowDown, 0.13, 0, 0), c01Box(0.1, 0.09, 0.13, C01.ink, 0.27, 0.02, 0));
+  boom.add(stick); g.add(boom);
+  g.scale.setScalar(0.85 + r() * 0.4); return g;
 }
 function c01Barrels() {
   const g = new THREE.Group();

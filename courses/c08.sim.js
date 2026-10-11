@@ -41,7 +41,7 @@
       tiers: [{ poly: rect(-0.72, -0.12, 0.72, 2.4), h: 0.5 }, { poly: rect(-1.32, 2.4, 1.4, 4.72), h: 0.25 }],
       bumps: [{ x: -0.35, z: 3.6, r: 0.42, h: -0.16 }, { x: 2.3, z: 5.2, r: 0.5, h: -0.2 }] },
     /* 4. asteroid bridge: a rail-less span with rocks drifting across it */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [0.5, 6.2],
+    { par: 3, sol: [[4,0.6,0.5]], tee: [0, 0.5], cup: [0.5, 6.2],
       floors: [rect(-0.9, 0, 0.9, 1.6), rect(-0.5, 1.6, 0.5, 5), rect(-1, 5, 1, 6.9)],
       walls: [[[-0.5, 1.6], [-0.9, 1.6], [-0.9, 0], [0.9, 0], [0.9, 1.6], [0.5, 1.6]], [[-0.5, 5], [-1, 5], [-1, 6.9], [1, 6.9], [1, 5], [0.5, 5]]],
       posts: [ALIEN(0.05, 5.85)],
@@ -66,12 +66,12 @@
       bumps: [{ x: -0.7, z: 4.7, r: 0.45, h: -0.2 }],
       posts: [ALIEN(0.3, 4.55), ALIEN(1.05, 4.35), ALIEN(0.25, 5.5)],
       movers: [SAT(0, 2.8, 0.72, 1.3, 0, 2)] },
-    /* 8. stairway to orbit: two ramp jumps up onto higher decks */
-    { par: 4, sol: [[334.25,0.9,0]], tee: [0, 0.5], cup: [3.1, 5.6],
-      floors: [rect(-0.6, 0, 0.6, 3), rect(-1, 3.6, 1, 6), rect(1.6, 3.8, 3.8, 6.6)],
-      walls: [...box(-0.6, 0, 0.6, 3, 'n'), [[1, 3.6], [-1, 3.6], [-1, 6], [1, 6]], ...box(1.6, 3.8, 3.8, 6.6, 'ne')],
-      tiers: [DECK(-1, 3.6, 1, 6, 0.3), DECK(1.6, 3.8, 3.8, 6.6, 0.55)],
-      ramps: [{ x0: -0.6, z0: 2.2, x1: 0.6, z1: 3, axis: 'z', h0: 0, h1: 0.35 }, { x0: 0.3, z0: 3.6, x1: 1, z1: 6, axis: 'x', h0: 0.3, h1: 0.6 }],
+    /* 8. stairway to orbit: two ramp jumps, each deck higher than the last */
+    { par: 4, sol: [], tee: [0, 0.5], cup: [2.9, 5.9],
+      floors: [rect(-0.6, 0, 0.6, 3), rect(-1, 3.6, 1, 6), rect(1.45, 3.8, 3.6, 6.6)],
+      walls: [...box(-0.6, 0, 0.6, 3, 'n'), [[1, 3.6], [0.25, 3.6], [-1, 3.6], [-1, 6], [0.25, 6], [1, 6]], ...box(1.45, 3.8, 3.6, 6.6, 'n')],
+      tiers: [DECK(-1, 3.6, 1, 6, 0.2), DECK(1.45, 3.8, 3.6, 6.6, 0.32)],
+      ramps: [{ x0: -0.6, z0: 2.2, x1: 0.6, z1: 3, axis: 'z', h0: 0, h1: 0.4 }, { x0: 0.3, z0: 3.6, x1: 1, z1: 6, axis: 'x', h0: 0.2, h1: 0.42 }],
       bumps: [{ x: 2.4, z: 5.2, r: 0.4, h: -0.16 }] },
     /* 9. tilted greenhouse: the whole deck leans, aliens kick */
     { par: 2, sol: [[326,1,0],[0,0.68,0]], tee: [0, 0.5], cup: [3, 5.05],
@@ -80,7 +80,7 @@
       bumps: [{ x: 0, z: 5, r: 0.5, h: -0.2 }],
       posts: [ALIEN(1.6, 5.3), ALIEN(2.25, 4.55), ALIEN(1.5, 4.4)] },
     /* 10. tube relay: tee deck, tube, asteroid deck, jump, cup deck */
-    { par: 4, sol: [], tee: [0, 0.5], cup: [1.6, 6.4],
+    { par: 3, sol: [[344,1,0],[32,0.96,0]], tee: [0, 0.5], cup: [1.6, 6.4],
       floors: [rect(-0.8, 0, 0.8, 2.4), rect(2, 0, 3.6, 4), rect(1, 4.8, 3.8, 7)],
       walls: [...box(-0.8, 0, 0.8, 2.4), ...box(2, 0, 3.6, 4, 'n'), ...box(1, 4.8, 3.8, 7, 'w')],
       ramps: [{ x0: 2, z0: 3.2, x1: 3.6, z1: 4, axis: 'z', h0: 0, h1: 0.2 }],

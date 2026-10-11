@@ -40,13 +40,13 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(0.1, 2.75, 0.6, 3.1)), J3_MUD(rect(1.0, 4.6, 1.6, 5.6))],
     tubes: [{ a: [0.38, 2.4], b: [2.4, 1.9], dir: 180, keep: 0, add: 0.6 }], posts: [J3_IDOL(2.0, 1.2), J3_IDOL(2.75, 0.45)] },
   /* 8: the crocodile pool: a skinny causeway straight over, or the long way round the banks */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.5, 5.3], shape: rect(-1.4, 0, 1.4, 6),
+  { par: 3, sol: [[357,0.84,0]], tee: [0, 0.5], cup: [-0.5, 5.3], shape: rect(-1.4, 0, 1.4, 6),
     zones: [J3_WATER(rect(-0.9, 2.0, -0.2, 4.2)), J3_WATER(rect(0.3, 2.0, 0.9, 4.2))],
     bumps: [{ x: 0, z: 4.6, r: 0.45, h: 0.18 }], posts: [J3_IDOL(-1.0, 4.7)] },
   /* 9: the boulder run: downhill, over the bridge, past two rolling boulders */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
+  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
     tiers: [{ poly: rect(-0.9, 0, 0.9, 9), h: 0.4, sz: -0.04 }],
-    zones: [J3_WATER(rect(-0.9, 5, 0.2, 5.5)), J3_WATER(rect(0.7, 5, 0.9, 5.5)), J3_MUD(rect(-0.9, 2.4, 0.3, 2.9))],
+    zones: [J3_WATER(rect(-0.9, 5, 0.25, 5.5)), J3_WATER(rect(0.65, 5, 0.9, 5.5)), J3_MUD(rect(-0.9, 2.4, 0.3, 2.9))],
     movers: [J3_ROCK(-0.55, 3.7, 0.55, 3.7, 2.2), J3_ROCK(0.55, 6.6, -0.55, 6.6, 3.0)], bumps: [{ x: -0.3, z: 7.6, r: 0.4, h: 0.12 }] },
   /* 10: the idol ring: the cup on a hilltop shrine, idols all round */
   { par: 3, sol: [[0,0.6,0]], tee: [0, 0.5], cup: [0, 4.4], shape: [[-0.6, 0], [0.6, 0], [0.6, 2.2], [1.5, 3.1], [1.5, 5.6], [0.7, 6.4], [-0.7, 6.4], [-1.5, 5.6], [-1.5, 3.1], [-0.6, 2.2]],

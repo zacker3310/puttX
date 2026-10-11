@@ -67,16 +67,16 @@ registerWorld(9, { holes: [
     posts: [C9_GUM(2.4, 4.7), C9_GUM(3.0, 5.3)],
     tubes: [C9_PIPE([0.4, 2.1], [2.0, 3.8], 30), C9_PIPE([3.1, 5.7], [-0.45, 7.35], 0)] },
   /* 13: a hard-candy causeway through the chocolate */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.3, 6.4], shape: rect(-1.5, 0, 1.5, 7),
+  { par: 3, sol: [[183, 0.75, 0], [27, 0.3, 0]], tee: [0, 0.5], cup: [0.3, 6.4], shape: rect(-1.5, 0, 1.5, 7),
     zones: [{ surf: 'water', poly: rect(-1.5, 1.6, -0.8, 6) }, { surf: 'water', poly: rect(0.8, 1.6, 1.5, 6) }, { surf: 'fast', poly: rect(-0.8, 1.6, 0.8, 6) }],
     posts: [C9_GUM(0.35, 3, 0.12, 1.1), C9_GUM(-0.05, 4.4, 0.12, 1.1), C9_GUM(0.3, 5.5, 0.11, 1.1)] },
   /* 14: up to the lollipop deck, drop into the crater, through the taffy to the cup */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.7, 7.9], aim0: 0,
+  { par: 3, sol: [], tee: [0, 0.5], cup: [0.7, 8.0], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 3], [1.2, 3], [1.2, 8.6], [-1.2, 8.6], [-1.2, 3], [-0.7, 3]],
     ramps: [{ x0: -0.7, z0: 1.8, x1: 0.7, z1: 3, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.2, 3, 1.2, 5), h: 0.3 }],
     bumps: [{ x: -0.2, z: 6.0, r: 0.55, h: -0.2 }],
-    zones: [{ surf: 'mud', poly: rect(-0.1, 7.1, 1.2, 7.4) }],
+    zones: [{ surf: 'mud', poly: rect(0.35, 7.3, 1.2, 7.5) }, { surf: 'mud', poly: rect(0.15, 7.3, 0.35, 8.6) }],
     movers: [C9_POP(0, 4, 0.5, 1.5, 0, 2)] },
   /* 15: lollipop, press, taffy: the packing line */
   { par: 4, sol: [], tee: [0, 0.5], cup: [0.4, 8.3], shape: rect(-1, 0, 1, 9),
@@ -95,13 +95,15 @@ registerWorld(9, { holes: [
     zones: [{ surf: 'water', poly: rect(-2, 3, 1.5, 4.2) }, { surf: 'mud', poly: rect(-1.55, 6.3, -0.85, 6.5) }, { surf: 'mud', poly: rect(-2, 6.3, -1.55, 7.5) },
       { surf: 'mud', poly: rect(-0.85, 6.3, -0.6, 7.5) }],
     posts: [C9_GUM(-0.5, 5.5), C9_GUM(-1.4, 5.4), C9_GUM(0.4, 5.9)] },
-  /* 18: the production line: belt up the ramp, gumdrop maze, pipe drop, taffy-guarded cup */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [0.6, 10.8], aim0: 0,
+  /* 18: the production line: belt up the ramp, gumdrop maze round a lollipop to the pipe, taffy-guarded cup */
+  { par: 5, sol: [], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]], rect(-0.6, 8.5, 3.4, 11.6)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]]), ring(rect(-0.6, 8.5, 3.4, 11.6))],
     ramps: [{ x0: -0.6, z0: 2, x1: 0.6, z1: 4.5, axis: 'z', h0: 0, h1: 0.45 }],
     tiers: [{ poly: rect(-0.6, 4.5, 3.4, 7.5), h: 0.45 }],
-    zones: [C9_BELT(rect(-0.6, 2, 0.6, 4.5), 0, 2.4), { surf: 'mud', poly: rect(-0.6, 10.0, 1.3, 10.3) }, { surf: 'mud', poly: rect(1.3, 10.0, 1.6, 11.6) }],
-    posts: [C9_GUM(0.6, 5.3), C9_GUM(1.4, 5.9), C9_GUM(2.3, 5.3), C9_GUM(0.2, 6.6), C9_GUM(1.2, 6.9), C9_GUM(2.2, 6.6)],
+    zones: [C9_BELT(rect(-0.6, 2, 0.6, 4.5), 0, 2.4), C9_BELT(rect(-0.6, 8.5, 3.4, 9.5), 1.2, 0),
+      { surf: 'mud', poly: rect(0.05, 10.3, 0.75, 10.5) }, { surf: 'mud', poly: rect(-0.6, 10.3, 0.05, 11.6) }, { surf: 'mud', poly: rect(0.75, 10.3, 0.95, 11.6) }],
+    posts: [C9_GUM(0.6, 5.3), C9_GUM(1.4, 5.9), C9_GUM(2.4, 5.2), C9_GUM(0.2, 6.6), C9_GUM(1.2, 6.9), C9_GUM(3.0, 6.0)],
+    movers: [C9_POP(2.3, 6.4, 0.5, 1.4, 0, 2)],
     tubes: [C9_PIPE([3.0, 7.1], [3.0, 8.9], 270)] },
 ] });

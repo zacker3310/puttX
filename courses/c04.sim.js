@@ -30,9 +30,9 @@ registerWorld(4, { holes: [
     zones: [{ surf: 'water', poly: C4_POOL(0.05, 3.0, 0.55, 0.5) }, { surf: 'water', poly: C4_POOL(-0.4, 6.0, 0.55, 0.22) }, { surf: 'water', poly: C4_POOL(0.85, 4.5, 0.3, 0.35, 8) },
       { surf: 'ice', poly: rect(-1.4, 1.6, 1.4, 6.4) }], bumps: [{ x: -0.3, z: 5.1, r: 0.6, h: 0.1 }] },
   /* 7. terraces: drop off the tee deck onto an ice shelf, then drop again and come back to the cup */
-  { par: 4, sol: [[326,0.96,0],[0,1,0]], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
+  { par: 3, sol: [], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
     tiers: [{ poly: rect(-0.6, 0, 0.6, 3), h: 0.4 }, { poly: rect(-0.6, 3, 3, 4.6), h: 0.2 }],
-    zones: [{ surf: 'ice', poly: rect(-0.6, 3, 3, 4.6) }], bumps: [{ x: 1.2, z: 3.8, r: 0.3, h: 0.1 }, { x: 2.4, z: 1.1, r: 0.55, h: 0.08 }] },
+    zones: [{ surf: 'ice', poly: rect(-0.6, 3, 3, 4.6) }], bumps: [{ x: 1.2, z: 3.8, r: 0.3, h: 0.1 }, { x: 2.4, z: 1.1, r: 0.55, h: 0.12 }] },
   /* 8. ski lift: a lift bar sweeps across the gap, then a climb to the summit deck */
   { par: 3, sol: [[40,1,1]], tee: [0, 0.5], cup: [0.35, 6.1], shape: rect(-1, 0, 1, 7), inner: [[[-1, 2.8], [-0.3, 2.8]], [[0.3, 2.8], [1, 2.8]]],
     movers: [{ kind: 'gate', ax: -0.44, az: 3.1, bx: 0.44, bz: 3.1, len: 0.35, ang: 90, period: 3.2, phase: 0, look: 'lift' }],
@@ -54,7 +54,7 @@ registerWorld(4, { holes: [
     ramps: [{ x0: -0.7, z0: 2.6, x1: 0.7, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }], zones: [{ surf: 'ice', poly: rect(1.1, 3.6, 1.5, 4.4) }],
     inner: [[[-1.2, 6.3], [0.8, 6.3]]], bumps: [{ x: 0.3, z: 5.4, r: 0.35, h: 0.12 }, { x: -0.4, z: 7.3, r: 0.55, h: 0.08 }], posts: [C4_MAN(0.55, 7.6)] },
   /* 12. ice cave: a tube through the snowbank, or the long way round over the ice */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.8, 5.4], aim0: 330, shape: rect(-1.5, 0, 1.5, 6.2), inner: [[[-1.5, 3.2], [1.0, 3.2]]],
+  { par: 3, sol: [[34,0.8,0]], tee: [0, 0.5], cup: [-0.8, 5.4], aim0: 330, shape: rect(-1.5, 0, 1.5, 6.2), inner: [[[-1.5, 3.2], [1.0, 3.2]]],
     tubes: [{ a: [-1.0, 2.5], b: [-1.0, 4.0], dir: 270 }], posts: [C4_MAN(-0.45, 1.55)],
     zones: [{ surf: 'ice', poly: rect(-1.5, 3.2, 1.5, 6.2) }], bumps: [{ x: -0.8, z: 5.4, r: 0.6, h: 0.1 }] },
   /* 13. ice run: a switchback with banked turns and an ice straight down the middle */

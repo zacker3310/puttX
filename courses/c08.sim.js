@@ -25,7 +25,7 @@
   };
   registerWorld(8, { g: 0.427, feltMu: 0.19, holes: [
     /* 1. launch pad: one ramp jump over the void, then round the bulkhead to the cup */
-    { par: 3, sol: [[330,1,0],[2,0.2,0]], tee: [0, 0.5], cup: [2.85, 5.5],
+    { par: 3, sol: [[44,1,0],[8,0.68,0]], tee: [0, 0.5], cup: [2.85, 5.5],
       floors: [rect(-0.7, 0, 0.7, 3), [[-1.2, 4], [1.2, 4], [1.2, 5], [3.4, 5], [3.4, 6], [-1.2, 6]]],
       walls: [...box(-0.7, 0, 0.7, 3, 'n'), [[3.4, 5], [1.2, 5], [1.2, 4], [-1.2, 4], [-1.2, 6], [3.4, 6]]],
       ramps: [{ x0: -0.7, z0: 2.2, x1: 0.7, z1: 3, axis: 'z', h0: 0, h1: 0.22 }] },
@@ -42,10 +42,10 @@
       bumps: [{ x: -0.35, z: 3.6, r: 0.42, h: -0.16 }, { x: 2.3, z: 5.2, r: 0.5, h: -0.2 }] },
     /* 4. asteroid bridge: a rail-less span with rocks drifting across it */
     { par: 3, sol: [], tee: [0, 0.5], cup: [0.5, 6.2],
-      floors: [rect(-0.9, 0, 0.9, 1.6), rect(-0.45, 1.6, 0.45, 5), rect(-1, 5, 1, 6.9)],
-      walls: [[[-0.45, 1.6], [-0.9, 1.6], [-0.9, 0], [0.9, 0], [0.9, 1.6], [0.45, 1.6]], [[-0.45, 5], [-1, 5], [-1, 6.9], [1, 6.9], [1, 5], [0.45, 5]]],
+      floors: [rect(-0.9, 0, 0.9, 1.6), rect(-0.5, 1.6, 0.5, 5), rect(-1, 5, 1, 6.9)],
+      walls: [[[-0.5, 1.6], [-0.9, 1.6], [-0.9, 0], [0.9, 0], [0.9, 1.6], [0.5, 1.6]], [[-0.5, 5], [-1, 5], [-1, 6.9], [1, 6.9], [1, 5], [0.5, 5]]],
       posts: [ALIEN(0.05, 5.85)],
-      movers: [ROCK(-0.8, 2.7, 0.8, 2.7, 2.6, 0, 0.15), ROCK(0.8, 3.9, -0.8, 3.9, 3.3, 0, 0.15)] },
+      movers: [ROCK(-0.85, 3.3, 0.85, 3.3, 3, 0, 0.16)] },
     /* 5. teleporter: jump the gap the long way, or drop into the tube */
     { par: 2, sol: [[6,0.8,0],[0,0.28,0]], tee: [0.3, 0.5], cup: [0.95, 6.05], aim0: -15,
       floors: [rect(-1, 0, 1, 2.6), rect(-1.4, 3.6, 1.4, 6.8)],
@@ -118,12 +118,14 @@
       bumps: [{ x: -0.6, z: 4.3, r: 0.5, h: -0.2 }, { x: 0.7, z: 3.9, r: 0.45, h: -0.2 }],
       tubes: [{ a: [-1.15, 5.15], b: [2.6, 6.85], dir: 0, keep: 0.5, add: 0.2 }],
       movers: [ROCK(0.25, 7.2, 2.0, 7.2, 2.6), ROCK(2.6, 7.9, 1.2, 7.9, 3.2, 1)] },
-    /* 16. solar wind: a rail-less deck with the wind blowing across it toward the void */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [-0.55, 6.3],
-      floors: [rect(-1.2, 0, 1.2, 7)],
-      walls: [[[-1.2, 1.5], [-1.2, 0], [1.2, 0], [1.2, 1.5]], [[-1.2, 6.2], [-1.2, 7], [1.2, 7], [1.2, 6.2]]],
-      bumps: [{ x: 0.35, z: 4.3, r: 0.45, h: -0.2 }],
-      zones: [{ push: [0.35, 0], poly: rect(-1.2, 1.6, 1.2, 5.9) }] },
+    /* 16. solar wind: a rail-less slab, a crosswind toward the void, rocks drifting through it */
+    { par: 3, sol: [[336,0.68,0]], tee: [0, 0.5], cup: [0.35, 7.1],
+      floors: [rect(-1.2, 0, 1.2, 7.9)],
+      walls: [],
+      bumps: [{ x: -0.35, z: 6.1, r: 0.4, h: -0.2 }],
+      posts: [ALIEN(0.08, 6.55), ALIEN(0.7, 6.6)],
+      zones: [{ push: [1.1, 0], poly: rect(-1.2, 1.5, 1.2, 5.6) }],
+      movers: [ROCK(-0.9, 2.6, 0.9, 2.6, 2.8, 0, 0.2), ROCK(0.9, 4.4, -0.9, 4.4, 2.2, 0, 0.2)] },
     /* 17. airlock maze: two doors to time, or thread the rock to the tube */
     { par: 4, sol: [], tee: [0, 0.5], cup: [1.1, 6.3], shape: rect(-1.8, 0, 1.8, 7),
       inner: [[[-1.8, 2.2], [0.9, 2.2]], [[-0.9, 4.4], [1.8, 4.4]]],

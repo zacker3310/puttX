@@ -66,7 +66,7 @@ WORLD_LOOK[5] = (() => {
     return g;
   }
   function palm(r) {
-    const g = new THREE.Group(), s = 0.8 + r() * 0.5, lean = (r() - 0.5) * 0.5;
+    const g = new THREE.Group(), s = 0.55 + r() * 0.3, lean = (r() - 0.5) * 0.4;
     const trunk = mat('#a8804e', { roughness: 0.9 });
     let y = 0, x = 0;
     for (let i = 0; i < 5; i++) {
@@ -75,9 +75,9 @@ WORLD_LOOK[5] = (() => {
     }
     const leaf = mat('#4e9a45', { roughness: 0.8, side: THREE.DoubleSide });
     for (let i = 0; i < 6; i++) {
-      const fr = shade(new THREE.Mesh(new THREE.BoxGeometry(0.5 * s, 0.02, 0.14 * s), leaf));
+      const fr = shade(new THREE.Mesh(new THREE.BoxGeometry(0.4 * s, 0.02, 0.13 * s), leaf));
       const a = i * Math.PI / 3;
-      fr.position.set(x + Math.cos(a) * 0.22 * s, y - 0.02, Math.sin(a) * 0.22 * s); fr.rotation.y = -a; fr.rotation.z = -0.35; g.add(fr);
+      fr.position.set(x + Math.cos(a) * 0.17 * s, y - 0.02, Math.sin(a) * 0.17 * s); fr.rotation.y = -a; fr.rotation.z = -0.35; g.add(fr);
     }
     for (let i = 0; i < 3; i++) { const nut = new THREE.Mesh(new THREE.SphereGeometry(0.04 * s, 8, 6), mat('#6e5233')); nut.position.set(x + Math.cos(i * 2.1) * 0.05, y - 0.06, Math.sin(i * 2.1) * 0.05); g.add(nut); }
     return g;
@@ -91,11 +91,11 @@ WORLD_LOOK[5] = (() => {
     g.add(box, lid, lock, gold); return g;
   }
   function island(r) {
-    const g = new THREE.Group(), rad = 0.35 + r() * 0.35;
+    const g = new THREE.Group(), rad = 0.24 + r() * 0.16;
     const sandy = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad * 1.15, 0.1, 20), mat('#f1d79c', { roughness: 1 })); sandy.position.y = 0.02; sandy.receiveShadow = true; g.add(sandy);
     const k = r();
     const top = k < 0.6 ? palm(r) : k < 0.8 ? chest() : barrel(0.12, 0.24);
-    top.position.y = 0.07; g.add(top);
+    top.position.y = 0.07; top.userData.tall = k < 0.6; g.add(top);
     return g;
   }
   function floater(r) {
@@ -129,8 +129,12 @@ WORLD_LOOK[5] = (() => {
     decor(group, h) {
       const B = holeBounds(h), s = ship();
       s.position.set(B.x1 + 3.2, -0.05, B.z1 + 2.2); s.rotation.y = 0.5; group.add(s); group.userData.ship = s;
-      const floats = [];
-      group.traverse(o => { if (o.userData.bob !== undefined) floats.push(o); });
+      const floats = [], tee = new THREE.Vector3();
+      group.traverse(o => {
+        if (o.userData.bob !== undefined) floats.push(o);
+        /* no palm fronds in the camera's face behind the tee */
+        if (o.userData.tall) { o.getWorldPosition(tee); if (Math.hypot(tee.x - h.tee[0], tee.z - h.tee[1]) < 3.2) o.visible = false; }
+      });
       group.userData.floats = floats;
     },
     tick(group, dt, t) {

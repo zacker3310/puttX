@@ -50,10 +50,9 @@
     hook.position.set(0.16 * s, 1.2 * s, 0); shaft.castShadow = hook.castShadow = true; g.add(shaft, hook); return g;
   };
   const prop = r => {
-    const k = r();
-    if (k < 0.4) return lollipop(0.5 + r() * 0.6, CANDY[Math.floor(r() * CANDY.length)]);
-    if (k < 0.75) { const g = gumdrop(0.12 + r() * 0.14, CANDY[Math.floor(r() * CANDY.length)], 0.3 + r() * 0.2); return g; }
-    return candyCane(0.5 + r() * 0.5);
+    const k = r(), g = k < 0.4 ? lollipop(0.5 + r() * 0.6, CANDY[Math.floor(r() * CANDY.length)])
+      : k < 0.75 ? gumdrop(0.12 + r() * 0.14, CANDY[Math.floor(r() * CANDY.length)], 0.3 + r() * 0.2) : candyCane(0.5 + r() * 0.5);
+    g.name = 'c9prop'; return g;
   };
   /* gumdrop bumper */
   const post = p => p.look === 'gumdrop' ? gumdrop(p.r, pick(p.x, p.z), p.top || 0.22) : defaultPost(p, lookOf(9));
@@ -95,6 +94,10 @@
         const B = holeBounds(h), pad = 0.35;
         const pool = new THREE.Mesh(new THREE.PlaneGeometry(B.x1 - B.x0 + pad * 2, B.z1 - B.z0 + pad * 2), mat('#5a3420', { roughness: 0.2, metalness: 0.1 }));
         pool.rotation.x = -Math.PI / 2; pool.position.set(B.cx, -0.02, B.cz); pool.receiveShadow = true; group.add(pool);
+        /* no scenery standing in the chocolate */
+        for (const o of group.children.filter(c => c.name === 'c9prop')) {
+          if (o.position.x > B.x0 - pad - 0.4 && o.position.x < B.x1 + pad + 0.4 && o.position.z > B.z0 - pad - 0.4 && o.position.z < B.z1 + pad + 0.4) { group.remove(o); disposeGroup(o); }
+        }
       }
       /* the lollipop discs in the props turn slowly */
       group.traverse(o => { if (o.name === 'lollyDisc') group.userData.lolly = (group.userData.lolly || []).concat(o); });

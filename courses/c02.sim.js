@@ -81,7 +81,7 @@ registerWorld(2, { holes: [
       C2_CACTUS(-0.55, 4.3), C2_CACTUS(0.5, 4.8), C2_ROCK(-1.15, 5.4, 0.15), C2_CACTUS(1.0, 5.15), C2_CACTUS(0.35, 6.0)],
     zones: [{ surf: 'sand', poly: rect(-1.6, 6.2, -0.4, 6.8) }, { surf: 'sand', poly: [[1.5, 6.0], [1.5, 6.25], [1.1, 6.8], [0.9, 6.8]] }] },
   /* 11. mesa hop: up a ramp, across the mesa past a tumbleweed, off the far left edge to the green */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.3, 7.8],
+  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.3, 7.8],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [2.4, 3], [2.4, 8.6], [-0.8, 8.6]],
     inner: [[[-0.8, 5.5], [1.0, 5.5]]],
     ramps: [{ x0: -0.8, z0: 2, x1: 0.8, z1: 3, axis: 'z', h0: 0, h1: 0.4 }],
@@ -113,7 +113,7 @@ registerWorld(2, { holes: [
     posts: [C2_CACTUS(-1.1, 2.0), C2_CACTUS(-0.2, 8.3), C2_ROCK(0.6, 8.6)] },
   /* 15. the summit cup: the hole sits on top of a giant dune */
   { par: 3, sol: [], tee: [0, 0.5], cup: [0, 5.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [1.6, 7.2], [-1.6, 7.2], [-1.6, 3.0]],
-    bumps: [{ x: 0, z: 5.2, r: 1.0, h: 0.35 }, { x: 0.8, z: 2.3, r: 0.4, h: 0.15 }],
+    bumps: [{ x: 0, z: 5.2, r: 0.85, h: 0.35 }, { x: 0.8, z: 2.3, r: 0.4, h: 0.15 }],
     zones: [{ surf: 'sand', poly: [[-1.6, 3.4], [-0.6, 3.4], [-0.9, 4.2], [-1.6, 4.4]] }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
@@ -126,13 +126,13 @@ registerWorld(2, { holes: [
     movers: [C2_WEED(-0.18, 3.4, 0.18, 3.4, 1.8, 0, 0.13), C2_WEED(3.15, 5.4, 3.15, 6.3, 2.2, 0, 0.13)],
     posts: [C2_CACTUS(1.2, 4.75), C2_CACTUS(3.35, 8.4)] },
   /* 17. the gap jump: fly the kicker over the canyon, or walk the ledge round the left */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.3, 6.4],
+  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.75, 6.95],
     floors: [[[-0.8, 0], [1.4, 0], [1.4, 3.9], [0.9, 3.9], [0.9, 3.0], [-0.8, 3.0]], rect(-1.2, 3.8, 1.4, 7.6)],
-    walls: [[[-0.8, 3.0], [-0.8, 0], [1.4, 0], [1.4, 3.8]], [[0.9, 1.4], [0.9, 2.1]], [[-1.2, 3.8], [-1.2, 7.6], [1.4, 7.6], [1.4, 3.8]]],
+    walls: [[[-0.8, 3.0], [-0.8, 0], [1.4, 0], [1.4, 3.8]], [[0.9, 1.4], [0.9, 2.1]], [[-1.2, 3.8], [-1.2, 7.6], [1.4, 7.6], [1.4, 3.8]], [[-1.2, 6.2], [-0.1, 6.2]]],
     ramps: [{ x0: -0.35, z0: 2.2, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: 0.7, z: 5.4, r: 0.4, h: 0.14 }],
-    zones: [{ surf: 'sand', poly: rect(-1.2, 6.9, 0.2, 7.6) }],
-    posts: [C2_CACTUS(-0.75, 5.4), C2_CACTUS(0.35, 6.9)] },
+    zones: [{ surf: 'sand', poly: rect(0.4, 7.0, 1.4, 7.6) }],
+    posts: [C2_CACTUS(-0.75, 5.4), C2_CACTUS(0.1, 7.0)] },
   /* 18. the three-mesa descent: off the high mesa, across the middle mesa past a tumbleweed, down to the dune green */
   { par: 5, sol: [], tee: [-0.3, 0.6], cup: [0.6, 9.2],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [1.2, 3], [1.2, 6.5], [1.2, 10], [-1.8, 10], [-1.8, 6.5], [-1.8, 3], [-0.8, 3]],

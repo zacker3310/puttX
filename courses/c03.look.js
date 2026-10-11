@@ -73,7 +73,7 @@ function j3Temple() {
   return g;
 }
 WORLD_LOOK[3] = {
-  felt: '#2f6e3a', wall: '#9aa089', ground: '#5f8a46', sky: ['#8fcfc2', '#f4f0cc'], fog: true, flag: '#ffd66e', icon: J3_LEAF_SVG,
+  felt: '#2f6e3a', wall: '#9aa089', ground: '#4a5e2e', sky: ['#8fcfc2', '#f4f0cc'], fog: true, flag: '#ffd66e', icon: J3_LEAF_SVG,
   mud: '#5b4630', water: '#2f86c8', skirt: '#6f6f5c', tube: '#ffd66e', sand: '#8a6236',
   jingle: [392, 523, 659, 587, 784],
   prop: r => { const k = r(); return k < 0.4 ? j3Palm(r) : k < 0.8 ? j3Fern(r) : j3Ruin(r); },

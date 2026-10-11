@@ -76,6 +76,28 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #rotate { display: none; position: fixed; inset: 0; background: #2f241a; place-items: center; z-index: 10; }
 #rotate svg { width: 40vmin; height: 40vmin; }
 @media (orientation: portrait) { #rotate { display: grid; } }
+/* ---------- 6. HOLE HUD ---------- */
+#homeBtn { left: 24px; top: 24px; }
+#hudHole { left: 132px; top: 30px; }
+#hudPar { left: 300px; top: 30px; }
+#hudStrokes { right: 24px; top: 30px; }
+#holeDone { position: absolute; left: 340px; top: 150px; width: 520px; height: 400px; display: none;
+  border-radius: var(--v-r-xl); background: var(--v-surface); border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card);
+  background-image: var(--v-dots); background-size: var(--v-dots-size); animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#holeDone.show { display: block; }
+#holeDone .stars { position: absolute; top: 34px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; }
+#holeDone .star { width: 96px; height: 96px; fill: var(--v-mute); }
+#holeDone .star.on { fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 3; animation: popIn .4s cubic-bezier(.3, 1.6, .5, 1) both; }
+#holeDone .star.on:nth-child(2) { animation-delay: .15s; }
+#holeDone .star.on:nth-child(3) { animation-delay: .3s; }
+#holeDone .score { position: absolute; top: 150px; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px;
+  font: 800 96px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+#holeDone .par { display: flex; align-items: center; gap: 6px; font-size: 52px; color: var(--v-ink-soft); }
+#holeDone .par svg { width: 52px; height: 52px; }
+#doneMap { left: 60px; bottom: 36px; }
+#doneNext { right: 60px; bottom: 36px; width: 140px; }
+@keyframes popIn { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #holeDone, #holeDone .star.on { animation: none; } }
 </style>
 </head>
 <body>
@@ -85,7 +107,18 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
   </section>
   <section class="scene panel" id="map"></section>
-  <section class="scene" id="hole"></section>
+  <section class="scene" id="hole">
+    <button class="btn" id="homeBtn" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+    <div class="chip" id="hudHole" aria-label="hole"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#fffdf7" stroke="#e6d2ab" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#e6d2ab"/></svg><span id="hudHoleN">1</span></div>
+    <div class="chip" id="hudPar" aria-label="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/><ellipse cx="32" cy="56" rx="18" ry="5" fill="#5a4634"/></svg><span id="hudParN">2</span></div>
+    <div class="chip" id="hudStrokes" aria-label="strokes"><svg viewBox="0 0 64 64"><path d="M44 6 L24 48" stroke="#8a7360" stroke-width="6" stroke-linecap="round"/><rect x="10" y="44" width="24" height="12" rx="5" fill="#6fc0df"/></svg><span id="hudStrokesN">0</span></div>
+    <div class="live" id="holeDone" aria-label="hole done">
+      <div class="stars"><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg></div>
+      <div class="score"><span id="doneStrokes">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
+      <button class="btn" id="doneMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+      <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+    </div>
+  </section>
   <section class="scene" id="card"></section>
 </div>
 <div id="rotate" aria-label="turn sideways"><svg viewBox="0 0 64 64"><rect x="20" y="8" width="24" height="40" rx="5" fill="none" stroke="#fff8ec" stroke-width="4"/><path d="M14 52 A22 22 0 0 0 50 52" fill="none" stroke="#ffd66e" stroke-width="4"/><path d="M50 44 L50 53 L41 53" fill="none" stroke="#ffd66e" stroke-width="4"/></svg></div>
@@ -707,21 +740,157 @@ WORLD_LOOK[1] = {
 };
 
 /* ============ 6. PLAY ============ */
-let loopPaused = false, lastNow = 0;
+const DRAG_DEAD = 24, DRAG_FULL = 260;   /* stage px: below DEAD cancels, FULL is full power */
+let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimArrow = null, aimRing = null;
+const _ray = new THREE.Raycaster(), _plane = new THREE.Plane(), _hit = new THREE.Vector3(), _v = new THREE.Vector3(), _n = new THREE.Vector3(0, 1, 0);
+
+function initAim() {
+  aimGroup = new THREE.Group(); aimGroup.visible = false;
+  const s = new THREE.Shape();
+  s.moveTo(-0.025, 0); s.lineTo(0.025, 0); s.lineTo(0.025, 0.7); s.lineTo(0.07, 0.7); s.lineTo(0, 0.86); s.lineTo(-0.07, 0.7); s.lineTo(-0.025, 0.7); s.closePath();
+  aimArrow = new THREE.Mesh(new THREE.ShapeGeometry(s), new THREE.MeshBasicMaterial({ color: 0xfffdf7, transparent: true, opacity: 0.92, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  aimArrow.rotation.x = Math.PI / 2;
+  aimRing = new THREE.Mesh(new THREE.RingGeometry(BALL_R * 1.6, BALL_R * 2.3, 48, 1, 0, 0.01), new THREE.MeshBasicMaterial({ color: 0xffd66e, side: THREE.DoubleSide, transparent: true, opacity: 0.95, depthWrite: false, toneMapped: false }));
+  aimRing.rotation.x = -Math.PI / 2;
+  aimGroup.add(aimArrow, aimRing);
+  scene.add(aimGroup);
+}
+function showAim(d) {
+  const b = play.ball;
+  aimGroup.visible = d.live;
+  aimGroup.position.set(b.x, b.y + 0.006, b.z);
+  aimArrow.rotation.z = -d.angle * Math.PI / 180;
+  aimArrow.scale.set(1, 0.35 + 0.65 * d.power, 1);
+  aimArrow.material.color.set(d.power > 0.85 ? 0xef7d6d : 0xfffdf7);
+  aimRing.geometry.dispose();
+  aimRing.geometry = new THREE.RingGeometry(BALL_R * 1.6, BALL_R * 2.3, 48, 1, Math.PI / 2, Math.max(0.01, d.power * Math.PI * 2));
+  aimRing.material.color.set(d.power > 0.85 ? 0xef7d6d : 0xffd66e);
+}
+function hideAim() { if (aimGroup) aimGroup.visible = false; }
+/* screen drag -> world aim: the putt goes opposite the drag, through the ground plane */
+function aimFromDrag(d, cx, cy) {
+  const dx = (cx - d.sx) / stageScale, dy = (cy - d.sy) / stageScale, len = Math.hypot(dx, dy), b = play.ball;
+  d.live = len >= DRAG_DEAD;
+  d.power = clamp((len - DRAG_DEAD) / (DRAG_FULL - DRAG_DEAD), 0, 1);
+  _v.set(b.x, b.y, b.z).project(camera);
+  const tx = (_v.x + 1) / 2 * 1200 - dx, ty = (1 - _v.y) / 2 * 700 - dy;
+  _ray.setFromCamera({ x: tx / 1200 * 2 - 1, y: -(ty / 700 * 2 - 1) }, camera);
+  _plane.set(_n, -b.y);
+  if (!_ray.ray.intersectPlane(_plane, _hit)) _hit.copy(_ray.ray.direction).multiplyScalar(50).add(_ray.ray.origin);
+  d.angle = Math.atan2(_hit.x - b.x, _hit.z - b.z) * 180 / Math.PI;
+  showAim(d);
+}
+function onDown(e) {
+  if (play.phase !== 'aim' || play.drag) return;
+  play.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, angle: 0, power: 0, live: false };
+}
+function onMove(e) { const d = play.drag; if (d && e.pointerId === d.id) aimFromDrag(d, e.clientX, e.clientY); }
+function onUp(e) {
+  const d = play.drag;
+  if (!d || e.pointerId !== d.id) return;
+  aimFromDrag(d, e.clientX, e.clientY);
+  play.drag = null; hideAim();
+  if (d.live) beginPutt(d.angle, d.power);
+}
+function onCancel(e) { if (play.drag && e.pointerId === play.drag.id) { play.drag = null; hideAim(); } }
+
 function startHole(key) {
   const h = holeAt(key);
   if (!h) return false;
-  Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, drag: null, fx: {} });
+  Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, drag: null, fx: {}, lastOutcome: null });
+  simAcc = 0;
   buildHoleScene(h);
+  hideAim();
+  holeDone.classList.remove('show');
   syncBall(0);
   showScene('hole');
+  updateHud();
   snapCamera();
   return true;
+}
+function goHole(key) { sfx('tap'); startHole(key); sfx('jingle', Number(key.split('-')[0])); }
+function beginPutt(angle, power) {
+  if (play.phase !== 'aim') return false;
+  const b = play.ball;
+  play.from = [b.x, b.z]; play.t0 = play.time;
+  play.ball = launch(newBall(play.hole, b.x, b.z), angle, power);
+  play.phase = 'roll';
+  sfx('putt', power);
+  return true;
+}
+function tickSim() {
+  const h = play.hole;
+  if (play.phase === 'roll' || play.phase === 'drift') {
+    const end = stepBall(h, play.ball, play.time);
+    play.time += SIM_DT;
+    if (end) endRoll(end);
+    return;
+  }
+  if (play.phase === 'aim' && moverTouch(h, play.ball, play.time)) { play.from = [play.ball.x, play.ball.z]; play.phase = 'drift'; play.drag = null; hideAim(); }
+  play.time += SIM_DT;
+}
+function endRoll(end) {
+  const r = { end, x: play.ball.x, z: play.ball.z };
+  const out = play.phase === 'drift' ? resolveDrift(play.round, r, play.from) : resolvePutt(play.round, r, play.from);
+  play.lastOutcome = out;
+  setRoll(0);
+  if (out === 'sunk') { play.phase = 'sunk'; play.fx.sunkT = 0; sfx('cup'); }
+  else if (out === 'auto') { play.phase = 'auto'; play.fx.autoT = 0; play.fx.autoFrom = end === 'oob' ? play.from.slice() : [r.x, r.z]; }
+  else {
+    if (out === 'oob') sfx('boink');
+    play.ball = newBall(play.hole, play.round.at[0], play.round.at[1]);
+    play.phase = 'aim';
+  }
+  updateHud();
+}
+/* sounds and squash for what the ball hit since the last frame */
+function drainHits() {
+  for (const [kind, v] of play.ball.hits) {
+    if (kind === 'wall' || kind === 'post') sfx('clonk', v);
+    else if (kind === 'bump' || kind === 'mover') sfx('boing', v);
+    else if (kind === 'lip') sfx('lip');
+    else if (kind === 'land') sfx('land');
+    if (kind !== 'lip' && v > 0.8) play.fx.squash = 1;
+  }
+  play.ball.hits.length = 0;
+}
+function advance(dt) {
+  if (!play.hole || play.phase === 'idle') return;
+  simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
+  while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }
+  drainHits();
+  if (play.phase === 'roll' || play.phase === 'drift') setRoll(play.ball.air ? 0 : Math.hypot(play.ball.vx, play.ball.vz));
+  const h = play.hole, b = play.ball;
+  if (play.phase === 'auto') {
+    const t = (play.fx.autoT += dt) / 0.9, k = Math.min(1, t), e = k * k * (3 - 2 * k), [fx, fz] = play.fx.autoFrom;
+    b.x = fx + (h.cup[0] - fx) * e; b.z = fz + (h.cup[1] - fz) * e;
+    b.y = groundH(h, b.x, b.z) + Math.sin(k * Math.PI) * 0.12;
+    if (k >= 1) { play.phase = 'sunk'; play.fx.sunkT = 0; sfx('cup'); }
+  } else if (play.phase === 'sunk') {
+    const t = (play.fx.sunkT += dt);
+    b.x = h.cup[0]; b.z = h.cup[1]; b.y = groundH(h, h.cup[0], h.cup[1]) - Math.min(1, t / 0.25) * 0.08;
+    if (t > 1.3) finishHole();
+  }
+}
+function updateHud() {
+  const [, n] = play.key.split('-');
+  hudHoleN.textContent = n; hudParN.textContent = play.hole.par; hudStrokesN.textContent = Math.min(play.round.strokes, capOf(play.hole));
+}
+function finishHole() {
+  play.phase = 'done';
+  const { key, round, hole } = play;
+  recordHole(progress, key, round.score, hole.par); saveProgress();
+  const stars = starsFor(round.score, hole.par);
+  holeDone.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < stars));
+  doneStrokes.textContent = round.score; donePar.textContent = hole.par;
+  holeDone.classList.add('show');
+  for (let i = 0; i < stars; i++) setTimeout(() => sfx('star', i), 250 + i * 150);
 }
 /* one animation frame: dt is clamped so a backgrounded tab never jumps */
 function stepFrame(now) {
   const dt = lastNow ? Math.min(0.1, Math.max(0, (now - lastNow) / 1000)) : 0;
   lastNow = now;
+  if (!loopPaused) advance(dt);
   renderFrame(dt);
   return dt;
 }
@@ -732,10 +901,19 @@ function boot() {
   progress = loadProgress();
   fit();
   initRenderer();
+  initAim();
+  view.addEventListener('pointerdown', onDown);
+  addEventListener('pointermove', onMove);
+  addEventListener('pointerup', onUp);
+  addEventListener('pointercancel', onCancel);
+  homeBtn.addEventListener('click', () => { sfx('tap'); showScene('title'); });
+  doneMap.addEventListener('click', () => { sfx('tap'); showScene('title'); });
+  doneNext.addEventListener('click', () => { const k = nextKey(play.key); if (k) goHole(k); else showScene('title'); });
+  const q = new URLSearchParams(location.search);
+  if (q.has('hole') && holeAt(q.get('hole'))) startHole(q.get('hole')); else showScene('title');
   addEventListener('resize', () => { fit(); resizeRenderer(); });
   addEventListener('orientationchange', () => { fit(); setTimeout(fit, 350); });
   if (window.visualViewport) visualViewport.addEventListener('resize', fit);
-  showScene('title');
   requestAnimationFrame(frame);
   window.booted = true;
 }

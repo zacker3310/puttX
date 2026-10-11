@@ -107,7 +107,6 @@ registerWorld(10, { holes: [
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
     tiers: [{ poly: rect(0.6, 4.4, 2.6, 6.2), h: 0.3 }, { poly: C10_PAD(-0.6, 7, 2.8, 9.4), h: 0.15, sx: -0.05 }],
     zones: [{ surf: 'fast', push: [-0.5, -0.75], poly: [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]] }],
-    bumps: [{ x: 0.3, z: 8.6, r: 0.3, h: -0.06 }],
     movers: [{ kind: 'spin', x: 1.6, z: 5.05, len: 0.42, w: 1.5, phase: 0, blades: 2, look: 'windmill' }] },
   /* 14. ice palace: two golden gates sweep a bare cloud-ice island; the cup hides in the palace */
   { par: 3, tee: [0, 0.6], cup: [0.1, 7.35],

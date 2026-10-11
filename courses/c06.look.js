@@ -66,12 +66,17 @@ WORLD_LOOK[6] = {
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffa040, size: 0.05, transparent: true, opacity: 0.8, depthWrite: false }));
     group.add(pts); group.userData.embers = pts; group.userData.crater = lava; group.userData.smoke = smoke;
+    /* lava pools glow a little */
+    const glow = [];
+    group.traverse(o => { if (o.isMesh && o.material && o.material.color && o.material.color.getHexString() === 'f0642c') { o.material.emissive.set('#b8360a'); o.material.emissiveIntensity = 0.55; glow.push(o.material); } });
+    group.userData.glow = glow;
   },
   tick(group, dt, t) {
     if (reducedMotion()) return;
     const pts = group.userData.embers, lava = group.userData.crater, smoke = group.userData.smoke;
     if (lava) lava.material.color.setRGB(1, 0.38 + 0.08 * Math.sin(t * 1.3), 0.12);
     if (smoke) smoke.rotation.y = Math.sin(t * 0.1) * 0.05;
+    for (const m of group.userData.glow || []) m.emissiveIntensity = 0.5 + 0.12 * Math.sin(t * 1.7);
     if (!pts) return;
     const a = pts.geometry.attributes.position;
     for (let i = 0; i < a.count; i++) { let y = a.getY(i) + dt * 0.25; if (y > 5) y -= 5; a.setY(i, y); a.setX(i, a.getX(i) + Math.sin(y * 1.7 + i) * dt * 0.03); }

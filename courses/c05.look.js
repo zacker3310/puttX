@@ -9,13 +9,13 @@ WORLD_LOOK[5] = (() => {
     '<path d="M8 54 L56 60 M8 60 L56 54" stroke="#c9a476" stroke-width="5" stroke-linecap="round"/></svg>';
   const WOOD = '#b98a52', WOOD_DARK = '#8a6538', IRON = '#4a4a55';
   const shade = o => { o.castShadow = true; return o; };
-  function barrel(r, hgt) {
+  function barrel(r, hgt, bands = IRON) {
     const g = new THREE.Group();
     const body = shade(new THREE.Mesh(new THREE.CylinderGeometry(r * 0.92, r * 0.92, hgt, 16), mat(WOOD, { roughness: 0.7 })));
     const belly = new THREE.Mesh(new THREE.CylinderGeometry(r, r, hgt * 0.5, 16), mat(WOOD, { roughness: 0.7 }));
     body.position.y = belly.position.y = hgt / 2; g.add(body, belly);
     for (const k of [0.16, 0.84]) {
-      const band = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.97, r * 0.97, hgt * 0.08, 16), mat(IRON, { roughness: 0.5 }));
+      const band = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.97, r * 0.97, hgt * 0.08, 16), mat(bands, { roughness: 0.5 }));
       band.position.y = hgt * k; g.add(band);
     }
     const lid = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.8, r * 0.8, 0.01, 16), mat(WOOD_DARK)); lid.position.y = hgt + 0.002; g.add(lid);
@@ -124,7 +124,7 @@ WORLD_LOOK[5] = (() => {
     sand: '#a37440', water: '#2aa7b8', skirt: '#8a6538', mud: '#5b4630', ice: '#2f7ea6', fast: '#3f5f86', push: '#e9a23b',
     jingle: [392, 523, 659, 523, 784],
     prop: r => r() < 0.75 ? island(r) : floater(r),
-    post: (p, look) => p.look === 'barrel' ? barrel(p.r, p.top || 0.26) : p.look === 'anchor' ? anchor(p) : defaultPost(p, look),
+    post: (p, look) => p.look === 'barrel' ? barrel(p.r, p.top || 0.26, (p.e || 0) > 1 ? '#ef7d6d' : IRON) : p.look === 'anchor' ? anchor(p) : defaultPost(p, look),
     mover: (m, look) => m.look === 'cannon' ? cannonball(m) : m.look === 'bridge' ? drawbridge(m) : m.look === 'wheel' ? shipWheel(m) : defaultMover(m, look),
     decor(group, h) {
       const B = holeBounds(h), s = ship();

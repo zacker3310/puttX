@@ -73,13 +73,13 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1, 2.6, -0.1, 3.1) }],
     movers: [C2_WEED(2.25, 5.6, 0.95, 5.6, 2.8)],
     posts: [C2_CACTUS(-0.2, 6.6), C2_CACTUS(-0.95, 6.5), C2_CACTUS(0.15, 7.45), C2_ROCK(0.45, 2.5)] },
-  /* 10. the cactus garden on a leaning canyon floor */
-  { par: 3, sol: [], tee: [0.9, 0.5], cup: [-0.9, 5.9],
+  /* 10. the cactus garden on a leaning canyon floor: the cup sits up on the high side */
+  { par: 3, sol: [], tee: [-0.7, 0.5], cup: [1.05, 5.9],
     shape: [[-1.0, 0], [1.5, 0], [1.5, 6.0], [0.9, 6.8], [-1.6, 6.8], [-1.6, 1.0]],
-    tiers: [{ poly: rect(-1.7, -0.1, 1.6, 6.9), h: 0.07, sx: 0.045, sz: 0.008 }],
-    posts: [C2_CACTUS(0.6, 2.0), C2_CACTUS(-0.3, 2.4), C2_CACTUS(0.15, 3.4), C2_CACTUS(1.0, 3.6), C2_CACTUS(-0.85, 3.7),
-      C2_CACTUS(-0.2, 4.6), C2_CACTUS(0.7, 5.1), C2_ROCK(-1.1, 4.9, 0.15), C2_CACTUS(-0.3, 6.1)],
-    zones: [{ surf: 'sand', poly: rect(-1.6, 6.3, -0.6, 6.8) }] },
+    tiers: [{ poly: rect(-1.7, -0.1, 1.6, 6.9), h: 0.08, sx: 0.05, sz: 0.008 }],
+    posts: [C2_CACTUS(-0.2, 1.9), C2_CACTUS(0.6, 2.3), C2_CACTUS(-1.0, 2.9), C2_CACTUS(0.15, 3.4), C2_CACTUS(1.05, 3.7),
+      C2_CACTUS(-0.55, 4.3), C2_CACTUS(0.5, 4.8), C2_ROCK(-1.15, 5.4, 0.15), C2_CACTUS(1.0, 5.15), C2_CACTUS(0.35, 6.0)],
+    zones: [{ surf: 'sand', poly: rect(-1.6, 6.2, -0.4, 6.8) }, { surf: 'sand', poly: [[1.5, 6.0], [1.5, 6.25], [1.1, 6.8], [0.9, 6.8]] }] },
   /* 11. mesa hop: up a ramp, across the mesa past a tumbleweed, off the far left edge to the green */
   { par: 4, sol: [], tee: [0, 0.5], cup: [-0.3, 7.8],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [2.4, 3], [2.4, 8.6], [-0.8, 8.6]],
@@ -107,7 +107,7 @@ registerWorld(2, { holes: [
   /* 14. flash flood: jump the river off the kicker, or take the plank bridge round the side */
   { par: 4, sol: [], tee: [0, 0.5], cup: [0.2, 7.9], shape: rect(-1.6, 0, 1.6, 9),
     ramps: [{ x0: -0.45, z0: 2.4, x1: 0.45, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 }],
-    zones: [{ surf: 'fast', poly: rect(0.85, 3.3, 1.35, 4.5) }, { surf: 'water', poly: rect(-1.6, 3.5, 1.6, 4.3) }],
+    zones: [{ surf: 'fast', poly: rect(0.85, 3.3, 1.35, 4.5) }, { surf: 'fast', poly: rect(-0.45, 2.4, 0.45, 3.4) }, { surf: 'water', poly: rect(-1.6, 3.5, 1.6, 4.3) }],
     bumps: [{ x: -0.6, z: 6.0, r: 0.5, h: 0.22 }, { x: 0.9, z: 6.6, r: 0.45, h: 0.2 }],
     posts: [C2_CACTUS(-1.1, 2.0), C2_CACTUS(0.75, 8.4), C2_ROCK(-0.5, 8.4)] },
   /* 15. the summit cup: the hole sits on top of a giant dune */

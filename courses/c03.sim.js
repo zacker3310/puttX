@@ -35,14 +35,14 @@ registerWorld(3, { holes: [
   /* 7: switchback. Up the ramp, round the terrace, up the back stair to the cup; or the tunnel by the pool */
   { par: 4, sol: [], tee: [0, 0.5], cup: [2.4, 0.8], aim0: 0,
     shape: [[-0.6, 0], [0.6, 0], [0.6, 4.2], [1.8, 4.2], [1.8, 0], [3.0, 0], [3.0, 5.6], [-0.6, 5.6]],
-    ramps: [{ x0: -0.6, z0: 3.2, x1: 0.6, z1: 4.2, axis: 'z', h0: 0, h1: 0.25 }, { x0: 1.8, z0: 2.4, x1: 3.0, z1: 3.4, axis: 'z', h0: 0.5, h1: 0.25 }],
-    tiers: [{ poly: [[-0.6, 4.2], [3.0, 4.2], [3.0, 5.6], [-0.6, 5.6]], h: 0.25 }, { poly: rect(1.8, 3.4, 3.0, 4.2), h: 0.25 }, { poly: rect(1.8, 0, 3.0, 2.4), h: 0.5 }],
+    ramps: [{ x0: -0.6, z0: 3.2, x1: 0.6, z1: 4.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 1.8, z0: 2.4, x1: 3.0, z1: 3.4, axis: 'z', h0: 0.4, h1: 0.2 }],
+    tiers: [{ poly: [[-0.6, 4.2], [3.0, 4.2], [3.0, 5.6], [-0.6, 5.6]], h: 0.2 }, { poly: rect(1.8, 3.4, 3.0, 4.2), h: 0.2 }, { poly: rect(1.8, 0, 3.0, 2.4), h: 0.4 }],
     zones: [J3_WATER(rect(0.1, 2.75, 0.6, 3.1)), J3_MUD(rect(1.0, 4.6, 1.6, 5.6))],
     tubes: [{ a: [0.38, 2.4], b: [2.4, 1.9], dir: 180, keep: 0, add: 0.6 }], posts: [J3_IDOL(2.0, 1.2), J3_IDOL(2.75, 0.45)] },
   /* 8: the crocodile pool: a skinny causeway straight over, or the long way round the banks */
   { par: 3, sol: [], tee: [0, 0.5], cup: [-0.7, 5.3], shape: rect(-1.4, 0, 1.4, 6),
     zones: [J3_WATER(rect(-1.0, 2.0, -0.15, 4.2)), J3_WATER(rect(0.25, 2.0, 1.0, 4.2))],
-    bumps: [{ x: -0.2, z: 4.9, r: 0.45, h: 0.18 }], posts: [J3_IDOL(-1.0, 4.7)] },
+    bumps: [{ x: 0, z: 4.6, r: 0.45, h: 0.18 }], posts: [J3_IDOL(-1.0, 4.7)] },
   /* 9: the boulder run: downhill, over the bridge, past two rolling boulders */
   { par: 4, sol: [], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
     tiers: [{ poly: rect(-0.9, 0, 0.9, 9), h: 0.4, sz: -0.04 }],
@@ -50,8 +50,8 @@ registerWorld(3, { holes: [
     movers: [J3_ROCK(-0.55, 3.7, 0.55, 3.7, 2.2), J3_ROCK(0.55, 6.6, -0.55, 6.6, 3.0)], bumps: [{ x: -0.3, z: 7.6, r: 0.4, h: 0.12 }] },
   /* 10: the idol ring: the cup on a hilltop shrine, idols all round */
   { par: 3, sol: [], tee: [0, 0.5], cup: [0, 4.4], shape: [[-0.6, 0], [0.6, 0], [0.6, 2.2], [1.5, 3.1], [1.5, 5.6], [0.7, 6.4], [-0.7, 6.4], [-1.5, 5.6], [-1.5, 3.1], [-0.6, 2.2]],
-    bumps: [{ x: 0, z: 4.4, r: 0.9, h: 0.24 }],
-    posts: [J3_IDOL(0, 3.75), J3_IDOL(0.56, 4.08), J3_IDOL(-0.56, 4.08), J3_IDOL(0.4, 4.95), J3_IDOL(-0.4, 4.95)],
+    bumps: [{ x: 0, z: 4.4, r: 0.9, h: 0.18 }],
+    posts: [J3_IDOL(0.56, 4.08), J3_IDOL(-0.56, 4.08), J3_IDOL(0.4, 4.95), J3_IDOL(-0.4, 4.95)],
     zones: [J3_MUD(rect(-1.5, 3.1, -0.9, 4.2)), J3_MUD(rect(0.9, 4.6, 1.5, 5.6))] },
   /* 11: twin tunnels out of the sealed shrine: the left one to the long green, the right one up by the cup */
   { par: 4, sol: [], tee: [0, 0.5], cup: [2.3, 6.4], aim0: 20,
@@ -66,9 +66,9 @@ registerWorld(3, { holes: [
     posts: [J3_IDOL(-0.2, 5.1)], bumps: [{ x: -0.9, z: 4.6, r: 0.5, h: 0.15 }] },
   /* 13: three temple terraces, each ramp on the other side, a boulder guarding the top */
   { par: 4, sol: [], tee: [0, 0.5], cup: [0.5, 8.4], shape: [[-1.2, 0], [1.2, 0], [1.2, 2.5], [1.2, 5], [1.2, 7], [1.2, 9], [-1.2, 9], [-1.2, 7], [-1.2, 5], [-1.2, 2.5]],
-    ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.2, h1: 0.4 },
-      { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.4, h1: 0.6 }],
-    tiers: [{ poly: rect(-1.2, 2.5, 1.2, 5), h: 0.2 }, { poly: rect(-1.2, 5, 1.2, 7), h: 0.4 }, { poly: rect(-1.2, 7, 1.2, 9), h: 0.6 }],
+    ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.15, h1: 0.3 },
+      { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.45 }],
+    tiers: [{ poly: rect(-1.2, 2.5, 1.2, 5), h: 0.15 }, { poly: rect(-1.2, 5, 1.2, 7), h: 0.3 }, { poly: rect(-1.2, 7, 1.2, 9), h: 0.45 }],
     zones: [J3_MUD(rect(-0.2, 3.3, 1.2, 3.9)), J3_MUD(rect(0.5, 5.6, 1.2, 6.3))], posts: [J3_IDOL(-0.6, 5.9), J3_IDOL(0.75, 4.6)],
     movers: [J3_ROCK(-0.8, 7.75, 0.8, 7.75, 2.4)], bumps: [{ x: 0.5, z: 8.4, r: 0.45, h: -0.08 }] },
   /* 14: down the river bank: a skinny bridge early, a wide one late behind the boulder */

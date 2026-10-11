@@ -74,7 +74,7 @@ registerWorld(10, { holes: [
     movers: [{ kind: 'spin', x: 0.55, z: 5.0, len: 0.34, w: -1.7, phase: 0.3, blades: 2, look: 'windmill' }],
     tubes: [{ a: [0.55, 1.3], b: [0.7, 3.95], dir: 0, color: '#ffd66e' }, { a: [-0.55, 1.3], b: [-2.5, 1.4], dir: 0, color: '#6fc0df' }] },
   /* 10. crown crater: the cup in a crater on top of a big hill, ringed by cloud-ice that slides you off */
-  { par: 3, tee: [0, 0.6], cup: [0, 6],
+  { par: 3, sol: [[0,0.9,0]], tee: [0, 0.6], cup: [0, 6],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.3, 2, 0.3, 3.4), ring([[-1.6, 3.4], [1.6, 3.4], [2.1, 4.6], [2.1, 7.4], [1.6, 8.4], [-1.6, 8.4], [-2.1, 7.4], [-2.1, 4.6]]).slice(0, 8)],
     walls: [[[-0.3, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.3, 2]], [[-1.6, 8.4], [1.6, 8.4]]],
     ramps: [{ x0: -0.3, z0: 2, x1: 0.3, z1: 3.4, axis: 'z', h0: 0.2, h1: 0 }],

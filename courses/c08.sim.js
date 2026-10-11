@@ -118,7 +118,7 @@
       tiers: [DECK(-0.6, 0, 0.6, 2.4, 0.7), DECK(-1.6, 2.8, 1.6, 5.6, 0.3)],
       bumps: [{ x: -0.6, z: 4.3, r: 0.5, h: -0.2 }, { x: 0.7, z: 3.9, r: 0.45, h: -0.2 }],
       tubes: [{ a: [-1.15, 5.15], b: [2.6, 6.85], dir: 0, keep: 0.5, add: 0.2 }],
-      movers: [ROCK(0.25, 7.05, 2.55, 7.05, 2.8)] },
+      movers: [ROCK(0.25, 7.1, 2.05, 7.1, 2.6)] },
     /* 16. solar wind: a rail-less slab, a crosswind toward the void, rocks drifting through it */
     { par: 2, sol: [[336,0.68,0]], tee: [0, 0.5], cup: [0.35, 7.1],
       floors: [rect(-1.2, 0, 1.2, 7.9)],

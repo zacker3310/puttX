@@ -20,7 +20,7 @@ registerWorld(5, (() => {
       movers: [BRIDGE(-0.78, 2.35, -0.3, 2.35, 0.2, 90, 3.2)], bumps: [{ x: -0.5, z: 4.6, r: 0.45, h: 0.16 }], posts: [ANCHOR(1.0, 2.0)],
       inner: [[[0.2, 4.9], [1.2, 4.9]]] },
     /* 3 gangplank up to the deck, round the rail, back to the cup by the deck's edge */
-    { par: 3, tee: [0, 0.5], cup: [-0.75, 4.35], aim0: 22, shape: rect(-1.4, 0, 1.4, 6.6),
+    { par: 2, sol: [[22.5,1,0]], tee: [0, 0.5], cup: [-0.75, 4.35], aim0: 22, shape: rect(-1.4, 0, 1.4, 6.6),
       tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.6), h: 0.3 }], ramps: [{ x0: 0.7, z0: 2.4, x1: 1.4, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }],
       inner: [[[0, 5.1], [0, 3.6], [-1.4, 3.6]]], posts: [BARREL(-0.7, 5.8)], zones: [sand(rect(-1.4, 1.0, -0.3, 2.4))] },
     /* 4 cannon alley */
@@ -28,7 +28,7 @@ registerWorld(5, (() => {
       movers: [CANNON(-0.66, 2.6, 0.66, 2.6, 3), CANNON(0.66, 4.6, -0.66, 4.6, 3.6, 1)],
       bumps: [{ x: 0, z: 3.6, r: 0.4, h: 0.12 }], inner: [[[-0.4, 5.75], [0.4, 5.75]]] },
     /* 5 treasure cave: the long way round the rock, or the cave */
-    { par: 3, sol: [[4,1,0],[106,0.8,0]], tee: [1.2, 0.5], cup: [-1.2, 0.9], aim0: 0,
+    { par: 2, sol: [[4,1,0],[106,0.8,0]], tee: [1.2, 0.5], cup: [-1.2, 0.9], aim0: 0,
       shape: [[-1.8, 0], [-0.6, 0], [-0.6, 4.4], [0.6, 4.4], [0.6, 0], [1.8, 0], [1.8, 6], [-1.8, 6]],
       tubes: [{ a: [1.45, 3.4], b: [-1.2, 5.2], dir: 180 }], bumps: [{ x: 0, z: 5.3, r: 0.5, h: 0.2 }, { x: -1.0, z: 3.4, r: 0.4, h: 0.15 }],
       zones: [sand(rect(0.6, 2.9, 1.1, 3.9)), sand(rect(-1.8, 1.7, -1.05, 2.3)), sand(rect(-1.35, 2.3, -0.6, 2.9))], posts: [BARREL(-1.15, 1.65)] },
@@ -37,7 +37,7 @@ registerWorld(5, (() => {
       movers: [WHEEL(0, 3.3, 0.55, 1.5)], posts: [BARREL(-0.55, 5.8)], inner: [[[0, 5.1], [0.75, 5.1]]],
       zones: [sand(rect(-1.2, 4.3, -0.2, 5.3)), sand(rect(0.9, 1.4, 1.2, 2.4))], bumps: [{ x: -0.7, z: 1.8, r: 0.5, h: 0.2 }] },
     /* 7 beach, gangplank, deck with a cannon, then off the stern down to the lagoon green */
-    { par: 4, tee: [0, 0.5], cup: [-0.7, 8.4], aim0: 18, shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6], [1.4, 9.2], [-1.4, 9.2], [-1.4, 6], [-1.4, 3.4]],
+    { par: 4, sol: [[24,1,1.5]], tee: [0, 0.5], cup: [-0.7, 8.4], aim0: 18, shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6], [1.4, 9.2], [-1.4, 9.2], [-1.4, 6], [-1.4, 3.4]],
       tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6), h: 0.35 }], ramps: [{ x0: 0.7, z0: 2.2, x1: 1.4, z1: 3.4, axis: 'z', h0: 0, h1: 0.35 }],
       inner: [[[-1.4, 3.4], [0.7, 3.4]], [[-1.4, 6], [-0.2, 6]]],
       movers: [CANNON(-0.9, 4.7, 0.9, 4.7, 2.6)], zones: [lagoon(rect(0.2, 7.3, 1.4, 9.2))],
@@ -53,12 +53,12 @@ registerWorld(5, (() => {
       tiers: [{ poly: rect(-1.6, 6, 1.6, 9), h: 0.3 }], ramps: [{ x0: -0.3, z0: 4.8, x1: 0.3, z1: 6, axis: 'z', h0: 0, h1: 0.3 }],
       inner: [[[-1.6, 6], [-0.3, 6]], [[0.3, 6], [1.6, 6]]], posts: [BARREL(0.3, 7.6), ANCHOR(-0.8, 7.4)] },
     /* 10 barrel bank: the whole green leans toward the lagoon; barrels bounce */
-    { par: 3, sol: [[21,0.7,0]], tee: [0.3, 0.5], cup: [-0.2, 5.5], shape: rect(-1.5, 0, 1.5, 6.4),
+    { par: 2, sol: [[21,0.7,0]], tee: [0.3, 0.5], cup: [-0.2, 5.5], shape: rect(-1.5, 0, 1.5, 6.4),
       tiers: [{ poly: rect(-1.6, -0.1, 1.6, 6.5), h: 0.2, sx: 0.08 }],
       zones: [lagoon(rect(-1.5, 2.0, -0.95, 3.8))],
       posts: [BUMPER(0.6, 2.2), BUMPER(-0.4, 3.0), BUMPER(0.4, 3.9), BUMPER(-0.9, 4.3), BUMPER(0.95, 4.6), BARREL(-0.2, 4.8), BARREL(-0.78, 5.25), BARREL(0.38, 5.25)] },
     /* 11 smuggler's caves: zig-zag through the hideout, or find the cave on the dune */
-    { par: 4, sol: [[147,0.9,0],[285,1,0]], tee: [0, 0.6], cup: [1.2, 7.4], aim0: 30, shape: rect(-2, 0, 2, 8.4),
+    { par: 3, sol: [[147,0.9,0],[285,1,0]], tee: [0, 0.6], cup: [1.2, 7.4], aim0: 30, shape: rect(-2, 0, 2, 8.4),
       inner: [[[-2, 2.8], [1.2, 2.8]], [[-1.2, 5.6], [2, 5.6]], [[0.5, 8.4], [0.5, 6.9]]],
       bumps: [{ x: 1.55, z: 5.05, r: 0.4, h: 0.16 }, { x: 0, z: 4.2, r: 0.5, h: 0.22 }],
       tubes: [{ a: [1.55, 5.05], b: [-1.5, 6.3], dir: 90 }],
@@ -70,14 +70,14 @@ registerWorld(5, (() => {
       zones: [lagoon(rect(-1.4, 3.6, 1.0, 4.8)), sand(rect(-1.4, 4.8, 1.0, 6.4))],
       bumps: [{ x: 0.4, z: 7.0, r: 0.5, h: 0.25 }], posts: [BARREL(-0.1, 7.8), ANCHOR(1.15, 6.6)] },
     /* 13 crow's nest: two gangplanks to the top deck, where the wheel turns */
-    { par: 4, tee: [0, 0.6], cup: [-0.8, 7.35], aim0: 25,
+    { par: 4, sol: [[39,0.95,0],[36,1,0],[0,0.05,0]], tee: [0, 0.6], cup: [-0.8, 7.35], aim0: 25,
       shape: [[-1.6, 0], [1.6, 0], [1.6, 3], [1.6, 5.6], [1.6, 8], [0, 8], [-1.6, 8], [-1.6, 5.6], [-1.6, 4.4], [-1.6, 3]],
       tiers: [{ poly: rect(-1.7, 3, 1.7, 8.1), h: 0.25 }, { poly: rect(-1.7, 5.6, 0, 8.1), h: 0.5 }],
       ramps: [{ x0: 1.0, z0: 1.8, x1: 1.6, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: -1.6, z0: 4.4, x1: -1.0, z1: 5.6, axis: 'z', h0: 0.25, h1: 0.5 }],
       inner: [[[-1.6, 3], [1.0, 3]]], movers: [WHEEL(-0.8, 6.4, 0.4, 1.4)],
       posts: [BARREL(0.5, 4.3), BARREL(-0.3, 3.7)], zones: [sand(rect(0.3, 5.0, 1.6, 6.0))] },
     /* 14 cannon deck: dodge the cannonballs, down the gangplank or drop into the sand */
-    { par: 4, tee: [0, 0.5], cup: [0.7, 8.1], shape: [[-1.4, 0], [1.4, 0], [1.4, 4.4], [1.4, 9], [-1.4, 9], [-1.4, 4.4]],
+    { par: 4, sol: [[15,0.8,0]], tee: [0, 0.5], cup: [0.7, 8.1], shape: [[-1.4, 0], [1.4, 0], [1.4, 4.4], [1.4, 9], [-1.4, 9], [-1.4, 4.4]],
       tiers: [{ poly: rect(-1.5, -0.1, 1.5, 4.4), h: 0.35 }],
       ramps: [{ x0: -1.1, z0: 4.4, x1: -0.5, z1: 5.6, axis: 'z', h0: 0.35, h1: 0 }],
       inner: [[[-0.5, 4.4], [0.4, 4.4]]],

@@ -28,10 +28,10 @@ registerWorld(2, { holes: [
     posts: [C2_CACTUS(1.05, 1.6), C2_ROCK(-3.0, 7.6, 0.13)] },
   /* 4. tumbleweed pass, then up the ramp to a mesa green */
   { par: 3, sol: [], tee: [0, 0.5], cup: [-0.45, 6.75], shape: rect(-0.9, 0, 0.9, 7.4),
-    ramps: [{ x0: 0.25, z0: 4.8, x1: 0.9, z1: 5.7, axis: 'z', h0: 0, h1: 0.3 }],
+    ramps: [{ x0: -0.15, z0: 4.8, x1: 0.9, z1: 5.7, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1, 5.7, 1, 7.5), h: 0.3 }],
     movers: [C2_WEED(-0.55, 2.3, 0.55, 2.3, 2.6), C2_WEED(0.55, 3.7, -0.55, 3.7, 2.1, 1.3)],
-    posts: [C2_CACTUS(-0.05, 6.35), C2_CACTUS(-0.55, 6.0)] },
+    posts: [C2_CACTUS(0.05, 6.4)] },
   /* 5. a tilted canyon floor: the long dogleg left leans toward you */
   { par: 3, sol: [], tee: [0, 0.5], cup: [3.6, 5.0], aim0: 20,
     shape: [[-0.9, 0], [0.9, 0], [0.9, 3.6], [4.2, 3.6], [4.2, 5.5], [-0.9, 5.5]],

@@ -31,7 +31,7 @@
   const airlock = m => {
     const g = new THREE.Group(), n = Math.max(2, Math.round(m.len * 2 / 0.2));
     for (let i = 0; i < n; i++) {
-      const seg = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, 0.18, m.len * 2 / n), mat(i % 2 ? '#2a1f4a' : '#ffd66e', { roughness: 0.5 }));
+      const seg = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, 0.18, m.len * 2 / n), mat(i % 2 ? '#3f5f86' : '#ffd66e', { roughness: 0.5 }));
       seg.position.set(0, 0.09, -m.len + (i + 0.5) * m.len * 2 / n); seg.castShadow = true; g.add(seg);
     }
     return g;
@@ -102,7 +102,7 @@
       /* airlock housings: a door that slides off the deck parks inside one */
       for (const m of h.movers) {
         if (m.look !== 'airlock' || onFloor(h, m.bx, m.bz)) continue;
-        const a = (m.ang || 0) * Math.PI / 180, hs = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.26, m.len * 2 + 0.1), mat('#8f86a8', { roughness: 0.6 }));
+        const a = (m.ang || 0) * Math.PI / 180, hs = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.28, m.len * 2 + 0.1), mat('#ef7d6d', { roughness: 0.55 }));
         hs.position.set(m.bx, groundH(h, m.bx, m.bz) + 0.08, m.bz); hs.rotation.y = a; hs.castShadow = true; group.add(hs);
       }
     },

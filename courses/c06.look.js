@@ -43,7 +43,7 @@ function v6Prop(r) {
 }
 WORLD_LOOK[6] = {
   /* felt and mud are dark enough that the white ball reads at well over 3:1; lava is the water hazard */
-  felt: '#43594a', wall: '#625c68', ground: '#2f2729', skirt: '#2c282d', sky: ['#5c2a2a', '#f0a066'], fog: true,
+  felt: '#4f7254', wall: '#625c68', ground: '#2f2729', skirt: '#2c282d', sky: ['#5c2a2a', '#f0a066'], fog: true,
   sand: '#7a6a5c', mud: '#4e3426', water: '#f0642c', ice: '#6fa8c0', fast: '#5d5560', push: '#f08a3c', tube: '#f0642c',
   flag: '#ffd66e', icon: VOLCANO_SVG,
   jingle: [392, 494, 587, 740, 988],

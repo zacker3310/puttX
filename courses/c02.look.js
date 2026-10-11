@@ -52,7 +52,7 @@ WORLD_LOOK[2] = {
   prop(r) {
     const g = new THREE.Group(), k = r();
     const o = k < 0.5 ? c2Saguaro(0.06 + r() * 0.04, 0.45 + r() * 0.4, r() < 0.5 ? '#4e9a45' : '#438a3b')
-      : k < 0.85 ? c2Boulder(0.18 + r() * 0.25, Math.floor(r() * 1e6), C2_STRATA[Math.floor(r() * 4)]) : c2Butte(r, 0.35 + r() * 0.3, 1.2 + r() * 0.8);
+      : k < 0.85 ? c2Boulder(0.18 + r() * 0.25, Math.floor(r() * 1e6), C2_STRATA[Math.floor(r() * 4)]) : c2Butte(r, 0.3 + r() * 0.25, 0.9 + r() * 0.6);
     if (k < 0.85) o.position.y = C2_CANYON_Y;
     g.add(o); return g;
   },

@@ -128,6 +128,14 @@ WORLD_LOOK[7] = {
       for (let k = 0; k < 2; k++) { const wn = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.45, 0.1), winM); wn.position.set(x + (k - 0.5) * w * 0.35, hgt * (0.45 + k * 0.25), -w / 2); keep.add(wn); }
     }
     keep.position.set(B.cx, -0.03, B.z1 + 9); group.add(keep);
+    /* hole 17 winds round a tower: stand it in the middle of the U */
+    if (h.key === '7-17') {
+      const tw = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.46, 0.9, 16), mat(C7_STONE, { roughness: 0.85 })); tw.position.set(0, 0.45, 1.75); tw.castShadow = true;
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(0.52, 0.6, 16), mat('#8f7dc6', { roughness: 0.6 })); roof.position.set(0, 1.2, 1.75); roof.castShadow = true;
+      const door = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.05), mat('#4a3826')); door.position.set(0, 0.15, 1.75 - 0.45);
+      const wn = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.16, 0.05), winM); wn.position.set(0, 0.62, 1.75 - 0.43);
+      group.add(tw, roof, door, wn);
+    }
     /* bats circling high over the hole */
     const bats = [];
     for (let i = 0; i < 5; i++) {

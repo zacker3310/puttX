@@ -62,7 +62,7 @@ registerWorld(1, { holes: [
     zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
     bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
   /* 11: the tilted slab. A poured slab leans to the right; read the break through the girder posts */
-  { par: 2, sol: [[0,0.84,0]], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
+  { par: 2, sol: [[0,0.88,0]], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 7.2), h: 0.1, sx: 0.045 }],
     posts: [{ x: -0.35, z: 3.2, r: 0.09, look: 'girder' }, { x: 0.45, z: 3.6, r: 0.09, look: 'girder' }, { x: -0.9, z: 4.4, r: 0.09, look: 'girder' },
             { x: 0.05, z: 4.8, r: 0.09, look: 'girder' }],

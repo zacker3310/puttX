@@ -52,7 +52,7 @@ registerWorld(9, { holes: [
     zones: [C9_BELT(rect(-0.7, 2.4, 2.1, 4.2), 1.4, 0)],
     posts: [C9_GUM(1.4, 6.4), C9_GUM(0.8, 5.9)] },
   /* 10: over the frosting hills to a cup ringed by frosting, open only at the back */
-  { par: 2, sol: [[6, 0.88, 0]], tee: [0, 0.5], cup: [0.3, 6.6], shape: rect(-1.5, 0, 1.5, 8.6),
+  { par: 2, sol: [[16,0.76,0]], tee: [0, 0.5], cup: [0.3, 6.6], shape: rect(-1.5, 0, 1.5, 8.6),
     bumps: [{ x: -0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: 0.7, z: 3.0, r: 0.55, h: 0.3 }, { x: -0.2, z: 4.4, r: 0.5, h: -0.22 },
       { x: 1.04, z: 7.03, r: 0.35, h: 0.28 }, { x: 1.04, z: 6.18, r: 0.35, h: 0.28 }, { x: 0.3, z: 5.75, r: 0.35, h: 0.28 },
       { x: -0.44, z: 6.18, r: 0.35, h: 0.28 }, { x: -0.44, z: 7.03, r: 0.35, h: 0.28 }, { x: -0.9, z: 8.0, r: 0.4, h: -0.18 }] },

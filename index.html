@@ -1191,7 +1191,7 @@ registerWorld(4, { holes: [
     ramps: [{ x0: -0.6, z0: 5.6, x1: 1.8, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.6, z0: 0, x1: 3, z1: 0.6, axis: 'z', h0: 0.2, h1: 0 }],
     zones: [{ surf: 'ice', poly: rect(0.6, 0.6, 1.8, 5.6) }], posts: [C4_MAN(2.1, 3.0), C4_MAN(2.7, 3.9)], bumps: [{ x: 2.4, z: 5.3, r: 0.55, h: 0.1 }] },
   /* 14. pond carry: a sheet of ice full of open water between the tee and the cup */
-  { par: 4, sol: [[330,0.8,0],[2,0.68,0]], tee: [-1.2, 0.5], cup: [1.2, 7.2], shape: rect(-2, 0, 2, 8),
+  { par: 4, sol: [[330,0.8,0],[0,0.04,0]], tee: [-1.2, 0.5], cup: [1.2, 7.2], shape: rect(-2, 0, 2, 8),
     zones: [{ surf: 'water', poly: C4_POOL(-0.4, 3.2, 0.5) }, { surf: 'water', poly: C4_POOL(0.9, 4.3, 0.55) }, { surf: 'water', poly: C4_POOL(-1.0, 5.1, 0.45) },
       { surf: 'water', poly: C4_POOL(0.3, 5.9, 0.35) }, { surf: 'ice', poly: rect(-2, 2, 2, 6.4) }],
     posts: [C4_MAN(0.7, 7.0), C4_MAN(1.55, 6.6)], bumps: [{ x: 1.2, z: 7.2, r: 0.55, h: 0.1 }] },

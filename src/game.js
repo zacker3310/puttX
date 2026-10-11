@@ -24,7 +24,7 @@ const BALL_R = 0.051;            /* toy-sized ball, about 2.4x a real one (0.021
 const CUP_R = 0.11, CUP_DEPTH = 0.12;
 const CAP_V0 = 1.45;             /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
 const CAP_CREEP = 0.22;          /* anything this slow with its centre over the hole drops, whatever the line */
-const MIN_V = 0.35, MAX_V = 5;   /* putt speed at power 0 and power 1: full power rolls about 17 m of felt */
+const MIN_V = 0.35, MAX_V = 5;   /* putt speed at power 0 and power 1: full power rolls about 14.5 m of felt */
 const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step < BALL_R */
 const STOP_V = 0.03;
 const SETTLE_T = 0.4;            /* slower than STOP_V this long = at rest, even pressed on a wall or a lip */
@@ -191,7 +191,7 @@ function collideAll(h, b, t) {
   for (let i = 0; i < h.segs.length; i++) {
     const bb = h.segBox[i];
     if (b.x < bb[0] || b.x > bb[1] || b.z < bb[2] || b.z > bb[3]) continue;
-    if (air && b.y > h.segTop[i][0]) continue;          /* flying over the wall */
+    if (air && h.open && b.y > h.segTop[i][0]) continue;   /* open holes: a flying ball can clear a wall; walled holes keep it in */
     const s = h.segs[i], v = hitSeg(b, s[0], s[1], s[2], s[3], WALL_E);
     if (v) b.hits.push(['wall', v]);
   }
@@ -302,7 +302,8 @@ function stepBall(h, b, t) {
   if (dc < CUP_R) {
     /* how far the ball's line passes from the cup centre sets the chord it crosses, and so the capture speed */
     const off = s > 1e-6 ? Math.abs(b.vx * dz - b.vz * dx) / s : 0, chord = Math.sqrt(Math.max(0, 1 - (off / CUP_R) ** 2));
-    if (s < CAP_CREEP || s < CAP_V0 * chord) return 'sunk';
+    /* one capture decision per pass over the hole: a ball that hopped or lipped stays out unless it is crawling */
+    if (s < CAP_CREEP || (!b.inCup && s < CAP_V0 * chord)) return 'sunk';
     if (!b.inCup) {
       if (off < CUP_R * 0.3) { b.vx *= HOP_KEEP; b.vz *= HOP_KEEP; b.hits.push(['lip', s]); }   /* dead centre, too hot: hits the back and hops out */
       else {

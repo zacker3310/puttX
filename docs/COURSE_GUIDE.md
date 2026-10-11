@@ -13,7 +13,7 @@ Units are metres and seconds, and y is up. A hole lies in the x-z plane, and the
 - **Angles** are degrees, 0 is +z and 90 is +x. On screen, from behind the ball, +x is to the **left**.
 - **Ball** radius is 0.051 and **cup** radius is 0.11.
 - **Walls** are 0.1 thick (`WALL_HALF` 0.05) and stand 0.15 over the highest ground next to them.
-- **Full power** rolls about 17 m on felt. Keep holes inside about 14 x 14 m; most are 3-8 m long.
+- **Full power** rolls about 14.5 m on felt. Keep holes inside about 14 x 14 m; most are 3-8 m long.
 - **Lanes** need to be at least 0.6 m wide between wall centre lines, and choke points at least 0.4 m (the ball is 0.1 wide).
 
 ## A hole

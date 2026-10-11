@@ -2,17 +2,24 @@
   "name": "puttx",
   "version": "1.0.0",
   "private": true,
-  "description": "Mini golf for a 3 to 5 year old in vroom's worlds. One HTML file, no reading, works offline.",
+  "description": "Hard 3D mini golf for 12 year olds: ten courses of 18, a DS-style putter swing, a pro shop. One HTML file, no reading, works offline.",
   "homepage": "https://zacker3310.github.io/puttX/",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/zacker3310/puttX.git" },
-  "engines": { "node": ">=20" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zacker3310/puttX.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "build": "node scripts/build.cjs",
     "test": "PUTTX_ALL_WORLDS=1 node tests/run-all.cjs",
     "lint": "node tests/lint.cjs",
     "serve": "python3 -m http.server 4173",
-    "vendor": "node scripts/vendor-three.cjs",
+    "vendor": "node scripts/build.cjs",
     "solve": "node scripts/solve.cjs",
+    "shot": "node scripts/shot.cjs",
     "icons": "node scripts/render-icons.cjs"
   },
   "devDependencies": {

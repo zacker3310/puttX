@@ -14,7 +14,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const COURSES = path.join(ROOT, 'courses');
+/* PUTTX_COURSES_DIR points the build at another copy of courses/ (a pinned fixture while courses are mid-edit) */
+const COURSES = process.env.PUTTX_COURSES_DIR ? path.resolve(process.env.PUTTX_COURSES_DIR) : path.join(ROOT, 'courses');
 
 function courseFiles(kind, only) {
   if (!fs.existsSync(COURSES)) return [];

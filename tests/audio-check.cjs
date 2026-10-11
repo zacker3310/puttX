@@ -15,15 +15,15 @@ const { check, done, open, fresh } = require('./lib.cjs');
   check('first touch creates the audio context', ctx === 'running' || ctx === 'suspended', String(ctx));
 
   const all = await page.evaluate(() => { const bad = []; for (const k of Object.keys(SFX)) { try { sfx(k, 0.5); } catch (e) { bad.push(k + ': ' + e.message); } } try { setRoll(2); setRoll(0); } catch (e) { bad.push('roll: ' + e.message); } return { bad, n: Object.keys(SFX).length }; });
-  check('every SFX plays without throwing (11 sounds + roll)', all.bad.length === 0 && all.n === 11, JSON.stringify(all));
+  check('every SFX plays without throwing (17 sounds + roll)', all.bad.length === 0 && all.n === 17, JSON.stringify(all));
 
-  const q = await page.evaluate(() => { setSound(false); return { g: master.gain.value, saved: JSON.parse(localStorage.getItem('puttx.v1')).sound }; });
+  const q = await page.evaluate(() => { setSound(false); return { g: master.gain.value, saved: JSON.parse(localStorage.getItem('puttx.v2')).sound }; });
   check('quiet mode zeroes the master gain and saves', q.g === 0 && q.saved === false, JSON.stringify(q));
   await page.evaluate(() => setSound(true));
 
   /* a ball riding a wall or a mover logs a hit every physics step; the speaker must not machine-gun */
   const spam = await page.evaluate(() => {
-    startHole('1-1'); loopPaused = true;
+    startHole(playable()[0] + '-1'); loopPaused = true;
     const before = sfxLog.length;
     for (let f = 0; f < 60; f++) { for (let i = 0; i < 4; i++) play.ball.hits.push(['wall', 0.5], ['mover', 0.5]); advance(1 / 60); }
     const loud = sfxLog.slice(before), mid = sfxLog.length;
@@ -34,9 +34,9 @@ const { check, done, open, fresh } = require('./lib.cjs');
   check('grazing contacts stay silent', spam.grazes === 0, JSON.stringify(spam));
 
   const next = await page.evaluate(() => {
-    startHole('1-1'); loopPaused = true; for (let f = 0; f < 300; f++) advance(1 / 60);
+    startHole(playable()[0] + '-1'); loopPaused = true; for (let f = 0; f < 300; f++) advance(1 / 60);
     play.ball.hits.push(['wall', 0.5]); advance(1 / 60);
-    startHole('1-2'); loopPaused = true; const n = sfxLog.length;
+    startHole(playable()[0] + '-2'); loopPaused = true; const n = sfxLog.length;
     play.ball.hits.push(['wall', 0.5]); advance(1 / 60);
     return sfxLog.slice(n);
   });

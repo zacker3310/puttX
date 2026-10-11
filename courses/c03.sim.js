@@ -28,7 +28,7 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-1, 2.6, -0.22, 3.5)), J3_WATER(rect(0.22, 2.6, 1, 3.5))],
     movers: [J3_ROCK(-0.6, 4.4, 0.6, 4.4, 2.6)], bumps: [{ x: -0.5, z: 1.6, r: 0.5, h: 0.12 }] },
   /* 6: the waterfall. Jump the plunge pool off the upper deck, or take the side tunnel down */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 6.5], shape: rect(-1, 0, 1, 7),
+  { par: 3, sol: [[356,0.92,0]], tee: [0, 0.5], cup: [0.6, 6.5], shape: rect(-1, 0, 1, 7),
     tiers: [{ poly: rect(-1, 0, 1, 3), h: 0.35 }], inner: [[[-1, 3], [-0.5, 3]], [[0.5, 3], [1, 3]], [[0.15, 5.9], [1, 5.9]]],
     zones: [J3_WATER(rect(-1, 3, 1, 3.7)), J3_MUD(rect(-0.5, 3.7, 0.5, 4.4))], tubes: [{ a: [0.75, 2.6], b: [-0.75, 4.1], dir: 0 }],
     posts: [J3_IDOL(0.45, 5.45), J3_IDOL(-0.4, 6.1)], bumps: [{ x: 0, z: 4.9, r: 0.5, h: 0.16 }] },

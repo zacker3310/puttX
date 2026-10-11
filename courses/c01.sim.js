@@ -106,15 +106,15 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
-  { par: 3, sol: [[26,1,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
+  { par: 3, sol: [], tee: [0, 0.5], cup: [-3, 9.3], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],
     walls: [[[-0.7, 4.6], [-0.7, 0], [0.7, 0], [0.7, 6], [-2, 6]], [[-0.7, 4.6], [-3.6, 4.6], [-3.6, 6]],
-            [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]]],
+            [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]], [[-2.35, 8.6], [-3.6, 8.6]]],
     tiers: [{ poly: rect(-0.7, 0, 0.7, 3), h: 0.4 }],
     zones: [{ push: [-1.2, 0], poly: rect(-3, 4.6, -0.7, 6) }, { surf: 'sand', poly: rect(-3.6, 9.6, -0.8, 10) }],
     tubes: [{ a: [-3.15, 5.3], b: [-3.1, 7.5], dir: 80 }],
     movers: [{ kind: 'spin', x: -1.6, z: 8.2, len: 0.45, w: 1.4, phase: 0, look: 'crane' }],
-    bumps: [{ x: -2.2, z: 9, r: 0.45, h: -0.08 }] },
+    bumps: [{ x: -1.6, z: 9.35, r: 0.35, h: 0.12 }] },
   /* 18: topping out (4 parts, open). The belt ramp, the boom gate on the deck, the chute or the pipe, the crane green */
   { par: 4, sol: [[202,1,0],[137,0.97,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
     floors: [rect(-1, 0, 1, 3.05), rect(-0.45, 3, 0.45, 4.45), rect(-1.2, 4.4, 3.4, 6), rect(-0.2, 5.99, 3.6, 10.2)],

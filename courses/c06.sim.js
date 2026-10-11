@@ -60,7 +60,7 @@ registerWorld(6, { holes: [
     bumps: V6_CRATER(1.5, 5.2, 0.7), tubes: [{ a: [1.5, 5.2], b: [-0.2, 8.4], dir: 75 }], posts: [V6_COL(1.4, 8.2), V6_COL(0.9, 7.7)],
     zones: [V6_LAVA(rect(-0.7, 6.5, 2.6, 6.9))] },
   /* 12: lava delta: two rivers, two bridges, a cone between */
-  { par: 3, sol: [[28,0.8,0],[288,1,0]], tee: [0, 0.5], cup: [0.8, 7], shape: rect(-1.5, 0, 1.5, 8),
+  { par: 4, sol: [[28,0.8,0],[288,1,0]], tee: [0, 0.5], cup: [0.8, 7], shape: rect(-1.5, 0, 1.5, 8),
     bumps: [{ x: 0, z: 4.05, r: 0.5, h: 0.3 }],
     zones: [V6_LAVA(rect(-1.5, 2.6, 0.6, 3.1)), V6_LAVA(rect(-0.6, 5, 1.5, 5.5)), V6_MUD(rect(0.6, 3.1, 1.5, 3.5)), V6_MUD(rect(-1.5, 5.5, -0.6, 5.9))] },
   /* 13: lava jumps: two kickers over two lava rivers to a crater green (crazy, 3 parts) */

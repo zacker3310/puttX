@@ -51,11 +51,11 @@ registerWorld(9, { holes: [
     ramps: [{ x0: 2.1, z0: 4.2, x1: 3.3, z1: 5.4, axis: 'z', h0: 0, h1: 0.25 }],
     zones: [C9_BELT(rect(-0.7, 2.4, 2.1, 4.2), 1.4, 0)],
     posts: [C9_GUM(1.4, 6.4), C9_GUM(0.8, 5.9)] },
-  /* 10: a long walk over the frosting hills, past a sugar crater, to a cup behind the last hill */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.9, 8.9], shape: rect(-1.5, 0, 1.5, 9.5),
-    bumps: [{ x: -0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: 0.7, z: 3.0, r: 0.55, h: 0.3 }, { x: 0.35, z: 4.9, r: 0.6, h: 0.35 },
-      { x: -0.6, z: 5.6, r: 0.5, h: -0.22 }, { x: -0.7, z: 7.3, r: 0.55, h: 0.32 }, { x: 0.8, z: 7.2, r: 0.45, h: 0.25 },
-      { x: -0.45, z: 8.15, r: 0.4, h: 0.3 }, { x: 0.25, z: 8.7, r: 0.4, h: -0.2 }] },
+  /* 10: over the frosting hills to a cup ringed by frosting, open only at the back */
+  { par: 2, sol: [[21, 0.9, 0]], tee: [0, 0.5], cup: [0.3, 6.6], shape: rect(-1.5, 0, 1.5, 8.6),
+    bumps: [{ x: -0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: 0.7, z: 3.0, r: 0.55, h: 0.3 }, { x: -0.2, z: 4.4, r: 0.5, h: -0.22 },
+      { x: 0.95, z: 6.975, r: 0.35, h: 0.28 }, { x: 0.95, z: 6.225, r: 0.35, h: 0.28 }, { x: 0.3, z: 5.85, r: 0.35, h: 0.28 },
+      { x: -0.35, z: 6.225, r: 0.35, h: 0.28 }, { x: -0.35, z: 6.975, r: 0.35, h: 0.28 }, { x: -0.9, z: 8.0, r: 0.4, h: -0.18 }] },
   /* 11: belts in a zig-zag factory floor */
   { par: 2, sol: [[51, 1, 0], [72, 0.7, 0]], tee: [-1, 0.5], cup: [-0.9, 7.2], aim0: 30, shape: rect(-1.5, 0, 1.5, 8),
     inner: [[[-1.5, 2.5], [0.8, 2.5]], [[-0.8, 5], [1.5, 5]]],

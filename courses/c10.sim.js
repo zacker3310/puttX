@@ -110,14 +110,14 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 8.6, r: 0.3, h: -0.06 }],
     movers: [{ kind: 'spin', x: 1.6, z: 5.05, len: 0.42, w: 1.5, phase: 0, blades: 2, look: 'windmill' }] },
   /* 14. ice palace: two golden gates sweep a bare cloud-ice island; the cup hides in the palace */
-  { par: 3, tee: [0, 0.6], cup: [0, 7.4],
+  { par: 3, tee: [0, 0.6], cup: [0.1, 7.35],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.35, 2, 0.35, 3), rect(-1.6, 3, 1.6, 8.2)],
-    walls: [[[-0.35, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.35, 2]], [[-0.85, 6.8], [-0.85, 7.9], [0.85, 7.9], [0.85, 6.8]]],
+    walls: [[[-0.35, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.35, 2]], [[0.9, 7.9], [-0.6, 7.9], [-0.6, 6.8], [0.9, 6.8]]],
     tiers: [{ poly: C10_PAD(-0.7, 0, 0.7, 2), h: 0.35 }],
     ramps: [{ x0: -0.35, z0: 2, x1: 0.35, z1: 3, axis: 'z', h0: 0.35, h1: 0 }],
     zones: [{ surf: 'ice', poly: rect(-1.6, 3, 1.6, 8.2) }],
-    posts: [{ x: -0.42, z: 6.55, r: 0.12, look: 'cloud' }, { x: 0.42, z: 6.55, r: 0.12, look: 'cloud' }],
-    bumps: [{ x: 0, z: 7.4, r: 0.32, h: -0.05 }],
+    posts: [{ x: 1.25, z: 7.05, r: 0.1, look: 'cloud' }],
+    bumps: [{ x: 0.1, z: 7.35, r: 0.32, h: -0.05 }],
     movers: [{ kind: 'gate', ax: -1.05, az: 4.4, bx: 1.05, bz: 4.4, len: 0.45, ang: 90, period: 3, look: 'gate' },
       { kind: 'gate', ax: 1.05, az: 5.6, bx: -1.05, bz: 5.6, len: 0.45, ang: 90, period: 2.4, phase: 1, look: 'gate' }] },
   /* 15. bumper clouds: a steep tilted island studded with springy cloud bumpers; miss and it rolls back or flings you off */

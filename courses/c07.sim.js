@@ -8,35 +8,35 @@ const C7_GARG = (x, z) => ({ x, z, r: 0.12, top: 0.3, look: 'gargoyle' });
 const C7_MOAT = poly => ({ surf: 'water', poly });
 registerWorld(7, { holes: [
   /* 1: over the drawbridge; a gargoyle guards the cup */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [0, 5.3], shape: rect(-0.9, 0, 0.9, 6),
+  { par: 2, sol: [[34,0.84,0]], tee: [0, 0.5], cup: [0, 5.3], shape: rect(-0.9, 0, 0.9, 6),
     zones: [C7_MOAT(rect(-0.9, 2.6, -0.15, 3.4)), C7_MOAT(rect(0.35, 2.6, 0.9, 3.4))],
     posts: [C7_GARG(0.05, 4.4)] },
   /* 2: a windmill guards the ramp up to the keep */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.3, 5.6], shape: rect(-0.8, 0, 0.8, 6.5),
+  { par: 3, sol: [[312,0.96,0]], tee: [0, 0.5], cup: [0.3, 5.6], shape: rect(-0.8, 0, 0.8, 6.5),
     ramps: [{ x0: -0.8, z0: 2.7, x1: 0.8, z1: 3.7, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-0.8, 3.7, 0.8, 6.5), h: 0.25 }],
     movers: [C7_MILL(0, 2.0, 0.55, 1.6, 0)] },
   /* 3: the portcullis rises and falls in the castle door */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.45, 5.2], shape: rect(-1, 0, 1, 6),
+  { par: 2, sol: [[42,0.76,0]], tee: [0, 0.5], cup: [-0.45, 5.2], shape: rect(-1, 0, 1, 6),
     inner: [[[-1, 3], [-0.3, 3]], [[0.3, 3], [1, 3]]],
     bumps: [{ x: 0.1, z: 4.3, r: 0.5, h: 0.15 }],
     movers: [C7_GATE(0, 3, 0.47, 3, 0.3, 90, 3, 0)] },
   /* 4: three secret passages under the wall; only one comes out by the cup */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.3, 5.6], aim0: -14, shape: rect(-1.2, 0, 1.2, 6.5),
+  { par: 2, sol: [[136,0.96,0],[56,0.56,0]], tee: [0, 0.5], cup: [-0.3, 5.6], aim0: -14, shape: rect(-1.2, 0, 1.2, 6.5),
     inner: [[[-1.2, 3.2], [1.2, 3.2]]],
     tubes: [{ a: [0.65, 2.5], b: [-0.9, 0.6], dir: 20 }, { a: [0, 2.6], b: [0.85, 5.9], dir: 200 }, { a: [-0.65, 2.5], b: [0.6, 3.7], dir: -20 }] },
   /* 5: zig-zag castle stairs */
-  { par: 3, sol: [], tee: [0.4, 0.5], cup: [-0.3, 6.7], shape: rect(-0.9, 0, 0.9, 7.6),
+  { par: 3, sol: [[324,0.96,0]], tee: [0.4, 0.5], cup: [-0.3, 6.7], shape: rect(-0.9, 0, 0.9, 7.6),
     tiers: [{ poly: rect(-0.9, 2.5, 0.9, 7.6), h: 0.15 }, { poly: rect(-0.9, 4.6, 0.9, 7.6), h: 0.3 }],
     ramps: [{ x0: -0.9, z0: 1.8, x1: -0.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: 0.2, z0: 3.9, x1: 0.9, z1: 4.6, axis: 'z', h0: 0.15, h1: 0.3 }],
     posts: [C7_GARG(-0.45, 3.6)] },
   /* 6: a ghost drifts across the great hall corner */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [3.1, 5.0], shape: [[-0.8, 0], [0.8, 0], [0.8, 4.2], [3.8, 4.2], [3.8, 5.8], [-0.8, 5.8]],
+  { par: 3, sol: [[18,0.8,0]],
     bumps: [{ x: -0.1, z: 5.0, r: 0.6, h: 0.32 }],
     zones: [{ surf: 'sand', poly: rect(2.6, 4.2, 3.8, 4.6) }, { surf: 'sand', poly: rect(2.6, 5.4, 3.8, 5.8) }],
     movers: [C7_GHOST(1.4, 4.55, 1.4, 5.45, 2.6, 0), C7_GHOST(2.4, 5.45, 2.4, 4.55, 2.0, 0.7)] },
   /* 7: jump the moat off the drawbridge ramp, or tiptoe the narrow side bridge; the courtyard tilts */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [0.5, 5.9], shape: rect(-1.4, 0, 1.4, 7),
+  { par: 2, sol: [[6,0.68,0]], tee: [0, 0.5], cup: [0.5, 5.9], shape: rect(-1.4, 0, 1.4, 7),
     ramps: [{ x0: -0.3, z0: 2.3, x1: 0.3, z1: 3.0, axis: 'z', h0: 0, h1: 0.18 }],
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 7), h: 0.045, sx: 0.03 }],
     zones: [C7_MOAT(rect(-0.95, 3.0, 1.4, 3.6))] },

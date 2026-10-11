@@ -19,10 +19,10 @@ registerWorld(1, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.1, 5.9, -0.45, 7) }] },
   /* 4: scaffold deck. A narrow plank ramp climbs to the deck; miss it and the deck face bounces you back */
   { par: 3, sol: [], tee: [0, 0.5], cup: [0.55, 6.6], shape: rect(-1, 0, 1, 7.4),
-    tiers: [{ poly: rect(-1, 4.6, 1, 7.4), h: 0.3 }],
-    ramps: [{ x0: -0.55, z0: 3.4, x1: -0.05, z1: 4.6, axis: 'z', h0: 0, h1: 0.3 }],
-    inner: [[[0.2, 6], [0.2, 7.4]]],
-    zones: [{ surf: 'sand', poly: rect(-1, 1.6, -0.2, 2.4) }] },
+    tiers: [{ poly: rect(-1, 4.6, 1, 7.4), h: 0.25 }],
+    ramps: [{ x0: -0.65, z0: 3.3, x1: 0.05, z1: 4.6, axis: 'z', h0: 0, h1: 0.25 }],
+    bumps: [{ x: 0.1, z: 5.8, r: 0.35, h: 0.1 }],
+    zones: [{ surf: 'sand', poly: rect(0.15, 7, 1, 7.4) }, { surf: 'sand', poly: rect(-1, 1.6, -0.2, 2.4) }] },
   /* 5: boom gate. A barrier slides across the gap in the girder; an against-you belt guards the cup */
   { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.2),
     inner: [[[-1, 3.5], [-0.25, 3.5]], [[0.25, 3.5], [1, 3.5]]],

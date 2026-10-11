@@ -61,7 +61,7 @@ registerWorld(3, { holes: [
     tubes: [{ a: [0.6, 1.5], b: [-0.6, 3.4], dir: 0, keep: 0.5 }, { a: [-0.6, 1.6], b: [1.4, 7.6], dir: 90, keep: 0, add: 0.55 }],
     posts: [J3_IDOL(-0.33, 1.25, 0.11), J3_IDOL(-0.85, 1.05, 0.1)], zones: [J3_MUD(rect(-1, 5, 0.2, 5.8))] },
   /* 12: the rope bridge, or wade the mud ford */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.6, 5.6], shape: rect(-1.2, 0, 1.2, 6.4),
+  { par: 3, sol: [[0,0.68,0],[54,0.88,0]], tee: [0, 0.5], cup: [-0.6, 5.6], shape: rect(-1.2, 0, 1.2, 6.4),
     zones: [J3_WATER(rect(-1.2, 2.6, -0.2, 3.7)), J3_WATER(rect(0.22, 2.6, 0.7, 3.7)), J3_MUD(rect(0.7, 2.6, 1.2, 3.7))],
     posts: [J3_IDOL(-0.2, 5.1)], bumps: [{ x: -0.9, z: 4.6, r: 0.5, h: 0.15 }] },
   /* 13: three temple terraces, each ramp on the other side, a boulder guarding the top */

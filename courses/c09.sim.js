@@ -27,7 +27,7 @@ registerWorld(9, { holes: [
     zones: [{ surf: 'water', poly: rect(-1, 3, 0.2, 3.7) }, { surf: 'water', poly: rect(0.65, 3, 1, 3.7) }],
     movers: [C9_POP(0, 4.8, 0.6, 1.6, 0, 2)] },
   /* 6: up the ramp to the wafer deck, down the candy-cane pipe to the taffy green */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [1.6, 8.1], aim0: 0,
+  { par: 3, sol: [[327, 1, 0], [39, 0.75, 0]], tee: [0, 0.5], cup: [1.6, 8.1], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 3], [2.4, 3], [2.4, 4.6], [-0.6, 4.6]], rect(-0.6, 5.7, 2.4, 8.7)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 3], [2.4, 3], [2.4, 4.6], [-0.6, 4.6]]), ring(rect(-0.6, 5.7, 2.4, 8.7))],
     ramps: [{ x0: -0.6, z0: 1.8, x1: 0.6, z1: 3, axis: 'z', h0: 0, h1: 0.3 }],

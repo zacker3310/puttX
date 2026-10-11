@@ -3,3 +3,5 @@ tests/shots/
 .claude/
 .superpowers/
 .DS_Store
+preview/
+test-build.html

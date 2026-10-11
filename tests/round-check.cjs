@@ -1,5 +1,5 @@
-/* round-check (Node): strokes, the par + 3 cap, out-of-bounds, drift, stars, the world registry
-   and progress (bests and stars never get worse; hole 9 unlocks the next world). */
+/* round-check (Node): strokes, the par + 3 cap, out-of-bounds, drift, stars, the course registry
+   and progress (bests and stars never get worse; a course's last hole unlocks the next course). */
 'use strict';
 const { check, done } = require('./lib.cjs');
 const S = require('./sim.cjs').loadSim();
@@ -42,17 +42,21 @@ S.registerWorld(99, { g: 0.5, feltMu: 0.2, holes: [{ par: 3, tee: [0, 0.5], cup:
 const hh = S.holeAt('99-1');
 check('registerWorld keys holes and applies world gravity and felt', hh && hh.key === '99-1' && hh.g === 0.5 && hh.feltMu === 0.2 && hh.par === 3);
 check('holeAt misses cleanly', S.holeAt('99-2') === undefined && S.holeAt('42-1') === undefined);
-check('nextKey walks 1..9 then stops', S.nextKey('1-1') === '1-2' && S.nextKey('5-9') === null);
+S.registerWorld(98, { holes: Array.from({ length: 18 }, () => ({ par: 3, tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 4) })) });
+check('nextKey walks 1..18 then stops', S.nextKey('98-9') === '98-10' && S.nextKey('98-17') === '98-18' && S.nextKey('98-18') === null && S.nextKey('99-1') === null);
 
-const p = S.freshProgress();
-check('fresh progress: world 1 open, sound on', p.worlds.join() === '1' && p.sound === true && S.holeUnlocked(p, '1-1') && !S.holeUnlocked(p, '1-2'));
-S.recordHole(p, '1-1', 3, 2);
-let rec = S.recordHole(p, '1-1', 5, 2);
+const first = S.playable()[0], p = S.freshProgress(), k = n => first + '-' + n;
+check('fresh progress: the first course open, sound on', p.v === 2 && p.worlds.join() === String(first) && p.sound === true && S.holeUnlocked(p, k(1)) && !S.holeUnlocked(p, k(2)));
+S.recordHole(p, k(1), 3, 2);
+let rec = S.recordHole(p, k(1), 5, 2);
 check('best and stars never get worse', rec.best === 3 && rec.stars === 1);
-rec = S.recordHole(p, '1-1', 1, 2);
-check('a better score improves both', rec.best === 1 && rec.stars === 3 && S.holeUnlocked(p, '1-2'));
-S.recordHole(p, '1-9', 4, 3);
-check('finishing hole 9 opens the next world in order', p.worlds.join() === '1,5' && S.holeUnlocked(p, '5-1'));
-check('world order is construction, snow, space', S.WORLD_ORDER.join() === '1,5,8');
+rec = S.recordHole(p, k(1), 1, 2);
+check('a better score improves both', rec.best === 1 && rec.stars === 3 && S.holeUnlocked(p, k(2)));
+const list = S.playable().filter(w => w < 90), second = list[1], last = S.WORLDS[first].holes.length;
+S.recordHole(p, k(last - 1 > 0 ? last - 1 : 1), 4, 3);
+check('a hole before the last opens nothing new', p.worlds.length === 1, p.worlds.join());
+S.recordHole(p, k(last), 4, 3);
+check('finishing the last hole opens the next playable course', !second || (p.worlds.join() === first + ',' + second && S.holeUnlocked(p, second + '-1')), p.worlds.join());
+check('ten courses in order', S.WORLD_ORDER.join() === '1,2,3,4,5,6,7,8,9,10' && S.HOLES_PER === 18);
 
 done();

@@ -15,7 +15,7 @@ const { check, done, open } = require('./lib.cjs');
   check('manifest and apple-touch-icon resolve', links.manifest && links.icon, JSON.stringify(links));
   const budget = await page.evaluate(() => {
     let maxTris = 0, worst = '';
-    for (const w of WORLD_ORDER) for (const h of WORLDS[w].holes) {
+    for (const w of playable()) for (const h of WORLDS[w].holes) {
       startHole(h.key); renderFrame(0.016);
       const t = renderer.info.render.triangles; if (t > maxTris) { maxTris = t; worst = h.key; }
     }
@@ -23,8 +23,9 @@ const { check, done, open } = require('./lib.cjs');
   });
   check('pixel ratio <= 2 and one 1024 shadow map', budget.pr <= 2 && budget.map === 1024, JSON.stringify(budget));
   check('every hole renders under 400k triangles (shadow pass included)', budget.maxTris < 400000, JSON.stringify(budget));
-  const ms = await page.evaluate(() => { startHole('8-9'); const t0 = performance.now(); for (let i = 0; i < 30; i++) renderFrame(1 / 60); return (performance.now() - t0) / 30; });
-  console.log(`info  8-9 frame time under SwiftShader: ${ms.toFixed(1)} ms`);
+  await page.evaluate(w => { window.budgetWorst = w; }, budget.worst);
+  const ms = await page.evaluate(() => { startHole(budgetWorst); const t0 = performance.now(); for (let i = 0; i < 30; i++) renderFrame(1 / 60); return (performance.now() - t0) / 30; });
+  console.log(`info  ${budget.worst} frame time under SwiftShader: ${ms.toFixed(1)} ms`);
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

@@ -86,11 +86,12 @@ registerWorld(7, { holes: [
     zones: [C7_MOAT(rect(-1.6, 1.8, 0.6, 3.6)), C7_MOAT(rect(1.1, 1.8, 1.6, 3.6)), C7_MOAT(rect(-0.6, 4.8, 1.6, 6.6)), C7_MOAT(rect(-1.6, 4.8, -1.1, 6.6))],
     posts: [C7_GARG(0.15, 7.7), C7_GARG(1.25, 7.5)],
     movers: [C7_GHOST(-1.0, 4.2, 1.0, 4.2, 3.2, 0), C7_GHOST(-0.3, 7.2, 0.9, 7.2, 2.4, 1.5)] },
-  /* 16: over the graveyard hill, round the old well's crater, past the gargoyle */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.4, 7.6], shape: rect(-1.4, 0, 1.4, 8.5),
-    bumps: [{ x: 0.3, z: 2.6, r: 0.7, h: 0.35 }, { x: -0.2, z: 6.2, r: 0.55, h: -0.25 }],
-    posts: [C7_GARG(-1.0, 2.4), C7_GARG(0.3, 7.35)],
-    movers: [C7_GHOST(-0.9, 4.5, 0.9, 4.5, 2.2, 0)] },
+  /* 16: graveyard switchbacks: hills in the turns, a ghost in the middle aisle, the old well before the cup */
+  { par: 4, sol: [], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
+    inner: [[[-0.7, 0], [-0.7, 5.6]], [[0.7, 7], [0.7, 1.4]]],
+    bumps: [{ x: -0.7, z: 6.4, r: 0.45, h: 0.25 }, { x: 0.7, z: 0.6, r: 0.45, h: 0.25 }, { x: 1.4, z: 4.6, r: 0.45, h: -0.22 }],
+    posts: [C7_GARG(1.05, 5.6)],
+    movers: [C7_GHOST(-0.35, 3.5, 0.35, 3.5, 2.0, 0)] },
   /* 17: round the tower: up the stairs, along the battlement, through the portcullis */
   { par: 4, sol: [], tee: [-1.1, 0.5], cup: [1.1, 0.6], shape: [[-1.6, 0], [-0.6, 0], [-0.6, 3.6], [0.6, 3.6], [0.6, 0], [1.6, 0], [1.6, 4.6], [-1.6, 4.6]],
     tiers: [{ poly: rect(-1.6, 2.5, 1.6, 4.6), h: 0.15 }, { poly: rect(0.5, 0, 1.6, 4.6), h: 0.3 }],

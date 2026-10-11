@@ -80,6 +80,7 @@ registerWorld(1, { holes: [
     ramps: [{ x0: -0.3, z0: 3.8, x1: 0.3, z1: 5, axis: 'z', h0: 0, h1: 0.3 },
             { x0: -1.5, z0: 2.8, x1: -0.8, z1: 5, axis: 'z', h0: 0, h1: 0.3 }],
     movers: [{ kind: 'spin', x: 0, z: 5.95, len: 0.55, w: 1.6, phase: 0, look: 'crane' }],
+    inner: [[[0.3, 7], [1.5, 7]]],
     bumps: [{ x: 0.85, z: 7.6, r: 0.5, h: -0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.45, 3.2, 1.5, 5) }, { surf: 'sand', poly: rect(-1.5, 8.1, 1.5, 8.5) }] },
   /* 14: belt yard. Three belts run alternate ways between the girders */

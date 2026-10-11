@@ -30,7 +30,10 @@ function gameSource(only = parseOnly(process.env.PUTTX_ONLY)) {
   const g = fs.readFileSync(path.join(ROOT, 'src', 'game.js'), 'utf8');
   if (!g.includes('/* @@COURSES_SIM@@ */') || !g.includes('/* @@COURSES_LOOK@@ */')) throw new Error('build: course anchors missing from src/game.js');
   const shop = fs.readFileSync(path.join(ROOT, 'src', 'shop.js'), 'utf8').trim();
-  return g.replace('/* @@COURSES_SIM@@ */', () => join(courseFiles('sim', only))).replace('/* @@COURSES_LOOK@@ */', () => join(courseFiles('look', only)))
+  const sims = courseFiles('sim', only), looks = courseFiles('look', only);
+  /* the build fingerprint: changes exactly when anything the game runs changes */
+  const id = require('crypto').createHash('sha1').update(g + shop + sims.concat(looks).map(c => c.src).join('')).digest('hex').slice(0, 12);
+  return g.replace("'@@BUILD_ID@@'", () => `'${id}'`).replace('/* @@COURSES_SIM@@ */', () => join(sims)).replace('/* @@COURSES_LOOK@@ */', () => join(looks))
     .replace('/* @@SHOP@@ */', () => '/* ---- src/shop.js ---- */\n' + shop + '\n/* ---- end of src/shop.js ---- */');
 }
 function simSource(only) {

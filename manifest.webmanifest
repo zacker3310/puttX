@@ -1,7 +1,7 @@
 {
   "name": "PuttX",
   "short_name": "PuttX",
-  "description": "Mini golf for a 3 to 5 year old. One file, no reading, nothing to lose.",
+  "description": "Hard 3D mini golf: ten courses of 18, a real putter stroke, a pro shop. One file, no reading.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
@@ -10,7 +10,7 @@
   "background_color": "#fff8ec",
   "theme_color": "#2f241a",
   "lang": "en",
-  "categories": ["games", "kids"],
+  "categories": ["games", "sports"],
   "icons": [
     { "src": "docs/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "docs/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

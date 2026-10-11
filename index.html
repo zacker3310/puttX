@@ -270,6 +270,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #padPath .line { stroke: var(--v-surface-down); stroke-width: 3; stroke-dasharray: 6 8; }
 #padPath .hint { fill: none; stroke: var(--v-surface-down); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
 #padPath.old .back, #padPath.old .fwd { opacity: .55; }
+/* ---------- 12. UPDATE: a newer build is waiting ---------- */
+#updateBtn { left: 660px; top: 24px; display: none; background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); }
+#updateBtn.show { display: grid; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { #updateBtn.show { animation: none; } }
 </style>
 </head>
 <body>
@@ -288,6 +293,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <button class="btn" id="mulliganBtn" aria-label="take the last putt back"><svg viewBox="0 0 64 64"><path d="M18 22 A18 18 0 1 1 14 40" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M8 12 L18 24 L30 16" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="holeBanner" aria-label="hole and par"><span id="holeBannerN">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="holeBannerPar">3</span></span></div>
     <div id="replayTag" aria-label="replay"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="14" fill="#fff"/><circle cx="32" cy="32" r="24" fill="none" stroke="#fff" stroke-width="5"/></svg></div>
+    <button class="btn" id="updateBtn" aria-label="update"><svg viewBox="0 0 64 64"><path d="M50 30 A18 18 0 1 1 40 16" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M34 8 L44 16 L34 26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="btn" id="handBtn" aria-label="left or right handed"><svg viewBox="0 0 64 64"><path d="M22 58 V30 Q22 26 26 26 Q30 26 30 30 V12 Q30 8 34 8 Q38 8 38 12 V28 V14 Q38 10 42 10 Q46 10 46 14 V30 V20 Q46 16 50 16 Q54 16 54 20 V40 Q54 58 38 58 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/><path d="M22 34 L12 26 Q8 24 7 28 Q6 31 9 34 L22 48" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/></svg></button>
     <div class="live" id="swingPad" aria-label="swing"><svg id="padPath" viewBox="0 0 172 562" aria-hidden="true"><line class="line" id="padLine" x1="0" x2="172" y1="-50" y2="-50"/><path class="hint" id="padHint" d="M86 170 V330 M70 314 L86 330 L102 314 M86 330 V170 M70 186 L86 170 L102 186"/><polyline class="back" id="padBack" points=""/><polyline class="fwd" id="padFwd" points=""/><circle class="start" id="padStart" r="12" cx="-50" cy="-50"/></svg><div class="lane"></div><div id="padTicks"><i style="top:80px"></i><i style="top:160px"></i><i style="top:240px"></i><i style="top:320px"></i></div><div id="padFill"></div><div id="padGhost"></div><div id="padBall"></div><div id="padHead"></div></div>
     <button class="btn" id="aimL" aria-label="aim left"><svg viewBox="0 0 64 64"><path d="M40 12 L18 32 L40 52" fill="none" stroke="#8a7360" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -352,6 +358,8 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    1. stage   2. sim (DOM-free: physics, rounds, worlds, progress, hole packs)   3. save
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
+/* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
+const BUILD_ID = 'ee14b2565831';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -359,6 +367,7 @@ function fit() {
   stage.style.transform = `translate(-50%,-50%) scale(${stageScale})`;
 }
 function showScene(id) {
+  if (updateReady && id !== 'hole') { location.reload(); return; }   /* an update waiting: take it between holes, never mid-putt */
   currentScene = id;
   for (const s of document.querySelectorAll('.scene')) s.classList.toggle('active', s.id === id);
 }
@@ -1939,7 +1948,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 3.1, r: 0.35, h: 0.08 }, { x: 0.65, z: 8.05, r: 0.3, h: -0.05 }] },
   /* 13. thunder run: up a diagonal rainbow into a headwind, past a windmill on the high island,
      then off the kicker down onto a tilted crater green */
-  { par: 4, sol: [[309,0.45,0],[18,0.99,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
+  { par: 4, sol: [[212,0.92,0],[158,0.96,0],[260,0.96,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 7, 2.8, 9.4)],
     walls: [[[-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 8.4]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
@@ -4762,6 +4771,29 @@ function renderWallet() {
 }
 /* ---- end of src/shop.js ---- */
 
+/* ---- 8c. updates ---- */
+/* A web app on the home screen keeps the page it first loaded. On boot, on coming back to the
+   foreground and every 10 minutes, fetch the live page and compare fingerprints. A newer build
+   reloads at once on the title, map, card or shop; mid-hole, a refresh button appears and the
+   next scene change takes it. sw.js (network first, cache when offline) keeps it fresh. */
+let updateReady = false;
+function checkUpdate() {
+  if (!/^https?:$/.test(location.protocol) || updateReady) return;
+  fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(t => {
+    const m = t.match(/const BUILD_ID = '([0-9a-f]{12})'/);
+    if (!m || m[1] === BUILD_ID || !/^[0-9a-f]{12}$/.test(BUILD_ID)) return;
+    updateReady = true;
+    if (currentScene === 'hole') updateBtn.classList.add('show'); else location.reload();
+  }).catch(() => {});
+}
+function initUpdates() {
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  updateBtn.addEventListener('click', () => location.reload());
+  addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
+  setInterval(checkUpdate, 10 * 60 * 1000);
+  setTimeout(checkUpdate, 3000);
+}
+
 /* ============ 9. BOOT ============ */
 function boot() {
   progress = loadProgress();
@@ -4798,6 +4830,7 @@ function boot() {
   addEventListener('orientationchange', () => { fit(); setTimeout(fit, 350); });
   if (window.visualViewport) visualViewport.addEventListener('resize', fit);
   requestAnimationFrame(frame);
+  initUpdates();
   window.booted = true;
 }
 addEventListener('DOMContentLoaded', boot);

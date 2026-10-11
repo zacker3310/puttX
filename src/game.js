@@ -2,6 +2,8 @@
    1. stage   2. sim (DOM-free: physics, rounds, worlds, progress, hole packs)   3. save
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
+/* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
+const BUILD_ID = '@@BUILD_ID@@';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -9,6 +11,7 @@ function fit() {
   stage.style.transform = `translate(-50%,-50%) scale(${stageScale})`;
 }
 function showScene(id) {
+  if (updateReady && id !== 'hole') { location.reload(); return; }   /* an update waiting: take it between holes, never mid-putt */
   currentScene = id;
   for (const s of document.querySelectorAll('.scene')) s.classList.toggle('active', s.id === id);
 }
@@ -1605,6 +1608,29 @@ function updateFx(dt) {
 /* src/shop.js is inlined here by scripts/build.cjs. */
 /* @@SHOP@@ */
 
+/* ---- 8c. updates ---- */
+/* A web app on the home screen keeps the page it first loaded. On boot, on coming back to the
+   foreground and every 10 minutes, fetch the live page and compare fingerprints. A newer build
+   reloads at once on the title, map, card or shop; mid-hole, a refresh button appears and the
+   next scene change takes it. sw.js (network first, cache when offline) keeps it fresh. */
+let updateReady = false;
+function checkUpdate() {
+  if (!/^https?:$/.test(location.protocol) || updateReady) return;
+  fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(t => {
+    const m = t.match(/const BUILD_ID = '([0-9a-f]{12})'/);
+    if (!m || m[1] === BUILD_ID || !/^[0-9a-f]{12}$/.test(BUILD_ID)) return;
+    updateReady = true;
+    if (currentScene === 'hole') updateBtn.classList.add('show'); else location.reload();
+  }).catch(() => {});
+}
+function initUpdates() {
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  updateBtn.addEventListener('click', () => location.reload());
+  addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
+  setInterval(checkUpdate, 10 * 60 * 1000);
+  setTimeout(checkUpdate, 3000);
+}
+
 /* ============ 9. BOOT ============ */
 function boot() {
   progress = loadProgress();
@@ -1641,6 +1667,7 @@ function boot() {
   addEventListener('orientationchange', () => { fit(); setTimeout(fit, 350); });
   if (window.visualViewport) visualViewport.addEventListener('resize', fit);
   requestAnimationFrame(frame);
+  initUpdates();
   window.booted = true;
 }
 addEventListener('DOMContentLoaded', boot);

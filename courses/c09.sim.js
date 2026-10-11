@@ -41,7 +41,7 @@ registerWorld(9, { holes: [
     bumps: [{ x: -0.45, z: 8.6, r: 0.4, h: 0.12 }],
     zones: [{ surf: 'mud', poly: rect(-0.15, 8.55, 1, 8.75) }] },
   /* 8: the chocolate river: a thin wafer bridge straight on, or the wide bridge the long way */
-  { par: 2, sol: [[328, 0.88, 0]], tee: [0, 0.5], cup: [0.6, 6.2], shape: rect(-2, 0, 2, 7),
+  { par: 3, sol: [[328, 0.88, 0]], tee: [0, 0.5], cup: [0.6, 6.2], shape: rect(-2, 0, 2, 7),
     zones: [{ surf: 'water', poly: rect(-1.3, 3, 0.45, 4) }, { surf: 'water', poly: rect(0.8, 3, 2, 4) }],
     posts: [C9_GUM(0.6, 5.4, 0.14)], bumps: [{ x: -1, z: 5.6, r: 0.6, h: 0.18 }] },
   /* 9: off the high deck, a belt runs left to the ramp up to the cup terrace */
@@ -87,7 +87,7 @@ registerWorld(9, { holes: [
       { surf: 'mud', poly: rect(0.75, 7.6, 1, 9) }],
     bumps: [{ x: -0.3, z: 7.6, r: 0.4, h: 0.15 }] },
   /* 16: a tilted hard-candy slab with gumdrops */
-  { par: 3, sol: [[6, 0.85, 0]], tee: [0, 0.5], cup: [-0.8, 6.2], shape: rect(-1.5, 0, 1.5, 7),
+  { par: 4, sol: [[6, 0.85, 0]], tee: [0, 0.5], cup: [-0.8, 6.2], shape: rect(-1.5, 0, 1.5, 7),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 7), h: 0.08, sx: 0.04 }],
     zones: [{ surf: 'fast', poly: rect(-1.5, 1.5, 1.5, 7) }],
     posts: [C9_GUM(-0.3, 3, 0.13, 1.18), C9_GUM(-1.0, 4.4, 0.13, 1.18), C9_GUM(0.4, 4.6, 0.13, 1.18), C9_GUM(-0.4, 5.4, 0.13, 1.18)] },
@@ -99,7 +99,7 @@ registerWorld(9, { holes: [
       { surf: 'mud', poly: rect(-0.85, 6.3, -0.6, 7.5) }],
     posts: [C9_GUM(-0.5, 5.5), C9_GUM(-1.4, 5.4), C9_GUM(0.4, 5.9)] },
   /* 18: the production line: belt up the ramp, gumdrop maze to the pipe, taffy-guarded cup */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
+  { par: 5, sol: [[9, 0.9, 0], [49.5, 0.95, 0]], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]], rect(-0.6, 8.5, 3.4, 11.6)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]]), ring(rect(-0.6, 8.5, 3.4, 11.6))],
     ramps: [{ x0: -0.6, z0: 2, x1: 0.6, z1: 4.5, axis: 'z', h0: 0, h1: 0.45 }],

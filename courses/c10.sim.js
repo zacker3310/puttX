@@ -57,7 +57,7 @@ registerWorld(10, { holes: [
     zones: [{ push: [-1.5, 0], poly: rect(-1.4, 3.4, 1.4, 4.7) }],
     bumps: [{ x: -0.2, z: 7.1, r: 0.45, h: 0.12 }] },
   /* 8. rainbow windmill: a bare rainbow bridge with a windmill halfway, onto a cloud-ice green */
-  { par: 3, tee: [0, 0.6], cup: [-0.5, 7.4],
+  { par: 3, sol: [[357,0.35,1],[0,0.2,0]], tee: [0, 0.6], cup: [-0.5, 7.4],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.28, 1.8, 0.28, 5.6), rect(-1.3, 5.6, 1.3, 8.2)],
     walls: [[[-0.28, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.28, 1.8]], [[-1.3, 6.8], [-1.3, 8.2], [0.4, 8.2]]],
     zones: [{ surf: 'fast', poly: rect(-0.28, 1.8, 0.28, 5.6) }, { surf: 'ice', poly: rect(-1.3, 5.6, 1.3, 8.2) }],
@@ -83,7 +83,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0, z: 6, r: 1.1, h: 0.35 }, { x: 0, z: 6, r: 0.32, h: -0.07 }] },
   /* 11. gatehouse: a golden gate sweeps the bare bridge, a tilted court drains to the tube, and
      cloud bumpers guard the cup on the high keep (or climb the side ramp) */
-  { par: 4, tee: [0, 0.6], cup: [0.55, 8.4],
+  { par: 4, sol: [[357,0.7,0],[15,0.5,0]], tee: [0, 0.6], cup: [0.55, 8.4],
     floors: [rect(-0.7, 0, 0.7, 2.2), rect(-0.3, 2.2, 0.3, 4.2), rect(-1.4, 4.2, 1.4, 6), rect(0.6, 6, 1.1, 7), rect(-1, 7, 1.2, 9)],
     walls: [[[-0.3, 2.2], [-0.7, 2.2], [-0.7, 0], [0.7, 0], [0.7, 2.2], [0.3, 2.2]], [[0.6, 6], [-1.4, 6], [-1.4, 4.2], [-0.3, 4.2]],
       [[-1, 8.2], [-1, 9], [1.2, 9], [1.2, 7.8]]],
@@ -151,7 +151,7 @@ registerWorld(10, { holes: [
     tubes: [{ a: [0.5, 5.6], b: [-0.8, 7.0], dir: 25 }] },
   /* 18. the crown kingdom: tube or windy rainbow to the windmill isle, off the kicker onto the
      cloud-ice court past the golden gate, then up the royal ramp to the crater cup on the crown */
-  { par: 5, tee: [0, 0.6], cup: [0.3, 11.8],
+  { par: 4, sol: [[3,0.9,0],[0,0.55,0]], tee: [0, 0.6], cup: [0.3, 11.8],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.6, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
     walls: [[[-0.22, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.22, 2.2]], [[-1, 11], [-1, 12.6], [1, 12.6], [1, 11]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }, { poly: rect(-1.6, 7.6, 1.6, 10), h: 0.1 }, { poly: C10_PAD(-1, 11, 1, 12.6), h: 0.45 }],

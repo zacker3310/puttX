@@ -72,7 +72,7 @@ registerWorld(2, { holes: [
     tubes: [{ a: [-0.55, 3.55], b: [0.6, 4.9], dir: 0, keep: 0.6, add: 0.4 }],
     zones: [{ surf: 'sand', poly: rect(-1, 2.6, -0.1, 3.1) }],
     movers: [C2_WEED(2.25, 5.6, 0.95, 5.6, 2.8)],
-    posts: [C2_CACTUS(-0.2, 6.6), C2_CACTUS(-0.95, 6.5), C2_CACTUS(0.15, 7.45), C2_ROCK(0.45, 2.5)] },
+    posts: [C2_CACTUS(-0.2, 6.6), C2_CACTUS(-0.85, 6.5), C2_CACTUS(0.15, 7.45), C2_ROCK(0.45, 2.5)] },
   /* 10. the cactus garden on a leaning canyon floor: the cup sits up on the high side */
   { par: 3, sol: [[28.5,0.67,0]], tee: [-0.7, 0.5], cup: [1.05, 5.9],
     shape: [[-1.0, 0], [1.5, 0], [1.5, 6.0], [0.9, 6.8], [-1.6, 6.8], [-1.6, 1.0]],

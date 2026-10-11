@@ -76,7 +76,7 @@ registerWorld(1, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.8, 7.6, 0.8, 8) }],
     bumps: [{ x: -0.35, z: 5.6, r: 0.35, h: 0.1 }] },
   /* 13: cement mixer (3 parts). Up the narrow ramp under the crane or the long side ramp, then into the crater */
-  { par: 3, sol: [[338,0.84,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
+  { par: 4, sol: [[338,0.84,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
     tiers: [{ poly: rect(-1.5, 5, 1.5, 8.5), h: 0.3 }],
     ramps: [{ x0: -0.3, z0: 3.8, x1: 0.3, z1: 5, axis: 'z', h0: 0, h1: 0.3 },
             { x0: -1.5, z0: 2.8, x1: -0.8, z1: 5, axis: 'z', h0: 0, h1: 0.3 }],
@@ -84,12 +84,11 @@ registerWorld(1, { holes: [
     inner: [[[0.3, 7], [1.5, 7]], [[-0.8, 5], [-0.3, 5]], [[0.3, 5], [1.5, 5]]],
     bumps: [{ x: 0.85, z: 7.6, r: 0.5, h: -0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.45, 3.2, 1.5, 5) }, { surf: 'sand', poly: rect(-1.5, 8.1, 1.5, 8.5) }] },
-  /* 14: belt yard. A three-lane serpentine; the belts in the back lanes run against you */
-  { par: 4, sol: [], tee: [1.2, 0.5], cup: [-1.2, 8.2], aim0: 0, shape: rect(-1.8, 0, 1.8, 9),
-    inner: [[[0.6, 0], [0.6, 7.8]], [[-0.6, 1.2], [-0.6, 9]]],
-    zones: [{ surf: 'sand', poly: rect(1.05, 4, 1.8, 4.8) }, { push: [0, 1.3], poly: rect(-0.55, 2.6, 0.55, 5.2) },
-            { push: [0, -1.3], poly: rect(-1.75, 4.2, -0.65, 6.4) }, { surf: 'sand', poly: rect(-1.8, 8.6, -0.6, 9) }],
-    bumps: [{ x: 0, z: 8.4, r: 0.4, h: 0.14 }] },
+  /* 14: belt yard. Three belts run alternate ways between the girders */
+  { par: 3, sol: [[48.75,0.99,0]], tee: [0, 0.5], cup: [-1, 7.3], shape: rect(-1.8, 0, 1.8, 8),
+    inner: [[[-1.8, 3.3], [0.4, 3.3]], [[-0.4, 5.1], [1.8, 5.1]]],
+    zones: [{ push: [1.5, 0], poly: rect(-1.8, 2, 1.8, 2.8) }, { push: [-1.5, 0], poly: rect(-1.8, 3.8, 1.8, 4.6) },
+            { push: [1.5, 0], poly: rect(-1.8, 5.6, 1.8, 6.4) }, { surf: 'sand', poly: rect(-0.2, 6.8, 0.6, 8) }] },
   /* 15: boom gate climb (3 parts). Ramp to the deck, beat the barrier, then the chute or the pipe to the green */
   { par: 3, sol: [[-1,0.94,1.5]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.4, 0, 1.4, 9.6),
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.4), h: 0.35 }],

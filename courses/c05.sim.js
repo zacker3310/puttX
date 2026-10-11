@@ -47,7 +47,7 @@ registerWorld(5, (() => {
       bumps: [{ x: -0.6, z: 3.0, r: 0.45, h: -0.15 }, { x: 0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: -0.3, z: 4.6, r: 0.7, h: 0.32 }, { x: 0.9, z: 5.3, r: 0.5, h: 0.25 }],
       zones: [sand(rect(-1.05, 2.55, -0.15, 3.45)), lagoon(rect(-1.5, 6.85, 0.3, 7.2))], posts: [BARREL(-0.75, 5.75)] },
     /* 9 the fort: two drawbridges over the moat, then the gangplank up to the fort */
-    { par: 4, tee: [0, 0.5], cup: [0.9, 8.2], shape: [[-1.6, 0], [1.6, 0], [1.6, 6], [1.6, 9], [-1.6, 9], [-1.6, 6]],
+    { par: 3, sol: [[321,0.65,0],[348.25,0.97,0]], tee: [0, 0.5], cup: [0.9, 8.2], shape: [[-1.6, 0], [1.6, 0], [1.6, 6], [1.6, 9], [-1.6, 9], [-1.6, 6]],
       zones: [lagoon(rect(-1.6, 3, -1.2, 3.8)), lagoon(rect(-0.6, 3, 0.6, 3.8)), lagoon(rect(1.2, 3, 1.6, 3.8))],
       movers: [BRIDGE(-0.9, 2.75, -0.3, 2.75, 0.3, 90, 3), BRIDGE(0.9, 2.75, 0.3, 2.75, 0.3, 90, 3.6, 1.5)],
       tiers: [{ poly: rect(-1.6, 6, 1.6, 9), h: 0.3 }], ramps: [{ x0: -0.3, z0: 4.8, x1: 0.3, z1: 6, axis: 'z', h0: 0, h1: 0.3 }],
@@ -91,7 +91,7 @@ registerWorld(5, (() => {
       tubes: [{ a: [-1.2, 5.0], b: [-1.2, 7.1], dir: 0 }],
       bumps: [{ x: 0.5, z: 4.4, r: 0.5, h: 0.2 }], posts: [BARREL(0.2, 7.5)] },
     /* 16 the shipwreck: up the gangplank onto the listing wreck, through the hull or off the stern */
-    { par: 5, tee: [0.8, 0.5], cup: [1.0, 9.1], aim0: 0, shape: [[-1.8, 0], [1.8, 0], [1.8, 3.2], [1.8, 7], [1.8, 10], [-1.8, 10], [-1.8, 7], [-1.8, 3.2]],
+    { par: 4, sol: [[357,0.9,0],[150,1,0]], tee: [0.8, 0.5], cup: [1.0, 9.1], aim0: 0, shape: [[-1.8, 0], [1.8, 0], [1.8, 3.2], [1.8, 7], [1.8, 10], [-1.8, 10], [-1.8, 7], [-1.8, 3.2]],
       tiers: [{ poly: rect(-1.9, 3.2, 1.9, 7), h: 0.3, sx: 0.06 }],
       ramps: [{ x0: 0.4, z0: 2.0, x1: 1.0, z1: 3.2, axis: 'z', h0: 0, h1: 0.34 }],
       inner: [[[-1.8, 3.2], [0.4, 3.2]], [[1.0, 3.2], [1.8, 3.2]]],
@@ -99,13 +99,13 @@ registerWorld(5, (() => {
       tubes: [{ a: [-1.2, 4.2], b: [-1.2, 8.0], dir: 0 }],
       zones: [lagoon(rect(-0.4, 8.6, 0.4, 10)), sand(rect(-1.8, 1.2, -0.6, 2.2))], bumps: [{ x: 0.3, z: 7.9, r: 0.4, h: 0.14 }] },
     /* 17 skull rock: over the dunes or through the skull's cave to the tilted green */
-    { par: 4, tee: [0, 0.5], cup: [0.6, 8.2], shape: rect(-1.8, 0, 1.8, 9),
+    { par: 3, sol: [[30,0.9,0]], tee: [0, 0.5], cup: [0.6, 8.2], shape: rect(-1.8, 0, 1.8, 9),
       tiers: [{ poly: rect(-1.9, 6.5, 1.9, 9.1), h: -0.325, sz: 0.05 }],
       bumps: [{ x: -0.9, z: 3.6, r: 0.6, h: 0.35 }, { x: 0.9, z: 3.6, r: 0.6, h: 0.35 }, { x: 0, z: 2.6, r: 0.35, h: 0.15 }, { x: 0, z: 5.0, r: 0.5, h: 0.2 }],
       tubes: [{ a: [1.4, 1.6], b: [-1.2, 6.0], dir: 30 }],
       zones: [sand(rect(-1.8, 5.2, -0.6, 6.2)), lagoon(rect(-1.8, 7.4, -0.8, 9))], posts: [ANCHOR(1.3, 7.6)] },
     /* 18 board the ship: gangplank up, past the wheel, down the hatch (or walk the plank and jump) to treasure island */
-    { par: 5, tee: [0, 0.5], cup: [-0.8, 12.0], aim0: -20,
+    { par: 4, sol: [[327,0.95,0],[325.5,0.91,0]], tee: [0, 0.5], cup: [-0.8, 12.0], aim0: -20,
       shape: [[-2, 0], [2, 0], [2, 4], [2, 8.4], [2, 13], [-2, 13], [-2, 8.4], [-2, 4]],
       tiers: [{ poly: rect(-2.1, 4, 2.1, 8.4), h: 0.4 }, { poly: rect(-0.2, 8.4, 0.2, 9.2), h: 0.4 }],
       ramps: [{ x0: -2, z0: 2.6, x1: -1.3, z1: 4, axis: 'z', h0: 0, h1: 0.4 }],

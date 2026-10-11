@@ -18,7 +18,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.05, z: 5.2, r: 0.45, h: 0.16 }],
     zones: [{ surf: 'sand', poly: rect(-1.1, 5.9, -0.45, 7) }] },
   /* 4: scaffold deck. A narrow plank ramp climbs to the deck; miss it and the deck face bounces you back */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.55, 6.6], shape: rect(-1, 0, 1, 7.4),
+  { par: 3, sol: [[336.5,0.98,0]], tee: [0, 0.5], cup: [0.55, 6.6], shape: rect(-1, 0, 1, 7.4),
     tiers: [{ poly: rect(-1, 4.6, 1, 7.4), h: 0.25 }],
     ramps: [{ x0: -0.65, z0: 3.3, x1: 0.05, z1: 4.6, axis: 'z', h0: 0, h1: 0.25 }],
     inner: [[[-1, 4.6], [-0.65, 4.6]], [[0.05, 4.6], [1, 4.6]]],
@@ -53,7 +53,7 @@ registerWorld(1, { holes: [
              { kind: 'spin', x: -0.1, z: 5.5, len: 0.7, w: -1.4, phase: 0.5, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 6.6, -0.3, 8) }] },
   /* 10: scaffold climb (3 parts). Ramp to the first lift, cross the belt that wants you off the edge, ramp to the top deck */
-  { par: 3, sol: [], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
+  { par: 3, sol: [[310,1,0],[0,0.56,0]], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
     shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6.2], [1.4, 9], [-1.4, 9], [-1.4, 6.2], [-1.4, 3.4]],
     tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.44 }],
     ramps: [{ x0: -1.4, z0: 2.2, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 },
@@ -106,15 +106,15 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-3, 9.3], aim0: 0,
+  { par: 3, sol: [[26,1,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],
     walls: [[[-0.7, 4.6], [-0.7, 0], [0.7, 0], [0.7, 6], [-2, 6]], [[-0.7, 4.6], [-3.6, 4.6], [-3.6, 6]],
-            [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]], [[-2.35, 8.6], [-3.6, 8.6]]],
+            [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]]],
     tiers: [{ poly: rect(-0.7, 0, 0.7, 3), h: 0.4 }],
     zones: [{ push: [-1.2, 0], poly: rect(-3, 4.6, -0.7, 6) }, { surf: 'sand', poly: rect(-3.6, 9.6, -0.8, 10) }],
     tubes: [{ a: [-3.15, 5.3], b: [-3.1, 7.5], dir: 80 }],
     movers: [{ kind: 'spin', x: -1.6, z: 8.2, len: 0.45, w: 1.4, phase: 0, look: 'crane' }],
-    bumps: [{ x: -1.6, z: 9.35, r: 0.35, h: 0.12 }] },
+    bumps: [{ x: -2.2, z: 9, r: 0.45, h: -0.08 }] },
   /* 18: topping out (4 parts, open). The belt ramp, the boom gate on the deck, the chute or the pipe, the crane green */
   { par: 4, sol: [[202,1,0],[137,0.97,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
     floors: [rect(-1, 0, 1, 3.05), rect(-0.45, 3, 0.45, 4.45), rect(-1.2, 4.4, 3.4, 6), rect(-0.2, 5.99, 3.6, 10.2)],

@@ -369,10 +369,10 @@ function nextKey(key) { const [w, n] = key.split('-').map(Number); return WORLDS
 const playable = () => WORLD_ORDER.filter(w => WORLDS[w]);
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
-function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true }; }
-function recordHole(p, key, score, par) {
+function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R' }; }
+function recordHole(p, key, score, par, maxStars = 3) {
   const prev = p.holes[key];
-  const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, starsFor(score, par)) };
+  const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, Math.min(maxStars, starsFor(score, par))) };
   p.holes[key] = rec;
   /* the last hole of a course opens the next playable course */
   const [w, n] = key.split('-').map(Number), list = playable(), i = list.indexOf(w);
@@ -402,7 +402,7 @@ function loadProgress() {
       if (/^\d+-\d+$/.test(k) && r && Number.isInteger(r.best) && r.best >= 1 && [1, 2, 3].includes(r.stars)) holes[k] = { best: r.best, stars: r.stars };
     }
     if (Object.keys(holes).length !== Object.keys(p.holes).length) return freshProgress();
-    return Object.assign({}, p, { v: 2, holes, worlds, sound: p.sound !== false });
+    return Object.assign({}, p, { v: 2, holes, worlds, sound: p.sound !== false, hand: p.hand === 'L' ? 'L' : 'R' });
   } catch (e) { return freshProgress(); }
 }
 function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {} }
@@ -510,7 +510,7 @@ function initRenderer() {
   sun.shadow.radius = 4;
   sun.shadow.bias = -0.0004;
   scene.add(sun, sun.target);
-  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshStandardMaterial({ map: ballTexture(GEAR.ball), roughness: 0.32 }));
+  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshStandardMaterial({ map: ballTexture(GEAR.ball), bumpMap: dimpleTexture(), bumpScale: 0.6, roughness: 0.32 }));
   ballMesh.castShadow = true;
   scene.add(ballMesh);
   resizeRenderer();
@@ -530,6 +530,8 @@ function canvasTex(w, h, draw) {
 function feltTexture(hex) {
   const t = canvasTex(128, 128, x => {
     const r = rng32(7); x.fillStyle = hex; x.fillRect(0, 0, 128, 128);
+    /* mowing stripes, like a real green: two bands per tile, about 33 cm each */
+    x.fillStyle = 'rgba(255,255,255,0.045)'; x.fillRect(0, 0, 128, 32); x.fillRect(0, 64, 128, 32);
     for (let i = 0; i < 2600; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'; x.fillRect(r() * 128, r() * 128, 1.5, 1.5); }
   });
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
@@ -543,6 +545,26 @@ function ballTexture(b) {
     for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, r = i % 2 ? 9 : 20; x.lineTo(64 + Math.cos(a) * r, 30 + Math.sin(a) * r); }
     x.fill();
   });
+}
+/* dimples for the ball's bump map: a staggered grid of soft dots */
+function dimpleTexture() {
+  return canvasTex(256, 128, x => {
+    x.fillStyle = '#fff'; x.fillRect(0, 0, 256, 128);
+    for (let j = 0; j < 12; j++) for (let i = 0; i < 24; i++) {
+      const g = x.createRadialGradient(i * 10.7 + (j % 2) * 5.3 + 5, j * 10.7 + 5, 0, i * 10.7 + (j % 2) * 5.3 + 5, j * 10.7 + 5, 4.5);
+      g.addColorStop(0, '#888'); g.addColorStop(1, '#fff'); x.fillStyle = g; x.fillRect(i * 10.7 + (j % 2) * 5.3, j * 10.7, 10.7, 10.7);
+    }
+  });
+}
+/* ripples for water: scrolled slowly in renderFrame */
+function waterTexture(hex) {
+  const t = canvasTex(128, 128, x => {
+    x.fillStyle = hex; x.fillRect(0, 0, 128, 128);
+    x.strokeStyle = 'rgba(255,255,255,0.22)'; x.lineWidth = 3; x.lineCap = 'round';
+    const r = rng32(11);
+    for (let i = 0; i < 14; i++) { const cx = r() * 128, cy = r() * 128, w = 10 + r() * 18; x.beginPath(); x.moveTo(cx - w, cy); x.quadraticCurveTo(cx, cy - 5, cx + w, cy); x.stroke(); }
+  });
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
 }
 /* chevrons for conveyor and fan zones, scrolled along the push in renderFrame */
 function flowTexture(hex) {
@@ -711,7 +733,7 @@ function zoneMaterial(zn, look) {
   }
   switch (zn.surf) {
     case 'ice': return mat(look.ice, { roughness: 0.1, metalness: 0.05, transparent: true, opacity: 0.88 });
-    case 'water': return mat(look.water, { roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.85 });
+    case 'water': { const t = waterTexture(look.water); flowTex.push({ t, speed: 0.25 }); return mat('#ffffff', { map: t, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.88 }); }
     case 'fast': return mat(look.fast, { roughness: 0.35 });
     case 'mud': return mat(look.mud, { roughness: 1 });
     default: return mat(look.sand, { roughness: 1 });
@@ -775,9 +797,21 @@ function cameraGoal() {
     const yaw = play.time * 0.15, r = Math.max(4.5, B.ext * 1.3);
     return { pos: new THREE.Vector3(B.cx - Math.sin(yaw) * r, 2.6 + B.ext * 0.4, B.cz - Math.cos(yaw) * r), look: new THREE.Vector3(B.cx, 0, B.cz) };
   }
-  if (play.overview) {
-    const hi = Math.max(B.x1 - B.x0, (B.z1 - B.z0) * 1.7) * 0.75 + 2;
-    return { pos: new THREE.Vector3(B.cx, hi, B.cz - hi * 0.3), look: new THREE.Vector3(B.cx, 0, B.cz) };
+  const over = () => { const hi = Math.max(B.x1 - B.x0, (B.z1 - B.z0) * 1.7) * 0.75 + 2; return { pos: new THREE.Vector3(B.cx, hi, B.cz - hi * 0.3), look: new THREE.Vector3(B.cx, 0, B.cz) }; };
+  if (play.overview) return over();
+  if (play.phase === 'replay') {
+    /* low, beside the ball's path, looking across it */
+    const r = play.replay, b = r.b, v = Math.hypot(b.vx, b.vz), ux = v > 0.05 ? b.vx / v : 0, uz = v > 0.05 ? b.vz / v : 1;
+    const x = b.x - uz * 0.9 * r.side - ux * 0.5, z = b.z + ux * 0.9 * r.side - uz * 0.5;
+    return { pos: new THREE.Vector3(x, Math.max(b.y, groundH(h, x, z)) + 0.35, z), look: new THREE.Vector3(b.x, b.y + 0.05, b.z) };
+  }
+  if (play.intro) {
+    /* from high over the cup, swinging round to the tee: eased, then handed to the aim camera */
+    const u = Math.min(1, play.intro.t / play.intro.dur), e = u * u * (3 - 2 * u), cy = groundH(h, ...h.cup);
+    const from = { pos: new THREE.Vector3(h.cup[0] + 1.2, cy + 2.6 + B.ext * 0.35, h.cup[1] + 1.6), look: new THREE.Vector3(h.cup[0], cy, h.cup[1]) };
+    const mid = over(), saved = play.intro; play.intro = null; const to = cameraGoal(); play.intro = saved;
+    const a = e < 0.5 ? from : mid, c = e < 0.5 ? mid : to, k = e < 0.5 ? e * 2 : e * 2 - 1, kk = k * k * (3 - 2 * k);
+    return { pos: a.pos.clone().lerp(c.pos, kk), look: a.look.clone().lerp(c.look, kk) };
   }
   const aiming = play.phase === 'aim' || play.phase === 'idle';
   if (aiming) play.cam.yaw = play.aim * Math.PI / 180;
@@ -805,8 +839,11 @@ function updateCamera(dt) {
     let d = want - play.cam.yaw; d = Math.atan2(Math.sin(d), Math.cos(d));
     play.cam.yaw += d * (1 - Math.exp(-2.2 * dt));
   }
-  const g = cameraGoal(), k = 1 - Math.exp(-4 * dt);
+  const g = cameraGoal(), k = 1 - Math.exp(-(play.intro ? 12 : 4) * dt);
   camNow.pos.lerp(g.pos, k); camNow.look.lerp(g.look, k); applyCamera();
+  /* a big landing shakes the camera for a moment */
+  const sh = play.fx.shake || 0;
+  if (sh > 0.01 && !reducedMotion()) { camera.position.x += Math.sin(play.time * 90) * 0.03 * sh; camera.position.y += Math.cos(play.time * 77) * 0.02 * sh; play.fx.shake = sh * Math.exp(-9 * dt); }
 }
 function renderFrame(dt) {
   if (!play.hole || currentScene === 'map' || currentScene === 'shop') return;
@@ -814,6 +851,8 @@ function renderFrame(dt) {
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
   const lk = WORLD_LOOK[holeWorld(play.hole)]; if (lk && lk.tick) lk.tick(holeGroup, dt, play.time);
   syncBall(dt);
+  syncGhost();
+  updatePuffs(dt);
   updateAimLine();
   updatePutter(dt);
   updateFx(dt);
@@ -842,7 +881,7 @@ const SWING_FULL = 320, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 const FEEL_BASE = { sweet: 0.12, tempoDead: 0.1, tempoK: 0.22, pathK: 0.4, toeLoss: 0.22, twist: 3 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
-const PUTTER_BACK_M = 0.32, PUTTER_GAP = 0.006, HEAD_W = 0.13, HEAD_D = 0.04, HEAD_H = 0.032, AIM_LEN = 1.1;
+const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
 let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimLine = null, aimRing = null, putter = null;
 
 /* pure: a pad gesture's samples [{t, x, y}] (first = the touch) -> the stroke, or null (no contact) */
@@ -945,12 +984,14 @@ function buildPutter(gear) {
   const line = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.002, HEAD_D * 0.7), mat('#ffffff', { roughness: 0.5 })); line.position.set(0, HEAD_H + 0.001, -HEAD_D / 2);
   /* the shaft rises from the heel toward the player's hands, who stands to the side of the line (local +x) */
   const shaft = new THREE.Group(); shaft.position.set(HEAD_W * 0.36, HEAD_H, -HEAD_D * 0.5); shaft.rotation.x = -0.1; shaft.rotation.z = -0.38;
-  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.75, 8), mat(gear.shaft, metal)); rod.position.y = 0.375;
-  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.009, 0.22, 10), mat(gear.grip, { roughness: 0.9 })); grip.position.y = 0.66;
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.92, 10), mat(gear.shaft, metal)); rod.position.y = 0.46;
+  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.012, 0.27, 12), mat(gear.grip, { roughness: 0.9 })); grip.position.y = 0.8;
   rod.castShadow = grip.castShadow = true;
   shaft.add(rod, grip);
   g.add(head, line, shaft);
   g.visible = false;
+  /* a left-hander stands on the other side of the line: mirror the whole club */
+  g.scale.x = progress.hand === 'L' ? -1 : 1;
   return g;
 }
 function setPutter(gear) {
@@ -1007,11 +1048,15 @@ function updatePutter(dt) {
 const stageXY = e => { const r = stage.getBoundingClientRect(); return [(e.clientX - r.left) / stageScale, (e.clientY - r.top) / stageScale]; };
 const evT = e => (e.timeStamp || performance.now()) / 1000;
 function onViewDown(e) {
+  if (play.phase === 'replay') { endReplay(); return; }
+  if (play.intro) { skipIntro(); return; }
   if (play.phase !== 'aim' || play.aimDrag || play.swing) return;
   play.aimDrag = { id: e.pointerId, x: stageXY(e)[0], aim0: play.aim };
 }
 function onPadDown(e) {
   e.preventDefault();
+  if (play.intro) skipIntro();
+  if (play.phase === 'replay') { endReplay(); return; }
   if (play.phase !== 'aim' || play.swing || play.aimDrag || b0()) return;
   if (play.overview) setOverview(false);
   const [x, y] = stageXY(e);
@@ -1046,6 +1091,14 @@ function onCancel(e) {
   if (play.swing && e.pointerId === play.swing.id) { play.swing = null; drawPad(); }
 }
 function nudge(dir) { if (play.phase === 'aim') { play.aim -= dir * NUDGE_DEG; sfx('tick'); } }
+/* handedness: mirrors the club and puts the swing pad on the player's side of the screen */
+function setHand(h) {
+  progress.hand = h === 'L' ? 'L' : 'R'; saveProgress();
+  if (putter) putter.scale.x = progress.hand === 'L' ? -1 : 1;
+  document.getElementById('hole').classList.toggle('lefty', progress.hand === 'L');
+  handBtn.classList.toggle('on', progress.hand === 'L');
+  if (camera) camera.setViewOffset(1200, 700, progress.hand === 'L' ? -90 : 90, 0, 1200, 700);
+}
 function setOverview(on) { play.overview = on; viewBtn.classList.toggle('on', on); }
 /* the putter meets the ball */
 function strike(st) {
@@ -1068,7 +1121,7 @@ function drawPad() {
   padFill.style.top = (s ? s.sy - top : 120) + 'px';
   padFill.style.height = (s ? Math.min(SWING_FULL, s.back) : 0) + 'px';
   padTicks.style.top = (s ? s.sy - top : 120) + 'px';
-  swingPad.classList.toggle('live', !!s);
+  swingPad.classList.toggle('swinging', !!s);
   if (play.lastShot) { padGhost.style.display = 'block'; padGhost.style.top = ((s ? s.sy : 230) - top + Math.min(SWING_FULL, play.lastShot.length)) + 'px'; }
 }
 /* the shot readout: path arrow, strike dot on the face, tempo needle; green when clean */
@@ -1085,7 +1138,8 @@ function drawShot(st) {
 function startHole(key) {
   const h = holeAt(key);
   if (!h) return false;
-  Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, swing: null, aimDrag: null, fx: {}, lastOutcome: null, lastShot: null });
+  Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, swing: null, aimDrag: null, fx: {}, lastOutcome: null, lastShot: null,
+    log: [], undo: null, mulled: false, ghost: null, intro: null, replay: null });
   play.aim = h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI;
   setOverview(false);
   simAcc = 0;
@@ -1093,25 +1147,40 @@ function startHole(key) {
   buildHoleScene(h);
   hideAim();
   for (const m of trailDots.concat(confetti)) m.visible = false;
-  holeDone.classList.remove('show'); shotPanel.classList.remove('show'); padGhost.style.display = 'none';
+  holeDone.classList.remove('show'); shotPanel.classList.remove('show'); padGhost.style.display = 'none'; holeBanner.classList.remove('show');
+  setRead(false); initGhost(h); updateMulligan();
+  for (const p of puffs) p.visible = false;
   syncBall(0);
   showScene('hole');
   updateHud(); drawPad();
   snapCamera();
   return true;
 }
-function goHole(key) { sfx('tap'); startHole(key); sfx('jingle', Number(key.split('-')[0])); }
+function goHole(key) {
+  sfx('tap'); wipe(); startHole(key); sfx('jingle', Number(key.split('-')[0]));
+  /* the hole introduces itself: a sweep from over the cup back to the tee, with its number and par */
+  if (!reducedMotion()) { play.intro = { t: 0, dur: 2.4 }; snapCamera(); }
+  holeBannerN.textContent = key.split('-')[1]; holeBannerPar.textContent = play.hole.par;
+  holeBanner.classList.remove('show'); void holeBanner.offsetWidth; holeBanner.classList.add('show');
+}
+function skipIntro() { if (play.intro) { play.intro = null; holeBanner.classList.remove('show'); } }
 function beginPutt(angle, power, clean = true) {
   if (play.phase !== 'aim') return false;
   const b = play.ball;
+  skipIntro();
+  play.undo = { strokes: play.round.strokes, at: [b.x, b.z], aim: play.aim };
   play.from = [b.x, b.z]; play.t0 = play.time;
+  play.log.push([+angle.toFixed(3), +power.toFixed(4), +play.time.toFixed(6)]);
   play.ball = launch(newBall(play.hole, b.x, b.z), angle, power);
   play.phase = 'roll'; play.swing = null; play.aimDrag = null;
+  ghostPutt(play.log.length - 1);
+  updateMulligan();
   sfx('putt', power, clean ? 1 : 0);
   return true;
 }
 function tickSim() {
   const h = play.hole;
+  stepGhost();
   if (play.phase === 'roll' || play.phase === 'drift') {
     const end = stepBall(h, play.ball, play.time);
     play.time += SIM_DT;
@@ -1133,7 +1202,7 @@ function endRoll(end) {
   setRoll(0);
   if (out === 'sunk') {
     play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [r.x, r.z]; sfx('cup');
-    if (play.round.score === 1) { burst(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup) + 0.1, h.cup[1])); sfx('fanfare'); }
+    if (play.round.score === 1) { burst(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup) + 0.1, h.cup[1])); sfx('fanfare'); if (!reducedMotion() && play.log.length === 1) play.fx.wantReplay = true; }
   }
   else if (out === 'auto') { play.phase = 'auto'; play.fx.autoT = 0; play.fx.autoFrom = end === 'oob' ? play.from.slice() : [r.x, r.z]; }
   else {
@@ -1142,7 +1211,18 @@ function endRoll(end) {
     if (cupInSight(h, play.ball.x, play.ball.z)) play.aim = Math.atan2(h.cup[0] - play.ball.x, h.cup[1] - play.ball.z) * 180 / Math.PI;
     play.phase = 'aim';
   }
-  updateHud();
+  updateHud(); updateMulligan();
+}
+/* the mulligan: once per hole, take the last stroke back (ball, count and penalty); that hole then tops out at 2 stars */
+function updateMulligan() { mulliganBtn.classList.toggle('show', play.phase === 'aim' && !!play.undo && !play.mulled && play.round.strokes > 0); }
+function mulligan() {
+  if (play.phase !== 'aim' || !play.undo || play.mulled) return false;
+  const u = play.undo;
+  play.round.strokes = u.strokes; play.round.at = u.at.slice(); play.aim = u.aim;
+  play.ball = newBall(play.hole, u.at[0], u.at[1]); play.mulled = true; play.log.pop();
+  if (play.ghost) play.ghost.k = Math.max(0, play.ghost.k - 1);
+  sfx('tubeOut'); updateHud(); updateMulligan();
+  return true;
 }
 /* sounds and squash for what the ball hit since the last frame. A ball riding a wall or a mover
    logs a hit every physics step, so grazes stay silent and each sound plays at most every 60 ms. */
@@ -1156,10 +1236,10 @@ function drainHits() {
     if (kind === 'wall' || kind === 'post') hitSfx('clonk', v);
     else if (kind === 'bump' || kind === 'mover') hitSfx('boing', v);
     else if (kind === 'lip') sfx('lip');
-    else if (kind === 'land') hitSfx('land', v);
-    else if (kind === 'splash') sfx('splash');
+    else if (kind === 'land') { hitSfx('land', v); if (v > 0.8) puff(play.ball, 'dust', Math.min(14, 4 + v * 4)); if (v > 1.6) play.fx.shake = Math.min(1, v / 4); }
+    else if (kind === 'splash') { sfx('splash'); puff(play.ball, 'water', 22); }
     else if (kind === 'tubeIn') sfx('tube');
-    else if (kind === 'tubeOut') sfx('tubeOut');
+    else if (kind === 'tubeOut') { sfx('tubeOut'); puff(play.ball, 'dust', 8); }
     if ((kind === 'wall' || kind === 'post' || kind === 'bump' || kind === 'mover' || kind === 'land') && v > 0.8) play.fx.squash = 1;
   }
   play.ball.hits.length = 0;
@@ -1172,6 +1252,12 @@ function restInCup(h, from) {
 function advance(dt) {
   if (!play.hole || play.phase === 'idle') return;
   if (play.phase === 'title') { play.time += dt; return; }
+  if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
+  if (play.phase === 'replay') { advanceReplay(dt); return; }
+  /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
+  const b0b = play.ball, near = (play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.55 && Math.hypot(b0b.vx, b0b.vz) < 1.6;
+  play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.45 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
+  dt *= play.fx.slow;
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
   while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }
   drainHits();
@@ -1188,8 +1274,38 @@ function advance(dt) {
     const wob = t < 0.6 ? Math.sin(t * 40) * 0.006 * (1 - t / 0.6) : 0;
     b.x = h.cup[0] + (rx - h.cup[0]) * k + wob; b.z = h.cup[1] + (rz - h.cup[1]) * k;
     b.y = cy - (CUP_DEPTH - 0.004) * k * k;
-    if (t > 1.3) finishHole();
+    if (t > 1.3) { if (play.fx.wantReplay) startReplay(); else finishHole(); }
   }
+}
+/* the ace replay: the same putt again, from a low cinematic angle beside the line, at 70% speed. Any tap skips. */
+function startReplay() {
+  const h = play.hole, [a, p, t0] = play.log[0];
+  play.fx.wantReplay = false;
+  play.replay = { b: launch(newBall(h, h.tee[0], h.tee[1]), a, p), t: t0, acc: 0, done: false, side: Math.random() < 0.5 ? 1 : -1 };
+  play.ball = play.replay.b; play.phase = 'replay'; holeBanner.classList.remove('show');
+  replayTag.classList.add('show');
+}
+function advanceReplay(dt) {
+  const r = play.replay, h = play.hole;
+  r.acc += dt * 0.7;
+  while (r.acc >= SIM_DT && !r.done) {
+    r.acc -= SIM_DT;
+    const end = stepBall(h, r.b, r.t); r.t += SIM_DT;
+    if (end) { r.done = true; r.end = 0; }
+  }
+  drainHits();
+  if (r.done) {
+    r.end += dt;
+    const k = Math.min(1, r.end / 0.22), [rx, rz] = restInCup(h, [r.b.x, r.b.z]);
+    r.b.x += (rx - r.b.x) * k; r.b.z += (rz - r.b.z) * k; r.b.y = groundH(h, ...h.cup) - (CUP_DEPTH - 0.004) * k * k;
+    if (r.end > 0.9) endReplay();
+  }
+}
+function endReplay() {
+  if (play.phase !== 'replay') return;
+  replayTag.classList.remove('show');
+  play.phase = 'sunk'; play.fx.sunkT = 1.31;
+  finishHole();
 }
 function updateHud() {
   const [, n] = play.key.split('-');
@@ -1198,10 +1314,17 @@ function updateHud() {
 function finishHole() {
   play.phase = 'done';
   const { key, round, hole } = play;
-  recordHole(progress, key, round.score, hole.par);
+  const maxStars = play.mulled ? 2 : 3, prev = progress.holes[key];
+  recordHole(progress, key, round.score, hole.par, maxStars);
+  /* a new best (or a first finish) becomes this hole's ghost, unless the cap rolled it in */
+  if (!round.auto && (!prev || round.score <= prev.best) && play.log.length === round.score) {
+    progress.ghosts = progress.ghosts && typeof progress.ghosts === 'object' ? progress.ghosts : {};
+    progress.ghosts[key] = play.log.slice();
+  }
   onHoleFinished(key, round.score, hole.par);
   saveProgress();
-  const stars = starsFor(round.score, hole.par);
+  updateMulligan();
+  const stars = Math.min(maxStars, starsFor(round.score, hole.par));
   holeDone.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < stars));
   doneStrokes.textContent = round.score; donePar.textContent = hole.par;
   holeDone.classList.add('show');
@@ -1217,6 +1340,97 @@ function stepFrame(now) {
 }
 function frame(now) { stepFrame(now); requestAnimationFrame(frame); }
 
+/* ---- 6b. ghost ball, slope read, particles, wipe ---- */
+/* the ghost: your best run of this hole, stroke for stroke. When you strike putt k, the ghost
+   strikes its putt k from where its own ball lies, on the same physics, as a see-through ball. */
+let ghostMesh = null, readGroup = null, puffs = [];
+function initGhost(h) {
+  if (!ghostMesh) {
+    ghostMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 24, 16), new THREE.MeshBasicMaterial({ color: 0xbfe6f5, transparent: true, opacity: 0.45, depthWrite: false }));
+    ghostMesh.renderOrder = 3; scene.add(ghostMesh);
+  }
+  const log = progress.ghosts && progress.ghosts[h.key];
+  play.ghost = Array.isArray(log) && log.every(p => Array.isArray(p) && p.length === 3 && p.every(Number.isFinite)) ? { log, k: 0, b: newBall(h, h.tee[0], h.tee[1]), live: false, t: 0 } : null;
+  ghostMesh.visible = false;
+}
+function ghostPutt(k) {
+  const g = play.ghost;
+  if (!g || k >= g.log.length || g.done) return;
+  const [a, p, t0] = g.log[k];
+  g.b = launch(newBall(play.hole, g.b.x, g.b.z), a, p); g.t = t0; g.live = true; g.k = k + 1;
+}
+function stepGhost() {
+  const g = play.ghost;
+  if (!g || !g.live) return;
+  const end = stepBall(play.hole, g.b, g.t); g.t += SIM_DT; g.b.hits.length = 0;
+  if (end) { g.live = false; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, g.b.x, g.b.z); }
+}
+function syncGhost() {
+  const g = play.ghost;
+  ghostMesh.visible = !!g && g.k > 0 && !g.b.tube && !(g.done && !g.live) && play.phase !== 'replay';
+  if (ghostMesh.visible) ghostMesh.position.set(g.b.x, g.b.y + BALL_R, g.b.z);
+}
+/* slope read: arrows over the green pointing downhill, longer and redder where it is steeper */
+function setRead(on) {
+  if (readGroup) { scene.remove(readGroup); disposeGroup(readGroup); readGroup = null; }
+  readBtn.classList.toggle('on', on);
+  if (!on || !play.hole) return;
+  const h = play.hole, B = holeBounds(h), step = 0.28, s = new THREE.Shape();
+  s.moveTo(-0.018, -0.06); s.lineTo(0.018, -0.06); s.lineTo(0.018, 0.02); s.lineTo(0.045, 0.02); s.lineTo(0, 0.07); s.lineTo(-0.045, 0.02); s.lineTo(-0.018, 0.02); s.closePath();
+  const geo = new THREE.ShapeGeometry(s); geo.rotateX(Math.PI / 2);
+  const spots = [];
+  for (let x = B.x0 + step / 2; x < B.x1; x += step) for (let z = B.z0 + step / 2; z < B.z1; z += step) {
+    if (!onFloor(h, x, z) || h.segs.some(sg => { const p = closestOnSeg(sg[0], sg[1], sg[2], sg[3], x, z); return Math.hypot(x - p[0], z - p[1]) < 0.12; })) continue;
+    const [gx, gz] = groundGrad(h, x, z), m = Math.hypot(gx, gz);
+    if (m > 0.012) spots.push([x, z, gx, gz, m]);
+  }
+  readGroup = new THREE.Group();
+  const inst = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.85, depthWrite: false, toneMapped: false, side: THREE.DoubleSide }), Math.max(1, spots.length));
+  const o = new THREE.Object3D(), c = new THREE.Color();
+  spots.forEach(([x, z, gx, gz, m], i) => {
+    o.position.set(x, groundH(h, x, z) + 0.012, z);
+    o.rotation.set(0, Math.atan2(-gx, -gz), 0);
+    o.scale.setScalar(0.7 + Math.min(1.3, m * 6));
+    o.updateMatrix(); inst.setMatrixAt(i, o.matrix);
+    inst.setColorAt(i, c.setHSL(0.33 - Math.min(0.33, m * 1.6), 0.85, 0.6));
+  });
+  inst.count = spots.length; inst.renderOrder = 2; inst.frustumCulled = false;
+  readGroup.add(inst); scene.add(readGroup);
+}
+/* puffs: a small pool of dust and water particles for landings, splashes and tube exits */
+function initPuffs() {
+  const geo = new THREE.SphereGeometry(0.018, 8, 6);
+  for (let i = 0; i < 40; i++) {
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false }));
+    m.visible = false; m.userData = { life: 0, v: new THREE.Vector3() }; scene.add(m); puffs.push(m);
+  }
+}
+function puff(b, kind, n) {
+  if (reducedMotion()) return;
+  const col = kind === 'water' ? 0x9fd8ef : new THREE.Color(lookOf(holeWorld(play.hole)).skirt).lerp(new THREE.Color(0xfff8ec), 0.55).getHex();
+  for (let i = 0, k = 0; i < puffs.length && k < n; i++) {
+    const m = puffs[i]; if (m.visible) continue;
+    const a = Math.random() * Math.PI * 2, sp = kind === 'water' ? 0.6 + Math.random() * 0.8 : 0.25 + Math.random() * 0.35;
+    m.position.set(b.x, b.y + 0.02, b.z); m.visible = true; m.material.color.setHex(col);
+    m.userData.life = m.userData.max = 0.5 + Math.random() * 0.3;
+    m.userData.v.set(Math.cos(a) * sp, (kind === 'water' ? 1.6 : 0.5) + Math.random() * 0.6, Math.sin(a) * sp);
+    k++;
+  }
+}
+function updatePuffs(dt) {
+  for (const m of puffs) if (m.visible) {
+    const u = m.userData; u.life -= dt;
+    if (u.life <= 0) { m.visible = false; continue; }
+    u.v.y -= 3.5 * dt; m.position.addScaledVector(u.v, dt);
+    const k = u.life / u.max; m.material.opacity = k * 0.8; m.scale.setScalar(1.6 - k * 0.8);
+  }
+}
+/* the iris wipe between scenes: decoration only, the scene has already switched underneath */
+function wipe() {
+  if (reducedMotion()) return;
+  wipeEl.classList.remove('go'); void wipeEl.offsetWidth; wipeEl.classList.add('go');
+}
+
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
@@ -1231,6 +1445,8 @@ function showTitle() {
   showScene('title');
 }
 function showMap(w) {
+  if (currentScene === 'hole' || currentScene === 'card') wipe();
+  setRead(false);
   if (w) mapWorld = w;
   if (!WORLDS[mapWorld]) mapWorld = playable()[0];
   play.swing = null; play.aimDrag = null; hideAim();
@@ -1375,6 +1591,7 @@ function boot() {
   initAim();
   setPutter(GEAR.putter);
   initFx();
+  initPuffs();
   initShop();
   view.addEventListener('pointerdown', onViewDown);
   swingPad.addEventListener('pointerdown', onPadDown);
@@ -1384,6 +1601,10 @@ function boot() {
   aimL.addEventListener('click', () => nudge(-1));
   aimR.addEventListener('click', () => nudge(1));
   viewBtn.addEventListener('click', () => { sfx('tap'); setOverview(!play.overview); });
+  readBtn.addEventListener('click', () => { sfx('tap'); setRead(!readGroup); });
+  mulliganBtn.addEventListener('click', () => mulligan());
+  handBtn.addEventListener('click', () => { sfx('tap'); setHand(progress.hand === 'L' ? 'R' : 'L'); });
+  setHand(progress.hand);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   titleGo.addEventListener('click', () => { sfx('tap'); showMap(); });

@@ -64,10 +64,10 @@ function walkField(h) {
 }
 
 /* every putt from one spot: returns a sinking putt, or the outcomes ranked by distance */
-function sweep(h, at, far, fine) {
+function sweep(h, at, far, fine, angles = ANGLES, powers = POWERS) {
   const t0s = h.movers.length ? T0S : [0], out = [];
-  for (const t0 of t0s) for (let a = 0; a < ANGLES; a++) for (let p = 1; p <= POWERS; p++) {
-    const ang = a * 360 / ANGLES, pw = p / POWERS, r = S.simulatePutt(h, at, ang, pw, t0);
+  for (const t0 of t0s) for (let a = 0; a < angles; a++) for (let p = 1; p <= powers; p++) {
+    const ang = a * 360 / angles, pw = p / powers, r = S.simulatePutt(h, at, ang, pw, t0);
     if (r.end === 'sunk') return { sink: [ang, pw, t0] };
     if (r.end === 'stop') out.push({ putt: [ang, pw, t0], at: [r.x, r.z], d: far(r.x, r.z), e: Math.hypot(r.x - h.cup[0], r.z - h.cup[1]) });
   }
@@ -112,7 +112,8 @@ function bot(h) {
   /* its plan from a spot: a sinking putt if there is one, else the putt that ends nearest by walking distance */
   const plan = at => {
     const k = at.map(v => v.toFixed(2)).join();
-    if (!plans.has(k)) { const r = sweep(h, at, far, true); plans.set(k, r.sink || (r.out[0] && r.out[0].putt) || [0, 0.5, 0]); }
+    /* the bot plans on a coarser grid than the par proof: it needs a human plan, not the optimum, and it is 2x faster */
+    if (!plans.has(k)) { const r = sweep(h, at, far, true, 120, 20); plans.set(k, r.sink || (r.out[0] && r.out[0].putt) || [0, 0.5, 0]); }
     return plans.get(k);
   };
   for (let run = 0; run < BOT_RUNS; run++) {

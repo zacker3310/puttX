@@ -766,6 +766,7 @@ function renderFrame(dt) {
   if (!play.hole || currentScene === 'map') return;
   updateMovers(play.time);
   syncBall(dt);
+  updateFx(dt);
   updateCamera(dt);
   renderer.render(scene, camera);
 }
@@ -852,6 +853,7 @@ function startHole(key) {
   simAcc = 0;
   buildHoleScene(h);
   hideAim();
+  for (const m of trailDots.concat(confetti)) m.visible = false;
   holeDone.classList.remove('show');
   syncBall(0);
   showScene('hole');
@@ -885,7 +887,10 @@ function endRoll(end) {
   const out = play.phase === 'drift' ? resolveDrift(play.round, r, play.from) : resolvePutt(play.round, r, play.from);
   play.lastOutcome = out;
   setRoll(0);
-  if (out === 'sunk') { play.phase = 'sunk'; play.fx.sunkT = 0; sfx('cup'); }
+  if (out === 'sunk') {
+    play.phase = 'sunk'; play.fx.sunkT = 0; sfx('cup');
+    if (play.round.score === 1) { burst(new THREE.Vector3(play.hole.cup[0], groundH(play.hole, ...play.hole.cup) + 0.1, play.hole.cup[1])); sfx('fanfare'); }
+  }
   else if (out === 'auto') { play.phase = 'auto'; play.fx.autoT = 0; play.fx.autoFrom = end === 'oob' ? play.from.slice() : [r.x, r.z]; }
   else {
     if (out === 'oob') sfx('boink');
@@ -1008,7 +1013,71 @@ function showCard(w) {
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
   cardNext.onclick = () => { sfx('tap'); showMap(next); };
   showScene('card');
+  burst(new THREE.Vector3().copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(1.6)), 140);
   sfx('fanfare');
+}
+
+/* ============ 8. FX ============ */
+const FX_COLORS = [0xef7d6d, 0xffd66e, 0x74c465, 0x6fc0df, 0xfff8ec];
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+let trailDots = [], confetti = [], trailClock = 0, trailNext = 0;
+function initFx() {
+  const dotGeo = new THREE.SphereGeometry(BALL_R * 0.55, 10, 8);
+  for (let i = 0; i < 16; i++) {
+    const m = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xfffdf7, transparent: true, opacity: 0, depthWrite: false }));
+    m.visible = false; m.userData.life = 0; scene.add(m); trailDots.push(m);
+  }
+  const confGeo = new THREE.PlaneGeometry(0.045, 0.028);
+  for (let i = 0; i < 140; i++) {
+    const m = new THREE.Mesh(confGeo, new THREE.MeshBasicMaterial({ color: FX_COLORS[i % FX_COLORS.length], side: THREE.DoubleSide }));
+    m.visible = false; m.userData = { life: 0, v: new THREE.Vector3(), spin: new THREE.Vector3() }; scene.add(m); confetti.push(m);
+  }
+}
+function burst(pos, n = 120) {
+  if (reducedMotion()) return;
+  for (let i = 0; i < n && i < confetti.length; i++) {
+    const m = confetti[i], a = Math.random() * Math.PI * 2, s = 1.2 + Math.random() * 1.8;
+    m.position.copy(pos); m.visible = true;
+    m.userData.life = 2.2 + Math.random() * 0.6;
+    m.userData.v.set(Math.cos(a) * s * 0.6, 2.2 + Math.random() * 1.8, Math.sin(a) * s * 0.6);
+    m.userData.spin.set(Math.random() * 12, Math.random() * 12, Math.random() * 12);
+  }
+}
+const visibleTrail = () => trailDots.filter(m => m.visible).length;
+const activeConfetti = () => confetti.filter(m => m.visible).length;
+function updateFx(dt) {
+  const calm = reducedMotion(), b = play.ball, rolling = play.phase === 'roll' || play.phase === 'drift';
+  /* trail: a dot every 30 ms while rolling, each fading over 0.4 s */
+  trailClock += dt;
+  if (!calm && rolling && trailClock >= trailNext && Math.hypot(b.vx, b.vz) > 0.3) {
+    trailNext = trailClock + 0.03;
+    const m = trailDots.find(d => !d.visible) || trailDots[0];
+    m.position.set(b.x, b.y + BALL_R * 0.6, b.z); m.visible = true; m.userData.life = 0.4;
+  }
+  for (const m of trailDots) if (m.visible) {
+    m.userData.life -= dt;
+    if (m.userData.life <= 0 || calm) { m.visible = false; continue; }
+    m.material.opacity = m.userData.life / 0.4 * 0.55; m.scale.setScalar(0.4 + m.userData.life / 0.4 * 0.6);
+  }
+  /* squash on hard hits */
+  const s = calm ? 0 : (play.fx.squash || 0);
+  ballMesh.scale.set(1 + 0.22 * s, 1 - 0.28 * s, 1 + 0.22 * s);
+  play.fx.squash = s * Math.exp(-14 * dt);
+  /* flag pops up and spins when the ball drops */
+  if (flagGroup) {
+    const t = play.phase === 'sunk' && !calm ? play.fx.sunkT : -1;
+    flagGroup.position.y = t >= 0 && t < 0.9 ? Math.sin(t / 0.9 * Math.PI) * 0.3 : 0;
+    flagGroup.rotation.y = t >= 0 && t < 0.9 ? t / 0.9 * Math.PI * 2 : 0;
+  }
+  /* confetti */
+  for (const m of confetti) if (m.visible) {
+    const u = m.userData;
+    u.life -= dt;
+    if (u.life <= 0) { m.visible = false; continue; }
+    u.v.y -= 4 * dt; u.v.multiplyScalar(Math.exp(-1.2 * dt));
+    m.position.addScaledVector(u.v, dt);
+    m.rotation.x += u.spin.x * dt; m.rotation.y += u.spin.y * dt; m.rotation.z += u.spin.z * dt;
+  }
 }
 
 /* ============ 9. BOOT ============ */
@@ -1017,6 +1086,7 @@ function boot() {
   fit();
   initRenderer();
   initAim();
+  initFx();
   view.addEventListener('pointerdown', onDown);
   addEventListener('pointermove', onMove);
   addEventListener('pointerup', onUp);

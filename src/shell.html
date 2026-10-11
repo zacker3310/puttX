@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2f241a">
+<title>PuttX</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="docs/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="docs/icons/apple-touch-icon.png">
+<style>
+/* ---------- 1. TOKENS (copied from vroom's Toybox system) ---------- */
+:root {
+  --v-surface: #fff8ec;
+  --v-surface-2: #f6e9d2;
+  --v-surface-line: #e6d2ab;
+  --v-surface-down: #d9c193;
+  --v-ink: #5a4634;
+  --v-ink-strong: #4a3826;
+  --v-ink-soft: #8a7360;
+  --v-wood: #c9a476;
+  --v-wood-deep: #a8804e;
+  --v-wood-dark: #6e5233;
+  --v-wood-line: #8a6538;
+  --v-accent-green: #74c465;  --v-green-line: #4e9a45;  --v-green-down: #438a3b;
+  --v-accent-red:   #ef7d6d;  --v-red-line:   #c95a4c;  --v-red-down:   #b34e41;
+  --v-accent-blue:  #6fc0df;  --v-blue-line:  #4a94b5;  --v-blue-down:  #3f83a2;
+  --v-accent-yellow:#ffd66e;  --v-yellow-line:#dca63f;  --v-yellow-down:#c69334;
+  --v-mute: #cfc0a6;  --v-mute-line: #b1a082;  --v-mute-down: #a3916d;
+  --v-r-sm: 16px;
+  --v-r-md: 22px;
+  --v-r-lg: 30px;
+  --v-r-xl: 38px;
+  --v-r-round: 50%;
+  --v-shadow-soft: 0 5px 0 rgba(74, 53, 35, .18);
+  --v-shadow-card: 0 6px 0 rgba(74, 53, 35, .14);
+  --v-outline-soft: rgba(74, 53, 35, .22);
+  --v-scrim: rgba(64, 44, 28, .55);
+  --v-dots: radial-gradient(rgba(90, 70, 52, .05) 2.4px, transparent 2.6px);
+  --v-dots-size: 26px 26px;
+  --v-font: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold",
+            "Hiragino Maru Gothic ProN", -apple-system, system-ui, sans-serif;
+}
+
+/* ---------- 2. SHELL ---------- */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; touch-action: none; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1200px; height: 700px; transform-origin: 50% 50%;
+  overflow: hidden; background: var(--v-surface); font-family: var(--v-font); color: var(--v-ink); }
+#view { position: absolute; inset: 0; width: 1200px; height: 700px; display: block; touch-action: none; }
+.scene { position: absolute; inset: 0; display: none; pointer-events: none; }
+.scene.active { display: block; }
+.scene.panel { pointer-events: auto; }
+.scene button, .scene .live { pointer-events: auto; }
+
+/* ---------- 3. BUTTONS AND CHIPS ---------- */
+.btn { position: absolute; width: 88px; height: 88px; padding: 0; display: grid; place-items: center; cursor: pointer;
+  border: 4px solid var(--v-surface-line); border-radius: var(--v-r-md); background: var(--v-surface);
+  box-shadow: 0 6px 0 var(--v-surface-down); font: 800 40px var(--v-font); color: var(--v-ink-strong);
+  font-variant-numeric: tabular-nums; transition: transform .08s; }
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--v-surface-down); }
+.btn svg { width: 62%; height: 62%; pointer-events: none; }
+.btn.go { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); color: #fff; }
+.btn.go:active { box-shadow: 0 2px 0 var(--v-green-down); }
+.btn.locked { background: var(--v-mute); border-color: var(--v-mute-line); box-shadow: 0 6px 0 var(--v-mute-down); }
+.chip { position: absolute; height: 76px; padding: 0 22px 0 14px; display: flex; align-items: center; gap: 10px;
+  border-radius: var(--v-r-lg); background: var(--v-surface); border: 4px solid var(--v-surface-line);
+  box-shadow: var(--v-shadow-card); font: 800 44px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+.chip svg { width: 48px; height: 48px; }
+
+/* ---------- 4. TITLE ---------- */
+#titleGo { left: 510px; top: 452px; width: 180px; height: 180px; border-radius: 50%; }
+
+/* ---------- 5. ROTATE ---------- */
+#rotate { display: none; position: fixed; inset: 0; background: #2f241a; place-items: center; z-index: 10; }
+#rotate svg { width: 40vmin; height: 40vmin; }
+@media (orientation: portrait) { #rotate { display: grid; } }
+/* ---------- 6. HOLE HUD ---------- */
+#homeBtn { left: 24px; top: 24px; }
+#hudHole { left: 132px; top: 30px; }
+#hudPar { left: 300px; top: 30px; }
+#hudStrokes { right: 24px; top: 30px; }
+#holeDone { position: absolute; left: 340px; top: 150px; width: 520px; height: 400px; display: none;
+  border-radius: var(--v-r-xl); background: var(--v-surface); border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card);
+  background-image: var(--v-dots); background-size: var(--v-dots-size); animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#holeDone.show { display: block; }
+#holeDone .stars { position: absolute; top: 34px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; }
+#holeDone .star { width: 96px; height: 96px; fill: var(--v-mute); }
+#holeDone .star.on { fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 3; animation: popIn .4s cubic-bezier(.3, 1.6, .5, 1) both; }
+#holeDone .star.on:nth-child(2) { animation-delay: .15s; }
+#holeDone .star.on:nth-child(3) { animation-delay: .3s; }
+#holeDone .score { position: absolute; top: 150px; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px;
+  font: 800 96px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+#holeDone .par { display: flex; align-items: center; gap: 6px; font-size: 52px; color: var(--v-ink-soft); }
+#holeDone .par svg { width: 52px; height: 52px; }
+#doneMap { left: 60px; bottom: 36px; }
+#doneNext { right: 60px; bottom: 36px; width: 140px; }
+@keyframes popIn { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #holeDone, #holeDone .star.on { animation: none; } }
+/* ---------- 7. TITLE, MAP, CARD ---------- */
+#titleLogo { position: absolute; left: 420px; top: 120px; width: 360px; animation: popIn .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+#titleGo { animation: popIn .5s .2s cubic-bezier(.3, 1.6, .5, 1) both; }
+#map { background: var(--v-surface); background-image: var(--v-dots); background-size: var(--v-dots-size); }
+#worldTabs { position: absolute; left: 24px; top: 24px; display: flex; gap: 16px; }
+#worldTabs .btn { position: relative; width: 104px; height: 104px; }
+#worldTabs .btn.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#worldTabs .btn .lock, #holePath .lock { position: absolute; right: -8px; bottom: -8px; width: 40px; height: 40px; }
+#soundBtn { right: 24px; top: 24px; }
+#soundBtn .cross, #soundBtn.off .wave { display: none; }
+#soundBtn.off .cross { display: inline; }
+#pathLine { position: absolute; inset: 0; width: 1200px; height: 700px; pointer-events: none; }
+#holePath .node { width: 104px; height: 104px; margin: -52px 0 0 -52px; border-radius: 50%; animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#holePath .node .n { font-size: 44px; line-height: 1; }
+#holePath .node .stars { position: absolute; top: -30px; display: flex; gap: 2px; }
+#holePath .node .star { width: 26px; height: 26px; fill: var(--v-mute); }
+#holePath .node .star.on { fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 4; }
+#holePath .node .best { position: absolute; bottom: -34px; font-size: 26px; color: var(--v-ink-soft); }
+#card { background: var(--v-scrim); }
+#cardPanel { position: absolute; left: 110px; top: 90px; width: 980px; height: 520px; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .4s cubic-bezier(.3, 1.6, .5, 1) both; }
+#cardRow { position: absolute; left: 40px; right: 40px; top: 50px; display: grid; grid-template-columns: repeat(9, 1fr); gap: 10px; }
+#cardRow .cell { height: 150px; border-radius: var(--v-r-md); background: var(--v-surface-2); display: grid; place-items: center; font: 800 54px var(--v-font); color: var(--v-ink-strong); }
+#cardRow .cell small { font-size: 22px; color: var(--v-ink-soft); }
+#cardRow .cell.under { background: var(--v-accent-green); color: #fff; }
+#cardRow .cell.par { background: var(--v-accent-yellow); }
+#cardSum { position: absolute; left: 0; right: 0; top: 240px; display: flex; justify-content: center; align-items: center; gap: 40px; font: 800 96px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+#cardDiff { font-size: 60px; color: var(--v-ink-soft); }
+#cardStars { display: flex; align-items: center; gap: 8px; font-size: 60px; }
+#cardStars svg { width: 64px; height: 64px; fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 3; }
+#cardMap { left: 60px; bottom: 40px; }
+#cardNext { right: 60px; bottom: 40px; width: 140px; }
+@media (prefers-reduced-motion: reduce) { #titleLogo, #titleGo, #holePath .node, #cardPanel { animation: none; } }
+/* ---------- 8. SWING PAD, AIM, SHOT READOUT ---------- */
+#swingPad { position: absolute; right: 18px; top: 110px; width: 180px; height: 570px; border-radius: var(--v-r-xl);
+  background: rgba(255, 248, 236, .82); border: 4px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); touch-action: none; overflow: hidden; }
+#swingPad.live { border-color: var(--v-yellow-line); }
+#swingPad .lane { position: absolute; left: 86px; top: 0; bottom: 0; width: 8px; background: var(--v-surface-line); border-radius: 4px; }
+#padBall { position: absolute; left: 66px; width: 48px; height: 48px; margin-top: -24px; border-radius: 50%; background: #fffdf7; border: 4px solid var(--v-surface-line); pointer-events: none; }
+#padHead { position: absolute; width: 96px; height: 22px; margin: 6px 0 0 -48px; border-radius: 8px; background: #9aa3ad; border: 3px solid #6f7881; pointer-events: none; }
+#padFill { position: absolute; left: 82px; width: 16px; background: var(--v-accent-yellow); border-radius: 8px; opacity: .8; pointer-events: none; }
+#padTicks { position: absolute; left: 0; right: 0; height: 330px; pointer-events: none; }
+#padTicks i { position: absolute; left: 30px; right: 30px; height: 4px; border-radius: 2px; background: var(--v-surface-down); }
+#padGhost { position: absolute; left: 40px; right: 40px; height: 6px; border-radius: 3px; background: var(--v-accent-blue); opacity: .7; display: none; pointer-events: none; }
+#aimL { left: 24px; bottom: 24px; }
+#aimR { left: 128px; bottom: 24px; }
+#viewBtn { left: 24px; bottom: 128px; }
+#viewBtn.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#shotPanel { position: absolute; left: 440px; bottom: 20px; height: 96px; padding: 6px 18px; display: none; gap: 14px; align-items: center;
+  border-radius: var(--v-r-lg); background: var(--v-surface); border: 4px solid var(--v-surface-line); box-shadow: var(--v-shadow-card);
+  font: 800 40px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; pointer-events: none; }
+#shotPanel.show { display: flex; }
+#shotPanel svg { width: 80px; height: 80px; }
+#worldTabs { gap: 8px; }
+#worldTabs .btn { width: 88px; height: 88px; }
+#worldTabs .btn .n { font-size: 40px; }
+#holePath .node { width: 88px; height: 88px; margin: -44px 0 0 -44px; }
+#holePath .node .n { font-size: 40px; }
+#holePath .node .star { width: 22px; height: 22px; }
+#holePath .node .stars { top: -28px; }
+#holePath .node .best { bottom: -32px; font-size: 24px; }
+#cardRow { grid-template-columns: repeat(9, 1fr); gap: 8px; top: 30px; }
+#cardRow .cell { height: 92px; font-size: 40px; }
+#cardRow .cell small { font-size: 18px; }
+#cardSum { top: 250px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="view" aria-label="golf course"></canvas>
+  <section class="scene" id="title">
+    <div id="titleLogo" aria-label="puttx"><svg viewBox="0 0 240 160"><ellipse cx="120" cy="140" rx="100" ry="14" fill="rgba(74,53,35,.18)"/><circle cx="92" cy="86" r="52" fill="#fffdf7" stroke="#e6d2ab" stroke-width="6"/><path d="M40 86 H144" stroke="#ffd66e" stroke-width="14"/><path d="M170 140 V22" stroke="#8a7360" stroke-width="8" stroke-linecap="round"/><path d="M174 22 L222 38 L174 54 Z" fill="#ef7d6d"/></svg></div>
+    <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+  </section>
+  <section class="scene" id="hole">
+    <button class="btn" id="homeBtn" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+    <div class="chip" id="hudHole" aria-label="hole"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#fffdf7" stroke="#e6d2ab" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#e6d2ab"/></svg><span id="hudHoleN">1</span></div>
+    <div class="chip" id="hudPar" aria-label="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/><ellipse cx="32" cy="56" rx="18" ry="5" fill="#5a4634"/></svg><span id="hudParN">2</span></div>
+    <div class="chip" id="hudStrokes" aria-label="strokes"><svg viewBox="0 0 64 64"><path d="M44 6 L24 48" stroke="#8a7360" stroke-width="6" stroke-linecap="round"/><rect x="10" y="44" width="24" height="12" rx="5" fill="#6fc0df"/></svg><span id="hudStrokesN">0</span></div>
+    <div class="live" id="swingPad" aria-label="swing"><div class="lane"></div><div id="padTicks"><i style="top:80px"></i><i style="top:160px"></i><i style="top:240px"></i><i style="top:320px"></i></div><div id="padFill"></div><div id="padGhost"></div><div id="padBall"></div><div id="padHead"></div></div>
+    <button class="btn" id="aimL" aria-label="aim left"><svg viewBox="0 0 64 64"><path d="M40 12 L18 32 L40 52" fill="none" stroke="#8a7360" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="btn" id="aimR" aria-label="aim right"><svg viewBox="0 0 64 64"><path d="M24 12 L46 32 L24 52" fill="none" stroke="#8a7360" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="btn" id="viewBtn" aria-label="overview"><svg viewBox="0 0 64 64"><path d="M4 32 Q32 6 60 32 Q32 58 4 32 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="5"/><circle cx="32" cy="32" r="10" fill="#6fc0df"/><circle cx="32" cy="32" r="4" fill="#4a3826"/></svg></button>
+    <div id="shotPanel" aria-label="last shot">
+      <svg viewBox="0 0 80 88" aria-label="path"><path d="M40 84 V20" stroke="#e6d2ab" stroke-width="6" stroke-dasharray="4 6"/><g id="shotPath"><path d="M40 80 V16" stroke="#5a4634" stroke-width="7" stroke-linecap="round"/><path d="M28 28 L40 12 L52 28" fill="none" stroke="#5a4634" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+      <svg viewBox="0 0 80 88" aria-label="strike"><rect x="6" y="34" width="68" height="22" rx="8" fill="#c9ced6" stroke="#6f7881" stroke-width="3"/><rect x="34" y="36" width="12" height="18" rx="3" fill="#e9f5e6"/><circle id="shotDot" cx="40" cy="45" r="9" fill="#74c465"/></svg>
+      <svg viewBox="0 0 80 88" aria-label="tempo"><rect x="6" y="38" width="68" height="14" rx="7" fill="#f6e9d2" stroke="#e6d2ab" stroke-width="3"/><rect x="34" y="38" width="12" height="14" fill="#cdeac6"/><g id="shotNeedle"><path d="M40 20 L48 34 H32 Z" fill="#74c465"/><rect x="38" y="34" width="4" height="22" fill="#5a4634"/></g></svg>
+      <span id="shotPower">0</span>
+    </div>
+    <div class="live" id="holeDone" aria-label="hole done">
+      <div class="stars"><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg></div>
+      <div class="score"><span id="doneStrokes">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
+      <button class="btn" id="doneMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+      <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+    </div>
+  </section>
+  <section class="scene panel" id="map">
+    <div id="worldTabs"></div>
+    <button class="btn" id="soundBtn" aria-label="sound"><svg viewBox="0 0 64 64"><path d="M10 24 H22 L36 12 V52 L22 40 H10 Z" fill="#8a7360"/><path class="wave" d="M44 22 Q52 32 44 42 M50 16 Q62 32 50 48" fill="none" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path class="cross" d="M44 24 L58 40 M58 24 L44 40" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></button>
+    <svg id="pathLine" viewBox="0 0 1200 700" aria-hidden="true"></svg>
+    <div id="holePath"></div>
+  </section>
+  <section class="scene panel" id="card">
+    <div id="cardPanel">
+      <div id="cardRow"></div>
+      <div id="cardSum"><span id="cardTotal">0</span><span id="cardDiff">0</span><span id="cardStars"></span></div>
+      <button class="btn" id="cardMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+      <button class="btn go" id="cardNext" aria-label="next world"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+    </div>
+  </section>
+</div>
+<div id="rotate" aria-label="turn sideways"><svg viewBox="0 0 64 64"><rect x="20" y="8" width="24" height="40" rx="5" fill="none" stroke="#fff8ec" stroke-width="4"/><path d="M14 52 A22 22 0 0 0 50 52" fill="none" stroke="#ffd66e" stroke-width="4"/><path d="M50 44 L50 53 L41 53" fill="none" stroke="#ffd66e" stroke-width="4"/></svg></div>
+<script id="three">
+/* @@THREE@@ */
+</script>
+<script id="game">
+/* @@GAME@@ */
+</script>
+</body>
+</html>

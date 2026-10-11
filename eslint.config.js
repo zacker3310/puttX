@@ -1,10 +1,10 @@
-/* Dev-only ESLint flat config for the game script in index.html (tests/lint.cjs extracts it).
+/* Dev-only ESLint flat config for the game script (tests/lint.cjs assembles it from src/ and courses/).
    Browser globals are listed by hand; every element id is a global too, since the game
    addresses elements by id. THREE comes from the inlined three.js block. */
 const fs = require('fs');
 const path = require('path');
 
-const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, 'src', 'shell.html'), 'utf8');
 const ids = {};
 for (const m of html.matchAll(/\sid="([A-Za-z_$][\w$]*)"/g)) ids[m[1]] = 'readonly';
 
@@ -12,7 +12,7 @@ const browser = { THREE: 'readonly' };
 for (const g of [
   'window', 'document', 'navigator', 'location', 'localStorage', 'console', 'setTimeout', 'clearTimeout',
   'setInterval', 'clearInterval', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'URLSearchParams',
-  'AudioContext', 'webkitAudioContext', 'PointerEvent', 'Event', 'NodeFilter', 'matchMedia', 'getComputedStyle',
+  'AudioContext', 'webkitAudioContext', 'PointerEvent', 'stage', 'view', 'Event', 'NodeFilter', 'matchMedia', 'getComputedStyle',
   'devicePixelRatio', 'innerWidth', 'innerHeight', 'visualViewport', 'addEventListener', 'removeEventListener',
 ]) browser[g] = 'readonly';
 

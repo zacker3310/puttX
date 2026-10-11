@@ -58,6 +58,17 @@ const tap = (page, id) => page.evaluate(i => document.getElementById(i).click(),
   await tap(page, 'soundBtn');
   check('speaker toggle mutes and persists', await page.evaluate(() => JSON.parse(localStorage.getItem('puttx.v1')).sound === false && soundBtn.classList.contains('off')));
 
+  /* arriving at hole 9 without the earlier records (?hole=, or a gapped save) must not dead-end */
+  await fresh(page, '?hole=1-9');
+  const gap = await page.evaluate(() => {
+    const errs = []; addEventListener('error', e => errs.push(String(e.message)));
+    loopPaused = true; play.ball = newBall(play.hole, play.hole.cup[0], play.hole.cup[1] - 0.25);
+    beginPutt(0, 0); for (let i = 0; i < 400 && play.phase !== 'done'; i++) advance(1 / 60);
+    try { doneNext.click(); } catch (e) { errs.push(e.message); }
+    return { scene: currentScene, errs };
+  });
+  check('hole 9 without earlier records goes to the map instead of a broken card', gap.scene === 'map' && gap.errs.length === 0, JSON.stringify(gap));
+
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

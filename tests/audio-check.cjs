@@ -42,6 +42,14 @@ const { check, done, open, fresh } = require('./lib.cjs');
   });
   check('the first wall hit on the next hole still clonks', next.includes('clonk'), JSON.stringify(next));
 
+  /* iOS only honours resume() inside an activation gesture (pointerup, click), not a touch pointerdown,
+     and reports 'interrupted' after a call or backgrounding: any later tap must bring the sound back */
+  await page.evaluate(() => actx.suspend());
+  await page.evaluate(() => dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 3 })));
+  await page.waitForTimeout(250);
+  const back = await page.evaluate(() => actx.state);
+  check('a tap release resumes suspended audio', back === 'running', back);
+
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

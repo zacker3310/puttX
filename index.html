@@ -550,7 +550,10 @@ function audio() {
   src.connect(lp); lp.connect(rollGain); rollGain.connect(master); src.start();
   return actx;
 }
-addEventListener('pointerdown', () => { const a = audio(); if (a && a.state === 'suspended') a.resume(); }, { capture: true });
+/* iOS resumes audio only inside an activation gesture (pointerup, click), not a touch pointerdown, and
+   reports 'interrupted' after a call or backgrounding; any tap brings the sound back */
+function wakeAudio() { const a = audio(); if (a && a.state !== 'running') a.resume().catch(() => {}); }
+for (const ev of ['pointerdown', 'pointerup', 'click']) addEventListener(ev, wakeAudio, { capture: true });
 function setSound(on) {
   progress.sound = on; saveProgress();
   if (master) master.gain.value = on ? 0.8 : 0;
@@ -1140,6 +1143,8 @@ function renderMap() {
 }
 function showCard(w) {
   const holes = WORLDS[w].holes;
+  /* a world played out of order (?hole=, or a gapped save) has no full card yet: back to its map */
+  if (holes.some(h => !progress.holes[h.key])) { showMap(w); return; }
   cardRow.innerHTML = '';
   let total = 0, par = 0, stars = 0;
   holes.forEach((h, i) => {

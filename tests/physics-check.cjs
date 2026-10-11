@@ -99,4 +99,12 @@ check('moverTouch: a ball inside the disc is touched, one far away is not',
 let overCap = 0;
 for (let a = 0; a < 360; a += 5) { const b = S.launch(S.newBall(bumper, 0, 1.6), a, 1); let t = 0; for (let i = 0; i < 1200; i++) { if (S.stepBall(bumper, b, t)) break; t += S.SIM_DT; if (Math.hypot(b.vx, b.vz) > S.V_CAP + 1e-9) overCap++; } }
 check('bumpers never push the ball past V_CAP', overCap === 0, 'over-cap steps: ' + overCap);
+
+/* a ball the slope presses into a wall, or the cup's lip pull holds on a mound, still settles */
+const pinned = S.makeHole({ tee: [0, 0.5], cup: [0, 4], shape: S.rect(-0.8, 0, 0.8, 4.5), bumps: [{ x: 0.25, z: 2.2, r: 0.6, h: 0.12 }] });
+const mound = S.makeHole({ par: 3, tee: [0, 0.5], cup: [0, 3.2], shape: S.rect(-1, 0, 1, 4.5), bumps: [{ x: 0, z: 3.2, r: 0.6, h: 0.14 }] });
+const pin = S.simulatePutt(pinned, [0, 0.5], 4, 1, 1.2), lip = S.simulatePutt(mound, [0, 0.5], 2, 1, 0.6);
+check('a ball pinned against a wall by a slope settles', pin.end === 'stop', JSON.stringify([pin.end, pin.x, pin.z]));
+check('a ball held at the lip of a mound cup settles', lip.end !== 'timeout', JSON.stringify([lip.end, lip.x, lip.z]));
+
 done();

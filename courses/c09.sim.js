@@ -98,7 +98,7 @@ registerWorld(9, { holes: [
     zones: [{ surf: 'water', poly: rect(-2, 3, 1.5, 4.2) }, { surf: 'mud', poly: rect(-1.55, 6.3, -0.85, 6.5) }, { surf: 'mud', poly: rect(-2, 6.3, -1.55, 7.5) },
       { surf: 'mud', poly: rect(-0.85, 6.3, -0.6, 7.5) }],
     posts: [C9_GUM(-0.5, 5.5), C9_GUM(-1.4, 5.4), C9_GUM(0.4, 5.9)] },
-  /* 18: the production line: belt up the ramp, gumdrop maze round a lollipop to the pipe, taffy-guarded cup */
+  /* 18: the production line: belt up the ramp, gumdrop maze to the pipe, taffy-guarded cup */
   { par: 5, sol: [], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]], rect(-0.6, 8.5, 3.4, 11.6)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]]), ring(rect(-0.6, 8.5, 3.4, 11.6))],
@@ -106,7 +106,6 @@ registerWorld(9, { holes: [
     tiers: [{ poly: rect(-0.6, 4.5, 3.4, 7.5), h: 0.45 }],
     zones: [C9_BELT(rect(-0.6, 2, 0.6, 4.5), 0, 2.4), C9_BELT(rect(-0.6, 8.5, 3.4, 9.5), 1.2, 0),
       { surf: 'mud', poly: rect(0.05, 10.3, 0.75, 10.5) }, { surf: 'mud', poly: rect(-0.6, 10.3, 0.05, 11.6) }, { surf: 'mud', poly: rect(0.75, 10.3, 0.95, 11.6) }],
-    posts: [C9_GUM(0.6, 5.3), C9_GUM(1.4, 5.9), C9_GUM(2.4, 5.2), C9_GUM(0.2, 6.6), C9_GUM(1.2, 6.9), C9_GUM(3.0, 6.0)],
-    movers: [C9_POP(2.3, 6.4, 0.5, 1.4, 0, 2)],
+    posts: [C9_GUM(0.6, 5.3), C9_GUM(1.4, 5.9), C9_GUM(2.4, 5.2), C9_GUM(0.2, 6.6), C9_GUM(1.2, 6.9), C9_GUM(2.3, 6.5)],
     tubes: [C9_PIPE([3.0, 7.1], [3.0, 8.9], 270)] },
 ] });

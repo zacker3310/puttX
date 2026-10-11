@@ -63,7 +63,7 @@ registerWorld(7, { holes: [
     bumps: [{ x: -0.1, z: 4.85, r: 0.5, h: 0.2 }],
     movers: [C7_GHOST(1.2, 4.45, 1.2, 5.15, 2.2, 0), C7_GATE(2.4, 3, 2.85, 3, 0.25, 90, 2.8, 0)] },
   /* 12: the ghost ballroom: two dancing ghosts on a polished floor, the cup up on the stage */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 7.05], shape: rect(-1.3, 0, 1.3, 7.6),
+  { par: 3, sol: [[180,0.9,0],[4,0.95,0]], tee: [0, 0.5], cup: [0.6, 7.05], shape: rect(-1.3, 0, 1.3, 7.6),
     zones: [{ surf: 'fast', poly: rect(-1.3, 1.5, 1.3, 5.8) }],
     tiers: [{ poly: rect(-1.3, 6.4, 1.3, 7.6), h: 0.15 }],
     ramps: [{ x0: -0.25, z0: 5.8, x1: 0.25, z1: 6.4, axis: 'z', h0: 0, h1: 0.15 }],
@@ -103,12 +103,12 @@ registerWorld(7, { holes: [
     bumps: [{ x: -1.1, z: 4.1, r: 0.35, h: 0.1 }],
     movers: [C7_GATE(1.125, 2, 1.375, 2, 0.25, 90, 2.4, 0)] },
   /* 18: the showpiece: through the gate, up the tower stairs, into the right secret passage, down to the throne room */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [3.4, 7.3], floors: [rect(-1.2, 0, 1.2, 7), rect(2.0, 3.0, 4.8, 8.0)],
+  { par: 4, sol: [[0,0.6,1.2],[20,1,1.2]], tee: [0, 0.5], cup: [3.4, 7.3], floors: [rect(-1.2, 0, 1.2, 7), rect(2.0, 3.0, 4.8, 8.0)],
     walls: [ring(rect(-1.2, 0, 1.2, 7)), ring(rect(2.0, 3.0, 4.8, 8.0)), [[-1.2, 2.2], [-0.3, 2.2]], [[0.3, 2.2], [1.2, 2.2]]],
     tiers: [{ poly: rect(-1.2, 3.8, 1.2, 7), h: 0.2 }, { poly: rect(-1.2, 5.4, 1.2, 7), h: 0.4 }, { poly: rect(2.6, 6.4, 4.2, 8.0), h: 0.1 }],
     ramps: [{ x0: -1.2, z0: 3.0, x1: 0, z1: 3.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0, z0: 4.6, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.2, h1: 0.4 },
       { x0: 2.9, z0: 5.8, x1: 3.9, z1: 6.4, axis: 'z', h0: 0, h1: 0.1 }],
-    tubes: [{ a: [0.7, 6.6], b: [4.4, 3.4], dir: 270 }, { a: [0, 6.6], b: [-0.8, 0.5], dir: 0 }, { a: [-0.7, 6.6], b: [0.8, 2.7], dir: 0 }],
+    tubes: [{ a: [0.7, 6.6], b: [3.4, 3.4], dir: 0 }, { a: [0, 6.6], b: [-0.8, 0.5], dir: 0 }, { a: [-0.7, 6.6], b: [0.8, 2.7], dir: 0 }],
     posts: [C7_GARG(2.65, 6.1), C7_GARG(4.15, 6.1)],
     movers: [C7_GATE(0, 2.2, 0.6, 2.2, 0.3, 90, 3, 0), C7_MILL(0, 5.85, 0.4, 1.7, 0), C7_GHOST(2.4, 5.0, 4.4, 5.0, 3.0, 0)] },
 ] });

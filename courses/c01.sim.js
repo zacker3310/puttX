@@ -53,7 +53,7 @@ registerWorld(1, { holes: [
              { kind: 'spin', x: -0.1, z: 5.5, len: 0.7, w: -1.4, phase: 0.5, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 6.6, -0.3, 8) }] },
   /* 10: scaffold climb (3 parts). Ramp to the first lift, cross the belt that wants you off the edge, ramp to the top deck */
-  { par: 3, sol: [[310,1,0],[0,0.56,0]], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
+  { par: 4, sol: [[320,0.92,0],[34,1,0],[8,0.8,0]], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
     shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6.2], [1.4, 9], [-1.4, 9], [-1.4, 6.2], [-1.4, 3.4]],
     tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.44 }],
     ramps: [{ x0: -1.4, z0: 2.2, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 },
@@ -116,7 +116,7 @@ registerWorld(1, { holes: [
     movers: [{ kind: 'spin', x: -1.6, z: 8.2, len: 0.45, w: 1.4, phase: 0, look: 'crane' }],
     bumps: [{ x: -2.2, z: 9, r: 0.45, h: -0.08 }] },
   /* 18: topping out (4 parts, open). The belt ramp, the boom gate on the deck, the chute or the pipe, the crane green */
-  { par: 4, sol: [[202,1,0],[137,0.97,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
+  { par: 5, sol: [[202,1,0],[137,0.97,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
     floors: [rect(-1, 0, 1, 3.05), rect(-0.45, 3, 0.45, 4.45), rect(-1.2, 4.4, 3.4, 6), rect(-0.2, 5.99, 3.6, 10.2)],
     walls: [[[-0.45, 3.05], [-1, 3.05], [-1, 0], [1, 0], [1, 3.05], [0.45, 3.05]],
             [[-0.45, 4.4], [-1.2, 4.4], [-1.2, 6], [2, 6]], [[0.45, 4.4], [3.4, 4.4], [3.4, 6], [3.6, 6], [3.6, 10.2], [-0.2, 10.2], [-0.2, 6]],

@@ -48,7 +48,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.4, 7.3, 0.6, 7.8) }],
     posts: [C2_CACTUS(0.5, 3.4), C2_CACTUS(-0.75, 4.2), C2_CACTUS(0.25, 5.2), C2_ROCK(-1.05, 5.5, 0.12), C2_CACTUS(-0.55, 8.4)] },
   /* 7. switchback: up the canyon, round the ramp at the top, back down a leaning mesa past a tumbleweed */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [2.9, 1.7],
+  { par: 4, sol: [[3,0.6875,0],[31.5,1,3]], tee: [0, 0.5], cup: [2.9, 1.7],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 6], [1.8, 6], [1.8, 1], [3.4, 1], [3.4, 7.6], [-0.8, 7.6]],
     ramps: [{ x0: 0.8, z0: 6, x1: 1.8, z1: 7.6, axis: 'x', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(1.8, 0.9, 3.5, 7.7), h: 0.246, sx: 0.03 }],
@@ -117,7 +117,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: [[-1.6, 3.4], [-0.6, 3.4], [-0.9, 4.2], [-1.6, 4.4]] }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [3.1, 9.2],
+  { par: 5, sol: [[36,1,0],[120,1,3],[0,0.5625,0]], tee: [0, 0.5], cup: [3.1, 9.2],
     shape: [[-0.5, 0], [0.5, 0], [0.5, 4.2], [3.6, 4.2], [3.6, 10], [2.7, 10], [2.7, 5.0], [-0.5, 5.0]],
     ramps: [{ x0: 3.0, z0: 6.6, x1: 3.6, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.6, -0.1, 0.6, 2.6), h: 0.35 }, { poly: rect(2.6, 7.6, 3.7, 10.1), h: 0.3 }],
@@ -135,7 +135,7 @@ registerWorld(2, { holes: [
     posts: [C2_CACTUS(-0.75, 5.4), C2_CACTUS(0.1, 7.0)] },
   /* 18. the three-mesa descent: off the high mesa, across the middle mesa past a tumbleweed,
      down a narrow gap to the dune green and round the rock spur to the cup */
-  { par: 5, sol: [], tee: [-0.3, 0.6], cup: [0.55, 9.35],
+  { par: 4, sol: [[162,1,0],[36,0.875,0]], tee: [-0.3, 0.6], cup: [0.55, 9.35],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [1.2, 3], [1.2, 6.5], [1.2, 10], [-1.8, 10], [-1.8, 6.5], [-1.8, 3], [-0.8, 3]],
     inner: [[[-0.8, 3], [0.2, 3]], [[-1.15, 6.5], [1.2, 6.5]], [[-0.45, 8.5], [1.2, 8.5]]],
     tiers: [{ poly: rect(-1.9, 2.9, 1.3, 6.5), h: 0.35 }, { poly: rect(-0.9, -0.1, 0.9, 3), h: 0.7 }, { poly: rect(-1.9, 6.5, 1.3, 10.1), h: 0.05, sx: 0.03 }],

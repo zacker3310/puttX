@@ -33,7 +33,7 @@ registerWorld(10, { holes: [
     zones: [{ surf: 'ice', poly: rect(-1.5, 3, 1.5, 7.2) }],
     bumps: [{ x: 0.5, z: 5.6, r: 0.7, h: 0.2 }, { x: 0.5, z: 5.6, r: 0.25, h: -0.07 }] },
   /* 5. windmill neck: a cloud windmill guards a bare neck, then a sliding gate guards the cup */
-  { par: 3, tee: [0, 0.6], cup: [0, 5.9], aim0: 0,
+  { par: 3, sol: [[324,0.68,2],[10,0.6,0]], tee: [0, 0.6], cup: [0, 5.9], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 2.5), rect(-0.35, 2.5, 0.35, 3.7), rect(-1.2, 3.7, 1.2, 6.6)],
     walls: [[[-0.35, 2.5], [-0.8, 2.5], [-0.8, 0], [0.8, 0], [0.8, 2.5], [0.35, 2.5]], [[-1.2, 6.6], [1.2, 6.6]]],
     movers: [{ kind: 'spin', x: 0, z: 3.1, len: 0.32, w: 1.6, phase: 0, blades: 2, look: 'windmill' },
@@ -101,7 +101,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 3.1, r: 0.35, h: 0.08 }, { x: 0.65, z: 8.05, r: 0.3, h: -0.05 }] },
   /* 13. thunder run: up a diagonal rainbow into a headwind, past a windmill on the high island,
      then off the kicker down onto a tilted crater green */
-  { par: 4, tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
+  { par: 4, sol: [[309,0.45,0],[18,0.99,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 7, 2.8, 9.4)],
     walls: [[[-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 8.4]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
@@ -109,7 +109,7 @@ registerWorld(10, { holes: [
     zones: [{ surf: 'fast', push: [-0.5, -0.75], poly: [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]] }],
     movers: [{ kind: 'spin', x: 1.6, z: 5.05, len: 0.42, w: 1.5, phase: 0, blades: 2, look: 'windmill' }] },
   /* 14. ice palace: two golden gates sweep a bare cloud-ice island; the cup hides in the palace */
-  { par: 3, tee: [0, 0.6], cup: [0.1, 7.35],
+  { par: 3, sol: [[10,0.48,0]], tee: [0, 0.6], cup: [0.1, 7.35],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.35, 2, 0.35, 3), rect(-1.6, 3, 1.6, 8.2)],
     walls: [[[-0.35, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.35, 2]], [[0.9, 7.9], [-0.6, 7.9], [-0.6, 6.8], [0.9, 6.8]]],
     tiers: [{ poly: C10_PAD(-0.7, 0, 0.7, 2), h: 0.35 }],

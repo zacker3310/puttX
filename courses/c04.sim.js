@@ -12,8 +12,8 @@ registerWorld(4, { holes: [
   { par: 2, sol: [[0,0.48,0]], tee: [0, 0.5], cup: [0, 5.2], shape: rect(-0.7, 0, 0.7, 6.4),
     zones: [{ surf: 'ice', poly: rect(-0.7, 1.4, 0.7, 4.0) }], bumps: [{ x: 0, z: 5.2, r: 0.65, h: 0.12 }] },
   /* 2. mogul field: turn left into a field of moguls, the cup on top of the last one */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [2.9, 4.7], aim0: 10, shape: [[-0.6, 0], [0.6, 0], [0.6, 3.4], [3.8, 3.4], [3.8, 5.9], [-0.6, 5.9]],
-    bumps: [{ x: 0.1, z: 4.9, r: 0.4, h: 0.16 }, { x: 1.0, z: 4.0, r: 0.4, h: 0.18 }, { x: 1.5, z: 5.2, r: 0.42, h: 0.2 }, { x: 2.1, z: 3.95, r: 0.35, h: 0.14 }, { x: 2.9, z: 4.7, r: 0.6, h: 0.13 }] },
+  { par: 3, sol: [[338,0.96,0],[16,0.56,0]], tee: [0, 0.5], cup: [2.9, 4.7], aim0: 10, shape: [[-0.6, 0], [0.6, 0], [0.6, 3.4], [3.8, 3.4], [3.8, 5.9], [-0.6, 5.9]],
+    bumps: [{ x: 0.1, z: 4.9, r: 0.4, h: 0.16 }, { x: 1.0, z: 4.0, r: 0.4, h: 0.18 }, { x: 1.5, z: 5.2, r: 0.42, h: 0.2 }, { x: 2.1, z: 3.95, r: 0.35, h: 0.14 }, { x: 2.9, z: 4.7, r: 0.6, h: 0.1 }] },
   /* 3. ice corner: a dogleg left whose elbow and leg are glare ice */
   { par: 3, sol: [[38,0.92,0]], tee: [0, 0.5], cup: [2.2, 4.7], aim0: 0, shape: [[-0.6, 0], [0.6, 0], [0.6, 4], [3.6, 4], [3.6, 5.4], [-0.6, 5.4]],
     zones: [{ surf: 'water', poly: rect(3.0, 4.0, 3.6, 5.4) }, { surf: 'ice', poly: rect(-0.6, 3.3, 3.0, 5.4) }], bumps: [{ x: 1.2, z: 4.7, r: 0.3, h: 0.1 }] },
@@ -22,17 +22,17 @@ registerWorld(4, { holes: [
     movers: [C4_BALL(-0.52, 2.4, 0.52, 2.4, 2.6), C4_BALL(0.52, 3.8, -0.52, 3.8, 3.1, 1)],
     zones: [{ surf: 'ice', poly: rect(-0.9, 1.3, 0.9, 4.5) }], bumps: [{ x: 0.15, z: 5.6, r: 0.62, h: 0.1 }] },
   /* 5. half-pipe: steep ski banks either side, snowmen in the gully */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0, 6.2], shape: rect(-1.2, 0, 1.2, 7),
+  { par: 3, sol: [[24,0.88,0]], tee: [0, 0.5], cup: [0, 6.2], shape: rect(-1.2, 0, 1.2, 7),
     ramps: [{ x0: 0.6, z0: 0, x1: 1.2, z1: 7, axis: 'x', h0: 0, h1: 0.3 }, { x0: -1.2, z0: 0, x1: -0.6, z1: 7, axis: 'x', h0: 0.3, h1: 0 }],
-    posts: [C4_MAN(-0.36, 3.2), C4_MAN(0, 3.2), C4_MAN(0.36, 3.2), C4_MAN(-0.36, 4.8), C4_MAN(0, 4.8), C4_MAN(0.36, 4.8)], bumps: [{ x: 0, z: 6.2, r: 0.5, h: 0.08 }] },
+    posts: [C4_MAN(-0.36, 3.2), C4_MAN(0, 3.2), C4_MAN(0.36, 3.2), C4_MAN(-0.36, 4.8), C4_MAN(0, 4.8), C4_MAN(0.36, 4.8)] },
   /* 6. frozen pond: glare ice round open water, the cup on a snowy island with water behind it */
   { par: 3, sol: [], tee: [0, 0.5], cup: [-0.3, 5.1], shape: rect(-1.4, 0, 1.4, 6.4),
     zones: [{ surf: 'water', poly: C4_POOL(0.05, 3.0, 0.55, 0.5) }, { surf: 'water', poly: C4_POOL(-0.4, 6.0, 0.55, 0.22) }, { surf: 'water', poly: C4_POOL(0.85, 4.5, 0.3, 0.35, 8) },
       { surf: 'ice', poly: rect(-1.4, 1.6, 1.4, 6.4) }], bumps: [{ x: -0.3, z: 5.1, r: 0.6, h: 0.1 }] },
   /* 7. terraces: drop off the tee deck onto an ice shelf, then drop again and come back to the cup */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
+  { par: 3, sol: [[326,0.96,0],[0,1,0]], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
     tiers: [{ poly: rect(-0.6, 0, 0.6, 3), h: 0.4 }, { poly: rect(-0.6, 3, 3, 4.6), h: 0.2 }],
-    zones: [{ surf: 'ice', poly: rect(-0.6, 3, 3, 4.6) }], bumps: [{ x: 1.2, z: 3.8, r: 0.3, h: 0.1 }, { x: 2.4, z: 1.1, r: 0.55, h: 0.12 }] },
+    zones: [{ surf: 'ice', poly: rect(-0.6, 3, 3, 4.6) }], bumps: [{ x: 1.2, z: 3.8, r: 0.3, h: 0.1 }, { x: 2.4, z: 1.1, r: 0.55, h: 0.08 }] },
   /* 8. ski lift: a lift bar sweeps across the gap, then a climb to the summit deck */
   { par: 3, sol: [[40,1,1]], tee: [0, 0.5], cup: [0.35, 6.1], shape: rect(-1, 0, 1, 7), inner: [[[-1, 2.8], [-0.3, 2.8]], [[0.3, 2.8], [1, 2.8]]],
     movers: [{ kind: 'gate', ax: -0.44, az: 3.1, bx: 0.44, bz: 3.1, len: 0.35, ang: 90, period: 3.2, phase: 0, look: 'lift' }],
@@ -67,9 +67,9 @@ registerWorld(4, { holes: [
       { surf: 'water', poly: C4_POOL(0.3, 5.9, 0.35) }, { surf: 'ice', poly: rect(-2, 2, 2, 6.4) }],
     posts: [C4_MAN(0.7, 7.0), C4_MAN(1.55, 6.6)], bumps: [{ x: 1.2, z: 7.2, r: 0.55, h: 0.1 }] },
   /* 15. mogul descent: down a steep slope of moguls into a ring of snowmen */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[15,0.71,1.5]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 1.4), h: 0.4 }], ramps: [{ x0: -1.2, z0: 1.4, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.4, h1: 0 }],
-    bumps: [{ x: 0.4, z: 2.4, r: 0.35, h: 0.14 }, { x: -0.5, z: 3.2, r: 0.4, h: 0.16 }, { x: 0.3, z: 4.2, r: 0.4, h: 0.15 }, { x: -0.2, z: 5.0, r: 0.35, h: 0.12 }, { x: -0.6, z: 7.8, r: 0.55, h: 0.1 }],
+    bumps: [{ x: 0.4, z: 2.4, r: 0.35, h: 0.14 }, { x: -0.5, z: 3.2, r: 0.4, h: 0.16 }, { x: 0.3, z: 4.2, r: 0.4, h: 0.15 }, { x: -0.2, z: 5.0, r: 0.35, h: 0.12 }],
     inner: [[[-1.2, 6.0], [0.5, 6.0]]], posts: [C4_MAN(-0.05, 7.5), C4_MAN(-0.6, 8.45)], movers: [C4_BALL(0.1, 5.6, 0.8, 5.6, 2.8)] },
   /* 16. twin bowls: off the deck, round two icy avalanche bowls, past a rolling snowball */
   { par: 4, sol: [], tee: [0, 0.5], cup: [-0.9, 7.2], shape: rect(-1.6, 0, 1.6, 8),

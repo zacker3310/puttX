@@ -33,7 +33,7 @@ registerWorld(5, (() => {
       tubes: [{ a: [1.45, 3.4], b: [-1.2, 5.2], dir: 180 }], bumps: [{ x: 0, z: 5.3, r: 0.5, h: 0.2 }, { x: -1.0, z: 3.4, r: 0.4, h: 0.15 }],
       zones: [sand(rect(0.6, 2.9, 1.1, 3.9)), sand(rect(-1.8, 1.7, -1.05, 2.3)), sand(rect(-1.35, 2.3, -0.6, 2.9))], posts: [BARREL(-1.15, 1.65)] },
     /* 6 the ship's wheel guards the cup */
-    { par: 3, tee: [0, 0.5], cup: [0.6, 5.6], shape: rect(-1.2, 0, 1.2, 6.5),
+    { par: 3, sol: [[30,1,0],[24,0.75,0]], tee: [0, 0.5], cup: [0.6, 5.6], shape: rect(-1.2, 0, 1.2, 6.5),
       movers: [WHEEL(0, 3.3, 0.55, 1.5)], posts: [BARREL(-0.55, 5.8)], inner: [[[1.2, 5.15], [0, 5.15], [0, 6.0]]],
       zones: [sand(rect(-1.2, 4.3, -0.2, 5.3)), sand(rect(0.9, 1.4, 1.2, 2.4))], bumps: [{ x: -0.7, z: 1.8, r: 0.5, h: 0.2 }] },
     /* 7 beach, gangplank, deck with a cannon, then off the stern down to the lagoon green */

@@ -70,4 +70,33 @@ check('fuzz: 720 putts stay on the floor and terminate', bad.length === 0, JSON.
 const src = regionSource();
 check('sim region is deterministic and DOM-free', !/Math\.random|Date\b|performance|document|window|THREE/.test(src));
 
+
+/* ---- obstacles (T1.3) ---- */
+const posted = S.makeHole({ tee: [0, 0.5], cup: [0, 4.5], shape: S.rect(-0.6, 0, 0.6, 5), posts: [{ x: 0, z: 2, r: 0.15 }] });
+const pr = S.simulatePutt(posted, [0, 0.5], 0, 0.5);
+check('post blocks and bounces a straight putt', pr.hits.some(h => h[0] === 'post') && pr.z < 2, JSON.stringify(pr));
+
+const bumper = S.makeHole({ tee: [0, 0.5], cup: [0, 4.5], shape: S.rect(-0.6, 0, 0.6, 5), posts: [{ x: 0.05, z: 2, r: 0.15, e: 1.1 }] });
+check('bumper logs a bump', S.simulatePutt(bumper, [0, 0.5], 0, 0.6).hits.some(h => h[0] === 'bump'));
+
+const arm = (phase, w) => S.makeHole({ tee: [0.4, 0.5], cup: [0, 4.5], shape: S.rect(-0.9, 0, 0.9, 5), movers: [{ kind: 'spin', x: 0, z: 2.5, len: 0.7, w, phase }] });
+check('arm along the lane lets an off-centre ball past', S.simulatePutt(arm(0, 0), [0.4, 0.5], 0, 0.6).z > 2.6);
+check('arm across the lane blocks it', S.simulatePutt(arm(Math.PI / 2, 0), [0.4, 0.5], 0, 0.6).z < 2.5);
+const st = S.moverState({ kind: 'spin', x: 0, z: 2.5, len: 0.7, w: 0, phase: Math.PI / 2 }, 0);
+check('spin state: arm across x at phase pi/2', Math.abs(st.ax + 0.7) < 1e-9 && Math.abs(st.bx - 0.7) < 1e-9 && Math.abs(st.az - 2.5) < 1e-9);
+let pass = 0, block = 0;
+for (let t0 = 0; t0 < 4.5; t0 += 0.1) { const r = S.simulatePutt(arm(0, 1.4), [0.4, 0.5], 0, 0.6, t0); if (r.z > 2.6) pass++; else block++; }
+check('a spinning arm makes timing matter', pass > 0 && block > 0, JSON.stringify({ pass, block }));
+
+const sl = { kind: 'slide', ax: -0.5, az: 2.5, bx: 0.5, bz: 2.5, r: 0.16, period: 2.4, phase: 0 };
+const s0 = S.moverState(sl, 0), s1 = S.moverState(sl, 1.2);
+check('slider starts at A and reaches B at half period', Math.abs(s0.x + 0.5) < 1e-9 && Math.abs(s1.x - 0.5) < 1e-9);
+const slid = S.makeHole({ tee: [0, 0.5], cup: [0, 4.5], shape: S.rect(-0.6, 0, 0.6, 5), movers: [Object.assign({}, sl, { ax: 0, bx: 0, period: 1000 })] });
+check('slider disc bounces the ball', S.simulatePutt(slid, [0, 0.5], 0, 0.5).hits.some(h => h[0] === 'mover'));
+check('moverTouch: a ball inside the disc is touched, one far away is not',
+  S.moverTouch(slid, S.newBall(slid, 0, 2.6), 0) && !S.moverTouch(slid, S.newBall(slid, 0, 0.5), 0));
+
+let overCap = 0;
+for (let a = 0; a < 360; a += 5) { const b = S.launch(S.newBall(bumper, 0, 1.6), a, 1); let t = 0; for (let i = 0; i < 1200; i++) { if (S.stepBall(bumper, b, t)) break; t += S.SIM_DT; if (Math.hypot(b.vx, b.vz) > S.V_CAP + 1e-9) overCap++; } }
+check('bumpers never push the ball past V_CAP', overCap === 0, 'over-cap steps: ' + overCap);
 done();

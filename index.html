@@ -133,6 +133,7 @@ const G = 9.8;
 const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slope */
 const SURF = { felt: { mu: 0.08 }, ice: { mu: 0.025 }, sand: { mu: 0.35 } };
 const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.75;
+const POST_E = 0.6, MOVER_E = 0.8;
 const DROP = 0.03;               /* ground falling away faster than this per step = airborne */
 const OOB_Y = -1;
 const LAND_KEEP = 0.85;
@@ -214,8 +215,48 @@ function hitSeg(b, ax, az, bx, bz, e, svx = 0, svz = 0) {
   b.x = px + nx * R; b.z = pz + nz * R;
   return bounce(b, nx, nz, e, svx, svz);
 }
+function hitCircle(b, cx, cz, cr, e, svx = 0, svz = 0) {
+  let nx = b.x - cx, nz = b.z - cz;
+  const d = Math.hypot(nx, nz), R = cr + BALL_R;
+  if (d >= R || d < 1e-9) return 0;
+  nx /= d; nz /= d;
+  b.x = cx + nx * R; b.z = cz + nz * R;
+  return bounce(b, nx, nz, e, svx, svz);
+}
+/* movers: a spinning two-sided arm, or a disc easing between two points */
+function moverState(m, t) {
+  if (m.kind === 'spin') {
+    const th = m.phase + m.w * t, dx = Math.sin(th) * m.len, dz = Math.cos(th) * m.len;
+    return { th, ax: m.x - dx, az: m.z - dz, bx: m.x + dx, bz: m.z + dz };
+  }
+  const k = 2 * Math.PI / m.period, u = k * t + m.phase, s = 0.5 - 0.5 * Math.cos(u), ds = 0.5 * Math.sin(u) * k;
+  return { x: m.ax + (m.bx - m.ax) * s, z: m.az + (m.bz - m.az) * s, vx: (m.bx - m.ax) * ds, vz: (m.bz - m.az) * ds };
+}
+function moverTouch(h, b, t) {
+  for (const m of h.movers) {
+    const s = moverState(m, t);
+    if (m.kind === 'spin') {
+      const p = closestOnSeg(s.ax, s.az, s.bx, s.bz, b.x, b.z);
+      if (Math.hypot(b.x - p[0], b.z - p[1]) < BALL_R + WALL_HALF) return true;
+    } else if (Math.hypot(b.x - s.x, b.z - s.z) < m.r + BALL_R) return true;
+  }
+  return false;
+}
 function collideAll(h, b, t) {
   for (const s of h.segs) { const v = hitSeg(b, s[0], s[1], s[2], s[3], WALL_E); if (v) b.hits.push(['wall', v]); }
+  for (const p of h.posts) {
+    const e = p.e || POST_E, v = hitCircle(b, p.x, p.z, p.r, e);
+    if (v) b.hits.push([e > 1 ? 'bump' : 'post', v]);
+  }
+  for (const m of h.movers) {
+    const s = moverState(m, t);
+    let v;
+    if (m.kind === 'spin') {
+      const p = closestOnSeg(s.ax, s.az, s.bx, s.bz, b.x, b.z), rx = p[0] - m.x, rz = p[1] - m.z;
+      v = hitSeg(b, s.ax, s.az, s.bx, s.bz, MOVER_E, m.w * rz, -m.w * rx);   /* contact point velocity = w x r */
+    } else v = hitCircle(b, s.x, s.z, m.r, MOVER_E, s.vx, s.vz);
+    if (v) b.hits.push(['mover', v]);
+  }
 }
 
 /* ---- 2d. the ball ---- */

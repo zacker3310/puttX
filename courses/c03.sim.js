@@ -10,7 +10,7 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-0.8, 2.6, 0, 3.2)), J3_WATER(rect(0.45, 2.6, 0.8, 3.2))],
     bumps: [{ x: 0.1, z: 4.4, r: 0.45, h: 0.12 }], posts: [J3_IDOL(0.45, 4.9, 0.12)] },
   /* 2: temple steps: a narrow ramp to the first terrace, a side ramp to the second */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.45, 6.5], shape: rect(-0.9, 0, 0.9, 7.2),
+  { par: 3, sol: [[8,0.88,0],[42,0.88,0]], tee: [0, 0.5], cup: [-0.45, 6.5], shape: rect(-0.9, 0, 0.9, 7.2),
     ramps: [{ x0: -0.3, z0: 2.2, x1: 0.3, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.35, z0: 4.8, x1: 0.9, z1: 5.5, axis: 'z', h0: 0.2, h1: 0.4 }],
     tiers: [{ poly: rect(-0.9, 3.0, 0.9, 5.5), h: 0.2 }, { poly: rect(-0.9, 5.5, 0.9, 7.2), h: 0.4 }],
     zones: [J3_MUD(rect(-0.9, 3.6, -0.1, 4.6))], posts: [J3_IDOL(0, 6.3)] },

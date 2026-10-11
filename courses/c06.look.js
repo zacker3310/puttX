@@ -62,9 +62,13 @@ WORLD_LOOK[6] = {
     group.add(cone, lava, smoke);
     /* embers drifting up around the course */
     const n = 160, pos = new Float32Array(n * 3), r = rng32(66);
-    for (let i = 0; i < n; i++) { pos[i * 3] = B.cx + (r() - 0.5) * 18; pos[i * 3 + 1] = r() * 5; pos[i * 3 + 2] = B.cz + (r() - 0.4) * 18; }
+    for (let i = 0; i < n; i++) {
+      /* only in a ring around the hole, never over the playing surface or in front of the camera */
+      const a = r() * Math.PI * 2, d = B.ext + 1.5 + r() * 6;
+      pos[i * 3] = B.cx + Math.sin(a) * d; pos[i * 3 + 1] = 0.3 + r() * 4.7; pos[i * 3 + 2] = B.cz + Math.abs(Math.cos(a)) * d;
+    }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffa040, size: 0.05, transparent: true, opacity: 0.8, depthWrite: false }));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffa040, size: 0.035, transparent: true, opacity: 0.8, depthWrite: false }));
     group.add(pts); group.userData.embers = pts; group.userData.crater = lava; group.userData.smoke = smoke;
     /* lava pools glow a little */
     const glow = [];
@@ -79,7 +83,7 @@ WORLD_LOOK[6] = {
     for (const m of group.userData.glow || []) m.emissiveIntensity = 0.5 + 0.12 * Math.sin(t * 1.7);
     if (!pts) return;
     const a = pts.geometry.attributes.position;
-    for (let i = 0; i < a.count; i++) { let y = a.getY(i) + dt * 0.25; if (y > 5) y -= 5; a.setY(i, y); a.setX(i, a.getX(i) + Math.sin(y * 1.7 + i) * dt * 0.03); }
+    for (let i = 0; i < a.count; i++) { let y = a.getY(i) + dt * 0.25; if (y > 5) y -= 4.7; a.setY(i, y); a.setX(i, a.getX(i) + Math.sin(y * 1.7 + i) * dt * 0.03); }
     a.needsUpdate = true;
   },
 };

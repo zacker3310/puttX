@@ -6,11 +6,11 @@ const C2_ROCK = (x, z, r = 0.14) => ({ x, z, r, top: 0.2, look: 'rock' });
 const C2_WEED = (ax, az, bx, bz, period, phase = 0, r = 0.17) => ({ kind: 'slide', ax, az, bx, bz, r, period, phase, look: 'weed' });
 registerWorld(2, { holes: [
   /* 1. up the first ramp onto a mesa, a cactus and a sand trap guard the cup */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.35, 5.5], shape: rect(-0.8, 0, 0.8, 6.4),
+  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.4, 5.6], shape: rect(-0.8, 0, 0.8, 6.4),
     ramps: [{ x0: -0.8, z0: 2.2, x1: 0.8, z1: 3.2, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.9, 3.2, 0.9, 6.5), h: 0.3 }],
     zones: [{ surf: 'sand', poly: rect(0.1, 4.7, 0.8, 5.9) }],
-    posts: [C2_CACTUS(0.35, 4.3)] },
+    posts: [C2_CACTUS(-0.27, 4.5)] },
   /* 2. ride off the mesa: a canyon drop onto a green that tilts to the right, the cup tucked behind a rock spur */
   { par: 3, sol: [], tee: [0, 0.6], cup: [1.2, 6.8],
     shape: [[-0.7, 0], [0.7, 0], [0.7, 2.6], [1.8, 2.6], [1.8, 7.6], [-1.8, 7.6], [-1.8, 2.6], [-0.7, 2.6]],
@@ -119,10 +119,10 @@ registerWorld(2, { holes: [
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
   { par: 5, sol: [], tee: [0, 0.5], cup: [3.1, 9.2],
     shape: [[-0.5, 0], [0.5, 0], [0.5, 4.2], [3.6, 4.2], [3.6, 10], [2.7, 10], [2.7, 5.0], [-0.5, 5.0]],
-    ramps: [{ x0: 2.7, z0: 6.6, x1: 3.6, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
+    ramps: [{ x0: 3.0, z0: 6.6, x1: 3.6, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.6, -0.1, 0.6, 2.6), h: 0.35 }, { poly: rect(2.6, 7.6, 3.7, 10.1), h: 0.3 }],
     bumps: [{ x: 1.6, z: 4.6, r: 0.3, h: 0.1 }],
-    zones: [{ surf: 'sand', poly: rect(-0.5, 4.4, 0.5, 5.0) }],
+    zones: [{ surf: 'sand', poly: rect(-0.5, 4.4, 0.5, 5.0) }, { surf: 'sand', poly: rect(2.7, 4.2, 3.6, 4.7) }],
     movers: [C2_WEED(-0.18, 3.4, 0.18, 3.4, 1.8, 0, 0.13), C2_WEED(3.15, 5.4, 3.15, 6.3, 2.2, 0, 0.13)],
     posts: [C2_CACTUS(1.2, 4.75), C2_CACTUS(3.35, 8.4)] },
   /* 17. the gap jump: fly the kicker over the canyon, or walk the ledge round the left */
@@ -133,13 +133,14 @@ registerWorld(2, { holes: [
     bumps: [{ x: 0.7, z: 5.4, r: 0.4, h: 0.14 }],
     zones: [{ surf: 'sand', poly: rect(0.4, 7.0, 1.4, 7.6) }],
     posts: [C2_CACTUS(-0.75, 5.4), C2_CACTUS(0.1, 7.0)] },
-  /* 18. the three-mesa descent: off the high mesa, across the middle mesa past a tumbleweed, down to the dune green */
-  { par: 5, sol: [], tee: [-0.3, 0.6], cup: [0.6, 9.2],
+  /* 18. the three-mesa descent: off the high mesa, across the middle mesa past a tumbleweed,
+     down a narrow gap to the dune green and round the rock spur to the cup */
+  { par: 5, sol: [], tee: [-0.3, 0.6], cup: [0.55, 9.35],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [1.2, 3], [1.2, 6.5], [1.2, 10], [-1.8, 10], [-1.8, 6.5], [-1.8, 3], [-0.8, 3]],
-    inner: [[[-0.8, 3], [0.0, 3]], [[-0.9, 6.5], [1.2, 6.5]]],
-    tiers: [{ poly: rect(-1.9, 2.9, 1.3, 6.5), h: 0.35 }, { poly: rect(-0.9, -0.1, 0.9, 3), h: 0.7 }],
-    bumps: [{ x: -0.5, z: 8.0, r: 0.5, h: 0.28 }],
-    zones: [{ surf: 'sand', poly: rect(-1.8, 9.3, -0.6, 10) }, { surf: 'sand', poly: rect(0.0, 7.6, 1.2, 8.2) }],
-    movers: [C2_WEED(-1.4, 5.0, 0.7, 5.0, 3.2)],
-    posts: [C2_CACTUS(0.5, 3.9), C2_CACTUS(-1.3, 3.8), C2_CACTUS(-0.4, 6.0), C2_ROCK(0.85, 6.0, 0.12), C2_CACTUS(-0.2, 9.4)] },
+    inner: [[[-0.8, 3], [0.2, 3]], [[-1.15, 6.5], [1.2, 6.5]], [[-0.45, 8.5], [1.2, 8.5]]],
+    tiers: [{ poly: rect(-1.9, 2.9, 1.3, 6.5), h: 0.35 }, { poly: rect(-0.9, -0.1, 0.9, 3), h: 0.7 }, { poly: rect(-1.9, 6.5, 1.3, 10.1), h: 0.05, sx: 0.03 }],
+    bumps: [{ x: -0.9, z: 7.6, r: 0.4, h: 0.2 }],
+    zones: [{ surf: 'sand', poly: rect(-1.8, 9.4, -0.9, 10) }, { surf: 'sand', poly: rect(0.4, 3.0, 1.2, 3.5) }],
+    movers: [C2_WEED(-1.4, 5.0, 0.75, 5.0, 3.2), C2_WEED(-1.35, 6.9, -1.35, 8.6, 2.6, 1.0, 0.15)],
+    posts: [C2_CACTUS(0.5, 4.1), C2_CACTUS(-1.3, 3.8), C2_CACTUS(-0.4, 6.0), C2_ROCK(0.85, 6.05, 0.12), C2_CACTUS(-0.3, 9.4), C2_CACTUS(0.9, 7.4)] },
 ] });

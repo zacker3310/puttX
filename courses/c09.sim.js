@@ -36,7 +36,7 @@ registerWorld(9, { holes: [
     posts: [C9_GUM(0.9, 6.9)],
     tubes: [C9_PIPE([1.9, 3.8], [0.0, 6.3], 0)] },
   /* 7: three candy presses slam across the lane, then a taffy sill */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.3, 9.2], shape: rect(-1, 0, 1, 10),
+  { par: 3, sol: [[12, 0.9, 0]], tee: [0, 0.5], cup: [0.3, 9.2], shape: rect(-1, 0, 1, 10),
     movers: [C9_PRESS(-0.55, 3, 0.55, 3, 0.55, 90, 3), C9_PRESS(0.55, 5.2, -0.55, 5.2, 0.55, 90, 3.4), C9_PRESS(-0.55, 7.4, 0.55, 7.4, 0.55, 90, 2.8, 1)],
     bumps: [{ x: -0.45, z: 8.6, r: 0.4, h: 0.12 }],
     zones: [{ surf: 'mud', poly: rect(-0.15, 8.55, 1, 8.75) }] },
@@ -52,10 +52,10 @@ registerWorld(9, { holes: [
     zones: [C9_BELT(rect(-0.7, 2.4, 2.1, 4.2), 1.4, 0)],
     posts: [C9_GUM(1.4, 6.4), C9_GUM(0.8, 5.9)] },
   /* 10: a long walk over the frosting hills, past a sugar crater, to a cup behind the last hill */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.3, 8.8], shape: rect(-1.5, 0, 1.5, 9.5),
+  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.9, 8.9], shape: rect(-1.5, 0, 1.5, 9.5),
     bumps: [{ x: -0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: 0.7, z: 3.0, r: 0.55, h: 0.3 }, { x: 0.35, z: 4.9, r: 0.6, h: 0.35 },
-      { x: -0.6, z: 5.6, r: 0.5, h: -0.22 }, { x: -0.6, z: 7.4, r: 0.6, h: 0.32 }, { x: 0.7, z: 7.1, r: 0.45, h: 0.25 }],
-    zones: [{ surf: 'mud', poly: rect(-0.25, 8.05, 0.85, 8.25) }] },
+      { x: -0.6, z: 5.6, r: 0.5, h: -0.22 }, { x: -0.7, z: 7.3, r: 0.55, h: 0.32 }, { x: 0.8, z: 7.2, r: 0.45, h: 0.25 },
+      { x: -0.45, z: 8.15, r: 0.4, h: 0.3 }, { x: 0.25, z: 8.7, r: 0.4, h: -0.2 }] },
   /* 11: belts in a zig-zag factory floor */
   { par: 2, sol: [[51, 1, 0], [72, 0.7, 0]], tee: [-1, 0.5], cup: [-0.9, 7.2], aim0: 30, shape: rect(-1.5, 0, 1.5, 8),
     inner: [[[-1.5, 2.5], [0.8, 2.5]], [[-0.8, 5], [1.5, 5]]],

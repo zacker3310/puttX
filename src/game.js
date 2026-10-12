@@ -488,7 +488,7 @@ function sfx(name, ...args) {
 }
 /* rolling hiss follows ball speed; 0 silences it */
 function setRoll(speed) {
-  if (rollGain) rollGain.gain.setTargetAtTime(Math.min(0.25, speed * 0.06), actx.currentTime, 0.03);
+  if (rollGain) rollGain.gain.setTargetAtTime(0, actx.currentTime, 0.03);   /* the rolling hiss is gone: the ball rolls quietly */
 }
 
 /* ============ 5. RENDER ============ */
@@ -861,6 +861,10 @@ function updateCamera(dt) {
   if (sh > 0.01 && !reducedMotion()) { camera.position.x += Math.sin(play.time * 90) * 0.03 * sh; camera.position.y += Math.cos(play.time * 77) * 0.02 * sh; play.fx.shake = sh * Math.exp(-9 * dt); }
 }
 function renderFrame(dt) {
+  const hs = document.getElementById('hole');
+  if (hs.dataset.phase !== play.phase) hs.dataset.phase = play.phase;
+  const intro = play.intro ? '1' : '';
+  if (hs.dataset.intro !== intro) hs.dataset.intro = intro;
   if (!play.hole || currentScene === 'map' || currentScene === 'shop') return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
@@ -893,7 +897,7 @@ function renderFrame(dt) {
 const SWING_FULL = 240, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 /* how forgiving the stroke is. The equipped putter sets these (the pro shop's applyGear); they shape
    only how a gesture becomes (angle, power), never the physics, so every hole's proof still holds. */
-const FEEL_BASE = { sweet: 0.25, tempoDead: 0.22, tempoK: 0.18, pathK: 0.22, toeLoss: 0.15, twist: 1.8 };
+const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeLoss: 0.15, twist: 4 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
@@ -998,9 +1002,9 @@ function buildPutter(gear) {
   head.position.set(0, HEAD_H / 2, -HEAD_D / 2); head.castShadow = true; head.name = 'head';
   const line = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.002, HEAD_D * 0.7), mat('#ffffff', { roughness: 0.5 })); line.position.set(0, HEAD_H + 0.001, -HEAD_D / 2);
   /* the shaft rises from the heel toward the player's hands, who stands to the side of the line (local +x) */
-  const shaft = new THREE.Group(); shaft.position.set(HEAD_W * 0.36, HEAD_H, -HEAD_D * 0.5); shaft.rotation.x = -0.1; shaft.rotation.z = -0.38;
-  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.92, 10), mat(gear.shaft, metal)); rod.position.y = 0.46;
-  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.012, 0.27, 12), mat(gear.grip, { roughness: 0.9 })); grip.position.y = 0.8;
+  const shaft = new THREE.Group(); shaft.position.set(HEAD_W * 0.36, HEAD_H, -HEAD_D * 0.5); shaft.rotation.x = 0.12; shaft.rotation.z = -0.2;
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.62, 10), mat(gear.shaft, metal)); rod.position.y = 0.31;
+  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.012, 0.2, 12), mat(gear.grip, { roughness: 0.9 })); grip.position.y = 0.56;
   rod.castShadow = grip.castShadow = true;
   shaft.add(rod, grip);
   g.add(head, line, shaft);
@@ -1111,7 +1115,7 @@ function setHand(h) {
   progress.hand = h === 'L' ? 'L' : 'R'; saveProgress();
   if (putter) putter.scale.x = progress.hand === 'L' ? -1 : 1;
   document.getElementById('hole').classList.toggle('lefty', progress.hand === 'L');
-  handBtn.classList.toggle('on', progress.hand === 'L');
+  handR.classList.toggle('on', progress.hand !== 'L'); handL.classList.toggle('on', progress.hand === 'L');
   if (camera) camera.setViewOffset(1200, 700, progress.hand === 'L' ? -60 : 60, 0, 1200, 700);
 }
 function setOverview(on) { play.overview = on; viewBtn.classList.toggle('on', on); }
@@ -1149,14 +1153,13 @@ function drawPad() {
   padStart.setAttribute('cx', ((s0.x - ox) * sx).toFixed(1)); padStart.setAttribute('cy', ((s0.y - oy) * sy).toFixed(1));
   padLine.setAttribute('y1', ((s0.y - oy) * sy).toFixed(1)); padLine.setAttribute('y2', ((s0.y - oy) * sy).toFixed(1));
 }
-/* the shot readout: path arrow, strike dot on the face, tempo needle; green when clean */
+/* the shot readout: where the ball started against the aim (the marker drifts the way the ball did; the
+   green notch is dead on) and the power. One meter: path, strike and face all show up as start line. */
 function drawShot(st) {
   shotPanel.classList.add('show');
-  shotPath.setAttribute('transform', `rotate(${clamp(st.path, -45, 45).toFixed(1)} 40 44)`);
-  shotDot.setAttribute('cx', (40 + clamp(st.off, -1.5, 1.5) * 26).toFixed(1));
-  shotDot.setAttribute('fill', Math.abs(st.off) <= FEEL.sweet ? '#74c465' : '#ef7d6d');
-  shotNeedle.setAttribute('transform', `translate(${(clamp(st.tempo, -1, 1) * 30).toFixed(1)} 0)`);
-  shotNeedle.setAttribute('fill', Math.abs(st.tempo) <= FEEL.tempoDead ? '#74c465' : '#ef7d6d');
+  const k = clamp(-st.turn / 6, -1, 1);
+  shotMark.setAttribute('cx', (110 + k * 92).toFixed(1));
+  shotMark.setAttribute('fill', Math.abs(st.turn) < 0.75 ? '#74c465' : Math.abs(st.turn) < 2.5 ? '#ffd66e' : '#ef7d6d');
   shotPower.textContent = Math.round(st.power * 100);
 }
 
@@ -1460,7 +1463,7 @@ function wipe() {
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
-const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 117, 290 + (i % 2) * 40] : [1066 - (i - 9) * 117, 530 + (i % 2) * 40]);
+const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 117, 310] : [1066 - (i - 9) * 117, 550]);
 let mapWorld = 1;
 
 function showTitle() {
@@ -1651,7 +1654,10 @@ function boot() {
   viewBtn.addEventListener('click', () => { sfx('tap'); setOverview(!play.overview); });
   readBtn.addEventListener('click', () => { sfx('tap'); setRead(!readGroup); });
   mulliganBtn.addEventListener('click', () => mulligan());
-  handBtn.addEventListener('click', () => { sfx('tap'); setHand(progress.hand === 'L' ? 'R' : 'L'); });
+  handR.addEventListener('click', () => { sfx('tap'); setHand('R'); });
+  handL.addEventListener('click', () => { sfx('tap'); setHand('L'); });
+  setBtn.addEventListener('click', () => { sfx('tap'); settings.classList.add('show'); });
+  setClose.addEventListener('click', () => { sfx('tap'); settings.classList.remove('show'); });
   setHand(progress.hand);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });

@@ -231,9 +231,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #doneCoins.pop { opacity: 1; animation: popIn .4s .6s cubic-bezier(.3, 1.6, .5, 1) both; }
 @media (prefers-reduced-motion: reduce) { #shopGrid .card, #shopStage.pop, #shopWallet.pop, .shake, #doneCoins.pop { animation: none; } }
 /* ---------- 9. HANDEDNESS: a lefty gets the swing pad on the left, aim buttons on the right ---------- */
-#handBtn { left: 452px; top: 24px; }
-#handBtn.on svg { transform: scaleX(-1); }
-#handBtn.on { background: var(--v-accent-blue); border-color: var(--v-blue-line); box-shadow: 0 6px 0 var(--v-blue-down); }
 #hole.lefty #swingPad { right: auto; left: 18px; }
 #hole.lefty #aimL { left: auto; right: 128px; }
 #hole.lefty #aimR { left: auto; right: 24px; }
@@ -246,19 +243,22 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #mulliganBtn.show { display: grid; animation: popIn .3s cubic-bezier(.3, 1.6, .5, 1) both; }
 #holeBanner { position: absolute; left: 0; right: 0; top: 230px; display: none; justify-content: center; align-items: center; gap: 34px; pointer-events: none;
   font: 900 150px var(--v-font); color: #fff; text-shadow: 0 8px 0 rgba(74, 53, 35, .35); font-variant-numeric: tabular-nums; }
-#holeBanner.show { display: flex; animation: bannerIn 2.3s cubic-bezier(.3, 1.4, .5, 1) both; }
+#holeBanner { left: 50%; right: auto; transform-origin: 50% 50%; width: max-content; margin-left: 0; padding: 4px 44px 10px; border-radius: 999px; background: rgba(47, 36, 26, .55); translate: -50% 0; }
+#holeBanner.show { display: flex; animation: bannerIn .45s cubic-bezier(.3, 1.6, .5, 1) both; }
 #holeBanner .par { display: flex; align-items: center; gap: 8px; font-size: 92px; }
 #holeBanner svg { width: 96px; height: 96px; }
-@keyframes bannerIn { 0% { transform: scale(.3); opacity: 0; } 18% { transform: scale(1); opacity: 1; } 78% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.15); opacity: 0; } }
+/* visible from the first frame (a stalled animation must never hide it); the intro's end takes it away */
+@keyframes bannerIn { from { scale: .6; } to { scale: 1; } }
 #replayTag { position: absolute; left: 50%; top: 24px; margin-left: -60px; width: 120px; height: 76px; display: none; place-items: center; pointer-events: none;
   border-radius: var(--v-r-lg); background: var(--v-accent-red); border: 4px solid var(--v-red-line); box-shadow: var(--v-shadow-card); }
 #replayTag.show { display: grid; animation: blink 1s steps(2) infinite; }
 #replayTag svg { width: 56px; height: 56px; }
 @keyframes blink { 50% { opacity: .55; } }
-#wipeEl { position: absolute; inset: 0; pointer-events: none; z-index: 5; opacity: 0; background: radial-gradient(circle at 50% 50%, transparent 0, transparent var(--r, 0px), #2f241a calc(var(--r, 0px) + 2px)); }
-#wipeEl.go { animation: iris .55s ease-in-out both; }
-@keyframes iris { 0% { opacity: 1; --r: 0px; } 100% { opacity: 1; --r: 900px; } }
-@property --r { syntax: '<length>'; inherits: false; initial-value: 0px; }
+#wipeEl { position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%;
+  box-shadow: 0 0 0 3000px #2f241a; pointer-events: none; z-index: 5; opacity: 0; transform: scale(30); }
+/* the iris opens from a dot to beyond the screen, then fades out: its end state is always invisible */
+#wipeEl.go { animation: iris .6s ease-in both; }
+@keyframes iris { 0% { opacity: 1; transform: scale(0); } 85% { opacity: 1; transform: scale(30); } 100% { opacity: 0; transform: scale(30); } }
 @media (prefers-reduced-motion: reduce) { #holeBanner.show, #replayTag.show, #mulliganBtn.show { animation: none; } #wipeEl { display: none; } }
 /* ---------- 11. SWING PAD: just the path your finger drew ---------- */
 #padBall, #padHead, #padFill, #padTicks, #padGhost, #swingPad .lane { display: none !important; }
@@ -275,6 +275,30 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #updateBtn.show { display: grid; animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(1.08); } }
 @media (prefers-reduced-motion: reduce) { #updateBtn.show { animation: none; } }
+/* ---------- 13. POLISH: one HUD grid, settings, calm map, phase-aware controls ---------- */
+#soundBtn { position: absolute; left: 40px; top: 40px; right: auto; }
+#setBtn { right: 24px; top: 24px; }
+#settings { position: absolute; inset: 0; display: none; background: var(--v-scrim); z-index: 4; }
+#settings.show { display: block; }
+#setPanel { position: absolute; left: 330px; top: 220px; width: 540px; height: 168px; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .3s cubic-bezier(.3, 1.6, .5, 1) both; }
+#handR { left: 160px; top: 34px; } #handL { left: 280px; top: 34px; } #setClose { left: 412px; top: 34px; }
+#handR.on, #handL.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#holePath .lock { right: -10px; top: -10px; bottom: auto; width: 34px; height: 34px; }
+#holePath .node.locked .n { color: var(--v-ink-soft); }
+#titleLogo { left: 450px; top: 46px; width: 300px; padding: 14px 26px 6px; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); }
+#shotPanel { left: 50%; transform: translateX(-50%); height: 84px; gap: 16px; padding: 4px 22px; }
+#shotPanel svg { width: 220px; height: 60px; }
+#mulliganBtn { left: 452px; }
+#updateBtn { left: 556px; }
+#replayTag { margin-left: -60px; }
+#hole[data-phase="done"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
+#hole[data-phase="replay"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
+#hole[data-phase="sunk"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn),
+#hole[data-phase="auto"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn) { visibility: hidden; }
+#hole[data-intro="1"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn) { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { #setPanel { animation: none; } }
 </style>
 </head>
 <body>
@@ -294,15 +318,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div id="holeBanner" aria-label="hole and par"><span id="holeBannerN">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="holeBannerPar">3</span></span></div>
     <div id="replayTag" aria-label="replay"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="14" fill="#fff"/><circle cx="32" cy="32" r="24" fill="none" stroke="#fff" stroke-width="5"/></svg></div>
     <button class="btn" id="updateBtn" aria-label="update"><svg viewBox="0 0 64 64"><path d="M50 30 A18 18 0 1 1 40 16" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M34 8 L44 16 L34 26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="btn" id="handBtn" aria-label="left or right handed"><svg viewBox="0 0 64 64"><path d="M22 58 V30 Q22 26 26 26 Q30 26 30 30 V12 Q30 8 34 8 Q38 8 38 12 V28 V14 Q38 10 42 10 Q46 10 46 14 V30 V20 Q46 16 50 16 Q54 16 54 20 V40 Q54 58 38 58 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/><path d="M22 34 L12 26 Q8 24 7 28 Q6 31 9 34 L22 48" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/></svg></button>
     <div class="live" id="swingPad" aria-label="swing"><svg id="padPath" viewBox="0 0 112 352" aria-hidden="true"><line class="line" id="padLine" x1="0" x2="112" y1="-50" y2="-50"/><path class="hint" id="padHint" d="M56 110 V240 M44 228 L56 240 L68 228 M56 240 V110 M44 122 L56 110 L68 122"/><polyline class="back" id="padBack" points=""/><polyline class="fwd" id="padFwd" points=""/><circle class="start" id="padStart" r="8" cx="-50" cy="-50"/></svg><div class="lane"></div><div id="padTicks"><i style="top:80px"></i><i style="top:160px"></i><i style="top:240px"></i><i style="top:320px"></i></div><div id="padFill"></div><div id="padGhost"></div><div id="padBall"></div><div id="padHead"></div></div>
     <button class="btn" id="aimL" aria-label="aim left"><svg viewBox="0 0 64 64"><path d="M40 12 L18 32 L40 52" fill="none" stroke="#8a7360" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="btn" id="aimR" aria-label="aim right"><svg viewBox="0 0 64 64"><path d="M24 12 L46 32 L24 52" fill="none" stroke="#8a7360" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="btn" id="viewBtn" aria-label="overview"><svg viewBox="0 0 64 64"><path d="M4 32 Q32 6 60 32 Q32 58 4 32 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="5"/><circle cx="32" cy="32" r="10" fill="#6fc0df"/><circle cx="32" cy="32" r="4" fill="#4a3826"/></svg></button>
     <div id="shotPanel" aria-label="last shot">
-      <svg viewBox="0 0 80 88" aria-label="path"><path d="M40 84 V20" stroke="#e6d2ab" stroke-width="6" stroke-dasharray="4 6"/><g id="shotPath"><path d="M40 80 V16" stroke="#5a4634" stroke-width="7" stroke-linecap="round"/><path d="M28 28 L40 12 L52 28" fill="none" stroke="#5a4634" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
-      <svg viewBox="0 0 80 88" aria-label="strike"><rect x="6" y="34" width="68" height="22" rx="8" fill="#c9ced6" stroke="#6f7881" stroke-width="3"/><rect x="34" y="36" width="12" height="18" rx="3" fill="#e9f5e6"/><circle id="shotDot" cx="40" cy="45" r="9" fill="#74c465"/></svg>
-      <svg viewBox="0 0 80 88" aria-label="tempo"><rect x="6" y="38" width="68" height="14" rx="7" fill="#f6e9d2" stroke="#e6d2ab" stroke-width="3"/><rect x="34" y="38" width="12" height="14" fill="#cdeac6"/><g id="shotNeedle"><path d="M40 20 L48 34 H32 Z" fill="#74c465"/><rect x="38" y="34" width="4" height="22" fill="#5a4634"/></g></svg>
+      <svg viewBox="0 0 220 60" aria-label="start line"><rect x="8" y="22" width="204" height="16" rx="8" fill="#f6e9d2" stroke="#e6d2ab" stroke-width="3"/><rect x="98" y="22" width="24" height="16" fill="#cdeac6"/><path d="M110 8 V52" stroke="#8a7360" stroke-width="3" stroke-linecap="round"/><circle id="shotMark" cx="110" cy="30" r="12" fill="#74c465" stroke="#fff" stroke-width="4"/></svg>
       <span id="shotPower">0</span>
     </div>
     <div class="live" id="holeDone" aria-label="hole done">
@@ -314,7 +335,15 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
   </section>
   <section class="scene panel" id="map">
     <div id="worldTabs"></div>
-    <button class="btn" id="soundBtn" aria-label="sound"><svg viewBox="0 0 64 64"><path d="M10 24 H22 L36 12 V52 L22 40 H10 Z" fill="#8a7360"/><path class="wave" d="M44 22 Q52 32 44 42 M50 16 Q62 32 50 48" fill="none" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path class="cross" d="M44 24 L58 40 M58 24 L44 40" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></button>
+    <button class="btn" id="setBtn" aria-label="settings"><svg viewBox="0 0 64 64"><path d="M32 6 l5 7 8-3 1 9 8 3-4 8 4 8-8 3-1 9-8-3-5 7-5-7-8 3-1-9-8-3 4-8-4-8 8-3 1-9 8 3z" fill="#a8804e"/><circle cx="32" cy="32" r="10" fill="#fff8ec"/></svg></button>
+    <div id="settings" class="live" aria-label="settings">
+      <div id="setPanel">
+        <button class="btn" id="soundBtn" aria-label="sound"><svg viewBox="0 0 64 64"><path d="M10 24 H22 L36 12 V52 L22 40 H10 Z" fill="#8a7360"/><path class="wave" d="M44 22 Q52 32 44 42 M50 16 Q62 32 50 48" fill="none" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path class="cross" d="M44 24 L58 40 M58 24 L44 40" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></button>
+        <button class="btn" id="handR" aria-label="right handed"><svg viewBox="0 0 64 64"><path d="M22 58 V30 Q22 26 26 26 Q30 26 30 30 V12 Q30 8 34 8 Q38 8 38 12 V28 V14 Q38 10 42 10 Q46 10 46 14 V30 V20 Q46 16 50 16 Q54 16 54 20 V40 Q54 58 38 58 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/><path d="M22 34 L12 26 Q8 24 7 28 Q6 31 9 34 L22 48" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/></svg></button>
+        <button class="btn" id="handL" aria-label="left handed"><svg viewBox="0 0 64 64" style="transform:scaleX(-1)"><path d="M22 58 V30 Q22 26 26 26 Q30 26 30 30 V12 Q30 8 34 8 Q38 8 38 12 V28 V14 Q38 10 42 10 Q46 10 46 14 V30 V20 Q46 16 50 16 Q54 16 54 20 V40 Q54 58 38 58 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/><path d="M22 34 L12 26 Q8 24 7 28 Q6 31 9 34 L22 48" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/></svg></button>
+        <button class="btn go" id="setClose" aria-label="close"><svg viewBox="0 0 64 64"><path d="M14 34 L26 46 L50 20" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
     <div class="chip" id="mapWallet" aria-label="coins"><svg class="coin" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="35" r="26" fill="#c69334"/><circle cx="32" cy="30" r="26" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="32" cy="30" r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M32 20 L35 27 L42 27 L36.5 31.5 L38.5 39 L32 34.5 L25.5 39 L27.5 31.5 L22 27 L29 27 Z" fill="#dca63f"/></svg><span id="mapCoinsN">0</span></div>
     <button class="btn" id="shopBtn" aria-label="pro shop"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="11" y="28" width="42" height="28" rx="4" fill="#fff8ec" stroke="#a8804e" stroke-width="4"/><rect x="26" y="36" width="12" height="20" rx="3" fill="#6fc0df"/><path d="M6 12 H58 L58 24 H6 Z" fill="#ef7d6d"/><path d="M19 12 V24 M32 12 V24 M45 12 V24" stroke="#fff8ec" stroke-width="6"/><path d="M6 24 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 Z" fill="#c95a4c"/></svg></button>
     <svg id="pathLine" viewBox="0 0 1200 700" aria-hidden="true"></svg>
@@ -359,7 +388,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = 'b9b2dadb8cae';
+const BUILD_ID = '9430569f5395';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -2099,7 +2128,7 @@ function sfx(name, ...args) {
 }
 /* rolling hiss follows ball speed; 0 silences it */
 function setRoll(speed) {
-  if (rollGain) rollGain.gain.setTargetAtTime(Math.min(0.25, speed * 0.06), actx.currentTime, 0.03);
+  if (rollGain) rollGain.gain.setTargetAtTime(0, actx.currentTime, 0.03);   /* the rolling hiss is gone: the ball rolls quietly */
 }
 
 /* ============ 5. RENDER ============ */
@@ -2472,6 +2501,10 @@ function updateCamera(dt) {
   if (sh > 0.01 && !reducedMotion()) { camera.position.x += Math.sin(play.time * 90) * 0.03 * sh; camera.position.y += Math.cos(play.time * 77) * 0.02 * sh; play.fx.shake = sh * Math.exp(-9 * dt); }
 }
 function renderFrame(dt) {
+  const hs = document.getElementById('hole');
+  if (hs.dataset.phase !== play.phase) hs.dataset.phase = play.phase;
+  const intro = play.intro ? '1' : '';
+  if (hs.dataset.intro !== intro) hs.dataset.intro = intro;
   if (!play.hole || currentScene === 'map' || currentScene === 'shop') return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
@@ -3627,7 +3660,7 @@ WORLD_LOOK[10] = {
 const SWING_FULL = 240, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 /* how forgiving the stroke is. The equipped putter sets these (the pro shop's applyGear); they shape
    only how a gesture becomes (angle, power), never the physics, so every hole's proof still holds. */
-const FEEL_BASE = { sweet: 0.25, tempoDead: 0.22, tempoK: 0.18, pathK: 0.22, toeLoss: 0.15, twist: 1.8 };
+const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeLoss: 0.15, twist: 4 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
@@ -3732,9 +3765,9 @@ function buildPutter(gear) {
   head.position.set(0, HEAD_H / 2, -HEAD_D / 2); head.castShadow = true; head.name = 'head';
   const line = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.002, HEAD_D * 0.7), mat('#ffffff', { roughness: 0.5 })); line.position.set(0, HEAD_H + 0.001, -HEAD_D / 2);
   /* the shaft rises from the heel toward the player's hands, who stands to the side of the line (local +x) */
-  const shaft = new THREE.Group(); shaft.position.set(HEAD_W * 0.36, HEAD_H, -HEAD_D * 0.5); shaft.rotation.x = -0.1; shaft.rotation.z = -0.38;
-  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.92, 10), mat(gear.shaft, metal)); rod.position.y = 0.46;
-  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.012, 0.27, 12), mat(gear.grip, { roughness: 0.9 })); grip.position.y = 0.8;
+  const shaft = new THREE.Group(); shaft.position.set(HEAD_W * 0.36, HEAD_H, -HEAD_D * 0.5); shaft.rotation.x = 0.12; shaft.rotation.z = -0.2;
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.62, 10), mat(gear.shaft, metal)); rod.position.y = 0.31;
+  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.012, 0.2, 12), mat(gear.grip, { roughness: 0.9 })); grip.position.y = 0.56;
   rod.castShadow = grip.castShadow = true;
   shaft.add(rod, grip);
   g.add(head, line, shaft);
@@ -3845,7 +3878,7 @@ function setHand(h) {
   progress.hand = h === 'L' ? 'L' : 'R'; saveProgress();
   if (putter) putter.scale.x = progress.hand === 'L' ? -1 : 1;
   document.getElementById('hole').classList.toggle('lefty', progress.hand === 'L');
-  handBtn.classList.toggle('on', progress.hand === 'L');
+  handR.classList.toggle('on', progress.hand !== 'L'); handL.classList.toggle('on', progress.hand === 'L');
   if (camera) camera.setViewOffset(1200, 700, progress.hand === 'L' ? -60 : 60, 0, 1200, 700);
 }
 function setOverview(on) { play.overview = on; viewBtn.classList.toggle('on', on); }
@@ -3883,14 +3916,13 @@ function drawPad() {
   padStart.setAttribute('cx', ((s0.x - ox) * sx).toFixed(1)); padStart.setAttribute('cy', ((s0.y - oy) * sy).toFixed(1));
   padLine.setAttribute('y1', ((s0.y - oy) * sy).toFixed(1)); padLine.setAttribute('y2', ((s0.y - oy) * sy).toFixed(1));
 }
-/* the shot readout: path arrow, strike dot on the face, tempo needle; green when clean */
+/* the shot readout: where the ball started against the aim (the marker drifts the way the ball did; the
+   green notch is dead on) and the power. One meter: path, strike and face all show up as start line. */
 function drawShot(st) {
   shotPanel.classList.add('show');
-  shotPath.setAttribute('transform', `rotate(${clamp(st.path, -45, 45).toFixed(1)} 40 44)`);
-  shotDot.setAttribute('cx', (40 + clamp(st.off, -1.5, 1.5) * 26).toFixed(1));
-  shotDot.setAttribute('fill', Math.abs(st.off) <= FEEL.sweet ? '#74c465' : '#ef7d6d');
-  shotNeedle.setAttribute('transform', `translate(${(clamp(st.tempo, -1, 1) * 30).toFixed(1)} 0)`);
-  shotNeedle.setAttribute('fill', Math.abs(st.tempo) <= FEEL.tempoDead ? '#74c465' : '#ef7d6d');
+  const k = clamp(-st.turn / 6, -1, 1);
+  shotMark.setAttribute('cx', (110 + k * 92).toFixed(1));
+  shotMark.setAttribute('fill', Math.abs(st.turn) < 0.75 ? '#74c465' : Math.abs(st.turn) < 2.5 ? '#ffd66e' : '#ef7d6d');
   shotPower.textContent = Math.round(st.power * 100);
 }
 
@@ -4194,7 +4226,7 @@ function wipe() {
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
-const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 117, 290 + (i % 2) * 40] : [1066 - (i - 9) * 117, 530 + (i % 2) * 40]);
+const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 117, 310] : [1066 - (i - 9) * 117, 550]);
 let mapWorld = 1;
 
 function showTitle() {
@@ -4814,7 +4846,10 @@ function boot() {
   viewBtn.addEventListener('click', () => { sfx('tap'); setOverview(!play.overview); });
   readBtn.addEventListener('click', () => { sfx('tap'); setRead(!readGroup); });
   mulliganBtn.addEventListener('click', () => mulligan());
-  handBtn.addEventListener('click', () => { sfx('tap'); setHand(progress.hand === 'L' ? 'R' : 'L'); });
+  handR.addEventListener('click', () => { sfx('tap'); setHand('R'); });
+  handL.addEventListener('click', () => { sfx('tap'); setHand('L'); });
+  setBtn.addEventListener('click', () => { sfx('tap'); settings.classList.add('show'); });
+  setClose.addEventListener('click', () => { sfx('tap'); settings.classList.remove('show'); });
   setHand(progress.hand);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });

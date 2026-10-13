@@ -1426,6 +1426,7 @@ function finishHole() {
   let won = counts ? onHoleFinished(key, round.score, hole.par) : 0;
   if (!play.practice) won += finishGoals(key, round, hole, counts);
   if (play.daily && !play.practice) won += finishDaily(round.score);
+  if (!play.practice) tallyHole(round.score, hole.par); else doneBadge.className = '';
   if (won) showCoinPop(won);
   saveProgress();
   updateMulligan();
@@ -1551,6 +1552,8 @@ function repairExtras(p) {
   const keyed = (o, ok) => { const out = {}; if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) if (/^\d+-\d+$/.test(k) && ok(v)) out[k] = v; return out; };
   p.lost = keyed(p.lost, v => v === 1);
   p.obj = keyed(p.obj, v => Number.isInteger(v) && v >= 1 && v <= 7);
+  const t = p.tally || {};
+  p.tally = Object.fromEntries(['birdie', 'eagle', 'alb', 'ace'].map(k => [k, Number.isInteger(t[k]) && t[k] >= 0 ? t[k] : 0]));
   const d = p.daily;
   p.daily = d && typeof d.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(d.d) && Number.isInteger(d.best) && d.best >= 1 && Number.isInteger(d.streak) && d.streak >= 1
     ? { d: d.d, best: d.best, streak: d.streak } : null;
@@ -1651,7 +1654,7 @@ const dayStr = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() +
 function dailyKey(ds) {
   let x = 2166136261;
   for (const c of ds) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619) >>> 0; }
-  const keys = playable().flatMap(w => WORLDS[w].holes.slice(2).map(h => h.key));
+  const keys = allCourses().flatMap(w => WORLDS[w].holes.slice(2).map(h => h.key));
   return keys[x % keys.length];
 }
 function finishDaily(score) {
@@ -1715,15 +1718,51 @@ function nightDecor(group, h) {
   glow.rotation.x = -Math.PI / 2; glow.position.set(h.cup[0], y + 0.003, h.cup[1]); group.add(glow);
 }
 
+/* the tracker: birdies, eagles, albatrosses and aces, counted for life, and the best on every
+   `crazy` hole of a world. Wordless: a bird for each, bigger birds for rarer scores. */
+const BIRD_SVG = {
+  birdie: '<svg viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="18" ry="13" fill="#6fc0df"/><circle cx="43" cy="24" r="10" fill="#6fc0df"/><path d="M51 22 L60 25 L51 28 Z" fill="#ffb347"/><circle cx="45" cy="22" r="2.5" fill="#2f241a"/><path d="M16 34 Q28 24 36 36 Q26 44 16 34 Z" fill="#4a94b5"/><path d="M13 40 L4 34 L6 45 Z" fill="#4a94b5"/></svg>',
+  eagle: '<svg viewBox="0 0 64 64"><path d="M2 26 Q18 10 30 26 Q42 10 62 26 Q48 24 40 34 L24 34 Q16 24 2 26 Z" fill="#a8804e"/><ellipse cx="32" cy="38" rx="9" ry="12" fill="#8a6538"/><circle cx="32" cy="24" r="7" fill="#fffdf7"/><path d="M32 26 L38 30 L32 32 Z" fill="#ffd66e"/><circle cx="34" cy="22" r="1.8" fill="#2f241a"/><path d="M27 50 L32 58 L37 50 Z" fill="#8a6538"/></svg>',
+  alb: '<svg viewBox="0 0 64 64"><path d="M0 30 Q14 22 28 30 L36 30 Q50 22 64 30 Q50 34 36 36 L28 36 Q14 34 0 30 Z" fill="#fffdf7" stroke="#7d6bb8" stroke-width="3"/><ellipse cx="32" cy="34" rx="10" ry="6" fill="#fffdf7" stroke="#7d6bb8" stroke-width="3"/><circle cx="42" cy="30" r="5" fill="#fffdf7" stroke="#7d6bb8" stroke-width="3"/><path d="M46 30 L56 32 L46 34 Z" fill="#ffd66e"/><path d="M2 30 L10 29 M54 29 L62 30" stroke="#2f241a" stroke-width="3"/></svg>',
+  ace: '<svg viewBox="0 0 64 64"><path d="M22 58 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M24 9 L54 19 L24 29 Z" fill="#ef7d6d"/><ellipse cx="34" cy="56" rx="20" ry="6" fill="#5a4634"/><circle cx="44" cy="44" r="8" fill="#fffdf7" stroke="#e6d2ab" stroke-width="3"/><path d="M50 34 L54 28 M44 32 V25 M38 34 L34 28" stroke="#ffd66e" stroke-width="4" stroke-linecap="round"/></svg>',
+};
+const BIRD_KINDS = ['birdie', 'eagle', 'alb', 'ace'];
+const birdFor = (score, par) => par - score >= 3 ? 'alb' : par - score === 2 ? 'eagle' : par - score === 1 ? 'birdie' : null;
+function tallyHole(score, par) {
+  const t = progress.tally = Object.assign({ birdie: 0, eagle: 0, alb: 0, ace: 0 }, progress.tally), b = birdFor(score, par);
+  if (b) t[b]++;
+  if (score === 1) t.ace++;
+  /* the badge on the done card: the bird, then the score against par */
+  doneBadge.className = b ? 'show ' + b : '';
+  doneBadge.innerHTML = b ? BIRD_SVG[b] + `<span>${score - par}</span>` : '';
+  if (b) setTimeout(() => sfx(b === 'birdie' ? 'star' : 'fanfare', 2), 380);
+}
+function openTracker() {
+  sfx('tap');
+  const t = Object.assign({ birdie: 0, eagle: 0, alb: 0, ace: 0 }, progress.tally);
+  trackTotals.innerHTML = BIRD_KINDS.map(k => `<div class="tt ${k}" aria-label="${k}">${BIRD_SVG[k]}<span>${t[k]}</span></div>`).join('');
+  const w = worldOf(dayOf(mapWorld)), night = mapNight ? NIGHT : 0, cells = [];
+  coursesOf(w).forEach((c, ci) => WORLDS[c].holes.forEach((h, i) => {
+    if (!h.crazy) return;
+    const key = (night + c) + '-' + (i + 1), r = progress.holes[key], b = r && (r.best === 1 && !birdFor(1, h.par) ? 'ace' : birdFor(r.best, h.par));
+    cells.push(`<div class="tc${b ? ' ' + b : ''}${h.auto ? ' auto' : ''}" aria-label="course ${ci + 1} hole ${i + 1}"><span class="pips">${'<i></i>'.repeat(ci + 1)}</span><span class="n">${i + 1}</span>${b ? BIRD_SVG[b] : `<span class="best">${r ? r.best + '/' + h.par : h.par}</span>`}</div>`);
+  }));
+  trackGrid.innerHTML = cells.join('');
+  tracker.classList.add('show');
+}
+
 function initExtras() {
   nightBtn.addEventListener('click', () => { sfx('tap'); mapNight = !mapNight; mapWorld = mapNight ? NIGHT + dayOf(mapWorld) : dayOf(mapWorld); renderMap(); });
   practiceBtn.addEventListener('click', () => { sfx('tap'); practiceMode = !practiceMode; renderMap(); });
   dailyBtn.addEventListener('click', () => { const ds = dayStr(); goHole(dailyKey(ds), { daily: ds }); });
   doneShare.addEventListener('click', shareShot);
+  trophyBtn.addEventListener('click', openTracker);
+  trackClose.addEventListener('click', () => { sfx('tap'); tracker.classList.remove('show'); });
 }
 
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
+const CRAZY_SVG = '<svg class="crazy" viewBox="0 0 64 64" aria-hidden="true"><path d="M36 2 L12 36 H30 L24 62 L52 24 H34 Z" fill="#ffd66e" stroke="#c95a4c" stroke-width="4" stroke-linejoin="round"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
 const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 117, 310] : [1066 - (i - 9) * 117, 550]);
@@ -1765,14 +1804,25 @@ function showMap(w) {
 }
 function renderMap() {
   worldTabs.innerHTML = '';
+  const off = mapNight ? NIGHT : 0, curW = worldOf(dayOf(mapWorld));
   for (const d of WORLD_ORDER) {
-    const w = mapNight ? NIGHT + d : d, open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
-    b.className = 'btn' + (mapNight ? ' night' : '') + (w === mapWorld ? ' on' : '') + (open ? '' : ' locked');
+    const w = off + d, open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
+    b.className = 'btn' + (mapNight ? ' night' : '') + (d === curW ? ' on' : '') + (open ? '' : ' locked');
     b.setAttribute('aria-label', (mapNight ? 'night course ' : 'course ') + d);
     b.innerHTML = (lookOf(d).icon || `<span class="n">${d}</span>`) + (open ? '' : LOCK_SVG);
     b.onclick = () => { if (open) { mapWorld = w; sfx('tap'); renderMap(); } else sfx('boink'); };
     worldTabs.append(b);
   }
+  /* the world's three courses: 1, 2, 3, each opened by finishing the one before */
+  courseTabs.innerHTML = '';
+  coursesOf(curW).forEach((c, k) => {
+    const id = off + c, open = progress.worlds.includes(id) && !!WORLDS[id], b = document.createElement('button');
+    b.className = 'btn' + (id === mapWorld ? ' on' : '') + (open ? '' : ' locked');
+    b.setAttribute('aria-label', 'course ' + (k + 1));
+    b.innerHTML = `<span class="n">${k + 1}</span>` + (open ? '' : LOCK_SVG);
+    b.onclick = () => { if (open) { mapWorld = id; sfx('tap'); renderMap(); } else sfx('boink'); };
+    courseTabs.append(b);
+  });
   const holes = WORLDS[mapWorld] ? WORLDS[mapWorld].holes : [], pts = NODE_POS.slice(0, holes.length);
   pathLine.innerHTML = `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="var(--v-surface-line)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 34"/>`;
   holePath.innerHTML = '';
@@ -1782,7 +1832,9 @@ function renderMap() {
     b.className = 'btn node' + (open ? (rec ? '' : ' go') : ' locked');
     b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.animationDelay = (i * 0.03) + 's';
     b.setAttribute('aria-label', 'hole ' + (i + 1));
-    b.innerHTML = `<span class="n">${i + 1}</span>` + (rec ? `<span class="stars">${[0, 1, 2].map(k => STAR_SVG.replace('class="star"', `class="star${k < rec.stars ? ' on' : ''}"`)).join('')}</span><span class="best">${rec.best}</span>` : '') + (open ? '' : LOCK_SVG);
+    const hd = WORLDS[mapWorld].holes[i];
+    if (hd.crazy) b.classList.add('crazy');
+    b.innerHTML = `<span class="n">${i + 1}</span>` + (hd.crazy ? CRAZY_SVG : '') + (rec ? `<span class="stars">${[0, 1, 2].map(k => STAR_SVG.replace('class="star"', `class="star${k < rec.stars ? ' on' : ''}"`)).join('')}</span><span class="best">${rec.best}</span>` : '') + (open ? '' : LOCK_SVG);
     b.onclick = () => open ? goHole(key) : sfx('boink');
     holePath.append(b);
   });
@@ -1809,7 +1861,7 @@ function showCard(w) {
   cardTotal.textContent = total;
   cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
   cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
-  const list = playable(), nd = list[list.indexOf(dayOf(w)) + 1], next = nd && (isNight(w) ? NIGHT + nd : nd);
+  const list = playable(), d = dayOf(w), nd = WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd && (isNight(w) ? NIGHT + nd : nd);
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
   cardNext.onclick = () => { sfx('tap'); showMap(next); };
   showScene('card');

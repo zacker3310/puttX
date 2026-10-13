@@ -380,6 +380,43 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #dailyBtn .tally.show { display: block; }
 #dailyBtn.done { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); }
 @media (prefers-reduced-motion: reduce) { #lostPop.show, #doneObj .obj.new { animation: none; } }
+/* ---------- 16. COURSES, TRACKER, BADGES ---------- */
+#courseTabs { position: absolute; left: 416px; top: 124px; display: flex; gap: 8px; }
+#courseTabs .btn { position: relative; }
+#courseTabs .btn .n { font-size: 40px; }
+#courseTabs .btn.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#courseTabs .lock { position: absolute; right: -10px; top: -10px; width: 34px; height: 34px; }
+#trophyBtn { left: 712px; top: 124px; }
+#holePath .node .crazy { position: absolute; left: -12px; bottom: -10px; width: 34px; height: 34px; }
+#holePath .node.crazy:not(.locked) { border-color: var(--v-red-line); }
+#tracker { position: absolute; inset: 0; display: none; background: var(--v-scrim); z-index: 4; }
+#tracker.show { display: block; }
+#trackPanel { position: absolute; left: 150px; top: 60px; width: 900px; height: 580px; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .3s cubic-bezier(.3, 1.6, .5, 1) both; }
+#trackTotals { position: absolute; left: 30px; right: 30px; top: 26px; display: flex; justify-content: space-between; }
+#trackTotals .tt { width: 196px; height: 108px; border-radius: var(--v-r-lg); background: var(--v-bg, #fff8ec); border: 4px solid var(--v-surface-line);
+  display: flex; align-items: center; justify-content: center; gap: 10px; font: 800 48px var(--v-font); color: var(--v-ink-strong); }
+#trackTotals .tt svg { width: 72px; height: 72px; }
+#trackGrid { position: absolute; left: 30px; right: 30px; top: 160px; height: 290px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; align-content: start; overflow: hidden; }
+#trackGrid .tc { position: relative; height: 88px; border-radius: var(--v-r-lg); background: var(--v-mute); border: 4px solid var(--v-mute-line);
+  display: flex; align-items: center; justify-content: center; gap: 6px; font: 800 30px var(--v-font); color: var(--v-ink-strong); }
+#trackGrid .tc svg { width: 52px; height: 52px; }
+#trackGrid .tc .best { font-size: 20px; color: var(--v-ink-soft); }
+#trackGrid .tc .pips { position: absolute; left: 8px; top: 6px; display: flex; gap: 3px; }
+#trackGrid .tc .pips i { width: 8px; height: 8px; border-radius: 50%; background: var(--v-ink-soft); }
+#trackGrid .tc.auto { border-style: dashed; }
+#trackGrid .tc.birdie { background: #d7eef7; border-color: var(--v-blue-line); }
+#trackGrid .tc.eagle { background: #f3e2c2; border-color: #a8804e; }
+#trackGrid .tc.alb { background: #e6defa; border-color: #7d6bb8; }
+#trackGrid .tc.ace { background: #fbd9d3; border-color: var(--v-red-line); }
+#trackClose { left: 50%; margin-left: -44px; bottom: 26px; }
+#doneBadge { position: absolute; left: 22px; top: 150px; display: none; align-items: center; gap: 2px; padding: 4px 10px 4px 4px; border-radius: 999px;
+  background: var(--v-accent-yellow); border: 4px solid var(--v-yellow-line); font: 800 30px var(--v-font); color: var(--v-ink-strong); pointer-events: none; }
+#doneBadge.show { display: flex; animation: popIn .45s .45s cubic-bezier(.3, 1.6, .5, 1) both; }
+#doneBadge svg { width: 60px; height: 60px; }
+#doneBadge.eagle { background: #f3e2c2; border-color: #a8804e; }
+#doneBadge.alb { background: #e6defa; border-color: #7d6bb8; }
+@media (prefers-reduced-motion: reduce) { #trackPanel, #doneBadge.show { animation: none; } }
 </style>
 </head>
 <body>
@@ -422,6 +459,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div class="live" id="holeDone" aria-label="hole done">
       <div class="stars"><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg></div>
       <div class="score"><span id="doneStrokes">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
+      <div id="doneBadge" aria-label="under par"></div>
       <div id="doneObj" aria-label="goals"><i class="obj" data-k="0" aria-label="under par"><svg viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="20" ry="14" fill="currentColor"/><circle cx="44" cy="22" r="11" fill="currentColor"/><path d="M53 20 L62 24 L53 27 Z" fill="#ef7d6d"/><circle cx="46" cy="20" r="2.6" fill="#fffdf7"/><path d="M14 34 Q26 26 34 36 Q24 44 14 34 Z" fill="#fffdf7" opacity=".55"/><path d="M10 38 L2 32 L4 42 Z" fill="currentColor"/></svg></i><i class="obj" data-k="1" aria-label="no walls"><svg viewBox="0 0 64 64"><rect x="8" y="14" width="20" height="12" rx="2" fill="currentColor"/><rect x="32" y="14" width="24" height="12" rx="2" fill="currentColor"/><rect x="8" y="30" width="28" height="12" rx="2" fill="currentColor"/><rect x="40" y="30" width="16" height="12" rx="2" fill="currentColor"/><path d="M8 56 L56 6" stroke="#fffdf7" stroke-width="10" stroke-linecap="round"/><path d="M8 56 L56 6" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></i><i class="obj" data-k="2" aria-label="lost ball"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg></i></div>
       <button class="btn" id="doneShare" aria-label="share this putt"><svg viewBox="0 0 64 64"><path d="M32 40 V8 M20 20 L32 8 L44 20" fill="none" stroke="#a8804e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 30 V54 H50 V30" fill="none" stroke="#a8804e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="btn" id="doneMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
@@ -444,6 +482,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <button class="btn" id="shopBtn" aria-label="pro shop"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="11" y="28" width="42" height="28" rx="4" fill="#fff8ec" stroke="#a8804e" stroke-width="4"/><rect x="26" y="36" width="12" height="20" rx="3" fill="#6fc0df"/><path d="M6 12 H58 L58 24 H6 Z" fill="#ef7d6d"/><path d="M19 12 V24 M32 12 V24 M45 12 V24" stroke="#fff8ec" stroke-width="6"/><path d="M6 24 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 Z" fill="#c95a4c"/></svg></button>
     <button class="btn" id="nightBtn" aria-label="night courses"><svg viewBox="0 0 64 64"><path d="M40 8 A24 24 0 1 0 56 42 A20 20 0 0 1 40 8 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4" stroke-linejoin="round"/><circle cx="16" cy="14" r="3" fill="#ffd66e"/><circle cx="54" cy="16" r="2.5" fill="#ffd66e"/></svg></button>
     <button class="btn" id="practiceBtn" aria-label="practice"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#fffdf7" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="15" fill="none" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="5" fill="#ef7d6d"/></svg></button>
+    <div id="courseTabs"></div>
+    <button class="btn" id="trophyBtn" aria-label="birdie tracker"><svg viewBox="0 0 64 64"><path d="M18 8 H46 V22 A14 14 0 0 1 18 22 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><path d="M18 12 H8 Q8 26 20 28 M46 12 H56 Q56 26 44 28" fill="none" stroke="#dca63f" stroke-width="4"/><path d="M32 36 V46 M20 56 H44 L40 46 H24 Z" fill="#dca63f" stroke="#dca63f" stroke-width="4" stroke-linejoin="round"/></svg></button>
+    <div id="tracker" class="live" aria-label="tracker"><div id="trackPanel"><div id="trackTotals"></div><div id="trackGrid"></div><button class="btn go" id="trackClose" aria-label="close"><svg viewBox="0 0 64 64"><path d="M14 34 L26 46 L50 20" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
     <div class="chip" id="mapLost" aria-label="lost balls found"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg><span id="mapLostN">0</span></div>
     <svg id="pathLine" viewBox="0 0 1200 700" aria-hidden="true"></svg>
     <div id="holePath"></div>

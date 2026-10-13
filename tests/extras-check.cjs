@@ -67,6 +67,23 @@ const SHOTS = process.env.PUTTX_SHOTS;
   check('done card: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
   if (SHOTS) await page.screenshot({ path: SHOTS + '/done.png' });
 
+  /* the tracker and the under-par badge */
+  const trk = await page.evaluate(`(() => {
+    const t0 = Object.assign({ birdie: 0, eagle: 0, alb: 0, ace: 0 }, progress.tally);
+    goHole(playable()[0] + '-3'); skipIntro(); ${sinkHere};
+    const t1 = progress.tally, badge = doneBadge.classList.contains('show') && /^-[0-9]$/.test(doneBadge.textContent);
+    showMap(playable()[0]); trophyBtn.click();
+    const totals = trackTotals.children.length, cells = trackGrid.children.length;
+    const crazy = allCourses().map(c => WORLDS[c].holes.filter(h => h.crazy).length);
+    trackClose.click();
+    return { ace: t1.ace - t0.ace, under: t1.birdie + t1.eagle + t1.alb - t0.birdie - t0.eagle - t0.alb, badge, totals, cells, crazy, tabs: courseTabs.children.length, want: coursesOf(playable()[0]).length };
+  })()`);
+  check('an ace under par counts on the tracker and pops a bird badge with the score', trk.ace === 1 && trk.under === 1 && trk.badge, JSON.stringify(trk));
+  check('the tracker shows four totals and a tile per crazy hole of the world; the map shows its courses', trk.totals === 4 && trk.tabs === trk.want, JSON.stringify(trk));
+  await page.evaluate(() => trophyBtn.click());
+  check('tracker: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
+  await page.evaluate(() => trackClose.click());
+
   /* daily */
   const daily = await page.evaluate(`(() => {
     const ds = dayStr(), k = dailyKey(ds), same = dailyKey(ds) === k && !!holeAt(k);

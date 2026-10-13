@@ -172,7 +172,7 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
 
   /* 10. sinking pulls the pin, rests the ball in the cup off the pole, scores and saves */
   const fin = await page.evaluate(() => {
-    startHole('97-1'); loopPaused = true;
+    progress.worlds.push(97); startHole('97-1'); loopPaused = true;   /* only holes you have reached are saved */
     play.ball = newBall(play.hole, 0, 5.2);
     beginPutt(0, 0.02);
     let pinOut = 0, gap = Infinity;

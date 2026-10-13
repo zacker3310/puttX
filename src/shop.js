@@ -4,7 +4,8 @@
      renderWallet()                      the map was redrawn
    Save fields (kept by loadProgress, repaired here): progress.coins (whole, >= 0),
    progress.owned (item ids), progress.equipped {putter, ball}, progress.firsts (hole keys
-   that already paid the first-clear bonus). Coins only ever go down by buying.
+   that already paid the first-clear bonus), progress.mulligans (whole, >= 0, default 5: the shop
+   sells packs of these tokens, the game spends them). Coins only ever go down by buying.
    Putters set FEEL from FEEL_BASE (how a pad gesture becomes angle and power), never the
    physics, so every hole proof still holds. Balls are looks only. */
 
@@ -91,7 +92,7 @@ const BALLS = [
 ];
 /* mulligan token packs: the game spends progress.mulligans when a putt is taken back */
 const PACKS = [{ id: 'm3', n: 3, price: 60 }, { id: 'm10', n: 10, price: 180 }, { id: 'm25', n: 25, price: 400 }];
-const MULL_START = 5, MULL_MAX = 999;
+const MULL_START = 5, MULL_MAX = 9999;
 const PREMIUM = 250;
 const SHOP_ITEMS = {};
 for (const p of PUTTERS) SHOP_ITEMS[p.id] = Object.assign(p, { kind: 'putter' });
@@ -122,9 +123,9 @@ function shopRepair(p) {
   /* an older save already cleared some holes: those do not pay the first-clear bonus again */
   const firsts = Array.isArray(p.firsts) ? p.firsts : holes;
   p.firsts = [...new Set(firsts.filter(k => typeof k === 'string' && /^\d+-\d+$/.test(k)))];
-  /* mulligan tokens: a fresh or older save starts with 5; junk resets to 5, odd numbers floor and clamp */
-  const m = p.mulligans;
-  p.mulligans = typeof m === 'number' && Number.isFinite(m) ? clamp(Math.floor(m), 0, MULL_MAX) : MULL_START;
+  /* mulligan tokens (the same rule as the game's repairExtras): a fresh or older save starts with 5,
+     anything but a whole number >= 0 resets to 5, and it tops out at MULL_MAX */
+  p.mulligans = Number.isInteger(p.mulligans) && p.mulligans >= 0 ? Math.min(p.mulligans, MULL_MAX) : MULL_START;
   return p;
 }
 const owns = id => progress.owned.includes(id);
@@ -346,8 +347,8 @@ const PUTTER_HEADS = {
   },
   wood(L) {
     const t = headTex.wood(), m = hmat('#ffffff', { map: t, roughness: 0.7 }), dark = hmat('#7a4a26', { roughness: 0.7 });
-    return [hp(along(0.024, 0.024, 0.15, 24), m, [0, 0.024, ZC], [0, 0, AX]),
-      hp(along(0.0255, 0.0255, 0.012, 24), dark, [-0.058, 0.024, ZC], [0, 0, AX]), hp(along(0.0255, 0.0255, 0.012, 24), dark, [0.058, 0.024, ZC], [0, 0, AX]),
+    return [hp(along(0.024, 0.024, 0.15, 24), m, [0, 0.0245, ZC], [0, 0, AX]),
+      hp(along(0.025, 0.025, 0.012, 24), dark, [-0.058, 0.0252, ZC], [0, 0, AX]), hp(along(0.025, 0.025, 0.012, 24), dark, [0.058, 0.0252, ZC], [0, 0, AX]),
       hp(along(0.021, 0.021, 0.01, 24), hmat('#e9b872', { roughness: 0.8 }), [-0.08, 0.024, ZC], [0, 0, AX]), hp(along(0.021, 0.021, 0.01, 24), hmat('#e9b872', { roughness: 0.8 }), [0.08, 0.024, ZC], [0, 0, AX])];
   },
   candy() {
@@ -377,11 +378,11 @@ const PUTTER_HEADS = {
       hp(ball(0.0035, 10, 8), k, [-0.062, 0.066, ZC - 0.012]), hp(ball(0.0035, 10, 8), k, [-0.062, 0.066, ZC + 0.012])];
   },
   banana(L) {
-    const pts = [[-0.074, 0.036], [-0.04, 0.02], [0, 0.016], [0.04, 0.02], [0.074, 0.036]].map(([px, py]) => new THREE.Vector3(px, py, ZC));
+    const pts = [[-0.064, 0.034], [-0.034, 0.02], [0, 0.016], [0.034, 0.02], [0.064, 0.034]].map(([px, py]) => new THREE.Vector3(px, py, ZC));
     const brown = hmat('#6b4a2a', { roughness: 0.7 });
     return [hp(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 32, 0.016, 14, false), hmat(L.head, { roughness: 0.4 })),
-      hp(ball(0.016, 16, 12), hmat(L.head, { roughness: 0.4 }), [-0.074, 0.036, ZC]), hp(ball(0.016, 16, 12), hmat(L.head, { roughness: 0.4 }), [0.074, 0.036, ZC]),
-      hp(new THREE.CylinderGeometry(0.005, 0.007, 0.014, 10), brown, [-0.084, 0.044, ZC], [0, 0, 0.9]), hp(ball(0.006, 10, 8), brown, [0.088, 0.038, ZC])];
+      hp(ball(0.016, 16, 12), hmat(L.head, { roughness: 0.4 }), [-0.064, 0.034, ZC]), hp(ball(0.016, 16, 12), hmat(L.head, { roughness: 0.4 }), [0.064, 0.034, ZC]),
+      hp(new THREE.CylinderGeometry(0.005, 0.007, 0.014, 10), brown, [-0.078, 0.04, ZC], [0, 0, 0.9]), hp(ball(0.006, 10, 8), brown, [0.079, 0.036, ZC])];
   },
   bone(L) {
     const m = hmat(L.head, { roughness: 0.5 }), out = [hp(along(0.012, 0.012, 0.13, 18), m, [0, 0.022, ZC], [0, 0, AX])];
@@ -463,11 +464,11 @@ const PUTTER_HEADS = {
     gem.userData.pulse = 0.7;
     out.push(hp(new THREE.BoxGeometry(0.16, 0.02, 0.016), g, [0, 0.014, -0.009]));
     for (const sx of [-1, 1]) out.push(hp(ball(0.011, 16, 12), g, [sx * 0.076, 0.016, -0.011]));
-    for (const [px, len] of [[-0.062, 0.022], [0, 0.026], [0.062, 0.022]]) {
+    for (const [px, len] of [[-0.062, 0.018], [0, 0.022], [0.062, 0.018]]) {
       out.push(hp(new THREE.CylinderGeometry(0.0055, 0.0055, len, 12), g, [px, 0.014, -0.017 - len / 2], [AX, 0, 0]));
       out.push(hp(new THREE.ConeGeometry(0.009, 0.014, 4), g, [px, 0.014, -0.017 - len - 0.006], [-AX, 0, 0]));
     }
-    out.push(hp(new THREE.OctahedronGeometry(0.011), gem, [0, 0.03, -0.009]));
+    out.push(hp(new THREE.OctahedronGeometry(0.01), gem, [0, 0.03, -0.012]));
     return out;
   },
   neon(L) {

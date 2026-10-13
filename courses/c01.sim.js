@@ -76,7 +76,7 @@ registerWorld(1, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.8, 7.6, 0.8, 8) }],
     bumps: [{ x: -0.35, z: 5.6, r: 0.35, h: 0.1 }] },
   /* 13: cement mixer (3 parts). Up the narrow ramp under the crane or the long side ramp, then into the crater */
-  { par: 4, sol: [[338,0.84,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
+  { par: 4, sol: [[338,0.96,0]], tee: [0, 0.5], cup: [0.85, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
     tiers: [{ poly: rect(-1.5, 5, 1.5, 8.5), h: 0.3 }],
     ramps: [{ x0: -0.3, z0: 3.8, x1: 0.3, z1: 5, axis: 'z', h0: 0, h1: 0.3 },
             { x0: -1.5, z0: 2.8, x1: -0.8, z1: 5, axis: 'z', h0: 0, h1: 0.3 }],
@@ -85,7 +85,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.85, z: 7.6, r: 0.5, h: -0.1 }],
     zones: [{ surf: 'sand', poly: rect(0.45, 3.2, 1.5, 5) }, { surf: 'sand', poly: rect(-1.5, 8.1, 1.5, 8.5) }] },
   /* 14: belt yard. Three belts run alternate ways between the girders */
-  { par: 3, sol: [[48.75,0.99,0]], tee: [0, 0.5], cup: [-1, 7.3], shape: rect(-1.8, 0, 1.8, 8),
+  { par: 3, sol: [[50,1,0]], tee: [0, 0.5], cup: [-1, 7.3], shape: rect(-1.8, 0, 1.8, 8),
     inner: [[[-1.8, 3.3], [0.4, 3.3]], [[-0.4, 5.1], [1.8, 5.1]]],
     zones: [{ push: [1.5, 0], poly: rect(-1.8, 2, 1.8, 2.8) }, { push: [-1.5, 0], poly: rect(-1.8, 3.8, 1.8, 4.6) },
             { push: [1.5, 0], poly: rect(-1.8, 5.6, 1.8, 6.4) }, { surf: 'sand', poly: rect(-0.2, 6.8, 0.6, 8) }] },

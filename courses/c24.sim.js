@@ -33,12 +33,12 @@ registerWorld(24, { holes: [
     zones: [{ surf: 'water', poly: C24_POOL(0.5, 5.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 3.0, 1.4, 4.4) }],
     bumps: [{ x: -0.5, z: 5.8, r: 0.5, h: 0.08 }], posts: [C24_MAN(0.3, 6.2)] },
   /* 5. sinkhole lift: roll into the sinkhole and its cave lifts you to the high shelf; drop off the shelf to the cup */
-  { par: 3, sol: [[358,1,0],[104,0.92,0]], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
+  { par: 3, sol: [[335,1,0],[100,1,0]], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }], ramps: [{ x0: -1.4, z0: 3.8, x1: -0.4, z1: 4.6, axis: 'z', h0: 0, h1: 0.3 }],
     bumps: [{ x: -0.6, z: 2.6, r: 0.6, h: -0.25 }, { x: 0.9, z: 2.0, r: 0.5, h: 0.06 }], tubes: [{ a: [-0.6, 2.6], b: [-0.4, 5.6], dir: 90 }],
     zones: [{ surf: 'ice', poly: rect(-1.4, 4.6, 1.4, 6.6) }], posts: [C24_MAN(0.9, 5.6)] },
   /* 6. lift tower: up the lift ramp past the first bar or the cave onto the deck, then through the fence gap past the second bar, down to the lake */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.6, 8.6], shape: rect(-1.4, 0, 1.4, 9.4), inner: [[[-1.4, 6.0], [-0.3, 6.0]], [[0.3, 6.0], [1.4, 6.0]]],
+  { par: 4, sol: [[0,0.917,0],[20,1,0]], tee: [0, 0.5], cup: [-0.6, 8.6], shape: rect(-1.4, 0, 1.4, 9.4), inner: [[[-1.4, 6.0], [-0.3, 6.0]], [[0.3, 6.0], [1.4, 6.0]]],
     ramps: [{ x0: -0.45, z0: 2.0, x1: 0.45, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }], tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.0), h: 0.3 }],
     movers: [C24_LIFT(-0.8, 4.0, 0.8, 4.0, 0.35, 90, 3.2), C24_LIFT(-0.5, 5.75, 0.5, 5.75, 0.25, 90, 2.6, 1)], tubes: [{ a: [1.0, 1.4], b: [0.9, 4.9], dir: 330 }],
     zones: [{ surf: 'water', poly: C24_POOL(0.5, 8.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 6.0, 1.4, 7.4) }],
@@ -81,7 +81,7 @@ registerWorld(24, { holes: [
     tiers: [{ poly: rect(-1.2, 6.9, 1.8, 8.4), h: 0.2 }], zones: [{ surf: 'ice', poly: rect(1.1, 3.6, 1.5, 4.4) }],
     movers: [C24_BALL(-0.6, 5.6, 1.2, 5.6, 3.0)], bumps: [{ x: 0.3, z: 4.9, r: 0.25, h: 0.08 }], posts: [C24_MAN(0.4, 7.7)] },
   /* 12. twin chutes: the icy chute past the open water or the mogul chute, onto the terrace, then through the gated fence to the cup */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
+  { par: 4, sol: [[295,0.667,2],[150,0.84,0]], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
     inner: [[[0, 1.6], [0, 5.6]], [[-1.4, 7.0], [-0.3, 7.0]], [[0.3, 7.0], [1.4, 7.0]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.4), h: 0.42 }, { poly: rect(-1.4, 5.6, 1.4, 7.0), h: 0.14 }],
     ramps: [{ x0: -1.4, z0: 1.4, x1: 1.4, z1: 5.6, axis: 'z', h0: 0.42, h1: 0.14 }],
@@ -118,7 +118,7 @@ registerWorld(24, { holes: [
     movers: [C24_BALL(-0.8, 2.2, 0.8, 2.2, 2.6), C24_BALL(0.8, 4.2, -0.8, 4.2, 3.0, 1), C24_BALL(-0.7, 7.6, 0.7, 7.6, 2.4, 2)],
     zones: [{ surf: 'ice', poly: rect(-1.2, 3.0, 1.2, 6.4) }], posts: [C24_MAN(0.6, 5.4), C24_MAN(-0.5, 8.8)] },
   /* 17. cave maze: four chambers; walk the gaps round or chain the caves through the middle */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [-0.9, 8.0], aim0: 0, shape: rect(-1.6, 0, 1.6, 9.0),
+  { par: 4, crazy: true, sol: [[45,1,0],[40,0.833,0]], tee: [0, 0.5], cup: [-0.9, 8.0], aim0: 0, shape: rect(-1.6, 0, 1.6, 9.0),
     inner: [[[-1.6, 2.4], [1.0, 2.4]], [[-1.0, 4.6], [1.6, 4.6]], [[-1.6, 6.8], [1.0, 6.8]]],
     tubes: [{ a: [-0.9, 1.8], b: [0.9, 3.0], dir: 0 }, { a: [0.0, 4.0], b: [-0.9, 5.2], dir: 90 }, { a: [0.9, 6.2], b: [0.9, 7.4], dir: 270 }],
     tiers: [{ poly: rect(-1.6, 6.8, 1.6, 9.0), h: 0.15 }], ramps: [{ x0: 1.0, z0: 6.2, x1: 1.6, z1: 7.4, axis: 'z', h0: 0, h1: 0.15 }],

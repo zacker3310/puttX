@@ -81,7 +81,7 @@ registerWorld(14, { holes: [
     tubes: [{ a: [-1.0, 1.9], b: [-0.4, 5.3], dir: 20 }, { a: [1.0, 3.9], b: [1.0, 5.3], dir: 340 }],
     zones: [{ surf: 'ice', poly: rect(-1.6, 4.6, 1.6, 7.2) }], bumps: [{ x: 0.2, z: 6.4, r: 0.55, h: 0.1 }], posts: [C14_MAN(-0.5, 6.6), C14_MAN(0.0, 1.5)] },
   /* 13. avalanche terraces: four terraces down the mountain, each snow fence open at a different end */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [0.5, 8.2], shape: rect(-1.4, 0, 1.4, 9),
+  { par: 4, crazy: true, sol: [[55,0.917,0],[340.25,0.85,2]], tee: [0, 0.5], cup: [0.5, 8.2], shape: rect(-1.4, 0, 1.4, 9),
     inner: [[[-1.4, 1.8], [0.6, 1.8]], [[-0.6, 4.0], [1.4, 4.0]], [[-1.4, 6.2], [-0.3, 6.2]], [[0.3, 6.2], [1.4, 6.2]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.8), h: 0.42 }, { poly: rect(-1.4, 1.8, 1.4, 4.0), h: 0.28 }, { poly: rect(-1.4, 4.0, 1.4, 6.2), h: 0.14 }],
     zones: [{ surf: 'water', poly: C14_POOL(0.2, 3.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 1.8, 1.4, 4.0) }],
@@ -100,14 +100,14 @@ registerWorld(14, { holes: [
     posts: [C14_MAN(-0.3, 2.8), C14_MAN(0.3, 3.8), C14_MAN(-0.2, 4.8), C14_MAN(0.85, 8.3)], movers: [C14_BALL(-0.4, 5.5, 0.4, 5.5, 2.6)],
     zones: [{ surf: 'water', poly: C14_POOL(-0.5, 7.4, 0.35, 0.3) }, { surf: 'ice', poly: rect(-1.2, 6.0, 1.2, 7.0) }] },
   /* 16. sinkholes: two icy bowls, each with a cave at the bottom; one comes out on the cup shelf, one back on the deck */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.6, 0, 1.6, 8.2),
+  { par: 4, sol: [[5,0.583,0],[20,0.44,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.6, 0, 1.6, 8.2),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }, { poly: rect(-1.6, 6.2, 1.6, 8.2), h: 0.2 }],
     ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.7, z: 3.4, r: 0.75, h: -0.3 }, { x: 0.8, z: 4.4, r: 0.75, h: -0.3 }],
     tubes: [{ a: [-0.7, 3.4], b: [-0.9, 6.8], dir: 90 }, { a: [0.8, 4.4], b: [1.2, 1.0], dir: 270 }],
     zones: [{ surf: 'ice', poly: rect(-1.6, 1.6, 1.6, 5.6) }], posts: [C14_MAN(1.0, 7.8)] },
   /* 17. lift chain: up the lift ramp past the first bar, up the side ramp past the second, off the top deck to the lake */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [-0.5, 9.6], shape: rect(-1.4, 0, 1.4, 10.4),
+  { par: 5, crazy: true, sol: [[350,1,0],[0,0.25,0]], tee: [0, 0.5], cup: [-0.5, 9.6], shape: rect(-1.4, 0, 1.4, 10.4),
     ramps: [{ x0: -0.45, z0: 1.6, x1: 0.45, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.4, z0: 5.2, x1: -0.5, z1: 6.4, axis: 'z', h0: 0.2, h1: 0.42 }],
     tiers: [{ poly: rect(-1.4, 3.0, 1.4, 6.4), h: 0.2 }, { poly: rect(-1.4, 6.4, 1.4, 8.0), h: 0.42 }],
     movers: [C14_LIFT(-0.8, 3.5, 0.8, 3.5, 0.35, 90, 3.0), C14_LIFT(-0.8, 6.9, 0.8, 6.9, 0.35, 90, 2.6, 1.5), C14_BALL(0.0, 8.7, 1.0, 8.7, 2.4)],

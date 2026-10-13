@@ -129,7 +129,7 @@ registerWorld(13, { holes: [
     movers: [J13_ROCK(-0.27, 2.9, 0.27, 2.9, 1.8, 0, 0.15), J13_ROCK(0.27, 4.9, -0.27, 4.9, 2.2, 1, 0.15), J13_ROCK(0, 6.3, 0, 7.9, 2.6, 0, 0.15)],
     posts: [J13_IDOL(-1.0, 8.0, 0.11)], bumps: [{ x: -1.6, z: 7.5, r: 0.45, h: -0.06 }] },
   /* 18: the sun temple: two stairs, the stone door before the idol's mouth, then jump the river to the boulder green */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0.3, 9.8], shape: rect(-1.5, 0, 1.5, 10.4),
+  { par: 5, crazy: true, sol: [[153, 1, 0], [315, 0.9, 0], [0, 0.55, 0]], tee: [0, 0.5], cup: [0.3, 9.8], shape: rect(-1.5, 0, 1.5, 10.4),
     ramps: [{ x0: 0.8, z0: 2.0, x1: 1.5, z1: 2.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.5, z0: 4.3, x1: -0.8, z1: 5.0, axis: 'z', h0: 0.2, h1: 0.4 },
       { x0: -0.4, z0: 7.4, x1: 0.4, z1: 8.0, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-1.5, 2.8, 1.5, 5.0), h: 0.2 }, { poly: rect(-1.5, 5.0, 1.5, 6.5), h: 0.4 }],

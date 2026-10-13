@@ -34,7 +34,7 @@ registerWorld(11, { holes: [
     tubes: [{ a: [0.35, 2.4], b: [-2.6, 3.75], dir: 0 }],
     bumps: [{ x: 0, z: 4.3, r: 0.45, h: 0.15 }] },
   /* 5: double deck (3 parts). Two plank ramps on opposite sides, then a jib on the top deck */
-  { par: 3, sol: [[28,0.86,0],[324,0.93,0]], tee: [0, 0.5], cup: [0.6, 8.3], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[28,0.86,0],[324,1,1]], tee: [0, 0.5], cup: [0.6, 8.3], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 3.2, 1.2, 6), h: 0.2 }, { poly: rect(-1.2, 6, 1.2, 9), h: 0.4 }],
     ramps: [{ x0: 0.5, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 },
             { x0: -1.2, z0: 4.8, x1: -0.5, z1: 6, axis: 'z', h0: 0.2, h1: 0.4 }],
@@ -67,7 +67,7 @@ registerWorld(11, { holes: [
             { surf: 'sand', poly: rect(-1.6, 4.4, -1, 5.4) }],
     bumps: [{ x: -0.5, z: 0.6, r: 0.3, h: 0.08 }] },
   /* 9: tower drop (3 parts). Off the scaffold, through twin cranes, then up the ramp past the boom */
-  { par: 3, crazy: true, sol: [[332,0.79,0],[236,0.86,0]], tee: [0, 0.5], cup: [0.6, 9.1], shape: rect(-1.3, 0, 1.3, 10),
+  { par: 3, crazy: true, sol: [[332,0.79,0],[237.5,0.88,1]], tee: [0, 0.5], cup: [0.6, 9.1], shape: rect(-1.3, 0, 1.3, 10),
     tiers: [{ poly: rect(-1.3, 0, 1.3, 3), h: 0.4 }, { poly: rect(-1.3, 7.6, 1.3, 10), h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 6.4, x1: 0.4, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     inner: [[[-1.3, 7.6], [-0.4, 7.6]], [[0.4, 7.6], [1.3, 7.6]]],
@@ -137,7 +137,7 @@ registerWorld(11, { holes: [
     movers: [{ kind: 'spin', x: -0.2, z: 7.4, len: 0.5, w: 1.3, phase: 0, look: 'crane' }],
     bumps: [{ x: 0.7, z: 8.4, r: 0.4, h: -0.06 }] },
   /* 17: deck relay (4 parts). Ramp to the deck, slip the side boom, drop the chute or take the pipe, then the belt pocket */
-  { par: 4, crazy: true, sol: [[0,0.93,0],[52,0.86,0]], tee: [-0.8, 0.5], cup: [-0.9, 9.6], aim0: 0, shape: rect(-1.6, 0, 1.6, 10.4),
+  { par: 4, crazy: true, sol: [[0,0.93,0],[52,0.89,0]], tee: [-0.8, 0.5], cup: [-0.9, 9.6], aim0: 0, shape: rect(-1.6, 0, 1.6, 10.4),
     tiers: [{ poly: rect(-1.6, 3.2, 1.6, 6.2), h: 0.35 }],
     ramps: [{ x0: -1.2, z0: 2, x1: -0.4, z1: 3.2, axis: 'z', h0: 0, h1: 0.35 }],
     inner: [[[-1.6, 3.2], [-1.2, 3.2]], [[-0.4, 3.2], [1.6, 3.2]], [[0, 3.2], [0, 4.5]], [[0, 5.1], [0, 6.2]],

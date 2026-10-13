@@ -122,7 +122,7 @@ registerWorld(17, { holes: [
     movers: [C17_GHOST(-1.0, 2.6, 1.0, 2.6, 3.0, 0), C17_GHOST(1.0, 4.0, -1.0, 4.0, 2.4, 1.2)] },
   /* 17: the crypt descent: three floating floors; leap through the portcullis, over the windmill
      deck and down to the crypt, or find the passage that skips the middle */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [-0.3, 9.0], floors: [rect(-0.8, 0, 0.8, 3.0), rect(-1.4, 3.6, 1.4, 6.4), rect(-1.0, 7.0, 1.0, 10)],
+  { par: 4, crazy: true, sol: [[328,1,0],[28,0.6875,0]], tee: [0, 0.5], cup: [-0.3, 9.0], floors: [rect(-0.8, 0, 0.8, 3.0), rect(-1.4, 3.6, 1.4, 6.4), rect(-1.0, 7.0, 1.0, 10)],
     tiers: [{ poly: rect(-0.8, 0, 0.8, 3.0), h: 0.45 }, { poly: rect(-1.4, 3.6, 1.4, 6.4), h: 0.22 }],
     walls: [[[-0.25, 3.0], [-0.8, 3.0], [-0.8, 0], [0.8, 0], [0.8, 3.0], [0.25, 3.0]],
       [[-0.5, 3.6], [-1.4, 3.6], [-1.4, 6.4], [-0.3, 6.4]], [[0.5, 3.6], [1.4, 3.6], [1.4, 6.4], [0.3, 6.4]],

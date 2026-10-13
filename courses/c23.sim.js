@@ -36,7 +36,7 @@ registerWorld(23, { holes: [
     inner: [[[-1, 2.4], [0.3, 2.4]], [[0.8, 2.4], [1, 2.4]], [[-1, 4.4], [-0.8, 4.4]], [[-0.3, 4.4], [1, 4.4]], [[-1, 6.4], [-0.25, 6.4]], [[0.25, 6.4], [1, 6.4]]],
     zones: [J23_WATER(rect(0.3, 2.4, 1, 2.9))], posts: [J23_IDOL(-0.4, 1.6), J23_IDOL(-0.55, 5.3), J23_IDOL(0, 7.3)] },
   /* 6: the stone door over the drop, the pool terrace, then down to the cup; or the tunnel */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [-0.6, 8.0], shape: [[-1.2, 0], [1.2, 0], [1.2, 3], [1.2, 6], [1.2, 9], [-1.2, 9], [-1.2, 6], [-1.2, 3]],
+  { par: 4, sol: [[0, 0.7, 1], [0, 0.35, 0]], tee: [0, 0.5], cup: [-0.6, 8.0], shape: [[-1.2, 0], [1.2, 0], [1.2, 3], [1.2, 6], [1.2, 9], [-1.2, 9], [-1.2, 6], [-1.2, 3]],
     tiers: [{ poly: rect(-1.2, 0, 1.2, 3), h: 0.4 }, { poly: rect(-1.2, 3, 1.2, 6), h: 0.2 }],
     inner: [[[-1.2, 3], [-0.35, 3]], [[0.35, 3], [1.2, 3]], [[-1.2, 6], [0.6, 6]]],
     movers: [J23_DOOR(-0.6, 3, 0.6, 3, 0.25, 3.0)],
@@ -57,13 +57,13 @@ registerWorld(23, { holes: [
     tubes: [{ a: [-0.7, 4.2], b: [0.6, 6.0], dir: 0, keep: 0, add: 0.45 }],
     zones: [J23_MUD(rect(-1, 3.2, -0.4, 3.6))], posts: [J23_IDOL(0.1, 3.8), J23_IDOL(0.1, 6.6)] },
   /* 9: the leap: fly the kicker over the pool or tiptoe the muddy edge, then up the stair past the boulder */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.4, 8.4], shape: [[-1.2, 0], [1.2, 0], [1.2, 7], [1.2, 9], [-1.2, 9], [-1.2, 7]],
+  { par: 4, sol: [[150, 1, 0], [6, 0.75, 0]], tee: [0, 0.5], cup: [0.4, 8.4], shape: [[-1.2, 0], [1.2, 0], [1.2, 7], [1.2, 9], [-1.2, 9], [-1.2, 7]],
     ramps: [{ x0: -0.3, z0: 2.6, x1: 0.3, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }, { x0: -1.2, z0: 6.4, x1: -0.5, z1: 7.0, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.2, 7, 1.2, 9), h: 0.25 }],
     zones: [J23_WATER(rect(-1.2, 3.6, 0.8, 4.6)), J23_MUD(rect(0.8, 3.6, 1.2, 4.6))],
     movers: [J23_ROCK(-0.7, 7.6, 0.7, 7.6, 2.4)], posts: [J23_IDOL(0.5, 5.6), J23_IDOL(-0.5, 5.0)] },
   /* 10: two stone doors, two drops, a side tunnel round the second door, and a crater cup */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.3, 8.8], shape: [[-1, 0], [1, 0], [1, 3.2], [1, 6.4], [1, 9.6], [-1, 9.6], [-1, 6.4], [-1, 3.2]],
+  { par: 4, sol: [[3, 0.8, 2]], tee: [0, 0.5], cup: [0.3, 8.8], shape: [[-1, 0], [1, 0], [1, 3.2], [1, 6.4], [1, 9.6], [-1, 9.6], [-1, 6.4], [-1, 3.2]],
     tiers: [{ poly: rect(-1, 0, 1, 3.2), h: 0.4 }, { poly: rect(-1, 3.2, 1, 6.4), h: 0.2 }],
     inner: [[[-1, 3.2], [-0.3, 3.2]], [[0.3, 3.2], [1, 3.2]], [[-1, 6.4], [0.2, 6.4]], [[0.8, 6.4], [1, 6.4]]],
     movers: [J23_DOOR(-0.55, 3.2, 0.55, 3.2, 0.25, 2.8), J23_DOOR(0.0, 6.4, 0.85, 6.4, 0.25, 3.4, 1)],
@@ -86,12 +86,12 @@ registerWorld(23, { holes: [
     tiers: [{ poly: rect(-0.8, 3.2, 2.6, 4.4), h: 0.2 }, { poly: rect(1.2, 0, 2.6, 1.6), h: 0.4 }],
     posts: [J23_IDOL(1.0, 3.9), J23_IDOL(2.25, 0.9, 0.1)] },
   /* 13: the sealed shrine: wait for the stone door, take the idol's mouth up to the high hall, drop to the cup */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [0, 5.6], aim0: 0,
+  { par: 4, crazy: true, sol: [[0, 0.72, 0], [44, 0.94, 0]], tee: [0, 0.5], cup: [0, 5.6], aim0: 0,
     floors: [[[-1, 0], [1, 0], [1, 2.8], [0.3, 2.8], [0.3, 3.6], [-0.3, 3.6], [-0.3, 2.8], [-1, 2.8]], [[1.8, 0], [3.4, 0], [3.4, 4.0], [3.4, 6.8], [-1, 6.8], [-1, 4.0], [1.8, 4.0]]],
     walls: [ring([[-1, 0], [1, 0], [1, 2.8], [0.3, 2.8], [0.3, 3.6], [-0.3, 3.6], [-0.3, 2.8], [-1, 2.8]]), ring([[1.8, 0], [3.4, 0], [3.4, 4.0], [3.4, 6.8], [-1, 6.8], [-1, 4.0], [1.8, 4.0]]),
       [[1.8, 4.0], [2.3, 4.0]], [[2.9, 4.0], [3.4, 4.0]]],
     tiers: [{ poly: rect(1.8, 0, 3.4, 4.0), h: 0.3 }],
-    movers: [J23_DOOR(-0.55, 2.8, 0.55, 2.8, 0.25, 2.6)],
+    movers: [J23_DOOR(-0.55, 3.0, 0.55, 3.0, 0.25, 2.6)],
     tubes: [{ a: [0, 3.3], b: [2.6, 0.4], dir: 0, keep: 0.5 }],
     zones: [J23_MUD(rect(1.8, 1.6, 2.4, 2.2))], posts: [J23_IDOL(-0.5, 1.6), J23_IDOL(0.5, 1.6), J23_IDOL(0.8, 5.2), J23_IDOL(-0.5, 6.2)] },
   /* 14: the aqueduct: up the stair, ride the temple conveyor across the top, down the far stair to the cup */
@@ -102,7 +102,7 @@ registerWorld(23, { holes: [
     zones: [{ push: [1.2, 0], poly: rect(0.6, 5.05, 2.4, 5.95) }, J23_WATER(rect(3.1, 2.6, 3.5, 3.0)), J23_MUD(rect(2.5, 1.6, 3.0, 2.0))],
     posts: [J23_IDOL(2.8, 2.4, 0.11), J23_IDOL(0, 2.2)] },
   /* 15: the temple heart: up the stair, past the stone door, down to the pool court, then tunnel or stair to the boulder shrine */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0, 9.2],
+  { par: 5, crazy: true, sol: [[6, 1, 0], [18, 0.9, 0]], tee: [0, 0.5], cup: [0, 9.2],
     shape: [[-1.4, 0], [1.4, 0], [1.4, 2.6], [1.4, 5.0], [1.4, 7.4], [1.4, 10], [-1.4, 10], [-1.4, 7.4], [-1.4, 5.0], [-1.4, 2.6]],
     ramps: [{ x0: -0.35, z0: 1.8, x1: 0.35, z1: 2.6, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.7, z0: 6.6, x1: 1.4, z1: 7.4, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.4, 2.6, 1.4, 5.0), h: 0.2 }, { poly: rect(-1.4, 7.4, 1.4, 10), h: 0.3 }],
@@ -121,7 +121,7 @@ registerWorld(23, { holes: [
     tubes: [{ a: [-0.9, 4.6], b: [1.2, 7.0], dir: 0, keep: 0, add: 0.45 }],
     zones: [J23_MUD(rect(0.6, 3.6, 1.4, 4.4))], posts: [J23_IDOL(2.2, 7.6), J23_IDOL(1.4, 8.1, 0.11)] },
   /* 17: the boulder terraces: three terraces, stairs on alternate sides, a boulder rolling on each of the top two */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [0.5, 8.5],
+  { par: 4, crazy: true, sol: [[20.75, 0.87, 0]], tee: [0, 0.5], cup: [0.5, 8.5],
     shape: [[-1.2, 0], [1.2, 0], [1.2, 2.5], [1.2, 5], [1.2, 7], [1.2, 9.2], [-1.2, 9.2], [-1.2, 7], [-1.2, 5], [-1.2, 2.5]],
     ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.15, h1: 0.3 },
       { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.42 }],

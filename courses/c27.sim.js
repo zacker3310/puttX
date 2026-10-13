@@ -9,7 +9,7 @@ const C27_GARG = (x, z) => ({ x, z, r: 0.12, top: 0.3, look: 'gargoyle' });
 const C27_MOAT = poly => ({ surf: 'water', poly });
 registerWorld(27, { holes: [
   /* 1: the barbican: the portcullis in the middle or the narrow postern door by the wall */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [-0.3, 5.3], shape: rect(-1.1, 0, 1.1, 6.2),
+  { par: 2, sol: [[0,0.55,0]], tee: [0, 0.5], cup: [-0.3, 5.3], shape: rect(-1.1, 0, 1.1, 6.2),
     inner: [[[-1.1, 3], [-0.3, 3]], [[0.3, 3], [0.7, 3]]],
     bumps: [{ x: 0, z: 1.8, r: 0.4, h: 0.1 }],
     posts: [C27_GARG(0.35, 4.6)],
@@ -22,14 +22,14 @@ registerWorld(27, { holes: [
     bumps: [{ x: -0.4, z: 6.4, r: 0.4, h: 0.12 }],
     movers: [C27_MILL(0, 3.9, 0.5, 1.6, 0), C27_GATE(0, 5, 0.54, 5, 0.3, 90, 2.8, 0)] },
   /* 3: the first switchback stair: across, up, back and up again to the cup */
-  { par: 3, sol: [], tee: [-1.1, 0.5], cup: [-1.1, 4.2], aim0: 90, shape: rect(-1.6, 0, 1.6, 5),
+  { par: 3, sol: [[52,0.75,0],[72,0.9375,0]], tee: [-1.1, 0.5], cup: [-1.1, 4.2], aim0: 90, shape: rect(-1.6, 0, 1.6, 5),
     inner: [[[-1.6, 2.5], [0.6, 2.5]]],
     tiers: [{ poly: rect(0.6, 0, 1.6, 5), h: 0.15 }, { poly: rect(-1.6, 2.5, -0.2, 5), h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 0, x1: 0.6, z1: 2.5, axis: 'x', h0: 0, h1: 0.15 }, { x0: -0.2, z0: 2.5, x1: 0.6, z1: 5, axis: 'x', h0: 0.3, h1: 0.15 }],
     posts: [C27_GARG(1.1, 1.9)],
     movers: [C27_MILL(-0.75, 1.4, 0.45, 1.5, 0)] },
   /* 4: island hopping: the bridge, the windmill island, then the ghost on the far bridge */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 7.1], aim0: 15, shape: rect(-1.5, 0, 1.5, 8),
+  { par: 3, sol: [[28,0.5625,0],[83.25,0.99,1.4]], tee: [0, 0.5], cup: [0.6, 7.1], aim0: 15, shape: rect(-1.5, 0, 1.5, 8),
     zones: [C27_MOAT(rect(-1.5, 2.4, 0.9, 3.4)), C27_MOAT(rect(-0.9, 5.0, 1.5, 6.0)), { surf: 'sand', poly: rect(-1.5, 3.4, -0.9, 4.0) }],
     posts: [C27_GARG(-0.1, 6.7)],
     movers: [C27_MILL(0, 4.2, 0.5, 1.5, 0), C27_GHOST(-1.2, 4.6, -1.2, 6.4, 2.4, 0)] },
@@ -115,7 +115,7 @@ registerWorld(27, { holes: [
     posts: [C27_GARG(1.15, 3.8), C27_GARG(0.85, 5.3)],
     movers: [C27_MILL(-0.4, 2.6, 0.55, 1.5, 0), C27_GHOST(0.8, 8.0, -0.8, 8.0, 2.6, 0)] },
   /* 14: graveyard switchbacks to the raised crypt row: hills in the turns, a passage from the first corner */
-  { par: 4, sol: [], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
+  { par: 4, sol: [[45,0.85,0],[174,1,0],[0,0.15,0]], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
     inner: [[[-0.7, 0], [-0.7, 5.6]], [[0.7, 7], [0.7, 1.4]]],
     tiers: [{ poly: rect(0.7, 2.2, 2.1, 7), h: 0.15 }],
     ramps: [{ x0: 0.7, z0: 1.4, x1: 2.1, z1: 2.2, axis: 'z', h0: 0, h1: 0.15 }],
@@ -124,7 +124,7 @@ registerWorld(27, { holes: [
     posts: [C27_GARG(1.05, 5.6)],
     movers: [C27_GHOST(-0.35, 2.6, 0.35, 2.6, 2.0, 0)] },
   /* 15: the crypt descent: four floating floors, a portcullis on the first drop, passages to skip ahead */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [-0.3, 9.7], floors: [rect(-0.7, 0, 0.7, 2.6), rect(-1.2, 2.9, 1.2, 5.1), rect(-1.2, 5.4, 1.2, 7.6), rect(-1.0, 7.9, 1.0, 10.5)],
+  { par: 4, sol: [[328,1,0],[0,0.5625,0]], tee: [0, 0.5], cup: [-0.3, 9.7], floors: [rect(-0.7, 0, 0.7, 2.6), rect(-1.2, 2.9, 1.2, 5.1), rect(-1.2, 5.4, 1.2, 7.6), rect(-1.0, 7.9, 1.0, 10.5)],
     tiers: [{ poly: rect(-0.7, 0, 0.7, 2.6), h: 0.45 }, { poly: rect(-1.2, 2.9, 1.2, 5.1), h: 0.3 }, { poly: rect(-1.2, 5.4, 1.2, 7.6), h: 0.15 }],
     walls: [[[-0.25, 2.6], [-0.7, 2.6], [-0.7, 0], [0.7, 0], [0.7, 2.6], [0.25, 2.6]],
       [[-0.5, 2.9], [-1.2, 2.9], [-1.2, 5.1], [0.3, 5.1]], [[0.5, 2.9], [1.2, 2.9], [1.2, 5.1], [0.9, 5.1]],
@@ -142,7 +142,7 @@ registerWorld(27, { holes: [
     tubes: [{ a: [-1.0, 4.5], b: [1.0, 4.5], dir: 0 }],
     movers: [C27_GATE(1.0, 7.0, 1.5, 7.0, 0.25, 90, 2.6, 0), C27_GHOST(-1.2, 7.9, 0.2, 7.9, 2.8, 0)] },
   /* 17: the four dungeons: a passage or the side door, a ghost, the portcullis, a windmill, a passage to the last cell */
-  { par: 5, sol: [], tee: [0, 0.5], cup: [-0.5, 11.2], shape: rect(-1.2, 0, 1.2, 12),
+  { par: 4, sol: [[200,0.9375,0],[0,0.3125,0]], tee: [0, 0.5], cup: [-0.5, 11.2], shape: rect(-1.2, 0, 1.2, 12),
     inner: [[[-0.6, 3.2], [1.2, 3.2]], [[-1.2, 6.4], [-0.25, 6.4]], [[0.25, 6.4], [1.2, 6.4]], [[-1.2, 9.6], [0.6, 9.6]]],
     tubes: [{ a: [0.8, 2.6], b: [0.8, 3.7], dir: 0 }, { a: [0.1, 2.6], b: [-0.7, 0.5], dir: 0 }, { a: [-0.8, 9.1], b: [-0.6, 10.1], dir: 0 }],
     bumps: [{ x: 0.2, z: 5.6, r: 0.45, h: 0.18 }, { x: 0.4, z: 10.8, r: 0.4, h: 0.18 }],
@@ -150,7 +150,7 @@ registerWorld(27, { holes: [
     movers: [C27_GHOST(-0.8, 4.6, 0.8, 4.6, 2.8, 0), C27_GATE(0, 6.4, 0.5, 6.4, 0.25, 90, 2.6, 0), C27_MILL(0.3, 7.9, 0.5, 1.6, 0)] },
   /* 18: the showpiece: the gate, the switchback stair, the right passage into the gallery and the
      next passage on to the throne room, past a ghost and up onto the dais */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
+  { par: 5, crazy: true, sol: [[296,1,0],[276,0.9375,0],[4,0.5,0],[163,0.94,0]], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
     inner: [[[-2.0, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [2.0, 2.6]], [[-2.0, 3.6], [1.0, 3.6]], [[-1.0, 4.6], [2.0, 4.6]], [[-2.0, 5.6], [2.0, 5.6]],
       [[1.2, 5.6], [1.2, 8.0], [2.0, 8.0]]],
     tiers: [{ poly: [[1.0, 2.6], [2.0, 2.6], [2.0, 4.6], [0.6, 4.6], [0.6, 3.6], [1.0, 3.6]], h: 0.15 },

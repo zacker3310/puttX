@@ -168,15 +168,16 @@
       posts: [ALIEN(-0.7, 9.0), ALIEN(2.1, 9.15)],
       tubes: [{ a: [1.0, 4.8], b: [-0.75, 8.1], dir: 90, keep: 0.5, add: 0.2 }],
       movers: [LOCK(-1.9, 3.9, 1.9, 3.9, 0.5, 90, 3.4), ROCK(-0.75, 6.4, 0.75, 6.4, 2.6, 0, 0.14)] },
-    /* 17. the stack: four rooms each a step higher, a ramp through every bulkhead, an airlock on each one */
-    { par: 4, sol: [], tee: [0, 0.5], cup: [-1.0, 8.2], shape: rect(-1.8, 0, 1.8, 9),
+    /* 17. the stack: four rooms each a step higher, a ramp through every bulkhead, an airlock on the middle one, or the tube past the rock */
+    { par: 4, sol: [[309.2,0.5,0],[48,0.45,0]], tee: [0, 0.5], cup: [-1.0, 8.2], shape: rect(-1.8, 0, 1.8, 9),
       inner: [[[-1.8, 2.2], [0.8, 2.2]], [[-0.8, 4.4], [1.8, 4.4]], [[-1.8, 6.6], [0.8, 6.6]]],
       tiers: [{ poly: rect(-1.8, 2.6, 1.8, 4.8), h: 0.12 }, { poly: rect(-1.8, 4.8, 1.8, 7), h: 0.24 }, { poly: rect(-1.8, 7, 1.8, 9), h: 0.36 }],
       ramps: [{ x0: 0.8, z0: 1.8, x1: 1.8, z1: 2.6, axis: 'z', h0: 0, h1: 0.12 }, { x0: -1.8, z0: 4, x1: -0.8, z1: 4.8, axis: 'z', h0: 0.12, h1: 0.24 },
         { x0: 0.8, z0: 6.2, x1: 1.8, z1: 7, axis: 'z', h0: 0.24, h1: 0.36 }],
       bumps: [{ x: -1.0, z: 8.2, r: 0.45, h: -0.1 }],
       posts: [ALIEN(-0.3, 3.3), ALIEN(0.6, 5.6), ALIEN(0, 8.0)],
-      movers: [LOCK(1.35, 2.2, 0.45, 2.2, 0.45, 90, 2.8), LOCK(-1.35, 4.4, -0.45, 4.4, 0.45, 90, 3.3, 2), LOCK(1.35, 6.6, 0.45, 6.6, 0.45, 90, 2.6, 1)] },
+      tubes: [{ a: [-1.35, 1.6], b: [-1.3, 5.6], dir: 90, keep: 0.6, add: 0.2 }],
+      movers: [LOCK(-1.35, 4.4, -0.45, 4.4, 0.45, 90, 3.3, 2), ROCK(-1.35, 0.55, -1.35, 1.05, 2, 0, 0.15)] },
     /* 18. the reactor tour: the guarded launch, three turning jumps between floating decks, a tube shortcut, the crater cup */
     { par: 5, crazy: true, sol: [[5,1,1.2]], tee: [0, 0.5], cup: [-3, 8.8],
       floors: [rect(-0.6, 0, 0.6, 2.8), rect(-1, 3.6, 1, 6), rect(-3.8, 4.2, -1.6, 6.6), rect(-4.4, 7.4, -1.8, 9.8)],

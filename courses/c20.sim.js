@@ -97,7 +97,7 @@ registerWorld(20, { holes: [
       [[-1.3, 4], [-1.5, 4], [-1.5, 5.3], [0.9, 5.3], [0.9, 4]], [[0.3, 4], [0.3, 1.6]], [[0.9, 4], [0.9, 1.6]],
       [[0.3, 1.6], [0.1, 1.6], [0.1, 0.2], [2.3, 0.2], [2.3, 1.6], [2.1, 1.6], [2.1, 3.6]], [[0.9, 1.6], [1.5, 1.6], [1.5, 3.6]], [[1.2, 5.2], [1.2, 6], [2.6, 6], [2.6, 5.0]]],
     ramps: [{ x0: -1.3, z0: 1.5, x1: -0.7, z1: 4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.2, z0: 1.6, x1: 1.0, z1: 4, axis: 'z', h0: 0.6, h1: 0.3 }],
-    tiers: [{ poly: C20_PAD(-1.5, 4, 0.9, 5.3), h: 0.3 }, { poly: C20_PAD(0.1, 0.2, 2.3, 1.6), h: 0.6 }, { poly: rect(1.5, 1.6, 2.1, 3.6), h: 0.6 }, { poly: C20_PAD(1.2, 3.6, 2.6, 6), h: 0.6 }],
+    tiers: [{ poly: C20_PAD(-1.5, 4, 0.9, 5.3), h: 0.3 }, { poly: C20_PAD(0.1, 0.2, 2.3, 1.6), h: 0.6 }, { poly: rect(1.4, 1.6, 2.2, 3.6), h: 0.6 }, { poly: C20_PAD(1.2, 3.6, 2.6, 6), h: 0.6 }],
     bumps: [{ x: 1.8, z: 2.6, r: 0.25, h: 0.05 }, { x: 1.8, z: 5.2, r: 0.5, h: 0.12 }, { x: 1.8, z: 5.2, r: 0.22, h: -0.05 }] },
   /* 11. tube relay: the walled high tee has two tubes; gold to the bridge isle, blue to the isle whose tube drops you by the windmill green */
   { par: 3, crazy: true, sol: [[300,1,0],[0,0.88,0]], tee: [0, 0.5], cup: [0.5, 6.8], aim0: 20,
@@ -109,14 +109,14 @@ registerWorld(20, { holes: [
     movers: [{ kind: 'spin', x: -0.35, z: 5.75, len: 0.34, w: 1.7, phase: 0.3, blades: 2, look: 'windmill' }],
     tubes: [{ a: [0.55, 1.3], b: [2.3, 2.85], dir: 0, color: '#ffd66e' }, { a: [-0.55, 1.3], b: [-2.3, 1.95], dir: 0, color: '#6fc0df' },
       { a: [-2.3, 3.55], b: [-0.7, 4.65], dir: 20 }] },
-  /* 12. gale terraces: three ramp bridges up three islands while the fans blow each way */
-  { par: 4, sol: [], tee: [0, 0.6], cup: [0.4, 10.2],
-    floors: [rect(-0.8, 0, 0.8, 2), rect(-0.6, 2, 0, 3), rect(-1.4, 3, 1.4, 5), rect(0.6, 5, 1.2, 6), rect(-1.4, 6, 1.4, 8), rect(-1.0, 8, -0.4, 9), rect(-1.2, 9, 1.2, 11)],
-    walls: [[[-0.6, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0, 2]], [[-1.2, 9.6], [-1.2, 11], [1.2, 11], [1.2, 9.6]]],
-    ramps: [{ x0: -0.6, z0: 2, x1: 0, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: 0.6, z0: 5, x1: 1.2, z1: 6, axis: 'z', h0: 0.25, h1: 0.5 },
-      { x0: -1.0, z0: 8, x1: -0.4, z1: 9, axis: 'z', h0: 0.5, h1: 0.75 }],
+  /* 12. gale terraces: three ramp bridges straight up three islands while the fans blow each way */
+  { par: 4, sol: [[0,1,0],[292,0.14,0],[358,0.62,0]], tee: [0, 0.6], cup: [0.4, 10.2],
+    floors: [rect(-0.8, 0, 0.8, 2), rect(-0.3, 2, 0.3, 3), rect(-1.4, 3, 1.4, 5), rect(-0.3, 5, 0.3, 6), rect(-1.4, 6, 1.4, 8), rect(-0.3, 8, 0.3, 9), rect(-1.2, 9, 1.2, 11)],
+    walls: [[[-0.3, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.3, 2]], [[-1.2, 9.6], [-1.2, 11], [1.2, 11], [1.2, 9.6]]],
+    ramps: [{ x0: -0.3, z0: 2, x1: 0.3, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: -0.3, z0: 5, x1: 0.3, z1: 6, axis: 'z', h0: 0.25, h1: 0.5 },
+      { x0: -0.3, z0: 8, x1: 0.3, z1: 9, axis: 'z', h0: 0.5, h1: 0.75 }],
     tiers: [{ poly: rect(-1.4, 3, 1.4, 5), h: 0.25 }, { poly: rect(-1.4, 6, 1.4, 8), h: 0.5 }, { poly: C20_PAD(-1.2, 9, 1.2, 11), h: 0.75 }],
-    zones: [{ push: [-1.3, 0], poly: rect(-1.4, 3.4, 1.4, 4.7) }, { push: [1.3, 0], poly: rect(-1.4, 6.4, 1.4, 7.6) }],
+    zones: [{ push: [-0.6, 0], poly: rect(-1.4, 3.4, 1.4, 4.7) }, { push: [0.6, 0], poly: rect(-1.4, 6.4, 1.4, 7.6) }],
     bumps: [{ x: -0.3, z: 10.1, r: 0.4, h: 0.1 }] },
   /* 13. bumper stair: a tilted island of springy cloud bumpers, a bridge up, and a gate sweeping in front of the cup */
   { par: 3, sol: [[0,0.88,0],[348,0.56,0]], tee: [0, 0.6], cup: [-0.5, 9.7],

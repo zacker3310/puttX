@@ -105,7 +105,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(0.9, 6.5), C12_CACTUS(-0.4, 7.0), C12_ROCK(0, 1.5)] },
   /* 12. the canyon descent: down off the high deck, across the mid mesa past the tumbleweed, through the
      gate onto the low green and round the spur */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [0.55, 9.35],
+  { par: 4, crazy: true, sol: [[355,1,1.5],[270,0.75,0]], tee: [0, 0.5], cup: [0.55, 9.35],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [1.2, 4], [1.2, 10], [-1.8, 10], [-1.8, 4], [-0.8, 4]],
     inner: [[[-1.8, 6.5], [-0.6, 6.5]], [[0, 6.5], [1.2, 6.5]], [[-0.45, 8.5], [1.2, 8.5]]],
     ramps: [{ x0: -0.8, z0: 3, x1: 0.8, z1: 4, axis: 'z', h0: 0.44, h1: 0.25 }],
@@ -164,7 +164,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(1.1, 1.4), C12_CACTUS(-1.0, 5.0), C12_CACTUS(-1.3, 9.6)] },
   /* 18. the grand descent: high deck, gate at the ramp foot, the mid mesa with two tumbleweeds, the shaft or the
      gated drop to the dunes, then up to the summit green */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [-0.6, 11.3],
+  { par: 5, crazy: true, sol: [[5,0.8125,1.5],[10,0.4375,0]], tee: [0, 0.5], cup: [-0.6, 11.3],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.5], [2, 3.5], [2, 12], [-2, 12], [-2, 3.5], [-0.8, 3.5]],
     inner: [[[-2, 6.3], [0.1, 6.3]], [[0.9, 6.3], [2, 6.3]]],
     ramps: [{ x0: -0.9, z0: 2.5, x1: 0.9, z1: 3.5, axis: 'z', h0: 0.44, h1: 0.27 }, { x0: -2.1, z0: 9.2, x1: 0.2, z1: 10, axis: 'z', h0: 0.05, h1: 0.3 }],

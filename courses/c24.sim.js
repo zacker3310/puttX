@@ -44,7 +44,7 @@ registerWorld(24, { holes: [
     zones: [{ surf: 'water', poly: C24_POOL(0.5, 8.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 6.0, 1.4, 7.4) }],
     bumps: [{ x: -0.6, z: 8.6, r: 0.5, h: 0.08 }], posts: [C24_MAN(0.1, 9.0)] },
   /* 7. terraced switchback: up the first run, across the top, down the icy second run, across the bottom and up the third run past the snowball */
-  { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [2.4, 5.7], aim0: 0, shape: rect(-0.6, 0, 3, 6.6), inner: [[[0.6, 0], [0.6, 5.4]], [[1.8, 6.6], [1.8, 1.2]]],
+  { par: 4, crazy: true, sol: [[345,1,0],[30,0.917,0],[8,1,0]], tee: [0, 0.5], cup: [2.4, 5.7], aim0: 0, shape: rect(-0.6, 0, 3, 6.6), inner: [[[0.6, 0], [0.6, 5.4]], [[1.8, 6.6], [1.8, 1.2]]],
     ramps: [{ x0: -0.6, z0: 1.4, x1: 0.6, z1: 4.0, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.6, z0: 1.2, x1: 1.8, z1: 4.0, axis: 'z', h0: 0.1, h1: 0.3 }, { x0: 1.8, z0: 1.2, x1: 3, z1: 2.0, axis: 'z', h0: 0.1, h1: 0.2 }],
     tiers: [{ poly: rect(-0.6, 4.0, 1.8, 6.6), h: 0.3 }, { poly: rect(0.6, 0, 3, 1.2), h: 0.1 }, { poly: rect(1.8, 2.0, 3, 6.6), h: 0.2 }],
     zones: [{ surf: 'ice', poly: rect(0.6, 1.2, 1.8, 4.0) }], movers: [C24_BALL(2.06, 3.6, 2.74, 3.6, 2.4, 0, 0.14)], bumps: [{ x: 2.4, z: 5.7, r: 0.5, h: 0.06 }] },
@@ -104,7 +104,7 @@ registerWorld(24, { holes: [
     tubes: [{ a: [-0.3, 4.9], b: [-1.0, 7.0], dir: 90 }, { a: [-0.8, 3.0], b: [-1.2, 1.0], dir: 90 }, { a: [0.7, 3.4], b: [1.2, 1.0], dir: 270 }],
     zones: [{ surf: 'ice', poly: rect(-1.6, 1.6, 1.6, 5.8) }], posts: [C24_MAN(1.1, 8.0)] },
   /* 15. lift chain: three decks up the mountain, a lift bar at the top of every ramp, then off the summit deck to the lake */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0.5, 11.0], shape: rect(-1.4, 0, 1.4, 11.8),
+  { par: 5, crazy: true, sol: [[10,0.833,2],[220,0.917,1],[46,0.48,0]], tee: [0, 0.5], cup: [0.5, 11.0], shape: rect(-1.4, 0, 1.4, 11.8),
     ramps: [{ x0: -0.45, z0: 1.4, x1: 0.45, z1: 2.6, axis: 'z', h0: 0, h1: 0.14 }, { x0: 0.5, z0: 4.4, x1: 1.4, z1: 5.4, axis: 'z', h0: 0.14, h1: 0.28 },
       { x0: -1.4, z0: 7.0, x1: -0.5, z1: 8.0, axis: 'z', h0: 0.28, h1: 0.42 }],
     tiers: [{ poly: rect(-1.4, 2.6, 1.4, 5.4), h: 0.14 }, { poly: rect(-1.4, 5.4, 1.4, 8.0), h: 0.28 }, { poly: rect(-1.4, 8.0, 1.4, 9.4), h: 0.42 }],
@@ -112,7 +112,7 @@ registerWorld(24, { holes: [
     zones: [{ surf: 'ice', poly: rect(-1.4, 8.0, 1.4, 9.4) }, { surf: 'water', poly: C24_POOL(-0.5, 10.6, 0.35, 0.3) }],
     bumps: [{ x: 0.5, z: 11.0, r: 0.4, h: 0.05 }], posts: [C24_MAN(-0.6, 4.0), C24_MAN(0.6, 7.0)] },
   /* 16. snowball gauntlet: up the ramp between two snowballs, along the ice deck, drop past the third to the cup */
-  { par: 4, sol: [], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.2, 0, 1.2, 9.4),
+  { par: 4, sol: [[0,1,1]], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.2, 0, 1.2, 9.4),
     ramps: [{ x0: -1.2, z0: 1.6, x1: 1.2, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }], tiers: [{ poly: rect(-1.2, 3.0, 1.2, 6.4), h: 0.3 }],
     inner: [[[-1.2, 6.4], [-0.4, 6.4]], [[0.3, 6.4], [1.2, 6.4]]],
     movers: [C24_BALL(-0.8, 2.2, 0.8, 2.2, 2.6), C24_BALL(0.8, 4.2, -0.8, 4.2, 3.0, 1), C24_BALL(-0.7, 7.6, 0.7, 7.6, 2.4, 2)],

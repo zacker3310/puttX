@@ -87,9 +87,9 @@ registerWorld(14, { holes: [
     zones: [{ surf: 'water', poly: C14_POOL(0.2, 3.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 1.8, 1.4, 4.0) }],
     bumps: [{ x: -0.6, z: 5.0, r: 0.3, h: 0.1 }, { x: 0.5, z: 5.3, r: 0.32, h: 0.12 }, { x: 0.5, z: 8.2, r: 0.5, h: 0.08 }],
     movers: [C14_BALL(-0.8, 7.2, 0.8, 7.2, 2.8)] },
-  /* 14. cave chain: walled chambers stacked up the slope; the only ways on are the caves, and a lift bar guards the deck */
-  { par: 4, sol: [], tee: [0.5, 0.5], cup: [-0.6, 7.6], aim0: 330, shape: rect(-1.4, 0, 1.4, 8.4), inner: [[[-1.4, 2.4], [1.4, 2.4]], [[-1.4, 5.2], [1.4, 5.2]]],
-    tiers: [{ poly: rect(-1.4, 2.4, 1.4, 5.2), h: 0.3 }],
+  /* 14. cave chain: three walled chambers up the slope; squeeze through the gap at the end of each snow fence or take
+     the caves, and a lift bar guards the middle chamber */
+  { par: 4, sol: [[70,0.917,0],[0,0.167,0]], tee: [0.5, 0.5], cup: [-0.6, 7.6], aim0: 330, shape: rect(-1.4, 0, 1.4, 8.4), inner: [[[-1.4, 2.4], [0.8, 2.4]], [[-0.8, 5.2], [1.4, 5.2]]],
     tubes: [{ a: [-0.9, 1.8], b: [-0.9, 2.9], dir: 0 }, { a: [0.9, 4.6], b: [0.9, 5.7], dir: 330 }],
     movers: [C14_LIFT(-0.8, 3.8, 0.8, 3.8, 0.3, 90, 3.0)],
     zones: [{ surf: 'water', poly: C14_POOL(0.3, 6.8, 0.35) }, { surf: 'ice', poly: rect(-1.4, 5.2, 1.4, 8.4) }], posts: [C14_MAN(-0.2, 1.2), C14_MAN(-1.0, 6.9)] },

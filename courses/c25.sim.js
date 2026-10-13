@@ -71,7 +71,7 @@ registerWorld(25, (() => {
       inner: [[[-1.4, 4], [-0.5, 4]], [[0.5, 4], [1.4, 4]], [[-1.4, 6.8], [0.0, 6.8]]],
       zones: [lagoon(rect(-1.4, 6.9, -0.2, 8.2)), sand(rect(0.7, 4.4, 1.4, 5.2))], bumps: [{ x: 0.9, z: 3.0, r: 0.4, h: 0.15 }] },
     /* 10 smugglers' relay: four chambers, three caves, every gap guarded */
-    { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [0.9, 8.8], aim0: 30, shape: rect(-1.8, 0, 1.8, 9.6),
+    { par: 4, crazy: true, sol: [[48,1,0],[213,0.85,0],[0,0.15,0]], tee: [0, 0.5], cup: [0.9, 8.8], aim0: 30, shape: rect(-1.8, 0, 1.8, 9.6),
       inner: [[[-1.8, 2.4], [1.1, 2.4]], [[-1.1, 4.8], [1.8, 4.8]], [[-1.8, 7.2], [1.1, 7.2]]],
       tubes: [{ a: [-1.2, 1.7], b: [-1.2, 3.2], dir: 90 }, { a: [1.2, 4.1], b: [1.2, 5.6], dir: 270 }, { a: [-1.2, 6.5], b: [-1.2, 8.0], dir: 90 }],
       movers: [CANNON(1.45, 2.0, 1.45, 3.0, 2.4), CANNON(-1.45, 4.4, -1.45, 5.3, 2.8, 1)],
@@ -137,7 +137,7 @@ registerWorld(25, (() => {
       zones: [lagoon(rect(-0.58, 0.1, -0.32, 8.9)), lagoon(rect(-0.28, 7.1, 0.28, 8.9)), lagoon(rect(-1.38, 0.1, -0.62, 0.7)), sand(rect(-2.5, 4.4, -1.4, 4.6))],
       bumps: [{ x: -1.95, z: 7.6, r: 0.45, h: -0.1 }, { x: -1.95, z: 3.4, r: 0.4, h: 0.1 }] },
     /* 18 the galleon: gangplank, the main deck's wheel and cannon, the quarterdeck's drawbridge, then walk the plank or the cave to treasure island */
-    { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
+    { par: 5, crazy: true, sol: [[324,1,0],[210,0.9,0],[3,0.95,0]], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
       ramps: [{ x0: -2, z0: 2.4, x1: -1.3, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }, { x0: 1.3, z0: 6.4, x1: 2, z1: 7.6, axis: 'z', h0: 0.25, h1: 0.44 }],
       tiers: [{ poly: rect(-2.1, 3.6, 2.1, 9), h: 0.25 }, { poly: rect(-2.1, 7.6, 2.1, 9), h: 0.44 }, { poly: rect(-0.2, 9, 0.2, 10), h: 0.44 }],
       inner: [[[-1.3, 3.6], [2, 3.6]], [[-2, 7.6], [1.3, 7.6]], [[-2, 9], [-0.2, 9]], [[0.2, 9], [2, 9]]],

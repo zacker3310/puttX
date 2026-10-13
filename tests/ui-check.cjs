@@ -61,7 +61,7 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   })()`);
   check('after the last hole the card shows every hole and the total', card.scene === 'card' && card.cells === card.holes && card.total === card.want, JSON.stringify(card));
   check('card shows strokes against par with a sign', card.diff === (card.wantDiff > 0 ? '+' : '') + card.wantDiff, JSON.stringify(card));
-  if (count > 1) check('the next course unlocked; the card offers it', card.worlds === first + ',' + card.second && card.next, JSON.stringify(card));
+  if (count > 1) check('the next course unlocked; the card offers it', card.worlds === [first, card.second, 100 + first].join() && card.next, JSON.stringify(card));
   check('card: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0);
   if (count > 1) {
     await tap(page, 'cardNext');

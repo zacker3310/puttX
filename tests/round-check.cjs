@@ -56,7 +56,7 @@ const list = S.playable().filter(w => w < 90), second = list[1], last = S.WORLDS
 S.recordHole(p, k(last - 1 > 0 ? last - 1 : 1), 4, 3);
 check('a hole before the last opens nothing new', p.worlds.length === 1, p.worlds.join());
 S.recordHole(p, k(last), 4, 3);
-check('finishing the last hole opens the next playable course', !second || (p.worlds.join() === first + ',' + second && S.holeUnlocked(p, second + '-1')), p.worlds.join());
+check('finishing the last hole opens the next playable course and its own night remix', !second || (p.worlds.join() === [first, second, S.NIGHT + first].join() && S.holeUnlocked(p, second + '-1')), p.worlds.join());
 check('ten courses in order', S.WORLD_ORDER.join() === '1,2,3,4,5,6,7,8,9,10' && S.HOLES_PER === 18);
 
 done();

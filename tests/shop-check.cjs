@@ -1,5 +1,6 @@
 /* shop-check (node + browser): the pro shop. Coins per hole (finish, under par, ace, first clear)
-   and never negative; buying deducts and owns, short of coins it boinks and nothing changes;
+   and never negative; 30 putters (20 with their own head models, inside the plain head's
+   footprint), 32 balls, mulligan token packs; pages and a swipe; buying deducts and owns, short of coins it boinks and nothing changes;
    equip persists across a reload and re-applies (putter look and FEEL, ball skin); FEEL resets for
    the starter and no putter is more than 40% kinder than base in any knob; the physics never
    changes; a corrupt shop save repairs; the shop has no words and no small targets. */
@@ -16,7 +17,7 @@ const feelBase = game.match(/const FEEL_BASE = (\{[^}]*\});/)[1];
 const ctx = vm.createContext({});
 vm.runInContext(`const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v)); const FEEL_BASE = ${feelBase};\n`
   + fs.readFileSync(path.join(ROOT, 'src', 'shop.js'), 'utf8')
-  + '\nthis.api = { coinsFor, feelOf, shopRepair, PUTTERS, BALLS, COIN, FEEL_BASE };', ctx);
+  + '\nthis.api = { coinsFor, feelOf, shopRepair, PUTTERS, BALLS, COIN, FEEL_BASE, PACKS, PUTTER_HEADS, BALL_PATS };', ctx);
 const S = ctx.api;
 {
   const c = S.coinsFor;
@@ -32,11 +33,25 @@ const S = ctx.api;
       && f.tempoK === b.tempoK && ['sweet', 'tempoDead', 'toeLoss', 'twist', 'pathK'].every(k => kind(f[k], b[k], ['sweet', 'tempoDead'].includes(k) ? 'up' : 0) >= 1 - 1e-9);
   });
   check('putters: never kinder than 40% over base in any knob, never harsher, tempoK untouched', ok);
-  check('putters: 8-10 of them, the starter is FEEL_BASE exactly and free', S.PUTTERS.length >= 8 && S.PUTTERS.length <= 10 && S.PUTTERS[0].price === 0
+  check('putters: 30 of them, the starter is FEEL_BASE exactly and free', S.PUTTERS.length === 30 && S.PUTTERS[0].price === 0
     && JSON.stringify(S.feelOf('p1')) === JSON.stringify(S.FEEL_BASE));
-  const lv = S.PUTTERS.map(p => p.f[0] + p.f[1] + p.f[2]), pr = S.PUTTERS.map(p => p.price);
-  check('putters: dearer is never less forgiving, top one is the best', lv.every((v, i) => !i || (v >= lv[i - 1] && pr[i] > pr[i - 1])) && lv[lv.length - 1] === 12, lv.join());
-  check('balls: 10-12, starter free, some premium', S.BALLS.length >= 10 && S.BALLS.length <= 12 && S.BALLS[0].price === 0 && S.BALLS.filter(b => b.price >= 250).length >= 3);
+  check('putters: forgiveness levels are whole numbers 0..4', S.PUTTERS.every(p => p.f.length === 3 && p.f.every(l => Number.isInteger(l) && l >= 0 && l <= 4)));
+  for (const [name, line] of [['pro line', S.PUTTERS.slice(0, 10)], ['crazy line', S.PUTTERS.slice(10)]]) {
+    const lv = line.map(p => p.f[0] + p.f[1] + p.f[2]), pr = line.map(p => p.price);
+    check('putters (' + name + '): dearer is never less forgiving, top one is the best', lv.every((v, i) => !i || (v >= lv[i - 1] && pr[i] > pr[i - 1])) && lv[lv.length - 1] === 12, lv.join());
+  }
+  const crazy = S.PUTTERS.slice(10), styles = crazy.map(p => p.look.style);
+  check('putters: 20 crazy ones, each its own head model, priced up to 2000', crazy.length === 20 && new Set(styles).size === 20 && styles.every(st => typeof S.PUTTER_HEADS[st] === 'function')
+    && Math.max(...crazy.map(p => p.price)) === 2000 && Math.min(...crazy.map(p => p.price)) >= 250, styles.join());
+  const pats = S.BALLS.map(b => b.pat), builtin = ['star', 'stripes', 'dots', 'swirl', 'checker', 'melon', 'eight', 'lava', 'rainbow', 'galaxy', 'gold'];
+  check('balls: 32, starter free, some premium', S.BALLS.length === 32 && S.BALLS[0].price === 0 && S.BALLS.filter(b => b.price >= 250).length >= 10);
+  check('balls: the 20 new ones each have their own painted skin', new Set(pats.slice(12)).size === 20 && pats.slice(12).every(p => !builtin.includes(p) && typeof S.BALL_PATS[p] === 'function') && pats.slice(0, 12).every(p => builtin.includes(p)), pats.join());
+  check('balls: glow and metal stay in range', S.BALLS.every(b => (b.glow || 0) >= 0 && (b.glow || 0) <= 1 && (b.metal || 0) >= 0 && (b.metal || 0) <= 1 && (!b.pulse || b.glow > 0)));
+  check('mulligan packs: 3 for 60, 10 for 180, 25 for 400', JSON.stringify(S.PACKS.map(p => [p.n, p.price])) === '[[3,60],[10,180],[25,400]]');
+  const mr = v => S.shopRepair(v === undefined ? {} : { mulligans: v }).mulligans;
+  check('repair (pure): mulligans default to 5, junk resets to 5, odd numbers floor and clamp to 0..999',
+    mr() === 5 && mr('lots') === 5 && mr(NaN) === 5 && mr(null) === 5 && mr(Infinity) === 5 && mr(-3) === 0 && mr(7.9) === 7 && mr(1e9) === 999 && mr(0) === 0 && mr(12) === 12,
+    [mr(), mr('lots'), mr(NaN), mr(-3), mr(7.9), mr(1e9), mr(0)].join());
   const r = S.shopRepair({ holes: { '1-1': {}, '1-2': {} }, coins: -40, owned: ['p3', 'nope', 'p3', 7], equipped: { putter: 'p4', ball: 'p3' } });
   check('repair (pure): negative coins to 0, unknown ids dropped, unowned equip falls back, old clears seed firsts',
     r.coins === 0 && JSON.stringify(r.owned) === '["p1","b1","p3"]' && r.equipped.putter === 'p1' && r.equipped.ball === 'b1' && r.firsts.join() === '1-1,1-2', JSON.stringify(r));
@@ -53,9 +68,9 @@ const realErrors = errs => errs.filter(e => !/Failed to load resource/.test(e));
 (async () => {
   const { browser, page, errors } = await open('?map');
   await fresh(page, '?map');
-  const f0 = await page.evaluate(() => ({ coins: progress.coins, owned: progress.owned.join(), eq: progress.equipped, feel: JSON.stringify(FEEL) === JSON.stringify(FEEL_BASE),
+  const f0 = await page.evaluate(() => ({ coins: progress.coins, mull: progress.mulligans, owned: progress.owned.join(), eq: progress.equipped, feel: JSON.stringify(FEEL) === JSON.stringify(FEEL_BASE),
     head: GEAR.putter.head, ball: GEAR.ball.base, map: !!ballMesh.material.map, wallet: mapCoinsN.textContent }));
-  check('fresh save: 0 coins, starters owned and equipped, FEEL is base', f0.coins === 0 && f0.owned === 'p1,b1' && f0.eq.putter === 'p1' && f0.eq.ball === 'b1' && f0.feel && f0.head === '#c9ced6' && f0.ball === '#fffdf7' && f0.map && f0.wallet === '0', JSON.stringify(f0));
+  check('fresh save: 0 coins, 5 mulligans, starters owned and equipped, FEEL is base', f0.coins === 0 && f0.mull === 5 && f0.owned === 'p1,b1' && f0.eq.putter === 'p1' && f0.eq.ball === 'b1' && f0.feel && f0.head === '#c9ced6' && f0.ball === '#fffdf7' && f0.map && f0.wallet === '0', JSON.stringify(f0));
   check('map: wallet and shop button, no words, no small targets', await page.evaluate(() => getComputedStyle(mapWallet).display !== 'none' && shopBtn.getBoundingClientRect().width >= 64)
     && (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
 
@@ -83,9 +98,9 @@ const realErrors = errs => errs.filter(e => !/Failed to load resource/.test(e));
   /* the shop scene */
   await page.evaluate(() => { progress.coins = 100; saveProgress(); showMap(1); shopBtn.click(); });
   await page.waitForTimeout(400);
-  const sc = await page.evaluate(() => ({ scene: currentScene, cards: shopGrid.querySelectorAll('.card').length, wallet: shopCoinsN.textContent,
+  const sc = await page.evaluate(() => ({ scene: currentScene, cards: shopGrid.querySelectorAll('.card').length, wallet: shopCoinsN.textContent, mull: shopMullN.textContent,
     eq: shopGrid.querySelector('.card.equipped') && shopGrid.querySelector('.card.equipped').dataset.id }));
-  check('shop button opens the shop on putters, the starter equipped, wallet shown', sc.scene === 'shop' && sc.cards === 10 && sc.wallet === '100' && sc.eq === 'p1', JSON.stringify(sc));
+  check('shop button opens the shop on putters (a page of 10), the starter equipped, coins and mulligans shown', sc.scene === 'shop' && sc.cards === 10 && sc.wallet === '100' && sc.mull === '5' && sc.eq === 'p1', JSON.stringify(sc));
   check('shop (putters): no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify([await visibleLetters(page), await smallTargets(page)]));
   const pix = await page.evaluate(() => {
     const busy = c => { if (!c.width) return 0; const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; const s = new Set(); for (let i = 0; i < d.length; i += 4 * 37) s.add(d[i] >> 3 << 10 | d[i + 1] >> 3 << 5 | d[i + 2] >> 3); return s.size; };

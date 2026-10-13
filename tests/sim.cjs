@@ -11,7 +11,7 @@ const NAMES = ['SIM_DT', 'BALL_R', 'CUP_R', 'CUP_DEPTH', 'CAP_V0', 'MIN_V', 'MAX
   'STEP_MAX', 'rect', 'ring', 'makeHole', 'inPoly', 'onFloor', 'zoneAt', 'baseAt', 'groundH', 'groundGrad', 'closestOnSeg', 'moverState',
   'moverTouch', 'newBall', 'launch', 'stepBall', 'simulatePutt', 'newRound', 'capOf', 'starsFor', 'resolvePutt',
   'resolveDrift', 'WORLD_ORDER', 'HOLES_PER', 'WORLDS', 'registerWorld', 'holeAt', 'nextKey', 'playable', 'freshProgress', 'recordHole',
-  'holeUnlocked'];
+  'holeUnlocked', 'NIGHT', 'mirrorDef', 'isNight'];
 
 function regionSource(only = parseOnly(process.env.PUTTX_ONLY)) { return simSource(only); }
 function loadSim(only) {

@@ -374,7 +374,7 @@ const HOLES_PER = 18;
 const WORLDS = {};
 function registerWorld(w, def) {
   const g = def.g || 1, feltMu = def.feltMu || SURF.felt.mu;
-  WORLDS[w] = { g, holes: def.holes.map((d, i) => Object.assign(makeHole(Object.assign({ g, feltMu }, d)), { key: w + '-' + (i + 1) })) };
+  WORLDS[w] = { g, feltMu, defs: def.holes, holes: def.holes.map((d, i) => Object.assign(makeHole(Object.assign({ g, feltMu }, d)), { key: w + '-' + (i + 1) })) };
 }
 function holeAt(key) {
   const [w, n] = String(key).split('-').map(Number);
@@ -384,14 +384,18 @@ function nextKey(key) { const [w, n] = key.split('-').map(Number); return WORLDS
 const playable = () => WORLD_ORDER.filter(w => WORLDS[w]);
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
-function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R' }; }
+function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R', mulligans: 5, lost: {}, obj: {}, daily: null }; }
 function recordHole(p, key, score, par, maxStars = 3) {
   const prev = p.holes[key];
   const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, Math.min(maxStars, starsFor(score, par))) };
   p.holes[key] = rec;
   /* the last hole of a course opens the next playable course */
   const [w, n] = key.split('-').map(Number), list = playable(), i = list.indexOf(w);
-  if (WORLDS[w] && n === WORLDS[w].holes.length && i >= 0 && i + 1 < list.length && !p.worlds.includes(list[i + 1])) p.worlds.push(list[i + 1]);
+  if (WORLDS[w] && n === WORLDS[w].holes.length && i >= 0) {
+    if (i + 1 < list.length && !p.worlds.includes(list[i + 1])) p.worlds.push(list[i + 1]);
+    /* finishing a course also opens its night remix */
+    if (WORLDS[NIGHT + w] && !p.worlds.includes(NIGHT + w)) p.worlds.push(NIGHT + w);
+  }
   return rec;
 }
 function holeUnlocked(p, key) {
@@ -401,6 +405,38 @@ function holeUnlocked(p, key) {
 /* ---- 2h. course packs ---- */
 /* Each courses/cNN.sim.js registers one course here (scripts/build.cjs inlines them). */
 /* @@COURSES_SIM@@ */
+
+/* ---- 2i. night remixes ---- */
+/* Course NIGHT + n is course n mirrored left to right (x -> -x). The physics is symmetric under
+   that mirror, so each proof carries over by mirroring its aims; tests/night-check.cjs replays all
+   of them. Spinners turn the other way, gates and tubes and pushes flip, ramps along x swap ends. */
+const NIGHT = 100;
+const mx = p => [-p[0], p[1]], mpoly = poly => poly.map(mx);
+function mirrorDef(d) {
+  const m = Object.assign({}, d);
+  for (const k of ['tee', 'cup']) if (d[k]) m[k] = mx(d[k]);
+  if (d.shape) m.shape = mpoly(d.shape);
+  if (d.floors) m.floors = d.floors.map(mpoly);
+  if (d.walls) m.walls = d.walls.map(mpoly);
+  if (d.inner) m.inner = d.inner.map(mpoly);
+  if (d.tiers) m.tiers = d.tiers.map(t => Object.assign({}, t, { poly: mpoly(t.poly), sx: t.sx ? -t.sx : t.sx }));
+  if (d.ramps) m.ramps = d.ramps.map(r => {
+    const h0 = r.h0 || 0, h1 = r.h1 !== undefined ? r.h1 : r.h, o = Object.assign({}, r, { x0: -r.x1, x1: -r.x0 });
+    delete o.h;
+    return r.axis === 'x' ? Object.assign(o, { h0: h1, h1: h0 }) : Object.assign(o, { h0, h1 });
+  });
+  if (d.bumps) m.bumps = d.bumps.map(b => Object.assign({}, b, { x: -b.x }));
+  if (d.zones) m.zones = d.zones.map(z => Object.assign({}, z, { poly: mpoly(z.poly) }, z.push ? { push: [-z.push[0], z.push[1]] } : {}));
+  if (d.posts) m.posts = d.posts.map(q => Object.assign({}, q, { x: -q.x }));
+  if (d.movers) m.movers = d.movers.map(v => v.kind === 'spin' ? Object.assign({}, v, { x: -v.x, w: -v.w, phase: -(v.phase || 0) })
+    : Object.assign({}, v, { ax: -v.ax, bx: -v.bx }, v.kind === 'gate' ? { ang: -(v.ang || 0) } : {}));
+  if (d.tubes) m.tubes = d.tubes.map(t => Object.assign({}, t, { a: mx(t.a), b: mx(t.b), dir: -t.dir }));
+  if (d.aim0 !== undefined) m.aim0 = -d.aim0;
+  if (d.sol) m.sol = d.sol.map(([a, p, t0]) => [(360 - a) % 360, p, t0]);
+  return m;
+}
+for (const w of WORLD_ORDER) if (WORLDS[w]) registerWorld(NIGHT + w, { g: WORLDS[w].g, feltMu: WORLDS[w].feltMu, holes: WORLDS[w].defs.map(mirrorDef) });
+const isNight = w => w > NIGHT;
 // #endregion sim
 
 /* ============ 3. SAVE ============ */
@@ -410,7 +446,7 @@ function loadProgress() {
   try {
     const p = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!p || p.v !== 2 || typeof p.holes !== 'object' || !p.holes || !Array.isArray(p.worlds)) return freshProgress();
-    const worlds = p.worlds.filter(w => WORLD_ORDER.includes(w));
+    const worlds = p.worlds.filter(w => WORLD_ORDER.includes(w) || WORLD_ORDER.includes(w - NIGHT));
     if (!worlds.includes(freshProgress().worlds[0])) return freshProgress();
     const holes = {};
     for (const [k, r] of Object.entries(p.holes)) {
@@ -500,10 +536,18 @@ const WORLD_LOOK = {};
 const DEFAULT_LOOK = { felt: '#36803a', wall: '#ffd66e', ground: '#c9a476', sky: ['#9fd8ef', '#fff1d6'], fog: true,
   sand: '#8a6236', ice: '#2f7ea6', mud: '#5b4630', fast: '#3f5f86', water: '#2f86c8', push: '#e9a23b', skirt: '#8a6538', tube: '#ef7d6d',
   flag: '#ef7d6d', jingle: [523, 659, 784, 1047], icon: '' };
-const lookOf = w => Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[w]);
+const dayOf = w => w > NIGHT ? w - NIGHT : w;
+/* a night remix wears its day course's look under a moon: deep sky, dimmer ground, a lit cup */
+const NIGHT_SKY = ['#0d1538', '#33407a'];
+const dim = (c, k) => '#' + new THREE.Color(c).lerp(new THREE.Color('#1b2246'), k).getHexString();
+const lookOf = w => {
+  const day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[dayOf(w)]);
+  if (w <= NIGHT) return day;
+  return Object.assign(day, { night: true, sky: NIGHT_SKY.slice(), fog: true, felt: dim(day.felt, 0.25), ground: day.ground && dim(day.ground, 0.6), skirt: dim(day.skirt, 0.45), wall: dim(day.wall, 0.2) });
+};
 /* what the player has equipped; the pro shop fills these in (see applyGear) */
 const GEAR = { ball: { base: '#fffdf7', band: '#ffd66e', mark: '#ef7d6d' }, putter: { head: '#c9ced6', metal: 0.85, shaft: '#d9dde3', grip: '#4a3826', shape: 'blade' } };
-let renderer = null, scene, camera, sun, holeGroup = null, ballMesh, flagGroup, moverMeshes = [], flowTex = [];
+let renderer = null, hemi = null, scene, camera, sun, holeGroup = null, ballMesh, flagGroup, moverMeshes = [], flowTex = [];
 const camNow = { pos: null, look: null };
 const play = { key: null, hole: null, round: null, ball: null, phase: 'idle', time: 0, from: null, t0: 0, aim: 0, swing: null, aimDrag: null,
   overview: false, cam: { yaw: 0 }, fx: {}, lastShot: null };
@@ -518,7 +562,7 @@ function initRenderer() {
   camera = new THREE.PerspectiveCamera(40, 1200 / 700, 0.05, 160);
   /* the swing pad covers the right edge, so the picture's centre sits left of the stage's */
   camera.setViewOffset(1200, 700, 60, 0, 1200, 700);
-  scene.add(new THREE.HemisphereLight(0xfff4e0, 0x8a7360, 1.4));
+  hemi = new THREE.HemisphereLight(0xfff4e0, 0x8a7360, 1.4); scene.add(hemi);
   sun = new THREE.DirectionalLight(0xffe2b8, 2.4);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -780,6 +824,10 @@ function buildHoleScene(h) {
   if (look.decor) look.decor(holeGroup, h);
   scene.background = skyTexture(look.sky[0], look.sky[1]);
   scene.fog = look.fog ? new THREE.Fog(look.sky[1], 16, 55) : null;
+  /* night: moonlight, stars, and a warm lamp in the cup */
+  hemi.intensity = look.night ? 0.6 : 1.4; hemi.color.set(look.night ? 0xaab8ff : 0xfff4e0);
+  sun.intensity = look.night ? 1.0 : 2.4; sun.color.set(look.night ? 0xc8d4ff : 0xffe2b8);
+  if (look.night) nightDecor(holeGroup, h);
   const B = holeBounds(h), ext = B.ext + 1.5;
   sun.position.set(B.cx + 3, 9, B.cz - 2.5); sun.target.position.set(B.cx, 0, B.cz);
   Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 0.5, far: 30 });
@@ -868,7 +916,8 @@ function renderFrame(dt) {
   if (!play.hole || currentScene === 'map' || currentScene === 'shop') return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
-  const lk = WORLD_LOOK[holeWorld(play.hole)]; if (lk && lk.tick) lk.tick(holeGroup, dt, play.time);
+  const lk = WORLD_LOOK[dayOf(holeWorld(play.hole))]; if (lk && lk.tick) lk.tick(holeGroup, dt, play.time);
+  syncLost(dt);
   syncBall(dt);
   syncGhost();
   updatePuffs(dt);
@@ -1168,11 +1217,12 @@ function drawShot(st) {
   shotPower.textContent = Math.round(st.power * 100);
 }
 
-function startHole(key) {
+function startHole(key, opts = {}) {
   const h = holeAt(key);
   if (!h) return false;
   Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, swing: null, aimDrag: null, fx: {}, lastOutcome: null, lastShot: null,
-    log: [], undo: null, mulled: false, ghost: null, intro: null, replay: null, camZoom: play.key === key ? play.camZoom : 0 });
+    log: [], undo: null, mulls: 0, touched: false, ghost: null, intro: null, replay: null, camZoom: play.key === key ? play.camZoom : 0,
+    practice: !opts.daily && !opts.friend && practiceMode, daily: opts.daily || null, friend: opts.friend || null, lost: null });
   play.aim = h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI;
   setOverview(false);
   simAcc = 0;
@@ -1181,7 +1231,7 @@ function startHole(key) {
   hideAim();
   for (const m of trailDots.concat(confetti)) m.visible = false;
   holeDone.classList.remove('show'); shotPanel.classList.remove('show'); play.lastPath = null; holeBanner.classList.remove('show');
-  setRead(false); initGhost(h); updateMulligan();
+  setRead(false); initGhost(h); startLostSearch(h); updateMode(); updateMulligan();
   for (const p of puffs) p.visible = false;
   syncBall(0);
   showScene('hole');
@@ -1189,8 +1239,8 @@ function startHole(key) {
   snapCamera();
   return true;
 }
-function goHole(key) {
-  sfx('tap'); wipe(); startHole(key); sfx('jingle', Number(key.split('-')[0]));
+function goHole(key, opts) {
+  sfx('tap'); wipe(); startHole(key, opts); sfx('jingle', dayOf(Number(key.split('-')[0])));
   /* the hole introduces itself: a sweep from over the cup back to the tee, with its number and par */
   if (!reducedMotion()) { play.intro = { t: 0, dur: 2.4 }; snapCamera(); }
   holeBannerN.textContent = key.split('-')[1]; holeBannerPar.textContent = play.hole.par;
@@ -1246,13 +1296,19 @@ function endRoll(end) {
   }
   updateHud(); updateMulligan();
 }
-/* the mulligan: once per hole, take the last stroke back (ball, count and penalty); that hole then tops out at 2 stars */
-function updateMulligan() { mulliganBtn.classList.toggle('show', play.phase === 'aim' && !!play.undo && !play.mulled && play.round.strokes > 0); }
+/* the mulligan: take the last stroke back (ball, count and penalty) for one token. Tokens come
+   from lost balls, goals, the daily hole and the pro shop; practice takes them back for free. */
+const canMulligan = () => play.phase === 'aim' && !play.daily && !!play.undo && play.round.strokes > 0 && (play.practice || progress.mulligans > 0);
+function updateMulligan() {
+  mulliganBtn.classList.toggle('show', canMulligan());
+  mulliganN.textContent = play.practice ? '\u221e' : progress.mulligans;
+}
 function mulligan() {
-  if (play.phase !== 'aim' || !play.undo || play.mulled) return false;
+  if (!canMulligan()) return false;
   const u = play.undo;
+  if (!play.practice) { progress.mulligans--; saveProgress(); }
   play.round.strokes = u.strokes; play.round.at = u.at.slice(); play.aim = u.aim;
-  play.ball = newBall(play.hole, u.at[0], u.at[1]); play.mulled = true; play.log.pop();
+  play.ball = newBall(play.hole, u.at[0], u.at[1]); play.undo = null; play.mulls++; play.log.pop();
   if (play.ghost) play.ghost.k = Math.max(0, play.ghost.k - 1);
   sfx('tubeOut'); updateHud(); updateMulligan();
   return true;
@@ -1266,7 +1322,7 @@ function hitSfx(name, v) {
 }
 function drainHits() {
   for (const [kind, v] of play.ball.hits) {
-    if (kind === 'wall' || kind === 'post') hitSfx('clonk', v);
+    if (kind === 'wall' || kind === 'post') { hitSfx('clonk', v); if (play.phase === 'roll') play.touched = true; }
     else if (kind === 'bump' || kind === 'mover') hitSfx('boing', v);
     else if (kind === 'lip') sfx('lip');
     else if (kind === 'land') { hitSfx('land', v); if (v > 0.8) puff(play.ball, 'dust', Math.min(14, 4 + v * 4)); if (v > 1.6) play.fx.shake = Math.min(1, v / 4); }
@@ -1294,6 +1350,7 @@ function advance(dt) {
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
   while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }
   drainHits();
+  stepLost();
   if (play.phase === 'roll' || play.phase === 'drift') setRoll(play.ball.air || play.ball.tube ? 0 : Math.hypot(play.ball.vx, play.ball.vz));
   const h = play.hole, b = play.ball, cy = groundH(h, h.cup[0], h.cup[1]);
   if (play.phase === 'auto') {
@@ -1347,17 +1404,26 @@ function updateHud() {
 function finishHole() {
   play.phase = 'done';
   const { key, round, hole } = play;
-  const maxStars = play.mulled ? 2 : 3, prev = progress.holes[key];
-  recordHole(progress, key, round.score, hole.par, maxStars);
-  /* a new best (or a first finish) becomes this hole's ghost, unless the cap rolled it in */
-  if (!round.auto && (!prev || round.score <= prev.best) && play.log.length === round.score) {
-    progress.ghosts = progress.ghosts && typeof progress.ghosts === 'object' ? progress.ghosts : {};
-    progress.ghosts[key] = play.log.slice();
+  /* practice keeps nothing; a daily or friend's hole you have not reached yet counts only for itself */
+  const counts = !play.practice && holeUnlocked(progress, key), prev = progress.holes[key];
+  if (counts) {
+    recordHole(progress, key, round.score, hole.par);
+    /* a new best (or a first finish) becomes this hole's ghost, unless the cap rolled it in */
+    if (!round.auto && (!prev || round.score <= prev.best) && play.log.length === round.score) {
+      progress.ghosts = progress.ghosts && typeof progress.ghosts === 'object' ? progress.ghosts : {};
+      progress.ghosts[key] = play.log.slice();
+    }
   }
-  onHoleFinished(key, round.score, hole.par);
+  let won = counts ? onHoleFinished(key, round.score, hole.par) : 0;
+  if (!play.practice) won += finishGoals(key, round, hole, counts);
+  if (play.daily && !play.practice) won += finishDaily(round.score);
+  if (won) showCoinPop(won);
   saveProgress();
   updateMulligan();
-  const stars = Math.min(maxStars, starsFor(round.score, hole.par));
+  holeDone.classList.toggle('practice', play.practice);
+  doneShare.classList.remove('ok');
+  doneShare.style.display = !round.auto && play.log.length >= 1 ? '' : 'none';
+  const stars = starsFor(round.score, hole.par);
   holeDone.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < stars));
   doneStrokes.textContent = round.score; donePar.textContent = hole.par;
   holeDone.classList.add('show');
@@ -1382,7 +1448,9 @@ function initGhost(h) {
     ghostMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 24, 16), new THREE.MeshBasicMaterial({ color: 0xbfe6f5, transparent: true, opacity: 0.45, depthWrite: false }));
     ghostMesh.renderOrder = 3; scene.add(ghostMesh);
   }
-  const log = progress.ghosts && progress.ghosts[h.key];
+  /* a friend's shared putt (?shot=) rides as a pink ghost instead of your own best */
+  const log = play.friend || (progress.ghosts && progress.ghosts[h.key]);
+  ghostMesh.material.color.set(play.friend ? 0xf6a6d8 : 0xbfe6f5);
   play.ghost = Array.isArray(log) && log.every(p => Array.isArray(p) && p.length === 3 && p.every(Number.isFinite)) ? { log, k: 0, b: newBall(h, h.tee[0], h.tee[1]), live: false, t: 0 } : null;
   ghostMesh.visible = false;
 }
@@ -1464,6 +1532,187 @@ function wipe() {
   wipeEl.classList.remove('go'); void wipeEl.offsetWidth; wipeEl.classList.add('go');
 }
 
+
+/* ---- 6c. extras: modes, lost balls, goals, the daily hole, shot codes, night ---- */
+let practiceMode = false, mapNight = false;
+/* save fields this section owns: mulligans (tokens), lost (key -> 1), obj (key -> goal bits), daily */
+function repairExtras(p) {
+  if (!Number.isInteger(p.mulligans) || p.mulligans < 0) p.mulligans = 5;
+  p.mulligans = Math.min(p.mulligans, 9999);
+  const keyed = (o, ok) => { const out = {}; if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) if (/^\d+-\d+$/.test(k) && ok(v)) out[k] = v; return out; };
+  p.lost = keyed(p.lost, v => v === 1);
+  p.obj = keyed(p.obj, v => Number.isInteger(v) && v >= 1 && v <= 7);
+  const d = p.daily;
+  p.daily = d && typeof d.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(d.d) && Number.isInteger(d.best) && d.best >= 1 && Number.isInteger(d.streak) && d.streak >= 1
+    ? { d: d.d, best: d.best, streak: d.streak } : null;
+}
+const addCoins = n => { progress.coins = Math.min(COIN_MAX, (progress.coins || 0) + n); return n; };
+
+/* the mode chip: practice (a target), the daily hole (a calendar), a friend's putt (their score) */
+const MODE_ICONS = {
+  practice: '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#fffdf7" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="15" fill="none" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="5" fill="#ef7d6d"/></svg>',
+  daily: '<svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="8" fill="#fffdf7" stroke="#a8804e" stroke-width="5"/><path d="M8 24 H56" stroke="#ef7d6d" stroke-width="10"/><path d="M20 6 V16 M44 6 V16" stroke="#a8804e" stroke-width="5" stroke-linecap="round"/></svg>',
+  friend: '<svg viewBox="0 0 64 64"><path d="M12 56 V28 A20 20 0 0 1 52 28 V56 L45 50 L38 56 L32 50 L26 56 L19 50 Z" fill="#fffdf7" stroke="#d38bbf" stroke-width="4" stroke-linejoin="round"/><circle cx="25" cy="30" r="4" fill="#4a3826"/><circle cx="39" cy="30" r="4" fill="#4a3826"/></svg>',
+};
+function updateMode() {
+  const m = play.practice ? 'practice' : play.daily ? 'daily' : play.friend ? 'friend' : '';
+  hudMode.className = 'chip' + (m ? ' show ' + m : '');
+  if (!m) return;
+  hudMode.querySelector('.ic').innerHTML = MODE_ICONS[m];
+  hudModeN.textContent = m === 'friend' ? (friendScore(play.hole, play.friend) || '') : m === 'daily' && progress.daily && progress.daily.d === play.daily ? progress.daily.best : '';
+}
+
+/* lost balls: one gold ball per hole, resting somewhere off the obvious line. Its spot is where
+   some putt from the tee really stops, so it is always reachable; roll over it to keep it. */
+const LOST_SHOTS = [], LOST_CACHE = {}, LOST_R = 0.1;
+for (let a = 0; a < 360; a += 10) for (const pw of [0.18, 0.3, 0.45, 0.62, 0.8]) LOST_SHOTS.push([a, pw]);
+let lostMesh = null;
+function lostScore(h, x, z) {
+  const d = (ax, az, bx, bz) => { const q = closestOnSeg(ax, az, bx, bz, x, z); return Math.hypot(x - q[0], z - q[1]); };
+  if (!onFloor(h, x, z) || zoneAt(h, x, z)) return -1;
+  if (Math.hypot(x - h.cup[0], z - h.cup[1]) < 0.9 || Math.hypot(x - h.tee[0], z - h.tee[1]) < 1) return -1;
+  if (h.segs.some(sg => d(...sg) < BALL_R + WALL_HALF + 0.06)) return -1;
+  if (h.posts.some(q => Math.hypot(x - q.x, z - q.z) < q.r + 0.16)) return -1;
+  if (h.tubes.some(t => [t.a, t.b].some(e => Math.hypot(x - e[0], z - e[1]) < TUBE_R + 0.16))) return -1;
+  if (h.movers.some(m => m.kind === 'spin' ? Math.hypot(x - m.x, z - m.z) < m.len + 0.2 : d(m.ax, m.az, m.bx, m.bz) < (m.kind === 'gate' ? m.len : m.r) + 0.2)) return -1;
+  const y = groundH(h, x, z);
+  for (let a = 0; a < 6.28; a += 0.8) if (Math.abs(groundH(h, x + Math.cos(a) * 0.12, z + Math.sin(a) * 0.12) - y) > 0.012) return -1;
+  return d(h.tee[0], h.tee[1], h.cup[0], h.cup[1]);
+}
+function lostStep(L) {
+  const [a, pw] = LOST_SHOTS[L.i++], h = L.h, r = simulatePutt(h, h.tee, a, pw, 0);
+  if (r.end === 'stop') { const sc = lostScore(h, r.x, r.z); if (sc > L.score) { L.score = sc; L.spot = [r.x, r.z]; } }
+  if (L.i >= LOST_SHOTS.length) { L.done = true; LOST_CACHE[h.key] = L.spot; }
+}
+function startLostSearch(h) {
+  play.lost = play.practice ? null : { h, i: 0, score: 0.25, spot: null, done: false, got: !!progress.lost[h.key] };
+  if (play.lost && h.key in LOST_CACHE) Object.assign(play.lost, { spot: LOST_CACHE[h.key], done: true });
+}
+const lostSpot = h => { const L = { h, i: 0, score: 0.25, spot: null, done: false }; if (h.key in LOST_CACHE) return LOST_CACHE[h.key]; while (!L.done) lostStep(L); return L.spot; };
+/* the search runs a few putts a frame (a few ms at most); the pick-up check runs every frame */
+function stepLost() {
+  const L = play.lost;
+  if (!L) return;
+  if (!L.done) { const until = performance.now() + 4; while (!L.done && performance.now() < until) lostStep(L); }
+  const b = play.ball;
+  if (L.done && L.spot && !L.got && (play.phase === 'roll' || play.phase === 'drift') && !b.tube && !b.air && Math.hypot(b.x - L.spot[0], b.z - L.spot[1]) < LOST_R) {
+    L.got = true; progress.lost[play.key] = 1; progress.mulligans++; addCoins(15); saveProgress();
+    sfx('coin'); setTimeout(() => sfx('star', 2), 120); puff({ x: L.spot[0], y: b.y, z: L.spot[1] }, 'dust', 14);
+    lostPop.classList.remove('show'); void lostPop.offsetWidth; lostPop.classList.add('show');
+    setTimeout(() => lostPop.classList.remove('show'), 1600);
+    updateMulligan(); renderWallet();
+  }
+}
+function syncLost(dt) {
+  if (!lostMesh) {
+    lostMesh = new THREE.Group();
+    const gold = new THREE.MeshStandardMaterial({ color: 0xffc94a, metalness: 0.7, roughness: 0.28, emissive: 0x5a3a00 });
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(BALL_R * 0.9, 20, 14), gold);
+    ball.castShadow = true; lostMesh.add(ball);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(BALL_R * 1.3, BALL_R * 1.75, 24), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.name = 'ring'; lostMesh.add(ring);
+    scene.add(lostMesh);
+  }
+  const L = play.lost, on = !!(L && L.done && L.spot && !L.got) && play.phase !== 'title' && play.phase !== 'replay';
+  lostMesh.visible = on;
+  if (!on) return;
+  const y = groundH(play.hole, ...L.spot), t = reducedMotion() ? 0 : play.time;
+  lostMesh.position.set(L.spot[0], y, L.spot[1]);
+  lostMesh.children[0].position.y = BALL_R * 0.55 + Math.sin(t * 2.4) * 0.01;
+  lostMesh.children[0].rotation.y = t * 1.5;
+  const ring = lostMesh.children[1]; ring.position.y = 0.004; ring.scale.setScalar(1 + (Math.sin(t * 3) + 1) * 0.15);
+}
+/* three goals per hole: under par, no wall touched, its lost ball found. Each first time pays 10;
+   all three pays a mulligan token. */
+function finishGoals(key, round, hole) {
+  const L = play.lost;
+  if (L && !L.done) while (!L.done) lostStep(L);
+  const noLost = L ? L.done && !L.spot : !lostSpot(hole);
+  const bits = (round.score < hole.par ? 1 : 0) | (!play.touched && !round.auto ? 2 : 0) | (progress.lost[key] || noLost ? 4 : 0);
+  const prev = progress.obj[key] | 0, fresh = bits & ~prev, all = prev | bits;
+  if (all) progress.obj[key] = all;
+  if (all === 7 && prev !== 7) progress.mulligans++;
+  doneObj.querySelectorAll('.obj').forEach((o, i) => { o.classList.toggle('on', !!(all & (1 << i))); o.classList.toggle('new', !!(fresh & (1 << i))); });
+  return addCoins(10 * ((fresh & 1) + ((fresh >> 1) & 1) + ((fresh >> 2) & 1)));
+}
+
+/* the daily hole: the same hole for everyone on a date, from all ten courses. First finish of the
+   day pays 25 and a token; days in a row grow the streak. */
+const dayStr = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function dailyKey(ds) {
+  let x = 2166136261;
+  for (const c of ds) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619) >>> 0; }
+  const keys = playable().flatMap(w => WORLDS[w].holes.slice(2).map(h => h.key));
+  return keys[x % keys.length];
+}
+function finishDaily(score) {
+  const ds = play.daily, d = progress.daily, y = new Date(); y.setDate(y.getDate() - 1);
+  if (d && d.d === ds) { d.best = Math.min(d.best, score); return 0; }
+  progress.daily = { d: ds, best: score, streak: d && d.d === dayStr(y) ? d.streak + 1 : 1 };
+  progress.mulligans++;
+  return addCoins(25);
+}
+function renderDaily() {
+  const ds = dayStr(), d = progress.daily, y = new Date(); y.setDate(y.getDate() - 1);
+  dailyDay.textContent = new Date().getDate();
+  dailyBtn.classList.toggle('done', !!d && d.d === ds);
+  const live = d && (d.d === ds || d.d === dayStr(y));
+  dailyStreak.textContent = live ? d.streak : '';
+  dailyStreak.classList.toggle('show', !!live);
+}
+
+/* shot codes: a finished hole's putts as a link (?shot=1-7_12.5~0.62~0_...). Opening one plays
+   that hole against the putts as a ghost. Only unreserved URL characters, nothing to escape. */
+const encodeShot = (key, log) => key + '_' + log.map(e => e.join('~')).join('_');
+function decodeShot(code) {
+  if (typeof code !== 'string' || code.length > 800) return null;
+  const [key, ...parts] = code.split('_'), h = holeAt(key);
+  if (!h || !parts.length || parts.length > capOf(h)) return null;
+  const log = parts.map(e => e.split('~').map(Number));
+  return log.every(e => e.length === 3 && e.every(Number.isFinite) && e[1] >= 0 && e[1] <= 1 && e[2] >= 0 && e[2] < 600) ? { key, log } : null;
+}
+function friendScore(h, log) {
+  let at = h.tee, n = 0;
+  for (const [a, pw, t0] of log) {
+    const r = simulatePutt(h, at, a, pw, t0);
+    n++;
+    if (r.end === 'sunk') return n;
+    if (r.end === 'oob') n++; else at = [r.x, r.z];
+  }
+  return null;
+}
+const shotUrl = () => location.origin + location.pathname + '?shot=' + encodeShot(play.key, play.log);
+function shareShot() {
+  const url = shotUrl(), ok = () => { doneShare.classList.add('ok'); sfx('star', 2); };
+  sfx('tap');
+  if (navigator.share) navigator.share({ url }).then(ok, () => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, () => {});
+}
+
+/* night: a starfield dome and a warm lamp glowing in the cup */
+function nightDecor(group, h) {
+  const B = holeBounds(h), pos = [];
+  let seed = 7;
+  const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 420; i++) {
+    const th = r() * Math.PI * 2, ph = 0.12 + r() * 1.3, R = 70;
+    pos.push(B.cx + Math.cos(th) * Math.cos(ph) * R, Math.sin(ph) * R, B.cz + Math.sin(th) * Math.cos(ph) * R);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  group.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xfff6d8, size: 0.45, fog: false })));
+  const y = groundH(h, ...h.cup);
+  const lamp = new THREE.PointLight(0xffd27a, 2.4, 3.2, 1.6); lamp.position.set(h.cup[0], y + 0.3, h.cup[1]); group.add(lamp);
+  const glow = new THREE.Mesh(new THREE.RingGeometry(CUP_R + 0.004, CUP_R + 0.04, 40), new THREE.MeshBasicMaterial({ color: 0xffd66e, transparent: true, opacity: 0.85, depthWrite: false }));
+  glow.rotation.x = -Math.PI / 2; glow.position.set(h.cup[0], y + 0.003, h.cup[1]); group.add(glow);
+}
+
+function initExtras() {
+  nightBtn.addEventListener('click', () => { sfx('tap'); mapNight = !mapNight; mapWorld = mapNight ? NIGHT + dayOf(mapWorld) : dayOf(mapWorld); renderMap(); });
+  practiceBtn.addEventListener('click', () => { sfx('tap'); practiceMode = !practiceMode; renderMap(); });
+  dailyBtn.addEventListener('click', () => { const ds = dayStr(); goHole(dailyKey(ds), { daily: ds }); });
+  doneShare.addEventListener('click', shareShot);
+}
+
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
@@ -1478,7 +1727,7 @@ function showTitle() {
   if (!play.hole || play.key !== key) startHole(key);
   play.phase = 'title'; titleT = 0;
   showScene('title');
-  renderTitleStrip(w);
+  renderTitleStrip(w); renderDaily();
 }
 function renderTitleStrip(cur) {
   titleStrip.innerHTML = '';
@@ -1499,19 +1748,19 @@ function tickTitle(dt) {
 function showMap(w) {
   if (currentScene === 'hole' || currentScene === 'card') wipe();
   setRead(false);
-  if (w) mapWorld = w;
-  if (!WORLDS[mapWorld]) mapWorld = playable()[0];
+  if (w) { mapWorld = w; mapNight = isNight(w); }
+  if (!WORLDS[mapWorld]) { mapWorld = playable()[0]; mapNight = false; }
   play.swing = null; play.aimDrag = null; hideAim();
   showScene('map');
   renderMap();
 }
 function renderMap() {
   worldTabs.innerHTML = '';
-  for (const w of WORLD_ORDER) {
-    const open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
-    b.className = 'btn' + (w === mapWorld ? ' on' : '') + (open ? '' : ' locked');
-    b.setAttribute('aria-label', 'course ' + w);
-    b.innerHTML = (lookOf(w).icon || `<span class="n">${w}</span>`) + (open ? '' : LOCK_SVG);
+  for (const d of WORLD_ORDER) {
+    const w = mapNight ? NIGHT + d : d, open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
+    b.className = 'btn' + (mapNight ? ' night' : '') + (w === mapWorld ? ' on' : '') + (open ? '' : ' locked');
+    b.setAttribute('aria-label', (mapNight ? 'night course ' : 'course ') + d);
+    b.innerHTML = (lookOf(d).icon || `<span class="n">${d}</span>`) + (open ? '' : LOCK_SVG);
     b.onclick = () => { if (open) { mapWorld = w; sfx('tap'); renderMap(); } else sfx('boink'); };
     worldTabs.append(b);
   }
@@ -1519,7 +1768,7 @@ function renderMap() {
   pathLine.innerHTML = `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="var(--v-surface-line)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 34"/>`;
   holePath.innerHTML = '';
   pts.forEach(([x, y], i) => {
-    const key = mapWorld + '-' + (i + 1), rec = progress.holes[key], open = holeUnlocked(progress, key);
+    const key = mapWorld + '-' + (i + 1), rec = progress.holes[key], open = holeUnlocked(progress, key) || (practiceMode && progress.worlds.includes(mapWorld));
     const b = document.createElement('button');
     b.className = 'btn node' + (open ? (rec ? '' : ' go') : ' locked');
     b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.animationDelay = (i * 0.03) + 's';
@@ -1529,6 +1778,9 @@ function renderMap() {
     holePath.append(b);
   });
   soundBtn.classList.toggle('off', !progress.sound);
+  map.classList.toggle('night', mapNight); map.classList.toggle('practice', practiceMode);
+  nightBtn.classList.toggle('on', mapNight); practiceBtn.classList.toggle('on', practiceMode);
+  mapLostN.textContent = holes.filter(h => progress.lost[h.key]).length + '/' + holes.length;
   renderWallet();
 }
 function showCard(w) {
@@ -1548,7 +1800,7 @@ function showCard(w) {
   cardTotal.textContent = total;
   cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
   cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
-  const list = playable(), next = list[list.indexOf(w) + 1];
+  const list = playable(), nd = list[list.indexOf(dayOf(w)) + 1], next = nd && (isNight(w) ? NIGHT + nd : nd);
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
   cardNext.onclick = () => { sfx('tap'); showMap(next); };
   showScene('card');
@@ -1661,6 +1913,7 @@ function initUpdates() {
 /* ============ 9. BOOT ============ */
 function boot() {
   progress = loadProgress();
+  repairExtras(progress);
   fit();
   initRenderer();
   initAim();
@@ -1688,10 +1941,17 @@ function boot() {
   titleGo.addEventListener('click', () => { sfx('tap'); showMap(); });
   cardMap.addEventListener('click', () => { sfx('tap'); showMap(); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
-  doneRetry.addEventListener('click', () => goHole(play.key));
-  doneNext.addEventListener('click', () => { const k = nextKey(play.key); if (k) goHole(k); else { sfx('tap'); showCard(Number(play.key.split('-')[0])); } });
+  doneRetry.addEventListener('click', () => goHole(play.key, { daily: play.daily, friend: play.friend }));
+  initExtras();
+  doneNext.addEventListener('click', () => {
+    const w = Number(play.key.split('-')[0]), k = nextKey(play.key);
+    if (play.daily || play.friend) { sfx('tap'); if (progress.worlds.includes(w)) showMap(w); else showTitle(); }
+    else if (k) goHole(k); else { sfx('tap'); showCard(w); }
+  });
   const q = new URLSearchParams(location.search);
-  if (q.has('hole') && holeAt(q.get('hole'))) startHole(q.get('hole'));
+  const shot = q.has('shot') && decodeShot(q.get('shot'));
+  if (shot) { showTitle(); goHole(shot.key, { friend: shot.log }); }
+  else if (q.has('hole') && holeAt(q.get('hole'))) startHole(q.get('hole'));
   else if (q.has('map')) { showTitle(); showMap(); }
   else showTitle();
   addEventListener('resize', () => { fit(); resizeRenderer(); });

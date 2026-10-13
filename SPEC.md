@@ -66,6 +66,23 @@ unlocks the next course.
   cup floor.
 - **Readout.** After each putt: path arrow, strike dot, tempo needle and power.
 
+## Extras
+
+- **Mulligans.** A take-back rewinds the last stroke (ball, count, penalty) for one token. A
+  fresh save starts with 5; lost balls, goals, the daily hole and the pro shop add more.
+  Practice takes back for free; the daily hole allows none.
+- **Lost balls.** One gold ball per hole, resting where some putt from the tee really stops,
+  away from the line, the cup and every obstacle. Rolling over it pays a token and 15 coins, once.
+- **Goals.** Three per hole on the done card: under par, no wall touched, lost ball found.
+  Each first time pays 10 coins; all three pays a token.
+- **Daily hole.** The calendar on the title plays one hole picked from the date, the same for
+  everyone that day. The first finish of the day pays 25 coins and a token and grows the streak.
+- **Shot codes.** The share button on the done card makes a link (`?shot=1-7_12.5~0.62~0_...`).
+  Opening it plays that hole with the putts as a pink ghost and their score in the HUD.
+- **Practice.** The target on the map: every hole of an open course, free take-backs, nothing saved.
+- **Night remixes.** Finishing a course opens course 100 + n: the same holes mirrored left to
+  right under moonlight, stars and a lit cup. The moon on the map flips the course tabs.
+
 ## Pro shop
 
 Coins from every hole (more for under par and aces). Putters change the look and how forgiving
@@ -74,7 +91,8 @@ cosmetic. Wordless, prices in numerals.
 
 ## Persistence
 
-`localStorage` key `puttx.v2`: per-hole best and stars, unlocked courses, sound, coins and gear.
+`localStorage` key `puttx.v2`: per-hole best and stars, unlocked courses, sound, coins and gear,
+mulligan tokens, lost balls found, goal bits per hole, the daily record and ghosts.
 Missing or corrupt data falls back to a fresh save. v1 saves are left alone.
 
 ## Verification

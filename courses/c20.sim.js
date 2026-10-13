@@ -138,7 +138,7 @@ registerWorld(20, { holes: [
     movers: [{ kind: 'spin', x: 1.4, z: 5.05, len: 0.42, w: 1.5, phase: 0, blades: 2, look: 'windmill' }],
     tubes: [{ a: [2.3, 4.75], b: [2.3, 7.4], dir: 345 }] },
   /* 15. twin kickers: two kickers off the high tee onto the landing isle, then a bare bridge past a sliding cloud to the green */
-  { par: 3, sol: [[16,0.88,0],[327,0.34,0]], tee: [0, 0.6], cup: [0.5, 8.0],
+  { par: 3, sol: [[22,0.9,0],[326,0.35,0.5],[9,0.41,0]], tee: [0, 0.6], cup: [0.5, 8.0],
     floors: [rect(-1, 0, 1, 2.4), rect(-1.4, 3.4, 1.4, 5.4), rect(-0.3, 5.4, 0.3, 6.6), rect(-1.2, 6.6, 1.2, 8.8)],
     walls: [[[-1, 2.4], [-1, 0], [1, 0], [1, 2.4]], [[-0.2, 2.4], [0.2, 2.4]], [[-1.4, 3.4], [-1.4, 5.4], [-0.3, 5.4]], [[1.4, 3.4], [1.4, 5.4], [0.3, 5.4]], [[-1.2, 7.8], [-1.2, 8.8], [1.2, 8.8], [1.2, 7.8]]],
     tiers: [{ poly: C20_PAD(-1, 0, 1, 2.4), h: 0.45 }, { poly: C20_PAD(-1.4, 3.4, 1.4, 5.4), h: 0.1 }, { poly: rect(-0.3, 5.4, 0.3, 6.6), h: 0.1 }, { poly: C20_PAD(-1.2, 6.6, 1.2, 8.8), h: 0.1 }],

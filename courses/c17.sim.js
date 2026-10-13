@@ -96,7 +96,7 @@ registerWorld(17, { holes: [
     posts: [C17_GARG(-1.15, 3.8), C17_GARG(-0.85, 5.3)],
     movers: [C17_MILL(0.4, 2.6, 0.55, 1.5, 0), C17_GHOST(-0.8, 8.0, 0.8, 8.0, 2.6, 0)] },
   /* 14: the secret library: four rooms, eight passages, only four of them go forward */
-  { par: 4, crazy: true, sol: [], tee: [0.8, 0.5], cup: [-0.5, 0.7], aim0: 0, shape: rect(-1.6, 0, 1.6, 7.2),
+  { par: 4, crazy: true, sol: [[207,0.9,0],[6,0.1,0],[204,0.95,0],[6,0.5,0]], tee: [0.8, 0.5], cup: [-0.5, 0.7], aim0: 0, shape: rect(-1.6, 0, 1.6, 7.2),
     inner: [[[0, 0], [0, 7.2]], [[-1.6, 3.6], [1.6, 3.6]]],
     tubes: [{ a: [1.2, 3.0], b: [0.8, 4.0], dir: 0 }, { a: [0.35, 3.0], b: [0.35, 0.5], dir: 0 },
       { a: [0.35, 6.7], b: [-0.4, 6.6], dir: 270 }, { a: [1.2, 6.7], b: [1.2, 1.5], dir: 0 },

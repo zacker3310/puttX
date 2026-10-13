@@ -78,7 +78,7 @@ registerWorld(25, (() => {
       bumps: [{ x: 0.2, z: 1.4, r: 0.5, h: 0.18 }, { x: 0, z: 3.6, r: 0.5, h: 0.2 }, { x: 0.2, z: 6.0, r: 0.5, h: 0.2 }],
       zones: [lagoon(rect(1.1, 6.6, 1.8, 7.8)), sand(rect(-1.8, 8.6, -0.8, 9.6))], posts: [BARREL(0.0, 8.6)] },
     /* 11 zig-zag rigging: three gangplanks up three decks to the crow's nest */
-    { par: 4, sol: [], tee: [0, 0.5], cup: [0.8, 9.8], aim0: 25, shape: rect(-1.6, 0, 1.6, 10.6),
+    { par: 4, sol: [[36,0.9,0],[333,0.85,0],[186.75,0.92,0]], tee: [0, 0.5], cup: [0.8, 9.8], aim0: 25, shape: rect(-1.6, 0, 1.6, 10.6),
       ramps: [{ x0: 0.9, z0: 1.6, x1: 1.6, z1: 2.8, axis: 'z', h0: 0, h1: 0.14 }, { x0: -1.6, z0: 4.2, x1: -0.9, z1: 5.4, axis: 'z', h0: 0.14, h1: 0.28 },
         { x0: 0.9, z0: 6.8, x1: 1.6, z1: 8.0, axis: 'z', h0: 0.28, h1: 0.42 }],
       tiers: [{ poly: rect(-1.7, 2.8, 1.7, 10.7), h: 0.14 }, { poly: rect(-1.7, 5.4, 1.7, 10.7), h: 0.28 }, { poly: rect(-1.7, 8.0, 1.7, 10.7), h: 0.42 }],

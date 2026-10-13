@@ -382,6 +382,11 @@ function holeAt(key) {
 }
 function nextKey(key) { const [w, n] = key.split('-').map(Number); return WORLDS[w] && n < WORLDS[w].holes.length ? w + '-' + (n + 1) : null; }
 const playable = () => WORLD_ORDER.filter(w => WORLDS[w]);
+/* each world has three courses of 18: course w, then w + 10 and w + 20, each more intricate */
+const COURSE_STEP = 10, COURSES_PER = 3;
+const coursesOf = w => Array.from({ length: COURSES_PER }, (_, k) => w + k * COURSE_STEP).filter(c => WORLDS[c]);
+const allCourses = () => WORLD_ORDER.flatMap(coursesOf);
+const worldOf = c => ((c % 100) - 1) % COURSE_STEP + 1;
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
 function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R', mulligans: 5, lost: {}, obj: {}, daily: null }; }
@@ -391,10 +396,13 @@ function recordHole(p, key, score, par, maxStars = 3) {
   p.holes[key] = rec;
   /* the last hole of a course opens the next playable course */
   const [w, n] = key.split('-').map(Number), list = playable(), i = list.indexOf(w);
-  if (WORLDS[w] && n === WORLDS[w].holes.length && i >= 0) {
-    if (i + 1 < list.length && !p.worlds.includes(list[i + 1])) p.worlds.push(list[i + 1]);
+  const open = c => { if (WORLDS[c] && !p.worlds.includes(c)) p.worlds.push(c); };
+  if (WORLDS[w] && n === WORLDS[w].holes.length && w < NIGHT) {
+    /* a world's first course opens the next world; each course opens the next one in its world */
+    if (i >= 0 && i + 1 < list.length) open(list[i + 1]);
+    if (w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
     /* finishing a course also opens its night remix */
-    if (WORLDS[NIGHT + w] && !p.worlds.includes(NIGHT + w)) p.worlds.push(NIGHT + w);
+    open(NIGHT + w);
   }
   return rec;
 }
@@ -435,7 +443,7 @@ function mirrorDef(d) {
   if (d.sol) m.sol = d.sol.map(([a, p, t0]) => [(360 - a) % 360, p, t0]);
   return m;
 }
-for (const w of WORLD_ORDER) if (WORLDS[w]) registerWorld(NIGHT + w, { g: WORLDS[w].g, feltMu: WORLDS[w].feltMu, holes: WORLDS[w].defs.map(mirrorDef) });
+for (const w of allCourses()) registerWorld(NIGHT + w, { g: WORLDS[w].g, feltMu: WORLDS[w].feltMu, holes: WORLDS[w].defs.map(mirrorDef) });
 const isNight = w => w > NIGHT;
 // #endregion sim
 
@@ -446,7 +454,7 @@ function loadProgress() {
   try {
     const p = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!p || p.v !== 2 || typeof p.holes !== 'object' || !p.holes || !Array.isArray(p.worlds)) return freshProgress();
-    const worlds = p.worlds.filter(w => WORLD_ORDER.includes(w) || WORLD_ORDER.includes(w - NIGHT));
+    const worlds = p.worlds.filter(w => !!WORLDS[w]);
     if (!worlds.includes(freshProgress().worlds[0])) return freshProgress();
     const holes = {};
     for (const [k, r] of Object.entries(p.holes)) {
@@ -541,7 +549,8 @@ const dayOf = w => w > NIGHT ? w - NIGHT : w;
 const NIGHT_SKY = ['#0d1538', '#33407a'];
 const dim = (c, k) => '#' + new THREE.Color(c).lerp(new THREE.Color('#1b2246'), k).getHexString();
 const lookOf = w => {
-  const day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[dayOf(w)]);
+  /* a world's later courses inherit its first course's look and override what they like */
+  const d = dayOf(w), day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[worldOf(d)], d !== worldOf(d) ? WORLD_LOOK[d] : null);
   if (w <= NIGHT) return day;
   return Object.assign(day, { night: true, sky: NIGHT_SKY.slice(), fog: true, felt: dim(day.felt, 0.25), ground: day.ground && dim(day.ground, 0.6), skirt: dim(day.skirt, 0.45), wall: dim(day.wall, 0.2) });
 };
@@ -916,7 +925,7 @@ function renderFrame(dt) {
   if (!play.hole || currentScene === 'map' || currentScene === 'shop') return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
-  const lk = WORLD_LOOK[dayOf(holeWorld(play.hole))]; if (lk && lk.tick) lk.tick(holeGroup, dt, play.time);
+  const lk = lookOf(holeWorld(play.hole)); if (lk.tick) lk.tick(holeGroup, dt, play.time);
   syncLost(dt);
   syncBall(dt);
   syncGhost();

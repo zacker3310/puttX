@@ -136,7 +136,7 @@ if (require.main === module) {
   const onlyHole = val('--hole'), onlyWorld = Number(val('--course') || val('--world')) || null, doBot = args.includes('--bot'), asJson = args.includes('--json');
   let missed = 0;
   const rows = [];
-  for (const w of S.WORLD_ORDER) {
+  for (const w of S.allCourses()) {
     if (!S.WORLDS[w] || (onlyWorld && w !== onlyWorld)) continue;
     for (const h of S.WORLDS[w].holes) {
       if (onlyHole && h.key !== onlyHole) continue;

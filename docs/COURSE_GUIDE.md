@@ -1,9 +1,12 @@
 # Course authoring guide
 
-PuttX v2 has 10 courses of 18 holes for players around 12. Each course is two files:
+PuttX v2 has 10 worlds of three 18-hole courses for players around 12: world w is courses w, w + 10
+and w + 20 (world 3 is courses 3, 13 and 23). Each course is two files:
 
 - `courses/cNN.sim.js` holds the holes. It is pure data inlined into the deterministic sim region, so no `THREE`, DOM, `Math.random` or clocks.
 - `courses/cNN.look.js` sets `WORLD_LOOK[N]`: colours, props, custom post and mover meshes, decor and per-frame `tick`. It may use `THREE`.
+  Courses w + 10 and w + 20 inherit everything from `WORLD_LOOK[w]` and set only what they change
+  (a time-of-day palette, new props, new mover meshes), so `WORLD_LOOK[13] = { felt: ..., sky: [...] }` is enough.
 
 `scripts/build.cjs` inlines both into `index.html`. Do not edit `index.html`, `src/` or anything outside your two files.
 
@@ -69,6 +72,16 @@ registerWorld(N, { g: 1, feltMu: 0.075, holes: [
 - **`sol`** is a list of `[angle, power, t0]` from `scripts/solve.cjs`. `holes-check` replays it, so it must sink within par.
 - **Course options** on `registerWorld`: `g` is the gravity scale (space is 0.427) and `feltMu` is the felt friction.
 
+## Showpiece flags
+
+- **`crazy: true`** marks a course's 3 to 6 wildest holes. The tracker records birdies, eagles and
+  albatrosses on them, and the map marks them. Every course needs 3 to 6.
+- **`auto: true`** marks an "automatic" hole: a long, absurd, multi-stage route (ramps, banked
+  turns, rails, tubes, funnels) that a well-struck putt rides all the way into the cup. It must
+  look mental and play easy. Its `sol` is a single ace, and `holes-check` requires at least half of
+  21 putts around that line (aim +-0.6 degrees, power +-0.036) to ace; the 4% ace gate does not
+  apply. At most 2 per course, and usually par 3 or 4 so the ace is an albatross or eagle.
+
 ## Look file
 
 ```js
@@ -89,6 +102,15 @@ Look rules:
 - The white ball must read at 3:1 or better against your felt and your surfaces.
 - Keep geometry low-poly: one shadow light, 60 fps on an iPad.
 - Decor must never sit on or float over the playing surface, and must not block the camera behind the tee.
+
+## Courses 2 and 3 of a world: more intricate, not harder
+
+- Course w + 10 keeps the world's theme and difficulty band but every hole has more going on:
+  more parts, more mechanisms, more ways round. At least 8 of its holes are 3-part holes.
+- Course w + 20 is the world's masterpiece: at least 10 holes of 3 or 4 stages, layered tiers,
+  chained tubes, switchback ramps, moving gates guarding drops. Still fair: the bot band below
+  still applies, a little above course w at most.
+- Each of the two has one or two `auto` holes and 3 to 6 `crazy` holes.
 
 ## Design brief: harder, for 12-year-olds
 

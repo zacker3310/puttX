@@ -3,7 +3,7 @@
 'use strict';
 const { check, done } = require('./lib.cjs');
 const S = require('./sim.cjs').loadSim();
-const days = S.playable(), bad = [];
+const days = S.allCourses(), bad = [];
 check('every course has a night remix with the same number of holes', days.every(w => S.WORLDS[S.NIGHT + w] && S.WORLDS[S.NIGHT + w].holes.length === S.WORLDS[w].holes.length));
 for (const w of days) for (const h of S.WORLDS[S.NIGHT + w].holes) {
   let at = h.tee, r = null;

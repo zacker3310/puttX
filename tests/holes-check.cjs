@@ -8,9 +8,10 @@
      - movers never pinch a ball against a wall, never sweep the cup, never hit a post
      - tube mouths and exits on flat floor, clear of walls; each exit has room to roll out
      - `sol` sinks within par
-     - at most 4% of a 72 x 20 grid of putts from the tee is an ace (the cup is friendly; the tee shot is not)
+     - at most 4% of a 72 x 20 grid of putts from the tee is an ace (the cup is friendly; the tee shot is not),
+       except an `auto` hole: one ace line that at least half of nearby putts ride in (at most 2 a course)
      - 180 full-power putts plus 60 random ones stay in (walled holes) and terminate
-   PUTTX_ONLY=3 checks one course. PUTTX_ALL_WORLDS=1 also requires all ten courses of 18. */
+   PUTTX_ONLY=3 checks one course. PUTTX_ALL_WORLDS=1 also requires all thirty courses of 18, each with 3 to 6 `crazy` holes. */
 'use strict';
 const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
 const os = require('os');
@@ -99,9 +100,18 @@ function checkHole(S, h) {
   for (const [a, p, t0] of h.sol || []) { last = S.simulatePutt(h, at, a, p, t0); if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
   check(`bot solution sinks within par ${h.par}`, !!h.sol && h.sol.length <= h.par && last && last.end === 'sunk', JSON.stringify(h.sol));
 
-  let aces = 0;
-  for (let a = 0; a < 72; a++) for (let p = 1; p <= 20; p++) if (S.simulatePutt(h, h.tee, a * 5, p / 20, 0).end === 'sunk') aces++;
-  check('not a gimme: at most 4% of tee shots ace', aces / 1440 <= 0.04, `${aces} of 1440`);
+  if (h.auto) {
+    /* an "auto" hole is a showpiece: one controlled line that nearly plays itself into the cup.
+       Its sol is a single ace, and at least half of the putts near that line ace too. */
+    const [a0, p0] = h.sol[0];
+    let near = 0, tot = 0;
+    for (const da of [-0.6, 0, 0.6]) for (let k = -3; k <= 3; k++) { tot++; if (S.simulatePutt(h, h.tee, a0 + da, Math.min(1, Math.max(0.02, p0 + k * 0.012)), 0).end === 'sunk') near++; }
+    check('auto hole: its sol is an ace and the line around it nearly always aces', h.sol.length === 1 && near / tot >= 0.5, `${near} of ${tot}`);
+  } else {
+    let aces = 0;
+    for (let a = 0; a < 72; a++) for (let p = 1; p <= 20; p++) if (S.simulatePutt(h, h.tee, a * 5, p / 20, 0).end === 'sunk') aces++;
+    check('not a gimme: at most 4% of tee shots ace', aces / 1440 <= 0.04, `${aces} of 1440`);
+  }
 
   let seed = 12345 + h.key.length;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -123,9 +133,13 @@ function checkHole(S, h) {
   const { check, done } = require('./lib.cjs');
   const S = require('./sim.cjs').loadSim();
   const STRICT = process.env.PUTTX_ALL_WORLDS === '1';
-  const worlds = S.playable();
-  if (STRICT) check('all ten courses are registered', worlds.length === 10, worlds.join());
+  const worlds = S.allCourses();
+  if (STRICT) check('all thirty courses are registered', worlds.length === 30, worlds.join());
   for (const w of worlds) check(`course ${w}: ${S.HOLES_PER} holes`, S.WORLDS[w].holes.length === S.HOLES_PER || !STRICT, 'has ' + S.WORLDS[w].holes.length);
+  for (const w of worlds) {
+    const hs = S.WORLDS[w].holes, auto = hs.filter(h => h.auto).length, crazy = hs.filter(h => h.crazy).length;
+    check(`course ${w}: at most 2 auto holes, 3 to 6 crazy holes`, auto <= 2 && ((crazy >= 3 && crazy <= 6) || !STRICT), `auto ${auto}, crazy ${crazy}`);
+  }
   check('at least one course registered', worlds.length > 0);
   const keys = worlds.flatMap(w => S.WORLDS[w].holes.map(h => h.key));
   const n = Math.max(1, Math.min(os.cpus().length, 4)), parts = Array.from({ length: n }, (_, i) => keys.filter((_, k) => k % n === i));

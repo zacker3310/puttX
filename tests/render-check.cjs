@@ -53,7 +53,7 @@ const { check, done, open } = require('./lib.cjs');
   /* every tee of every course: the ball in frame, in front of the camera, camera clear of the ground; overview frames the hole */
   const framing = await page.evaluate(() => {
     const bad = [];
-    for (const w of playable().concat([97])) for (const h of WORLDS[w].holes) {
+    for (const w of allCourses().concat([97])) for (const h of WORLDS[w].holes) {
       startHole(h.key); snapCamera(); camera.updateMatrixWorld();
       const ball = new THREE.Vector3(h.tee[0], groundH(h, ...h.tee) + BALL_R, h.tee[1]).project(camera);
       const camGround = groundH(h, camera.position.x, camera.position.z);
@@ -76,7 +76,7 @@ const { check, done, open } = require('./lib.cjs');
   /* every course look renders and the white ball reads against its felt at 3:1 */
   const looks = await page.evaluate(() => {
     const lum = p => { const c = [0, 1, 2].map(i => { const s = p[i] / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
-    return playable().map(w => {
+    return allCourses().map(w => {
       startHole(w + '-1'); loopPaused = true; snapCamera(); renderFrame(0.016); putter.visible = false; aimGroup.visible = false; renderer.render(scene, camera);
       const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
       const at = (x, y, z) => { const v = new THREE.Vector3(x, y, z).project(camera), px = new Uint8Array(4); gl.readPixels(Math.round((v.x + 1) / 2 * W), Math.round((v.y + 1) / 2 * H), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return [...px]; };

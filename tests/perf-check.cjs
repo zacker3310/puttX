@@ -15,7 +15,7 @@ const { check, done, open } = require('./lib.cjs');
   check('manifest and apple-touch-icon resolve', links.manifest && links.icon, JSON.stringify(links));
   const budget = await page.evaluate(() => {
     let maxTris = 0, worst = '';
-    for (const w of playable()) for (const h of WORLDS[w].holes) {
+    for (const w of allCourses()) for (const h of WORLDS[w].holes) {
       startHole(h.key); renderFrame(0.016);
       const t = renderer.info.render.triangles; if (t > maxTris) { maxTris = t; worst = h.key; }
     }

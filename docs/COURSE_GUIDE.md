@@ -65,7 +65,7 @@ registerWorld(N, { g: 1, feltMu: 0.075, holes: [
   - A ball over the cup drops if it is slower than 1.45 m/s times the chord factor `sqrt(1 - (offset/0.11)^2)`. A ball crawling at under 0.22 m/s always drops.
   - A faster dead-centre ball hops out. A faster off-centre ball lips out, deflected more the further off-centre it is.
 - **`aim0`** is the opening aim at the tee in degrees. Set it whenever the cup is not the way to go from the tee: blind doglegs, tubes, bank shots.
-- **`par`** is 2 to 5. The stroke cap is par + 3: the ball auto-sinks and the hole scores par + 3, so there are no fail states.
+- **`par`** is 2 to 5. The stroke cap is double par: the ball auto-sinks and the hole scores double par, so there are no fail states.
 - **`sol`** is a list of `[angle, power, t0]` from `scripts/solve.cjs`. `holes-check` replays it, so it must sink within par.
 - **Course options** on `registerWorld`: `g` is the gravity scale (space is 0.427) and `feltMu` is the felt friction.
 

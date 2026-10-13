@@ -95,12 +95,13 @@ WORLD_LOOK[5] = (() => {
     const sandy = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad * 1.15, 0.1, 20), mat('#f1d79c', { roughness: 1 })); sandy.position.y = 0.02; sandy.receiveShadow = true; g.add(sandy);
     const k = r();
     const top = k < 0.6 ? palm(r) : k < 0.8 ? chest() : barrel(0.12, 0.24);
-    top.position.y = 0.07; top.userData.tall = k < 0.6; g.add(top);
+    top.position.y = 0.07; g.add(top);
+    g.userData.prop = Math.max(rad * 1.15, k < 0.6 ? 0.34 : 0);
     return g;
   }
   function floater(r) {
     const g = new THREE.Group(), b = barrel(0.11, 0.24); b.rotation.z = Math.PI / 2; b.position.set(0.12, 0.06, 0); g.add(b);
-    g.userData.bob = r() * 6; return g;
+    g.userData.bob = r() * 6; g.userData.prop = 0.22; return g;
   }
   function ship() {
     const g = new THREE.Group(), hull = mat('#8a6538', { roughness: 0.7 });
@@ -129,12 +130,20 @@ WORLD_LOOK[5] = (() => {
     decor(group, h) {
       const B = holeBounds(h), s = ship();
       s.position.set(B.x1 + 3.2, -0.05, B.z1 + 2.2); s.rotation.y = 0.5; group.add(s); group.userData.ship = s;
-      const floats = [], tee = new THREE.Vector3();
-      group.traverse(o => {
+      /* scenery stays tidy: no prop touching another, the ship, or the camera's view from the tee */
+      const floats = [], kept = [], a0 = (h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI) * Math.PI / 180;
+      const camX = h.tee[0] - Math.sin(a0) * 1.8, camZ = h.tee[1] - Math.cos(a0) * 1.8;
+      for (const o of group.children) {
+        const rad = o.userData.prop;
+        if (rad === undefined) continue;
+        const x = o.position.x, z = o.position.z;
+        const clash = Math.hypot(x - h.tee[0], z - h.tee[1]) < 3 || Math.hypot(x - camX, z - camZ) < 2.6 || Math.hypot(x - s.position.x, z - s.position.z) < 2.3 + rad
+          || h.segs.some(q => { const c = closestOnSeg(q[0], q[1], q[2], q[3], x, z); return Math.hypot(x - c[0], z - c[1]) < rad + 0.2; })
+          || kept.some(k => Math.hypot(x - k.x, z - k.z) < rad + k.rad + 0.12);
+        if (clash) { o.visible = false; continue; }
+        kept.push({ x, z, rad });
         if (o.userData.bob !== undefined) floats.push(o);
-        /* no palm fronds in the camera's face behind the tee */
-        if (o.userData.tall) { o.getWorldPosition(tee); if (Math.hypot(tee.x - h.tee[0], tee.z - h.tee[1]) < 3.2) o.visible = false; }
-      });
+      }
       group.userData.floats = floats;
     },
     tick(group, dt, t) {

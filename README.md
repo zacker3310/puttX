@@ -17,7 +17,7 @@ Play at **https://zacker3310.github.io/puttX/**.
 
 ## For grown-ups
 
-- **No fail states.** After par + 3 putts the ball rolls itself in. Stars (1 finish, 2 par,
+- **No fail states.** After double par the ball rolls itself in. Stars (1 finish, 2 par,
   3 under par) and best scores only ever go up.
 - **Hard but fair.** Every par is proven by a solver bot, and a second bot with human-sized aim
   and pace errors measures how hard each hole really is.

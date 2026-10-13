@@ -31,8 +31,8 @@
   const airlock = m => {
     const g = new THREE.Group(), n = Math.max(2, Math.round(m.len * 2 / 0.2));
     for (let i = 0; i < n; i++) {
-      const seg = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, 0.18, m.len * 2 / n), mat(i % 2 ? '#3f5f86' : '#ffd66e', { roughness: 0.5 }));
-      seg.position.set(0, 0.09, -m.len + (i + 0.5) * m.len * 2 / n); seg.castShadow = true; g.add(seg);
+      const seg = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2 - 0.006, 0.14, m.len * 2 / n), mat(i % 2 ? '#4f8fb8' : '#ffd66e', { roughness: 0.5 }));
+      seg.position.set(0, 0.07, -m.len + (i + 0.5) * m.len * 2 / n); seg.castShadow = true; g.add(seg);
     }
     return g;
   };
@@ -64,7 +64,7 @@
       const light = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffd66e }));
       buoy.position.y = y; light.position.y = y + 0.11; light.name = 'beacon'; g.add(buoy, light);
     }
-    g.userData.bob = r() * 6.28; g.name = 'drift'; return g;
+    g.userData.bob = r() * 6.28; g.userData.size = g.children[0].geometry.parameters.radius || 0.1; g.name = 'drift'; return g;
   };
   WORLD_LOOK[8] = {
     /* white ball against this felt and the push zones stays above 3:1 */
@@ -99,11 +99,36 @@
           light.position.set(x, top + 0.12, z); light.name = 'lamp'; group.add(light);
         }
       }
-      /* airlock housings: a door that slides off the deck parks inside one */
+      /* airlock housings: wherever a door slides into a wall or off the deck, a hull block swallows it,
+         so no door ever pokes through a wall or hangs over space */
       for (const m of h.movers) {
-        if (m.look !== 'airlock' || onFloor(h, m.bx, m.bz)) continue;
-        const a = (m.ang || 0) * Math.PI / 180, hs = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.28, m.len * 2 + 0.1), mat('#ef7d6d', { roughness: 0.55 }));
-        hs.position.set(m.bx, groundH(h, m.bx, m.bz) + 0.08, m.bz); hs.rotation.y = a; hs.castShadow = true; group.add(hs);
+        if (m.look !== 'airlock') continue;
+        const a = (m.ang || 0) * Math.PI / 180, ux = Math.sin(a), uz = Math.cos(a);
+        const ta = m.ax * ux + m.az * uz, tb = m.bx * ux + m.bz * uz, t0 = Math.min(ta, tb) - m.len, t1 = Math.max(ta, tb) + m.len;
+        const ox = m.ax - ta * ux, oz = m.az - ta * uz, runs = [];
+        let cur = null;
+        for (let t = t0; t <= t1 + 1e-6; t += 0.01) {
+          const x = ox + t * ux, z = oz + t * uz;
+          const hidden = !onFloor(h, x, z) || h.segs.some(sg => { const c = closestOnSeg(sg[0], sg[1], sg[2], sg[3], x, z); return Math.hypot(x - c[0], z - c[1]) < WALL_HALF; });
+          if (hidden) { if (!cur) runs.push(cur = [t, t]); else cur[1] = t; } else cur = null;
+        }
+        for (const [s0, s1] of runs) {
+          if (s1 - s0 < 0.12) continue;
+          const len = s1 - s0 + 0.02, mid = (s0 + s1) / 2, x = ox + mid * ux, z = oz + mid * uz;
+          const y = Math.max(groundH(h, ox + s0 * ux, oz + s0 * uz), groundH(h, ox + s1 * ux, oz + s1 * uz));
+          const hs = new THREE.Group(); hs.position.set(x, y, z); hs.rotation.y = a;
+          const body = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.24, len), mat('#ef7d6d', { roughness: 0.55 })); body.position.y = 0.09; body.castShadow = true;
+          const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.135, 0.04, len + 0.004), mat('#ffd66e', { roughness: 0.5 })); stripe.position.y = 0.196;
+          hs.add(body, stripe); group.add(hs);
+        }
+      }
+      /* scenery hygiene: rocks and beacons never touch, and none floats in the camera's way behind the tee */
+      const aim = (h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI) * Math.PI / 180;
+      const dx = Math.sin(aim), dz = Math.cos(aim), kept = [];
+      for (const o of group.children.filter(c => c.name === 'drift')) {
+        const px = o.position.x - h.tee[0], pz = o.position.z - h.tee[1], back = -(px * dx + pz * dz), side = Math.abs(px * dz - pz * dx);
+        const clash = kept.some(k => Math.hypot(k.position.x - o.position.x, k.position.z - o.position.z) < k.userData.size + o.userData.size + 0.15);
+        if (clash || (back > -1.5 && back < 5.5 && side < 1.9 + Math.max(0, back) * 0.4)) group.remove(o); else kept.push(o);
       }
     },
     tick(group, dt, t) {

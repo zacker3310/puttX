@@ -8,7 +8,7 @@
      and hides when there is no room; the aim line drapes over hills and stops at walls
    - the live loop equals simulatePutt through ragged frames and a 5 s gap; movers nudge a resting
      ball for free; the HUD is numerals; sinking pulls the pin, rests the ball in the cup, scores
-     and saves; the par + 3 cap auto-sinks. Test holes are registered as course 97. */
+     and saves; the double-par cap auto-sinks. Test holes are registered as course 97. */
 'use strict';
 const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
 
@@ -190,7 +190,7 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
   check('the hole is saved', fin.saved && fin.saved.best === 1 && fin.saved.stars === 3, JSON.stringify(fin.saved));
   check('putt and cup sounds fired', fin.log.includes('putt') && fin.log.includes('cup'), fin.log.join());
 
-  /* 11. the par + 3 cap auto-rolls into the cup */
+  /* 11. the double-par cap auto-rolls into the cup */
   const cap = await page.evaluate(() => {
     startHole('97-1'); loopPaused = true; play.round.strokes = 5;
     beginPutt(180, 0);
@@ -198,7 +198,7 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
     for (let i = 0; i < 600 && play.phase !== 'done'; i++) { advance(1 / 60); if (play.phase === 'auto') sawAuto = true; }
     return { sawAuto, phase: play.phase, score: play.round.score };
   });
-  check('the cap putt auto-rolls in and scores par + 3', cap.sawAuto && cap.phase === 'done' && cap.score === 6, JSON.stringify(cap));
+  check('the cap putt auto-rolls in and scores double par', cap.sawAuto && cap.phase === 'done' && cap.score === 6, JSON.stringify(cap));
 
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();

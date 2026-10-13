@@ -11,12 +11,12 @@ function c01Cone() {
   const c = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.26, 16), mat(C01.red, { roughness: 0.5 })); c.position.y = 0.15;
   const band = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.062, 0.04, 16), mat(C01.cream, { roughness: 0.5 })); band.position.y = 0.15;
   const base = c01Box(0.2, 0.025, 0.2, C01.redDown, 0, 0.012, 0);
-  c.castShadow = true; g.add(c, band, base); return g;
+  c.castShadow = true; g.add(c, band, base); g.userData.c01r = 0.14; return g;
 }
 function c01Girders(r) {
   const g = new THREE.Group(), n = 1 + Math.floor(r() * 3);
-  for (let i = 0; i < n; i++) g.add(c01Box(0.9, 0.08, 0.12, i % 2 ? C01.yellowDown : C01.red, 0, 0.04 + i * 0.08, (i % 2) * 0.05));
-  return g;
+  for (let i = 0; i < n; i++) g.add(c01Box(0.7, 0.08, 0.12, i % 2 ? C01.yellowDown : C01.red, 0, 0.04 + i * 0.08, (i % 2) * 0.05));
+  g.userData.c01r = 0.37; return g;
 }
 function c01Digger(r) {
   const g = new THREE.Group();
@@ -28,7 +28,7 @@ function c01Digger(r) {
   const stick = new THREE.Group(); stick.position.x = 0.33; stick.rotation.z = -1.7;
   stick.add(c01Box(0.26, 0.06, 0.06, C01.yellowDown, 0.13, 0, 0), c01Box(0.1, 0.09, 0.13, C01.ink, 0.27, 0.02, 0));
   boom.add(stick); g.add(boom);
-  g.scale.setScalar(0.85 + r() * 0.4); return g;
+  const k = 0.85 + r() * 0.3; g.scale.setScalar(k); g.userData.c01r = 0.5 * k; return g;
 }
 function c01Barrels() {
   const g = new THREE.Group();
@@ -37,7 +37,7 @@ function c01Barrels() {
     b.position.set(x, 0.08, z); b.castShadow = true; g.add(b);
     const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.025, 14), mat(C01.cream)); ring.position.set(x, 0.1, z); g.add(ring);
   });
-  return g;
+  g.userData.c01r = 0.22; return g;
 }
 /* girder column: an I-beam with a red cap plate */
 function c01Column(p) {
@@ -61,11 +61,29 @@ function c01Crane(m) {
   g.add(hub, c01Box(0.12, 0.1, 0.12, C01.cream, 0, 0.31, 0), c01Box(0.13, 0.03, 0.13, C01.redDown, 0, 0.375, 0));
   return g;
 }
-/* boom barrier: a red and white striped bar, slimmer and taller than the girder it slides into */
+/* boom barrier: a red and white striped bar a hair slimmer and lower than the girder it slides into,
+   so the retracted part hides inside the wall instead of poking through it */
 function c01Boom(m) {
   const g = new THREE.Group(), L = m.len * 2, n = Math.max(3, Math.round(L / 0.12) | 1);
-  for (let k = 0; k < n; k++) g.add(c01Box(0.084, 0.24, L / n, k % 2 ? C01.cream : C01.red, 0, 0.12, -L / 2 + (k + 0.5) * L / n));
+  for (let k = 0; k < n; k++) g.add(c01Box(0.074, 0.13, L / n, k % 2 ? C01.cream : C01.red, 0, 0.065, -L / 2 + (k + 0.5) * L / n));
   return g;
+}
+/* scenery tidy: scatterProps only spaces prop centres from the course, so drop any prop whose footprint
+   would touch a wall, a floor edge or another prop. Every prop carries its footprint radius in userData.c01r */
+function c01Tidy(group, h) {
+  const edges = h.segs.slice();
+  for (const f of h.floors) f.forEach((p, i) => { const q = f[(i + 1) % f.length]; edges.push([p[0], p[1], q[0], q[1]]); });
+  const kept = [];
+  for (const o of group.children.slice()) {
+    const r = o.userData.c01r;
+    if (r === undefined) continue;
+    const x = o.position.x, z = o.position.z;
+    const nearEdge = edges.some(s => { const c = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - c[0], z - c[1]) < r + 0.15; });
+    const nearProp = kept.some(k => Math.hypot(x - k.position.x, z - k.position.z) < r + k.userData.c01r + 0.1);
+    /* the big pieces (diggers, girder stacks) stay out of the aim camera's frame round the tee */
+    const nearTee = r > 0.3 && Math.hypot(x - h.tee[0], z - h.tee[1]) < 2.2;
+    if (nearEdge || nearProp || nearTee) { group.remove(o); disposeGroup(o); } else kept.push(o);
+  }
 }
 WORLD_LOOK[1] = {
   /* felt and dirt keep the white ball at >= 3:1 (render-check) */
@@ -75,4 +93,5 @@ WORLD_LOOK[1] = {
   prop: r => { const k = r(); return k < 0.4 ? c01Cone() : k < 0.65 ? c01Girders(r) : k < 0.85 ? c01Barrels() : c01Digger(r); },
   post: (p, look) => p.look === 'girder' ? c01Column(p) : defaultPost(p, look),
   mover: (m, look) => m.look === 'crane' ? c01Crane(m) : m.look === 'boom' ? c01Boom(m) : defaultMover(m, look),
+  decor: (group, h) => c01Tidy(group, h),
 };

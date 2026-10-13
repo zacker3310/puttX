@@ -1,4 +1,4 @@
-/* round-check (Node): strokes, the par + 3 cap, out-of-bounds, drift, stars, the course registry
+/* round-check (Node): strokes, the double-par cap, out-of-bounds, drift, stars, the course registry
    and progress (bests and stars never get worse; a course's last hole unlocks the next course). */
 'use strict';
 const { check, done } = require('./lib.cjs');
@@ -18,16 +18,16 @@ check('par: score 2, 2 stars', r.score === 2 && S.starsFor(2, 2) === 2);
 
 r = S.newRound(h);
 let out;
-for (let i = 0; i < 5; i++) out = S.resolvePutt(r, stop(), [0, 0.5]);
-check('cap: the par + 3 putt auto-sinks with score 5, 1 star', out === 'auto' && r.done && r.auto && r.score === 5 && S.capOf(h) === 5 && S.starsFor(5, 2) === 1);
+for (let i = 0; i < 4; i++) out = S.resolvePutt(r, stop(), [0, 0.5]);
+check('cap: the double-par putt auto-sinks with score 4, 1 star', out === 'auto' && r.done && r.auto && r.score === 4 && S.capOf(h) === 4 && S.starsFor(4, 2) === 1);
 
 r = S.newRound(h);
 out = S.resolvePutt(r, { end: 'oob', x: 9, z: 9 }, [0.1, 0.7]);
 check('oob: +1 penalty, ball back where it was putted', out === 'oob' && r.strokes === 2 && r.at[0] === 0.1 && r.at[1] === 0.7);
 
-r = S.newRound(h); r.strokes = 4;
+r = S.newRound(h); r.strokes = 3;
 out = S.resolvePutt(r, { end: 'oob', x: 9, z: 9 }, [0, 0.5]);
-check('oob at the cap still scores the cap, never more', out === 'auto' && r.score === 5);
+check('oob at the cap still scores the cap, never more', out === 'auto' && r.score === 4);
 
 r = S.newRound(h);
 check('timeout counts as a stop', S.resolvePutt(r, { end: 'timeout', x: 0.2, z: 1.1 }, [0, 0.5]) === 'stop' && r.at[0] === 0.2);

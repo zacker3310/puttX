@@ -12,12 +12,12 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(0.1, 4.7, 0.8, 5.9) }],
     posts: [C2_CACTUS(-0.27, 4.5)] },
   /* 2. ride off the mesa: a canyon drop onto a green that tilts to the right, the cup tucked behind a rock spur */
-  { par: 3, sol: [[40,0.92,0],[22,0.76,0]], tee: [0, 0.6], cup: [1.2, 6.8],
+  { par: 3, sol: [[350,0.64,0],[22,0.72,0]], tee: [0, 0.6], cup: [1.2, 6.8],
     shape: [[-0.7, 0], [0.7, 0], [0.7, 2.6], [1.8, 2.6], [1.8, 7.6], [-1.8, 7.6], [-1.8, 2.6], [-0.7, 2.6]],
     inner: [[[1.8, 5.2], [-0.3, 5.2]]],
     tiers: [{ poly: rect(-0.75, -0.1, 0.75, 2.6), h: 0.42 }, { poly: rect(-1.9, 2.6, 1.9, 7.7), h: 0.08, sx: 0.042 }],
     bumps: [{ x: -0.9, z: 4.1, r: 0.45, h: 0.16 }],
-    zones: [{ surf: 'sand', poly: [[-1.8, 6.6], [-0.6, 6.6], [-0.3, 7.6], [-1.8, 7.6]] }],
+    zones: [{ surf: 'sand', poly: rect(-1.8, 6.6, -0.5, 7.6) }],
     posts: [C2_CACTUS(1.3, 4.0), C2_CACTUS(0.3, 6.2)] },
   /* 3. a sea of dunes, then a pocket to the right behind the biggest dune */
   { par: 3, sol: [[350,0.96,0]], tee: [0, 0.5], cup: [-2.5, 7.1], aim0: -10,
@@ -48,7 +48,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.4, 7.3, 0.6, 7.8) }],
     posts: [C2_CACTUS(0.5, 3.4), C2_CACTUS(-0.75, 4.2), C2_CACTUS(0.25, 5.2), C2_ROCK(-1.05, 5.5, 0.12), C2_CACTUS(-0.55, 8.4)] },
   /* 7. switchback: up the canyon, round the ramp at the top, back down a leaning mesa past a tumbleweed */
-  { par: 4, sol: [[3,0.6875,0],[31.5,1,3]], tee: [0, 0.5], cup: [2.9, 1.7],
+  { par: 4, sol: [[3,0.6875,0],[31.5,1,3]], tee: [0, 0.5], cup: [2.9, 1.7], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 6], [1.8, 6], [1.8, 1], [3.4, 1], [3.4, 7.6], [-0.8, 7.6]],
     ramps: [{ x0: 0.8, z0: 6, x1: 1.8, z1: 7.6, axis: 'x', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(1.8, 0.9, 3.5, 7.7), h: 0.246, sx: 0.03 }],
@@ -98,7 +98,7 @@ registerWorld(2, { holes: [
     movers: [C2_WEED(-0.8, 5.5, 0.9, 5.5, 3.0)],
     posts: [C2_CACTUS(-0.9, 2.6), C2_ROCK(1.55, 7.1, 0.13)] },
   /* 13. ridge walk: a narrow humped ridge over the canyon to a walled green */
-  { par: 4, sol: [[26,1,0],[0,0.64,0]], tee: [0, 0.5], cup: [2.5, 6.8],
+  { par: 4, sol: [[26,1,0],[0,0.64,0]], tee: [0, 0.5], cup: [2.5, 6.8], aim0: 0,
     floors: [[[-0.7, 0], [0.7, 0], [0.7, 2.2], [0.4, 2.2], [0.4, 4.3], [1.4, 4.3], [1.4, 3.8], [3.2, 3.8], [3.2, 7.6], [1.4, 7.6], [1.4, 5.1], [-0.4, 5.1], [-0.4, 2.2], [-0.7, 2.2]]],
     walls: [[[-0.7, 2.2], [-0.7, 0], [0.7, 0], [0.7, 2.2]], [[-0.4, 4.3], [-0.4, 5.1], [0.4, 5.1]], [[1.4, 5.1], [1.4, 7.6], [3.2, 7.6], [3.2, 3.8], [1.4, 3.8], [1.4, 4.3]]],
     bumps: [{ x: 0.0, z: 3.2, r: 0.35, h: 0.08 }],
@@ -112,9 +112,9 @@ registerWorld(2, { holes: [
     bumps: [{ x: 0.1, z: 5.9, r: 0.5, h: 0.24 }, { x: 0.9, z: 7.4, r: 0.45, h: 0.2 }],
     posts: [C2_CACTUS(-1.1, 2.0), C2_CACTUS(-0.2, 8.3), C2_ROCK(0.6, 8.6)] },
   /* 15. the summit cup: the hole sits on top of a giant dune */
-  { par: 3, sol: [[15,0.625,0],[87,0.75,0]], tee: [0, 0.5], cup: [0, 5.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [1.6, 7.2], [-1.6, 7.2], [-1.6, 3.0]],
+  { par: 3, sol: [[0,0.72,0]], tee: [0, 0.5], cup: [0, 5.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [1.6, 7.2], [-1.6, 7.2], [-1.6, 3.0]],
     bumps: [{ x: 0, z: 5.2, r: 0.85, h: 0.35 }, { x: 0.8, z: 2.3, r: 0.4, h: 0.15 }],
-    zones: [{ surf: 'sand', poly: [[-1.6, 3.4], [-0.6, 3.4], [-0.9, 4.2], [-1.6, 4.4]] }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
+    zones: [{ surf: 'sand', poly: rect(-1.6, 3.4, -0.75, 4.3) }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
   { par: 5, sol: [[36,1,0],[120,1,3],[0,0.5625,0]], tee: [0, 0.5], cup: [3.1, 9.2],

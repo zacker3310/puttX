@@ -82,19 +82,19 @@ registerWorld(6, { holes: [
     bumps: [{ x: 0.6, z: 6.4, r: 0.45, h: 0.2 }],
     zones: [V6_LAVA(rect(-1.4, 7.6, 1.4, 8))] },
   /* 16: tube maze: ramp to the deck, then the crater tube or the drop, then the cup plateau (crazy, 4 parts) */
-  { par: 5, sol: [[336,0.76,0],[74,0.76,0],[72,0.84,0]], tee: [0, 0.5], cup: [2.9, 0.7], aim0: 0,
+  { par: 5, sol: [[32,1,0],[92,0.8,0]], tee: [0, 0.5], cup: [2.9, 0.7], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 2], [0.7, 3.2], [2.2, 3.2], [2.2, 2.4], [2.2, 1.4], [2.2, 0], [3.6, 0], [3.6, 1.4], [3.6, 2.4], [3.6, 3.2], [3.6, 5], [-0.7, 5], [-0.7, 3.2], [-0.7, 2]],
     ramps: [{ x0: -0.7, z0: 2, x1: 0.7, z1: 3.2, axis: 'z', h0: 0, h1: 0.38 }, { x0: 2.2, z0: 1.4, x1: 3.6, z1: 2.4, axis: 'z', h0: 0.2, h1: 0 }],
     tiers: [{ poly: rect(-0.9, 3.2, 3.8, 5.2), h: 0.38 }, { poly: rect(2, -0.2, 3.8, 1.4), h: 0.2 }],
     bumps: V6_CRATER(1.6, 4.2, 0.65), tubes: [{ a: [1.6, 4.2], b: [3.1, 2.9], dir: 180 }],
     posts: [V6_COL(2.6, 1.1)],
-    zones: [V6_LAVA(rect(2.2, 2.4, 2.6, 3.2)), V6_LAVA(rect(3.2, 3.6, 3.6, 5))] },
+    zones: [V6_LAVA(rect(2.2, 2.4, 2.6, 3.15)), V6_LAVA(rect(3.2, 3.6, 3.6, 5))] },
   /* 17: crater moat: a narrow ramp over the lava moat to the island crater (crazy, 3 parts) */
   { par: 4, sol: [[206,0.68,0],[330,0.4,0]], tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
     ramps: [{ x0: 0.5, z0: 3.7, x1: 1.1, z1: 4.5, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.2, 4.5, 1.2, 7.5), h: 0.25 }],
     bumps: [...V6_CRATER(-0.4, 6.5, 0.85), ...V6_CRATER(-1.5, 2, 0.7)], tubes: [{ a: [-1.5, 2], b: [0.6, 5.1], dir: 340 }], posts: [V6_COL(0.1, 5.8)],
-    zones: [V6_LAVA(rect(-2, 3.7, 0.5, 4.5)), V6_LAVA(rect(1.1, 3.7, 2, 4.5)), V6_LAVA(rect(-2, 4.5, -1.2, 9)), V6_LAVA(rect(1.2, 4.5, 2, 9)), V6_LAVA(rect(-1.2, 7.5, 1.2, 9))] },
+    zones: [V6_LAVA(rect(-2, 3.7, 0.5, 4.45)), V6_LAVA(rect(1.1, 3.7, 2, 4.45)), V6_LAVA(rect(-2, 4.45, -1.25, 9)), V6_LAVA(rect(1.25, 4.45, 2, 9)), V6_LAVA(rect(-1.25, 7.55, 1.25, 9))] },
   /* 18: the summit: boulder run, two ledges up the cone and the summit crater, or the tube (crazy, 4 parts) */
   { par: 5, sol: [[350,0.96,0],[86,0.84,0]], tee: [0, 0.5], cup: [0.3, 9.3], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [0.8, 5], [3, 5], [3, 5.1], [3, 6.5], [3, 6.6], [3, 7.6], [3, 10.6], [-0.8, 10.6], [-0.8, 7.6], [-0.8, 6.6], [-0.8, 6.5], [-0.8, 5.1], [-0.8, 5], [-0.8, 4]],

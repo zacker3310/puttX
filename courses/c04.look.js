@@ -18,7 +18,7 @@ function c4Snowman(p) {
   return g;
 }
 function c4Pine(r) {
-  const g = new THREE.Group(), s = 0.7 + r() * 0.9, green = mat('#4e9a45', { roughness: 0.9, flatShading: true }), snow = mat(C4_SNOW, { roughness: 0.9, flatShading: true });
+  const g = new THREE.Group(), s = 0.85 + r() * 0.4, green = mat('#4e9a45', { roughness: 0.9, flatShading: true }), snow = mat(C4_SNOW, { roughness: 0.9, flatShading: true });
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.05 * s, 0.07 * s, 0.25 * s, 8), mat('#6e5233')); trunk.position.y = 0.12 * s; g.add(trunk);
   [[0.36, 0.5, 0.45], [0.28, 0.42, 0.75], [0.18, 0.34, 1.02]].forEach(([rad, ht, y]) => {
     const t = new THREE.Mesh(new THREE.ConeGeometry(rad * s, ht * s, 8), green); t.position.y = y * s; t.castShadow = true; g.add(t);
@@ -29,8 +29,8 @@ function c4Pine(r) {
 function c4Drift(r) {
   const g = new THREE.Group(), white = mat(C4_SNOW, { roughness: 1, flatShading: true });
   for (let i = 0, n = 2 + Math.floor(r() * 3); i < n; i++) {
-    const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2 + r() * 0.25, 1), white);
-    m.scale.y = 0.45; m.position.set((r() - 0.5) * 0.6, 0, (r() - 0.5) * 0.6); g.add(m);
+    const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.18 + r() * 0.14, 1), white);
+    m.scale.y = 0.45; m.position.set((r() - 0.5) * 0.4, 0, (r() - 0.5) * 0.4); g.add(m);
   }
   return g;
 }
@@ -43,24 +43,69 @@ function c4Snowball(m) {
   }
   return g;
 }
-/* the lift bar: a red padded bar with a hanger rising to a chair grip, along local z */
+/* the lift bar: a red padded bar with a yellow seat cushion on top and rounded end caps, along local z */
 function c4Lift(m) {
-  const g = new THREE.Group(), red = mat('#ef7d6d', { roughness: 0.5 }), metal = mat('#5a4634', { roughness: 0.6 });
+  const g = new THREE.Group(), red = mat('#ef7d6d', { roughness: 0.5 });
   const bar = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, 0.16, m.len * 2), red); bar.position.y = 0.08; bar.castShadow = true;
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, m.len * 1.6), mat('#ffd66e', { roughness: 0.6 })); seat.position.set(0, 0.36, 0);
-  const hang = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.5, 6), metal); hang.position.y = 0.6;
-  const grip = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.12), metal); grip.position.y = 0.86;
-  for (const sz of [-1, 1]) { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.22, 6), metal); leg.position.set(0, 0.26, sz * m.len * 0.75); g.add(leg); }
-  g.add(bar, seat, hang, grip);
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2 + 0.02, 0.04, m.len * 2 - 0.06), mat('#ffd66e', { roughness: 0.6 })); seat.position.y = 0.18; seat.castShadow = true;
+  g.add(bar, seat);
+  for (const sz of [-1, 1]) {
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(WALL_HALF, WALL_HALF, 0.16, 14), red); cap.position.set(0, 0.08, sz * m.len); g.add(cap);
+  }
   return g;
+}
+/* scatterProps only keeps props 0.5 m off the walls and never checks them against each other, so
+   tidy them: drop any prop whose footprint reaches within reach of a wall or floor edge (tall ones
+   need more room so their crowns never hang over the course), any that overlaps a kept prop, and
+   any standing in the aim camera's line behind the tee. */
+function c4Tidy(group, h, make) {
+  const t = h.aim0 !== undefined ? h.aim0 * Math.PI / 180 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]), ux = Math.sin(t), uz = Math.cos(t);
+  const edges = h.segs.slice();
+  for (const f of h.floors) f.forEach((p, i) => { const q = f[(i + 1) % f.length]; edges.push([p[0], p[1], q[0], q[1]]); });
+  const kept = [], box = new THREE.Box3();
+  const fits = o => {
+    o.updateMatrixWorld(true); box.setFromObject(o);
+    const x = o.position.x, z = o.position.z, rad = Math.max(box.max.x - x, x - box.min.x, box.max.z - z, z - box.min.z), tall = box.max.y > 0.5;
+    const d = onFloor(h, x, z) ? 0 : Math.min(...edges.map(s => { const c = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - c[0], z - c[1]); }));
+    const along = (x - h.tee[0]) * ux + (z - h.tee[1]) * uz, lat = Math.abs((x - h.tee[0]) * uz - (z - h.tee[1]) * ux);
+    if (d < rad + (tall ? 0.45 : 0.12) || kept.some(k => Math.hypot(k.x - x, k.z - z) < k.rad + rad + 0.06)
+      || (box.max.y > 0.12 && along > -3.6 && along < 0.4 && lat < 1.2 + rad)) return false;
+    kept.push({ x, z, rad }); return true;
+  };
+  for (const o of group.children.slice()) if (o.userData.prop && !fits(o)) { group.remove(o); disposeGroup(o); }
+  /* top the scenery back up to an even density with the same rules */
+  const B = holeBounds(h), r = rng32(44 + h.key.length * 7 + Math.round(B.x1 * 13 + B.z1 * 29));
+  for (let tries = 0; kept.length < 20 && tries < 300; tries++) {
+    const o = make(r); o.position.set(B.x0 - 3 + r() * (B.x1 - B.x0 + 6), 0, B.z0 - 3 + r() * (B.z1 - B.z0 + 6)); o.rotation.y = r() * Math.PI * 2;
+    if (fits(o)) group.add(o); else disposeGroup(o);
+  }
+}
+/* the grid-built zone meshes step along a round pool's edge, so trim every round zone (open water,
+   ice pans) with a smooth snow rim that follows the ground just above it */
+function c4Rims(group, h) {
+  const white = mat(C4_SNOW, { roughness: 0.9 }), W = 0.04;
+  for (const zn of h.zones) {
+    const poly = zn.poly; if (poly.length <= 4) continue;
+    const pts = [];
+    poly.forEach((p, i) => { const q = poly[(i + 1) % poly.length], n = Math.max(1, Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 0.04)); for (let k = 0; k < n; k++) pts.push([p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n]); });
+    const cx = poly.reduce((a, p) => a + p[0], 0) / poly.length, cz = poly.reduce((a, p) => a + p[1], 0) / poly.length, pos = [], idx = [];
+    pts.forEach(([x, z], i) => {
+      const d = Math.hypot(x - cx, z - cz) || 1, ox = (x - cx) / d * W, oz = (z - cz) / d * W;
+      for (const [px, pz] of [[x - ox, z - oz], [x + ox, z + oz]]) pos.push(px, onFloor(h, px, pz) ? groundH(h, px, pz) + 0.008 : groundH(h, x, z) + 0.008, pz);
+      const a = i * 2, b = ((i + 1) % pts.length) * 2; idx.push(a, b, a + 1, a + 1, b, b + 1);
+    });
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+    const m = new THREE.Mesh(g, white); m.receiveShadow = true; m.material.side = THREE.DoubleSide; group.add(m);
+  }
 }
 WORLD_LOOK[4] = {
   felt: '#3c7f35', wall: '#6fc0df', ground: C4_SNOW, sky: ['#9fcde6', '#f4f8fa'], fog: true, flag: '#ef7d6d', icon: C4_FLAKE_SVG,
   ice: '#4a94b5', water: '#24507e', skirt: '#d5e6ef', jingle: [659, 784, 988, 1175, 1319],
-  prop: r => { const k = r(); return k < 0.6 ? c4Pine(r) : k < 0.8 ? c4Drift(r) : c4Snowman({ r: 0.13 + r() * 0.07 }); },
+  prop: r => { const k = r(), o = k < 0.6 ? c4Pine(r) : k < 0.8 ? c4Drift(r) : c4Snowman({ r: 0.14 + r() * 0.03 }); o.userData.prop = true; return o; },
   post: (p, look) => p.look === 'snowman' ? c4Snowman(p) : defaultPost(p, look),
   mover: (m, look) => m.look === 'snowball' ? c4Snowball(m) : m.look === 'lift' ? c4Lift(m) : defaultMover(m, look),
   decor(group, h) {
+    c4Tidy(group, h, lookOf(4).prop); c4Rims(group, h);
     /* far peaks in a ring, well beyond the props and the camera */
     const pts = h.floors.flat(), cx = pts.reduce((a, p) => a + p[0], 0) / pts.length, cz = pts.reduce((a, p) => a + p[1], 0) / pts.length;
     const rock = mat('#b9d3e2', { roughness: 1, flatShading: true }), cap = mat(C4_SNOW, { roughness: 1, flatShading: true }), r = rng32(44);

@@ -16,7 +16,7 @@ Never hand-edit or Read `index.html` (the three.js line is ~690 KB). Edit the so
 ## Rules the suites enforce
 
 - Zero words on screen: numerals and symbols only. `aria-label`s are fine.
-- No fail states: every hole finishes (the stroke cap, par + 3, auto-sinks); stars and bests only go up.
+- No fail states: every hole finishes (the stroke cap, double par, auto-sinks); stars and bests only go up.
 - Tap targets at least 64 px rendered at 1024x768 (88 stage px buttons).
 - Toybox look: the `--v-*` tokens from vroom, flat shadows, big radii.
 - The `// #region sim` block is DOM-free, THREE-free and deterministic (no Math.random, no

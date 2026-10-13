@@ -12,11 +12,17 @@ function c7Pumpkin(r) {
   body.scale.y = 0.75; body.position.y = s * 0.75; body.castShadow = true;
   const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.022, 0.06, 8), mat('#4e9a45')); stem.position.y = s * 1.5 + 0.02;
   g.add(body, stem);
+  /* the face is cut flush into the skin: flat triangle eyes and a three-piece grin that follows the curve */
+  const glow = c7Glow(C7_GLOW, 1.4), skin = (x, y) => -Math.sqrt(Math.max(0, s * s * (1 - ((y - s * 0.75) / (s * 0.75)) ** 2) - x * x));
   for (const sx of [-1, 1]) {
-    const eye = new THREE.Mesh(new THREE.ConeGeometry(s * 0.2, s * 0.25, 3), c7Glow(C7_GLOW, 1.4));
-    eye.position.set(sx * s * 0.35, s * 0.9, -s * 0.93); eye.rotation.x = -Math.PI / 2; g.add(eye);
+    const eye = new THREE.Mesh(new THREE.CylinderGeometry(s * 0.18, s * 0.18, 0.02, 3), glow);
+    eye.rotation.set(-Math.PI / 2, 0, 0); eye.position.set(sx * s * 0.35, s * 0.95, skin(sx * s * 0.35, s * 0.95) + 0.004); g.add(eye);
   }
-  const grin = new THREE.Mesh(new THREE.BoxGeometry(s * 0.8, s * 0.14, 0.02), c7Glow(C7_GLOW, 1.4)); grin.position.set(0, s * 0.5, -s * 0.97); g.add(grin);
+  for (const gx of [-0.27, 0, 0.27]) {
+    const x = gx * s, gy = s * (gx ? 0.5 : 0.45), z = skin(x, gy);
+    const tooth = new THREE.Mesh(new THREE.BoxGeometry(s * 0.27, s * 0.13, 0.02), glow); tooth.position.set(x, gy, z + 0.004);
+    tooth.rotation.y = -Math.atan2(x, -z); g.add(tooth);
+  }
   return g;
 }
 function c7Lantern(r) {
@@ -99,16 +105,58 @@ function c7Bat() {
   }
   return g;
 }
+/* scenery hygiene: props never touch each other, and none stands in the camera's way behind the tee */
+function c7Tidy(group, h) {
+  const a = (h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI) * Math.PI / 180;
+  const dx = Math.sin(a), dz = Math.cos(a), kept = [];
+  for (const o of group.children.filter(c => c.userData.c7R)) {
+    const px = o.position.x - h.tee[0], pz = o.position.z - h.tee[1], back = -(px * dx + pz * dz), side = Math.abs(px * dz - pz * dx);
+    const clash = kept.some(k => Math.hypot(k.position.x - o.position.x, k.position.z - o.position.z) < k.userData.c7R + o.userData.c7R + 0.15);
+    if (clash || (back > -1.5 && back < 5.5 && side < 1.9 + Math.max(0, back) * 0.4)) group.remove(o); else kept.push(o);
+  }
+}
+/* gatehouse: where a portcullis slides into the castle wall, a stone tower hides the bars */
+function c7Gatehouses(group, h) {
+  const stone = mat(C7_STONE, { roughness: 0.85 }), cap = mat('#8f88a3', { roughness: 0.85 });
+  for (const m of h.movers) {
+    if (m.look !== 'portcullis') continue;
+    const a = (m.ang || 0) * Math.PI / 180, ux = Math.sin(a), uz = Math.cos(a);
+    const ta = m.ax * ux + m.az * uz, tb = m.bx * ux + m.bz * uz, t0 = Math.min(ta, tb) - m.len, t1 = Math.max(ta, tb) + m.len;
+    const ox = m.ax - ta * ux, oz = m.az - ta * uz, runs = [];
+    let cur = null;
+    for (let t = t0; t <= t1 + 1e-6; t += 0.01) {
+      const x = ox + t * ux, z = oz + t * uz;
+      const onWall = h.segs.some(s => { const c = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - c[0], z - c[1]) < 0.01; });
+      if (onWall) { if (!cur) runs.push(cur = [t, t]); else cur[1] = t; } else cur = null;
+    }
+    for (const [s0, s1] of runs) {
+      if (s1 - s0 < 0.08) continue;
+      const len = s1 - s0 + 0.04, mid = (s0 + s1) / 2, x = ox + mid * ux, z = oz + mid * uz, y = groundH(h, x, z);
+      const tower = new THREE.Group(); tower.position.set(x, y, z); tower.rotation.y = a;
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.42, len), stone); body.position.y = 0.21; body.castShadow = true; tower.add(body);
+      const n = Math.max(2, Math.round(len / 0.12));
+      for (let i = 0; i < n; i++) {
+        const c = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.07, len / n * 0.55), cap);
+        c.position.set(0, 0.455, -len / 2 + (i + 0.5) * len / n); tower.add(c);
+      }
+      group.add(tower);
+    }
+  }
+}
 WORLD_LOOK[7] = {
   /* mossy felt and dark moat keep the white ball well above 3:1 */
   felt: '#3f7350', wall: C7_STONE, ground: '#3b3556', sky: ['#1a1747', '#5a3486'], fog: true, skirt: '#5e5670',
   sand: '#8a6a4a', fast: '#6a4f8f', water: '#2d6f8f', flag: C7_PUMPKIN, icon: C7_ICON,
   jingle: [392, 466, 587, 698, 784],
-  prop: r => { const k = r(); return k < 0.5 ? c7Pumpkin(r) : k < 0.78 ? c7Lantern(r) : c7Grave(r); },
+  prop: r => {
+    const k = r(), o = k < 0.5 ? c7Pumpkin(r) : k < 0.78 ? c7Lantern(r) : c7Grave(r);
+    o.userData.c7R = k < 0.5 ? 0.2 : k < 0.78 ? 0.12 : 0.16; return o;
+  },
   post: p => p.look === 'gargoyle' ? c7Gargoyle(p) : defaultPost(p, lookOf(7)),
   mover: m => m.look === 'windmill' ? c7Windmill(m) : m.look === 'portcullis' ? c7Portcullis(m) : m.look === 'ghost' ? c7Ghost(m) : defaultMover(m, lookOf(7)),
   decor(group, h) {
     const B = holeBounds(h), r = rng32(77);
+    c7Tidy(group, h); c7Gatehouses(group, h);
     /* the moon and stars */
     const moon = new THREE.Mesh(new THREE.SphereGeometry(2.2, 24, 16), new THREE.MeshBasicMaterial({ color: '#fff1c4', fog: false }));
     moon.position.set(B.cx + 16, 15, B.cz + 34); group.add(moon);
@@ -130,10 +178,10 @@ WORLD_LOOK[7] = {
     keep.position.set(B.cx, -0.03, B.z1 + 9); group.add(keep);
     /* hole 17 winds round a tower: stand it in the middle of the U */
     if (h.key === '7-17') {
-      const tw = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.46, 0.9, 16), mat(C7_STONE, { roughness: 0.85 })); tw.position.set(0, 0.45, 1.75); tw.castShadow = true;
-      const roof = new THREE.Mesh(new THREE.ConeGeometry(0.52, 0.6, 16), mat('#8f7dc6', { roughness: 0.6 })); roof.position.set(0, 1.2, 1.75); roof.castShadow = true;
-      const door = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.05), mat('#4a3826')); door.position.set(0, 0.15, 1.75 - 0.45);
-      const wn = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.16, 0.05), winM); wn.position.set(0, 0.62, 1.75 - 0.43);
+      const tw = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.4, 0.55, 16), mat(C7_STONE, { roughness: 0.85 })); tw.position.set(0, 0.275, 1.75); tw.castShadow = true;
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(0.44, 0.42, 16), mat('#8f7dc6', { roughness: 0.6 })); roof.position.set(0, 0.76, 1.75); roof.castShadow = true;
+      const door = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.26, 0.05), mat('#4a3826')); door.position.set(0, 0.13, 1.75 - 0.39);
+      const wn = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.13, 0.05), winM); wn.position.set(0, 0.42, 1.75 - 0.36);
       group.add(tw, roof, door, wn);
     }
     /* bats circling high over the hole */

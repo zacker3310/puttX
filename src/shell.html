@@ -299,14 +299,42 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #hole[data-phase="auto"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn) { visibility: hidden; }
 #hole[data-intro="1"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn) { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { #setPanel { animation: none; } }
+/* ---------- 14. TITLE, RETRY ---------- */
+#title { background: linear-gradient(to bottom, rgba(47, 36, 26, .0) 55%, rgba(47, 36, 26, .45)); }
+#titleLogo { left: 390px; top: 34px; width: 420px; padding: 10px 24px 4px; animation: popIn .5s cubic-bezier(.3, 1.6, .5, 1) both, bob 3s 1s ease-in-out infinite; }
+#titleLogo .ball { animation: roll 3s 1s ease-in-out infinite; transform-origin: 150px 92px; }
+@keyframes bob { 50% { translate: 0 -6px; } }
+@keyframes roll { 50% { translate: 14px 0; rotate: 40deg; } }
+#titleGo { left: 520px; top: 300px; width: 160px; height: 160px; animation: popIn .5s .2s cubic-bezier(.3, 1.6, .5, 1) both, pulse 1.6s 1s ease-in-out infinite; }
+#titleGo svg { width: 56%; height: 56%; }
+#titleStrip { position: absolute; left: 0; right: 0; bottom: 26px; display: flex; justify-content: center; gap: 12px; }
+#titleStrip .btn { position: relative; width: 88px; height: 88px; }
+#titleStrip .btn.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#titleStrip .lock { position: absolute; right: -10px; top: -10px; width: 34px; height: 34px; }
+#titleStrip .tally { position: absolute; right: -8px; bottom: -10px; min-width: 34px; height: 30px; padding: 0 6px; border-radius: 15px; background: var(--v-accent-yellow);
+  border: 3px solid var(--v-yellow-line); font: 800 18px/24px var(--v-font); color: var(--v-ink-strong); }
+#titleStrip .n { font-size: 36px; }
+#doneMap { left: 32px; } #doneRetry { left: 136px; bottom: 36px; }
+#doneCoins { left: 238px; width: 114px; font-size: 30px; gap: 2px; }
+#doneNext { right: 32px; width: 110px; }
+@media (prefers-reduced-motion: reduce) { #titleLogo, #titleLogo .ball, #titleGo { animation: none; } }
 </style>
 </head>
 <body>
 <div id="stage">
   <canvas id="view" aria-label="golf course"></canvas>
   <section class="scene" id="title">
-    <div id="titleLogo" aria-label="puttx"><svg viewBox="0 0 240 160"><ellipse cx="120" cy="140" rx="100" ry="14" fill="rgba(74,53,35,.18)"/><circle cx="92" cy="86" r="52" fill="#fffdf7" stroke="#e6d2ab" stroke-width="6"/><path d="M40 86 H144" stroke="#ffd66e" stroke-width="14"/><path d="M170 140 V22" stroke="#8a7360" stroke-width="8" stroke-linecap="round"/><path d="M174 22 L222 38 L174 54 Z" fill="#ef7d6d"/></svg></div>
+    <div id="titleLogo" aria-label="puttx"><svg viewBox="0 0 360 170">
+      <ellipse cx="180" cy="150" rx="150" ry="12" fill="rgba(74,53,35,.16)"/>
+      <path d="M40 132 Q180 112 320 132" fill="none" stroke="#74c465" stroke-width="16" stroke-linecap="round"/>
+      <ellipse cx="270" cy="128" rx="26" ry="8" fill="#3a2c1e"/>
+      <path d="M270 128 V26" stroke="#8a7360" stroke-width="7" stroke-linecap="round"/>
+      <path d="M273 26 L322 42 L273 58 Z" fill="#ef7d6d"/>
+      <g class="trail"><path d="M60 92 H110 M48 108 H104 M70 76 H112" stroke="#e6d2ab" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="ball"><circle cx="150" cy="92" r="36" fill="#fffdf7" stroke="#e6d2ab" stroke-width="6"/><path d="M116 92 H184" stroke="#ffd66e" stroke-width="12"/><circle cx="138" cy="78" r="3" fill="#e6d2ab"/><circle cx="160" cy="76" r="3" fill="#e6d2ab"/><circle cx="168" cy="104" r="3" fill="#e6d2ab"/><circle cx="140" cy="106" r="3" fill="#e6d2ab"/></g>
+    </svg></div>
     <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+    <div id="titleStrip"></div>
   </section>
   <section class="scene" id="hole">
     <button class="btn" id="homeBtn" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
@@ -330,6 +358,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <div class="stars"><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg></div>
       <div class="score"><span id="doneStrokes">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
       <button class="btn" id="doneMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+      <button class="btn" id="doneRetry" aria-label="play this hole again"><svg viewBox="0 0 64 64"><path d="M50 32 A18 18 0 1 1 40 16" fill="none" stroke="#a8804e" stroke-width="8" stroke-linecap="round"/><path d="M33 7 L43 16 L33 26" fill="none" stroke="#a8804e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     </div>
   </section>

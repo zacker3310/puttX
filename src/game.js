@@ -350,7 +350,7 @@ function simulatePutt(h, from, angleDeg, power, t0 = 0) {
   return { end, x: b.x, z: b.z, t, steps: n, hits: b.hits };
 }
 /* ---- 2e. rounds and scoring ---- */
-const capOf = h => h.par + 3;
+const capOf = h => h.par * 2;   /* the worst a hole can cost: double par, then the ball rolls itself in */
 const starsFor = (score, par) => score < par ? 3 : score === par ? 2 : 1;
 function newRound(h) { return { hole: h, strokes: 0, at: h.tee.slice(), done: false, score: null, auto: false }; }
 /* a putt finished: count it, move the ball, and finish the hole at the cup or the cap */
@@ -836,7 +836,7 @@ function cameraGoal() {
   if (cd > 0.05 && (cdx * ux + cdz * uz) / cd > Math.cos(35 * Math.PI / 180)) ahead = cd;
   ahead = clamp(ahead, AHEAD_MIN, AHEAD_MAX);
   const by = b.tube ? groundH(h, b.tube.def.b[0], b.tube.def.b[1]) : b.y, bx = b.tube ? b.tube.def.b[0] : b.x, bz = b.tube ? b.tube.def.b[1] : b.z;
-  const back = aiming ? 0.8 + 0.22 * ahead : 1.5, high = aiming ? 0.75 + 0.3 * ahead : 1.15;
+  const z = play.camZoom || 0, back = (aiming ? 0.8 + 0.22 * ahead : 1.5) * (1 + z * 0.9), high = (aiming ? 0.75 + 0.3 * ahead : 1.15) * (1 + z * 1.3);
   const pos = new THREE.Vector3(bx - ux * back, by + high, bz - uz * back);
   /* never inside a hill or a raised tier behind the ball */
   pos.y = Math.max(pos.y, groundH(h, pos.x, pos.z) + 0.45);
@@ -1070,7 +1070,8 @@ function onViewDown(e) {
   if (play.phase === 'replay') { endReplay(); return; }
   if (play.intro) { skipIntro(); return; }
   if (play.phase !== 'aim' || play.aimDrag || play.swing) return;
-  play.aimDrag = { id: e.pointerId, x: stageXY(e)[0], aim0: play.aim };
+  const [x, y] = stageXY(e);
+  play.aimDrag = { id: e.pointerId, x, y, aim0: play.aim, zoom0: play.camZoom || 0, mode: null };
 }
 function onPadDown(e) {
   e.preventDefault();
@@ -1086,7 +1087,11 @@ function onPadDown(e) {
 function onMove(e) {
   const d = play.aimDrag;
   if (d && e.pointerId === d.id) {
-    play.aim = d.aim0 - (stageXY(e)[0] - d.x) * AIM_DEG_PX;
+    /* the first 12 px decide: sideways turns the aim, up or down moves the camera (up = higher and further back) */
+    const [x, y] = stageXY(e), dx = x - d.x, dy = y - d.y;
+    if (!d.mode && Math.hypot(dx, dy) > 12) d.mode = Math.abs(dy) > Math.abs(dx) * 1.3 ? 'cam' : 'aim';
+    if (d.mode === 'aim') play.aim = d.aim0 - dx * AIM_DEG_PX;
+    else if (d.mode === 'cam') play.camZoom = clamp(d.zoom0 - dy * 0.006, -0.45, 2.2);
     return;
   }
   const s = play.swing;
@@ -1167,7 +1172,7 @@ function startHole(key) {
   const h = holeAt(key);
   if (!h) return false;
   Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, swing: null, aimDrag: null, fx: {}, lastOutcome: null, lastShot: null,
-    log: [], undo: null, mulled: false, ghost: null, intro: null, replay: null });
+    log: [], undo: null, mulled: false, ghost: null, intro: null, replay: null, camZoom: play.key === key ? play.camZoom : 0 });
   play.aim = h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI;
   setOverview(false);
   simAcc = 0;
@@ -1279,7 +1284,7 @@ function restInCup(h, from) {
 }
 function advance(dt) {
   if (!play.hole || play.phase === 'idle') return;
-  if (play.phase === 'title') { play.time += dt; return; }
+  if (play.phase === 'title') { play.time += dt; if (currentScene === 'title') tickTitle(dt); return; }
   if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
   if (play.phase === 'replay') { advanceReplay(dt); return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
@@ -1466,11 +1471,30 @@ const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" widt
 const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 117, 310] : [1066 - (i - 9) * 117, 550]);
 let mapWorld = 1;
 
+/* the title flies round each course's showpiece 18th in turn; the strip below picks a course */
+let titleCourse = 0, titleT = 0;
 function showTitle() {
-  const first = playable()[0] + '-1';
-  if (!play.hole || play.key !== first) startHole(first);
-  play.phase = 'title';
+  const list = playable(), w = list[titleCourse % list.length], hs = WORLDS[w].holes, key = hs[hs.length - 1].key;
+  if (!play.hole || play.key !== key) startHole(key);
+  play.phase = 'title'; titleT = 0;
   showScene('title');
+  renderTitleStrip(w);
+}
+function renderTitleStrip(cur) {
+  titleStrip.innerHTML = '';
+  for (const w of WORLD_ORDER) {
+    const open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
+    const stars = WORLDS[w] ? WORLDS[w].holes.reduce((a, h) => a + ((progress.holes[h.key] || {}).stars || 0), 0) : 0;
+    b.className = 'btn' + (w === cur ? ' on' : '') + (open ? '' : ' locked');
+    b.setAttribute('aria-label', 'course ' + w);
+    b.innerHTML = (lookOf(w).icon || `<span class="n">${w}</span>`) + (open ? (stars ? `<span class="tally">${stars}</span>` : '') : LOCK_SVG);
+    b.onclick = () => { if (open) { sfx('tap'); showMap(w); } else sfx('boink'); };
+    titleStrip.append(b);
+  }
+}
+function tickTitle(dt) {
+  if ((titleT += dt) < 8 || reducedMotion()) return;
+  titleCourse++; wipe(); showTitle();
 }
 function showMap(w) {
   if (currentScene === 'hole' || currentScene === 'card') wipe();
@@ -1664,6 +1688,7 @@ function boot() {
   titleGo.addEventListener('click', () => { sfx('tap'); showMap(); });
   cardMap.addEventListener('click', () => { sfx('tap'); showMap(); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
+  doneRetry.addEventListener('click', () => goHole(play.key));
   doneNext.addEventListener('click', () => { const k = nextKey(play.key); if (k) goHole(k); else { sfx('tap'); showCard(Number(play.key.split('-')[0])); } });
   const q = new URLSearchParams(location.search);
   if (q.has('hole') && holeAt(q.get('hole'))) startHole(q.get('hole'));

@@ -8,7 +8,7 @@ putting game on an iPad. v1 (27 gentle holes for a 3-5 year old) is superseded.
 
 - Zero required reading. Icons, pictures and numerals only. `aria-label`s are fine.
 - Real scoring, no fail states. Strokes count against par, but every hole always finishes
-  (par + 3 auto-sinks) and stars and bests only go up.
+  (double par auto-sinks) and stars and bests only go up.
 - Every tap target is at least 64 px rendered at iPad landscape (1024x768).
 - Every touch answers instantly with motion and a synthesized sound.
 - Toybox look: vroom's `--v-*` tokens, flat `0 6px 0` shadows, big radii.

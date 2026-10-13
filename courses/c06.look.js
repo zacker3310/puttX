@@ -27,17 +27,18 @@ function v6Boulder(m) {
 function v6Prop(r) {
   const g = new THREE.Group(), k = r();
   if (k < 0.55) {
-    const s = 0.12 + r() * 0.25, m = v6Rock(r, s, r() < 0.5 ? '#3e3a40' : '#57504f'); m.position.y = s * 0.4; g.add(m);
+    const s = 0.16 + r() * 0.16, m = v6Rock(r, s, r() < 0.5 ? '#3e3a40' : '#57504f'); m.position.y = s * 0.4; g.add(m); g.userData.prop = s * 1.2;
   } else if (k < 0.8) {
     for (let i = 0; i < 3; i++) { const s = 0.06 + r() * 0.08, m = v6Rock(r, s, '#4b4650'); m.position.set((r() - 0.5) * 0.4, s * 0.4, (r() - 0.5) * 0.4); g.add(m); }
     const glow = new THREE.Mesh(new THREE.CircleGeometry(0.12, 12), new THREE.MeshBasicMaterial({ color: 0xff7a2e, toneMapped: false }));
-    glow.rotation.x = -Math.PI / 2; glow.position.y = 0.01; g.add(glow);
+    glow.rotation.x = -Math.PI / 2; glow.position.y = 0.01; g.add(glow); g.userData.prop = 0.36;
   } else {
     const n = 2 + Math.floor(r() * 3);
     for (let i = 0; i < n; i++) {
       const hgt = 0.25 + r() * 0.5, c = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.11, hgt, 6), mat('#4b4650', { roughness: 0.85, flatShading: true }));
-      c.position.set((i % 2) * 0.19 - 0.1, hgt / 2, Math.floor(i / 2) * 0.17); c.castShadow = true; g.add(c);
+      c.position.set((i % 2) * 0.19 - 0.1, hgt / 2, Math.floor(i / 2) * 0.17 - 0.08); c.castShadow = true; g.add(c);
     }
+    g.userData.prop = 0.34;
   }
   return g;
 }
@@ -60,6 +61,19 @@ WORLD_LOOK[6] = {
     const smoke = new THREE.Group(), puff = mat('#8a7a76', { roughness: 1, flatShading: true, transparent: true, opacity: 0.75 });
     for (let i = 0; i < 6; i++) { const s = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4 + i * 0.35, 0), puff); s.position.set(B.cx + i * 0.9 - 1.5, 10 + i * 1.6, far + i * 0.4); smoke.add(s); }
     group.add(cone, lava, smoke);
+    /* scenery stays tidy: no prop touching another, a wall, or the camera's view from the tee */
+    const a0 = (h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI) * Math.PI / 180;
+    const camX = h.tee[0] - Math.sin(a0) * 1.8, camZ = h.tee[1] - Math.cos(a0) * 1.8, kept = [];
+    for (const o of group.children) {
+      const rad = o.userData.prop;
+      if (rad === undefined) continue;
+      const x = o.position.x, z = o.position.z;
+      if (Math.hypot(x - h.tee[0], z - h.tee[1]) < 3 || Math.hypot(x - camX, z - camZ) < 2.6
+        || h.segs.some(q => { const c = closestOnSeg(q[0], q[1], q[2], q[3], x, z); return Math.hypot(x - c[0], z - c[1]) < rad + 0.2; })
+        || h.floors.some(f => f.some((p, i) => { const q = f[(i + 1) % f.length], c = closestOnSeg(p[0], p[1], q[0], q[1], x, z); return Math.hypot(x - c[0], z - c[1]) < rad + 0.2; }))
+        || kept.some(k => Math.hypot(x - k.x, z - k.z) < rad + k.rad + 0.12)) { o.visible = false; continue; }
+      kept.push({ x, z, rad });
+    }
     /* embers drifting up around the course */
     const n = 160, pos = new Float32Array(n * 3), r = rng32(66);
     for (let i = 0; i < n; i++) {

@@ -14,7 +14,7 @@ function c10Cloud(r, s) {
 /* clouds drift far below the islands */
 function c10Prop(r) {
   const g = new THREE.Group(), c = c10Cloud(r, 0.3 + r() * 0.35);
-  c.position.y = -0.9 - r() * 1.4; g.add(c); g.userData.c10drift = { c, base: c.position.x, sp: 0.2 + r() * 0.3, ph: r() * 6.28 };
+  c.position.y = -1.3 - r() * 1.2; g.add(c); g.userData.c10drift = { c, base: c.position.x, sp: 0.2 + r() * 0.3, ph: r() * 6.28 };
   return g;
 }
 function c10Post(p) {
@@ -66,11 +66,49 @@ WORLD_LOOK[10] = {
     const rock = mat('#6e5233', { roughness: 1, flatShading: true });
     for (const f of h.floors) {
       const xs = f.map(p => p[0]), zs = f.map(p => p[1]), w = Math.max(...xs) - Math.min(...xs), d = Math.max(...zs) - Math.min(...zs);
-      if (Math.min(w, d) < 0.7) continue;
+      /* skip bridges, and L shapes whose bounding box would stick a root out under open sky */
+      const area = Math.abs(f.reduce((a, p, i) => { const q = f[(i + 1) % f.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+      if (Math.min(w, d) < 0.7 || area < w * d * 0.8) continue;
+      /* the square pyramid is turned to line up with x and z first, then the wrap stretches it to the island, so it never pokes out past an edge */
       const deep = 0.6 + Math.min(w, d) * 0.5, root = new THREE.Mesh(new THREE.CylinderGeometry(0.7071, 0.06, deep, 4, 1), rock);
-      root.rotation.y = Math.PI / 4; root.scale.set(w * 0.96, 1, d * 0.96);
-      const wrap = new THREE.Group(); wrap.add(root); wrap.position.set((Math.max(...xs) + Math.min(...xs)) / 2, -0.5 - deep / 2, (Math.max(...zs) + Math.min(...zs)) / 2);
+      root.rotation.y = Math.PI / 4;
+      const wrap = new THREE.Group(); wrap.add(root); const k = f.length === 4 ? 0.94 : 0.7; wrap.scale.set(w * k, 1, d * k);
+      wrap.position.set((Math.max(...xs) + Math.min(...xs)) / 2, -0.5 - deep / 2, (Math.max(...zs) + Math.min(...zs)) / 2);
       group.add(wrap);
+    }
+    /* a slanted island edge is drawn by a square grid and comes out saw-toothed: a slim trim along it hides the teeth */
+    const trim = mat('#8a6538', { roughness: 1 });
+    for (const f of h.floors) for (let i = 0; i < f.length; i++) {
+      const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length];
+      if (Math.abs(bx - ax) < 0.01 || Math.abs(bz - az) < 0.01) continue;
+      const cx = f.reduce((a, p) => a + p[0], 0) / f.length, cz = f.reduce((a, p) => a + p[1], 0) / f.length;
+      const at = (x, z) => { const d = Math.hypot(cx - x, cz - z) || 1; return groundH(h, x + (cx - x) / d * 0.03, z + (cz - z) / d * 0.03) + 0.004; };
+      const A = new THREE.Vector3(ax, at(ax, az), az), B = new THREE.Vector3(bx, at(bx, bz), bz);
+      const strip = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.012, A.distanceTo(B)), trim);
+      strip.position.copy(A).add(B).multiplyScalar(0.5); strip.lookAt(B); strip.receiveShadow = true; group.add(strip);
+    }
+    /* a gate that slides out past a bare bridge rides a golden rail, so it never hangs in the air */
+    for (const m of h.movers) {
+      if (m.kind !== 'gate') continue;
+      const a = (m.ang || 0) * Math.PI / 180, ux = Math.sin(a), uz = Math.cos(a);
+      const ends = [[m.ax - ux * m.len, m.az - uz * m.len], [m.ax + ux * m.len, m.az + uz * m.len], [m.bx - ux * m.len, m.bz - uz * m.len], [m.bx + ux * m.len, m.bz + uz * m.len]];
+      if (ends.every(([x, z]) => onFloor(h, x, z))) continue;
+      const along = ends.map(([x, z]) => x * ux + z * uz), lo = Math.min(...along), hi = Math.max(...along), mx = (m.ax + m.bx) / 2, mz = (m.az + m.bz) / 2;
+      const off = mx * ux + mz * uz, y = groundH(h, mx, mz), gold = mat(C10_GOLD, { roughness: 0.4, metalness: 0.2 });
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.05, hi - lo + 0.06), gold);
+      rail.position.set(mx + ux * ((lo + hi) / 2 - off), y - 0.03, mz + uz * ((lo + hi) / 2 - off)); rail.rotation.y = a; rail.castShadow = true; group.add(rail);
+      for (const t of [lo - 0.03, hi + 0.03]) {
+        const stop = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 8), mat('#ef7d6d', { roughness: 0.5 }));
+        stop.position.set(mx + ux * (t - off), y - 0.01, mz + uz * (t - off)); group.add(stop);
+      }
+    }
+    /* keep the drifting clouds out from behind the tee, where they would fill the aim view, and off each other */
+    {
+      const a0 = (h.aim0 || 0) * Math.PI / 180, fx = Math.sin(a0), fz = Math.cos(a0), kept = [];
+      for (const o of group.children.filter(c => c.userData && c.userData.c10drift)) {
+        const x = o.position.x, z = o.position.z, dx = x - h.tee[0], dz = z - h.tee[1], along = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
+        if ((along < 1 && along > -5 && side < 3) || kept.some(k => Math.hypot(k.position.x - x, k.position.z - z) < 1.1)) { group.remove(o); disposeGroup(o); } else kept.push(o);
+      }
     }
     /* a golden castle on its own island far beyond the course */
     const pts = h.floors.flat(), cx = pts.reduce((a, p) => a + p[0], 0) / pts.length, z1 = Math.max(...pts.map(p => p[1]));

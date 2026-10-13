@@ -49,9 +49,11 @@
     const hook = new THREE.Mesh(new THREE.TorusGeometry(0.16 * s, 0.05 * s, 10, 20, Math.PI), mat('#ffffff', { map: stripeTex('#fff8ec', '#ef7d6d', 2), roughness: 0.45 }));
     hook.position.set(0.16 * s, 1.2 * s, 0); shaft.castShadow = hook.castShadow = true; g.add(shaft, hook); return g;
   };
+  /* three prop kinds at one shared scale each, so the scenery reads as one set */
   const prop = r => {
-    const k = r(), g = k < 0.4 ? lollipop(0.5 + r() * 0.6, CANDY[Math.floor(r() * CANDY.length)])
-      : k < 0.75 ? gumdrop(0.12 + r() * 0.14, CANDY[Math.floor(r() * CANDY.length)], 0.3 + r() * 0.2) : candyCane(0.5 + r() * 0.5);
+    const k = r(), col = CANDY[Math.floor(r() * CANDY.length)], g = k < 0.35 ? lollipop(0.8, col)
+      : k < 0.75 ? gumdrop(0.22, col, 0.4) : candyCane(0.75);
+    g.userData.c9rad = k < 0.35 ? 0.3 : k < 0.75 ? 0.24 : 0.3;
     g.name = 'c9prop'; return g;
   };
   /* gumdrop bumper */
@@ -99,6 +101,18 @@
           if (o.position.x > B.x0 - pad - 0.4 && o.position.x < B.x1 + pad + 0.4 && o.position.z > B.z0 - pad - 0.4 && o.position.z < B.z1 + pad + 0.4) { group.remove(o); disposeGroup(o); }
         }
       }
+      /* tidy the scenery: no prop touching another, none hugging the course, none behind the tee in the camera's way */
+      {
+        const a0 = (h.aim0 || 0) * Math.PI / 180, fx = Math.sin(a0), fz = Math.cos(a0), kept = [];
+        const nearCourse = (x, z, d) => h.segs.some(s => { const q = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - q[0], z - q[1]) < d; })
+          || h.floors.some(f => inPoly(f, x, z) || f.some((p, i) => { const q2 = f[(i + 1) % f.length], c = closestOnSeg(p[0], p[1], q2[0], q2[1], x, z); return Math.hypot(x - c[0], z - c[1]) < d; }));
+        for (const o of group.children.filter(c => c.name === 'c9prop')) {
+          const x = o.position.x, z = o.position.z, rad = o.userData.c9rad || 0.3, dx = x - h.tee[0], dz = z - h.tee[1];
+          const along = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
+          const clash = kept.some(k => Math.hypot(k.position.x - x, k.position.z - z) < rad + (k.userData.c9rad || 0.3) + 0.2);
+          if (clash || nearCourse(x, z, rad + 0.45) || (along < 0.5 && along > -4.5 && side < 2.2)) { group.remove(o); disposeGroup(o); } else kept.push(o);
+        }
+      }
       /* a press that slides through a side wall parks inside a chocolate housing */
       for (const m of h.movers) {
         if (m.look !== 'press') continue;
@@ -106,9 +120,9 @@
         for (const [px, pz] of [[m.ax, m.az], [m.bx, m.bz]]) for (const s of [-1, 1]) {
           const ex = px + s * dx, ez = pz + s * dz;
           if (onFloor(h, ex, ez)) continue;
-          const box = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.3), mat('#5a3420', { roughness: 0.5 }));
+          const box = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.34), mat('#5a3420', { roughness: 0.5 }));
           box.position.set(ex, groundH(h, ex - s * dx * 0.3, ez - s * dz * 0.3) + 0.13, ez); box.rotation.y = a; box.castShadow = true;
-          const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.03, 0.32), mat('#f29ac0', { roughness: 0.5 }));
+          const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.03, 0.36), mat('#f29ac0', { roughness: 0.5 }));
           cap.position.y = 0.14; box.add(cap); group.add(box);
         }
       }

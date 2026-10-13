@@ -45,6 +45,23 @@ function c2Butte(r, w, hgt) {
   }
   return g;
 }
+/* scenery tidy: scatterProps only spaces prop centres from the course, so drop any prop whose footprint
+   would touch a mesa side or another prop */
+function c2Tidy(group, h) {
+  const edges = h.segs.slice();
+  for (const f of h.floors) f.forEach((p, i) => { const q = f[(i + 1) % f.length]; edges.push([p[0], p[1], q[0], q[1]]); });
+  const kept = [];
+  for (const o of group.children.slice()) {
+    const r = o.userData.c2r;
+    if (r === undefined) continue;
+    const x = o.position.x, z = o.position.z;
+    const nearEdge = edges.some(s => { const c = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - c[0], z - c[1]) < r + 0.12; });
+    const nearProp = kept.some(k => Math.hypot(x - k.position.x, z - k.position.z) < r + k.userData.c2r + 0.1);
+    /* and nothing tall in the aim camera's frame round the tee */
+    const nearTee = Math.hypot(x - h.tee[0], z - h.tee[1]) < 2.4;
+    if (nearEdge || nearProp || nearTee) { group.remove(o); disposeGroup(o); } else kept.push(o);
+  }
+}
 WORLD_LOOK[2] = {
   felt: '#4b7a3a', wall: '#f0b878', ground: null, fog: true, sky: ['#e8763c', '#ffd49a'], flag: '#6fc0df', icon: C2_SUN_SVG,
   sand: '#a86d38', water: '#2f86c8', fast: '#8a5a32', skirt: '#c8693e', tube: '#6e5233', push: '#e9a23b',
@@ -54,6 +71,8 @@ WORLD_LOOK[2] = {
     const o = k < 0.5 ? c2Saguaro(0.06 + r() * 0.04, 0.45 + r() * 0.4, r() < 0.5 ? '#4e9a45' : '#438a3b')
       : k < 0.85 ? c2Boulder(0.18 + r() * 0.25, Math.floor(r() * 1e6), C2_STRATA[Math.floor(r() * 4)]) : c2Butte(r, 0.3 + r() * 0.25, 0.9 + r() * 0.6);
     if (k < 0.85) o.position.y = C2_CANYON_Y;
+    /* footprint radius, for c2Tidy: saguaro arms reach about 2.3 trunk radii, a butte's base is its widest stratum */
+    g.userData.c2r = k < 0.5 ? o.children[0].geometry.parameters.radiusTop * 2.4 : k < 0.85 ? o.children[0].geometry.parameters.radius * 1.1 : o.children[0].geometry.parameters.radiusBottom;
     g.add(o); return g;
   },
   post(p, look) {
@@ -65,6 +84,7 @@ WORLD_LOOK[2] = {
   },
   mover: (m, look) => m.look === 'weed' ? c2Tumbleweed(m) : defaultMover(m, look),
   decor(group, h) {
+    c2Tidy(group, h);
     const B = holeBounds(h);
     const floor = new THREE.Mesh(new THREE.CircleGeometry(70, 40), mat('#d99a5f', { roughness: 1 }));
     floor.rotation.x = -Math.PI / 2; floor.position.set(B.cx, C2_CANYON_Y, B.cz); floor.receiveShadow = true; group.add(floor);
@@ -75,7 +95,7 @@ WORLD_LOOK[2] = {
       for (let i = 0; i < bands; i++) {
         const geo = new THREE.ExtrudeGeometry(shape, { depth: band + 0.01, bevelEnabled: false });
         const m = new THREE.Mesh(geo, mat(C2_STRATA[i], { roughness: 1 }));
-        m.rotation.x = -Math.PI / 2; m.position.y = C2_CANYON_Y + band * i; m.receiveShadow = true; group.add(m);
+        m.rotation.x = -Math.PI / 2; m.position.y = C2_CANYON_Y + band * i; m.receiveShadow = m.castShadow = true; group.add(m);
       }
     }
     /* buttes on the horizon, well clear of the camera behind the tee */

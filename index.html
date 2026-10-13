@@ -417,7 +417,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '0d6a5c39e365';
+const BUILD_ID = '27ed87cf4ca6';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -2056,9 +2056,12 @@ registerWorld(10, { holes: [
     tubes: [{ a: [0.5, 5.6], b: [-0.8, 7.0], dir: 25 }] },
   /* 18. the crown kingdom: tube or windy rainbow to the windmill isle, off the kicker onto the
      cloud-ice court past the golden gate, then up the royal ramp to the crater cup on the crown */
-  { par: 5, sol: [[4,0.72,0],[2,0.84,0.5]], tee: [0, 0.6], cup: [0.3, 11.8],
+  { par: 5, sol: [[212,1,0],[237,0.86,2]], tee: [0, 0.6], cup: [0.3, 11.8],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.6, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
-    walls: [[[-0.22, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.22, 2.2]], [[-1, 11], [-1, 12.6], [1, 12.6], [1, 11]]],
+    /* the finale is hard, not hopeless: railed rainbow, walled windmill isle (only the kicker open), walled ice court, railed crown ramp */
+    walls: [[[-0.26, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.26, 2.2]],
+      [[-0.26, 2.2], [-0.26, 4.6], [-1.4, 4.6], [-1.4, 6.6], [-0.5, 6.6]], [[0.26, 2.2], [0.26, 4.6], [1.4, 4.6], [1.4, 6.6], [0.5, 6.6]],
+      [[-1.6, 7.6], [-1.6, 10], [-0.28, 10], [-0.28, 11], [-1, 11], [-1, 12.6], [1, 12.6], [1, 11], [0.28, 11], [0.28, 10], [1.6, 10], [1.6, 7.6]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }, { poly: rect(-1.6, 7.6, 1.6, 10), h: 0.1 }, { poly: C10_PAD(-1, 11, 1, 12.6), h: 0.45 }],
     ramps: [{ x0: -0.22, z0: 2.2, x1: 0.22, z1: 4.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: -0.5, z0: 6.2, x1: 0.5, z1: 6.6, axis: 'z', h0: 0.3, h1: 0.4 },
       { x0: -0.35, z0: 10, x1: 0.35, z1: 11, axis: 'z', h0: 0.1, h1: 0.45 }],
@@ -2066,7 +2069,7 @@ registerWorld(10, { holes: [
       { surf: 'ice', poly: rect(-1.6, 7.6, 1.6, 10) }],
     bumps: [{ x: 0.3, z: 11.8, r: 0.5, h: 0.12 }, { x: 0.3, z: 11.8, r: 0.24, h: -0.05 }],
     movers: [{ kind: 'spin', x: -0.5, z: 5.5, len: 0.36, w: 1.7, phase: 0, blades: 2, look: 'windmill' },
-      { kind: 'gate', ax: -1.1, az: 8.9, bx: 1.1, bz: 8.9, len: 0.4, ang: 90, period: 2.8, look: 'gate' }],
+      { kind: 'gate', ax: -0.95, az: 8.9, bx: 0.95, bz: 8.9, len: 0.4, ang: 90, period: 2.8, look: 'gate' }],
     tubes: [{ a: [0.5, 1.7], b: [0.8, 4.95], dir: 0 }] },
 ] });
 /* ---- end of courses ---- */

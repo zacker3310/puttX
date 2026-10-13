@@ -20,7 +20,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [1.2, 0], poly: rect(-1.2, 3.6, 1.2, 4.6) }, { surf: 'sand', poly: rect(0.4, 8.4, 1.2, 9) }],
     bumps: [{ x: 0.2, z: 7.5, r: 0.35, h: 0.12 }] },
   /* 3: stacked decks (3 parts). Right ramp, round the jib, left ramp, across the top belt */
-  { par: 3, sol: [[32,0.93,0],[20,0.57,0]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.2, 0, 1.2, 9.4),
+  { par: 3, sol: [[32,0.93,0],[328,0.96,0]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.2, 0, 1.2, 9.4),
     tiers: [{ poly: rect(-1.2, 3.2, 1.2, 6.2), h: 0.2 }, { poly: rect(-1.2, 6.2, 1.2, 9.4), h: 0.4 }],
     ramps: [{ x0: 0.5, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 },
             { x0: -1.2, z0: 5, x1: -0.6, z1: 6.2, axis: 'z', h0: 0.2, h1: 0.4 }],

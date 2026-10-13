@@ -38,14 +38,14 @@ registerWorld(11, { holes: [
     bumps: [{ x: 0.3, z: 4.4, r: 0.4, h: 0.12 }] },
   /* 6: the hopper run (auto, 4 parts). Up the plank to the deck pipe, down the return belt, through
      the second pipe and up the feed belt into the hopper bowl. A firm straight putt rides it all */
-  { par: 4, auto: true, crazy: true, sol: [], tee: [0.2, 0.5], cup: [-2.1, 7.6], aim0: 0, shape: rect(-3.2, 0, 0.6, 9.4),
+  { par: 4, auto: true, crazy: true, sol: [[0,0.8,0]], tee: [0.2, 0.5], cup: [-2.3, 7.4], aim0: 0, shape: rect(-3.2, 0, 0.6, 9.4),
     inner: [[[-0.2, 0], [-0.2, 9.4]], [[-1, 0], [-1, 9.4]]],
     tiers: [{ poly: rect(-0.2, 3.5, 0.6, 9.4), h: 0.3 }],
     ramps: [{ x0: -0.2, z0: 2, x1: 0.6, z1: 3.5, axis: 'z', h0: 0, h1: 0.3 }],
     tubes: [{ a: [0.2, 8.8], b: [-0.6, 8.7], dir: 180 }, { a: [-0.6, 0.6], b: [-2.1, 0.6], dir: 0 }],
-    zones: [{ push: [0, 1.2], poly: rect(-0.2, 3.5, 0.6, 9.4) }, { push: [0, -1.4], poly: rect(-1, 0, -0.2, 9.4) },
-            { push: [0, 1.4], poly: rect(-3.2, 1.2, -1, 5) }],
-    bumps: [{ x: -2.1, z: 7.6, r: 1, h: -0.3 }] },
+    zones: [{ push: [0, 1.2], poly: rect(-0.2, 3.5, 0.6, 9.4) }, { push: [0, -0.8], poly: rect(-1, 0, -0.2, 9.4) },
+            { push: [0, 0.8], poly: rect(-3.2, 1.2, -1, 6.5) }],
+    bumps: [{ x: -2.3, z: 7.4, r: 0.75, h: -0.25 }] },
   /* 7: trench jump (3 parts, open). Launch off the plank over the trench or creep round the side plank, then the jib */
   { par: 3, sol: [], tee: [0, 0.5], cup: [0.25, 8.3],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 9)],

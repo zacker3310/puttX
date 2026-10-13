@@ -6,13 +6,13 @@ registerWorld(1, { holes: [
     zones: [{ push: [1.6, 0], poly: rect(-0.75, 3, 0.75, 4.2) }, { surf: 'sand', poly: rect(0.2, 4.9, 0.75, 6) }],
     bumps: [{ x: -0.45, z: 2, r: 0.4, h: 0.1 }] },
   /* 2: girder dogleg. Bank off the back girder past a dirt mound in the corner */
-  { par: 3, sol: [[36,0.96,0],[4,0.48,0]], tee: [0, 0.5], cup: [-3.4, 3.9], aim0: 0,
+  { par: 3, sol: [[32,0.96,0],[2,0.52,0]], tee: [0, 0.5], cup: [-3.4, 3.9], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 4.6], [-4, 4.6], [-4, 3.2], [-0.7, 3.2]],
     inner: [[[-1.9, 4.6], [-1.9, 4.05]], [[-2.7, 3.2], [-2.7, 3.7]]],
     bumps: [{ x: 0.1, z: 3.95, r: 0.45, h: 0.16 }],
     zones: [{ surf: 'sand', poly: rect(-4, 4.25, -3, 4.6) }] },
   /* 3: crane arm. Time the jib, then crest the dirt mound in front of the cup */
-  { par: 2, sol: [[338,0.96,0]], tee: [0, 0.5], cup: [0.35, 6.3], shape: rect(-1.1, 0, 1.1, 7),
+  { par: 2, sol: [[336,1,0]], tee: [0, 0.5], cup: [0.35, 6.3], shape: rect(-1.1, 0, 1.1, 7),
     inner: [[[0, 5.75], [0.75, 5.75]]],
     movers: [{ kind: 'spin', x: 0, z: 3.2, len: 0.8, w: 1.3, phase: 0, look: 'crane' }],
     bumps: [{ x: 0.05, z: 5.2, r: 0.45, h: 0.16 }],

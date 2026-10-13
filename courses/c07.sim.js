@@ -51,7 +51,7 @@ registerWorld(7, { holes: [
     zones: [C7_MOAT(rect(-1.3, 7.0, 1.3, 7.5))],
     posts: [C7_GARG(0.6, 5.2), C7_GARG(-0.35, 5.25)] },
   /* 10: the drop deck: two secret passages and a daring jump down to the crypt green */
-  { par: 3, sol: [[2,0.84,0]], tee: [0, 0.5], cup: [-0.7, 7.2], floors: [rect(-1, 0, 1, 3.4), rect(-1.4, 4.2, 1.4, 8)],
+  { par: 3, crazy: true, sol: [[2,0.84,0]], tee: [0, 0.5], cup: [-0.7, 7.2], floors: [rect(-1, 0, 1, 3.4), rect(-1.4, 4.2, 1.4, 8)],
     tiers: [{ poly: rect(-1, 0, 1, 3.4), h: 0.35 }],
     walls: [[[-0.2, 3.4], [-1, 3.4], [-1, 0], [1, 0], [1, 3.4], [0.2, 3.4]], [[-0.4, 4.2], [-1.4, 4.2], [-1.4, 8], [1.4, 8], [1.4, 4.2], [0.4, 4.2]]],
     tubes: [{ a: [0.62, 2.9], b: [1.0, 4.7], dir: 0 }, { a: [-0.62, 2.9], b: [-0.7, 0.4], dir: 0 }],
@@ -78,14 +78,14 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(-0.1, 8.1), C7_GARG(-0.9, 8.15)],
     movers: [C7_MILL(0, 2.0, 0.6, 1.5, 0), C7_GHOST(-0.85, 7.35, 0.6, 7.35, 2.6, 0)] },
   /* 14: three dungeon rooms joined by secret passages; pick the right mouths */
-  { par: 4, sol: [[140,1,0],[56,0.88,1.2],[4,0.88,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 14, floors: [rect(-1, 0, 1, 2.8), rect(-1, 3.6, 1, 6.4), rect(-1, 7.2, 1, 10)],
+  { par: 4, crazy: true, sol: [[140,1,0],[56,0.88,1.2],[4,0.88,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 14, floors: [rect(-1, 0, 1, 2.8), rect(-1, 3.6, 1, 6.4), rect(-1, 7.2, 1, 10)],
     walls: [ring(rect(-1, 0, 1, 2.8)), ring(rect(-1, 3.6, 1, 6.4)), ring(rect(-1, 7.2, 1, 10)), [[-1, 5], [-0.25, 5]], [[0.25, 5], [1, 5]]],
     zones: [{ surf: 'sand', poly: rect(-1, 3.6, -0.3, 4.4) }],
     tubes: [{ a: [0.6, 2.35], b: [0.7, 3.95], dir: 0 }, { a: [0, 2.35], b: [-0.7, 0.45], dir: 20 }, { a: [-0.6, 2.35], b: [-0.7, 3.95], dir: 0 },
       { a: [0.6, 6.0], b: [-0.6, 7.5], dir: 0 }, { a: [-0.6, 6.0], b: [0.7, 0.45], dir: -20 }],
     movers: [C7_GATE(0, 5, -0.5, 5, 0.25, 90, 2.6, 0), C7_MILL(0.0, 8.5, 0.5, 1.6, 0)] },
   /* 15: bridge, island and bridge across the moat while ghosts patrol */
-  { par: 4, sol: [[164,0.5625,0],[348,0.3125,0],[280,0.5,0],[28,0.4375,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 18, shape: rect(-1.6, 0, 1.6, 9),
+  { par: 4, crazy: true, sol: [[164,0.5625,0],[348,0.3125,0],[280,0.5,0],[28,0.4375,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 18, shape: rect(-1.6, 0, 1.6, 9),
     zones: [C7_MOAT(rect(-1.6, 1.8, 0.6, 3.6)), C7_MOAT(rect(1.1, 1.8, 1.6, 3.6)), C7_MOAT(rect(-0.6, 4.8, 1.6, 6.6)), C7_MOAT(rect(-1.6, 4.8, -1.1, 6.6))],
     posts: [C7_GARG(0.15, 7.7), C7_GARG(1.25, 7.5)],
     movers: [C7_GHOST(-1.0, 4.2, 1.0, 4.2, 3.2, 0), C7_GHOST(-0.3, 7.2, 0.9, 7.2, 2.4, 1.5)] },
@@ -103,7 +103,7 @@ registerWorld(7, { holes: [
     bumps: [{ x: -1.1, z: 4.1, r: 0.35, h: 0.1 }],
     movers: [C7_GATE(1.125, 2, 1.375, 2, 0.25, 90, 2.4, 0)] },
   /* 18: the showpiece: through the gate, up the tower stairs, into the right secret passage, down to the throne room */
-  { par: 4, sol: [[0,0.6,1.2],[20,1,1.2]], tee: [0, 0.5], cup: [3.4, 7.3], floors: [rect(-1.2, 0, 1.2, 7), rect(2.0, 3.0, 4.8, 8.0)],
+  { par: 4, crazy: true, sol: [[0,0.6,1.2],[20,1,1.2]], tee: [0, 0.5], cup: [3.4, 7.3], floors: [rect(-1.2, 0, 1.2, 7), rect(2.0, 3.0, 4.8, 8.0)],
     walls: [ring(rect(-1.2, 0, 1.2, 7)), ring(rect(2.0, 3.0, 4.8, 8.0)), [[-1.2, 2.2], [-0.3, 2.2]], [[0.3, 2.2], [1.2, 2.2]]],
     tiers: [{ poly: rect(-1.2, 3.8, 1.2, 7), h: 0.2 }, { poly: rect(-1.2, 5.4, 1.2, 7), h: 0.4 }, { poly: rect(2.6, 6.4, 4.2, 8.0), h: 0.1 }],
     ramps: [{ x0: -1.2, z0: 3.0, x1: 0, z1: 3.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0, z0: 4.6, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.2, h1: 0.4 },

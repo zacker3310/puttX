@@ -12,17 +12,17 @@ registerWorld(15, (() => {
   const lagoon = poly => ({ surf: 'water', poly });
   return { holes: [
     /* 1 shore lane: round the corner, or the cave in the far corner */
-    { par: 2, sol: [], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
+    { par: 2, sol: [[10,1,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
       shape: [[-0.8, 0], [0.8, 0], [0.8, 4.2], [2.6, 4.2], [2.6, 6.2], [-0.8, 6.2]],
       zones: [sand(rect(-0.8, 2.0, 0.1, 2.8))], bumps: [{ x: 0.9, z: 5.3, r: 0.45, h: 0.14 }],
       tubes: [{ a: [-0.45, 5.6], b: [2.25, 4.6], dir: 0 }], posts: [BARREL(1.3, 4.6)] },
     /* 2 drawbridge, then the gangplank up to the deck */
-    { par: 3, sol: [], tee: [0.6, 0.5], cup: [-0.6, 6.9], shape: rect(-1.2, 0, 1.2, 7.6),
+    { par: 3, sol: [[324,0.83,0.5]], tee: [0.6, 0.5], cup: [-0.6, 6.9], shape: rect(-1.2, 0, 1.2, 7.6),
       zones: [lagoon(rect(-0.5, 2.6, 1.2, 3.4))], movers: [BRIDGE(-0.78, 2.35, -0.3, 2.35, 0.2, 90, 3.2)],
       ramps: [{ x0: 0.0, z0: 4.4, x1: 1.2, z1: 5.4, axis: 'z', h0: 0, h1: 0.25 }], tiers: [{ poly: rect(-1.3, 5.4, 1.3, 7.7), h: 0.25 }],
       inner: [[[-1.2, 5.4], [0.0, 5.4]]], bumps: [{ x: 0.6, z: 6.7, r: 0.4, h: 0.12 }, { x: -0.6, z: 4.0, r: 0.45, h: 0.15 }], posts: [ANCHOR(0.9, 1.8)] },
     /* 3 cave relay: three chambers, two caves */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [-0.7, 6.3], aim0: 30, shape: rect(-1.6, 0, 1.6, 7),
+    { par: 3, sol: [[24,0.8,0],[38,0.44,0]], tee: [0, 0.5], cup: [-0.7, 6.3], aim0: 30, shape: rect(-1.6, 0, 1.6, 7),
       inner: [[[-1.6, 2.6], [1.0, 2.6]], [[-1.0, 4.8], [1.6, 4.8]]],
       tubes: [{ a: [-1.0, 1.8], b: [-1.0, 3.3], dir: 90 }, { a: [1.0, 4.0], b: [1.0, 5.6], dir: 270 }],
       bumps: [{ x: 0.3, z: 1.6, r: 0.5, h: 0.18 }, { x: 0, z: 3.7, r: 0.5, h: 0.2 }],
@@ -40,7 +40,7 @@ registerWorld(15, (() => {
       tubes: [{ a: [-1.0, 1.7], b: [1.0, 4.1], dir: 0 }],
       zones: [sand(rect(-1.4, 4.6, -0.3, 5.4))], posts: [BARREL(-0.2, 6.2)] },
     /* 6 jump the lagoon off the plank, or walk the sandy shore round it */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [-0.4, 7.3], shape: rect(-1.2, 0, 1.2, 8),
+    { par: 3, sol: [[0,1,0]], tee: [0, 0.5], cup: [-0.4, 7.3], shape: rect(-1.2, 0, 1.2, 8),
       ramps: [{ x0: -0.4, z0: 2.2, x1: 0.4, z1: 3.4, axis: 'z', h0: 0, h1: 0.25 }],
       zones: [lagoon(rect(-0.6, 3.4, 1.2, 4.4)), sand(rect(-1.2, 3.4, -0.6, 4.4)), sand(rect(0.3, 5.0, 1.2, 5.8))],
       bumps: [{ x: 0.4, z: 6.4, r: 0.45, h: 0.2 }], posts: [BARREL(0.1, 7.6), ANCHOR(-0.9, 2.0)] },
@@ -52,13 +52,13 @@ registerWorld(15, (() => {
       tubes: [{ a: [1.15, 4.9], b: [-1.15, 6.4], dir: 90 }],
       posts: [BARREL(-0.2, 4.2), BARREL(0.2, 7.0)], zones: [sand(rect(-1.6, 1.4, -0.6, 2.2))], bumps: [{ x: 0.6, z: 1.2, r: 0.4, h: 0.15 }] },
     /* 8 the gangplank express: up the chute, through the treasure cave, down the long plank, into the bowl */
-    { par: 3, auto: true, sol: [[0, 0.7, 0]], tee: [0, 0.5], cup: [-1.2, 1.0], aim0: 0, shape: rect(-1.6, 0, 0.4, 8),
+    { par: 3, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [-1.25, 2.4], aim0: 0, shape: rect(-1.6, 0, 0.4, 8),
       inner: [[[-0.2, 0], [-0.2, 4.8], [0.2, 4.8], [0.2, 0]], [[-0.9, 0], [-0.9, 7.0]]],
-      ramps: [{ x0: -0.2, z0: 1.6, x1: 0.2, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1.6, z0: 3.6, x1: -0.9, z1: 6.4, axis: 'z', h0: 0, h1: 0.4 }],
-      tiers: [{ poly: rect(-0.2, 3.0, 0.2, 4.8), h: 0.3 }, { poly: rect(-1.6, 6.4, 0.4, 8.0), h: 0.4 }],
-      tubes: [{ a: [0, 4.3], b: [-1.25, 7.3], dir: 180, keep: 0, add: 1.2 }],
-      zones: [lagoon(rect(-0.8, 0.1, -0.3, 6.3)), sand(rect(-1.6, 2.2, -0.9, 2.8))],
-      bumps: [{ x: -1.2, z: 1.0, r: 0.7, h: -0.1 }] },
+      ramps: [{ x0: -0.2, z0: 1.6, x1: 0.2, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1.6, z0: 3.6, x1: -0.9, z1: 6.4, axis: 'z', h0: 0, h1: 0.35 }],
+      tiers: [{ poly: rect(-0.2, 3.0, 0.2, 4.8), h: 0.3 }, { poly: rect(-1.6, 6.4, 0.4, 8.0), h: 0.35 }],
+      tubes: [{ a: [0, 4.3], b: [-1.25, 7.3], dir: 180, keep: 0, add: 1.8 }],
+      zones: [lagoon(rect(-0.8, 0.1, -0.3, 6.3))],
+      bumps: [{ x: -1.25, z: 2.4, r: 0.5, h: -0.1 }] },
     /* 9 twin wheels: past the beach wheel, up the plank, past the deck wheel */
     { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.4, 0, 1.4, 8),
       movers: [WHEEL(0, 2.0, 0.5, 1.4), WHEEL(-0.5, 5.6, 0.45, -1.7)],

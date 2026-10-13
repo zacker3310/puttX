@@ -7,12 +7,12 @@ const J13_WATER = poly => ({ surf: 'water', poly });
 const J13_MUD = poly => ({ surf: 'mud', poly });
 registerWorld(13, { holes: [
   /* 1: two stone bridges over the stream, then the temple step up to the cup */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.5, 6.3], shape: rect(-1, 0, 1, 7),
+  { par: 3, sol: [[6,0.84,0]], tee: [0, 0.5], cup: [0.5, 6.3], shape: rect(-1, 0, 1, 7),
     zones: [J13_WATER(rect(-1, 2.4, -0.55, 3.0)), J13_WATER(rect(-0.15, 2.4, 0.15, 3.0)), J13_WATER(rect(0.55, 2.4, 1, 3.0))],
     ramps: [{ x0: -0.35, z0: 4.4, x1: 0.35, z1: 5.0, axis: 'z', h0: 0, h1: 0.18 }], tiers: [{ poly: rect(-1, 5.0, 1, 7), h: 0.18 }],
     bumps: [{ x: 0.55, z: 3.8, r: 0.4, h: 0.1 }], posts: [J13_IDOL(-0.1, 5.9)] },
   /* 2: the split shrine: the long left aisle through the mud, or the right one past the pool */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.6, 5.8], aim0: 0, shape: rect(-1.2, 0, 1.2, 6.6),
+  { par: 3, sol: [[4,0.92,0]], tee: [0, 0.5], cup: [-0.6, 5.8], aim0: 0, shape: rect(-1.2, 0, 1.2, 6.6),
     inner: [[[0, 1.6], [0, 5.0]]],
     zones: [J13_WATER(rect(-1.2, 2.6, -0.45, 3.3)), J13_MUD(rect(0.05, 3.8, 1.2, 4.4))],
     tubes: [{ a: [0.6, 3.0], b: [-0.6, 4.2], dir: 0, keep: 0.5 }],
@@ -24,7 +24,7 @@ registerWorld(13, { holes: [
     zones: [J13_MUD(rect(-1.1, 2.2, 0.0, 2.8)), J13_MUD(rect(0.3, 3.4, 1.1, 3.9))],
     posts: [J13_IDOL(-0.5, 3.6), J13_IDOL(0.4, 2.0)], movers: [J13_ROCK(-0.75, 5.75, 0.75, 5.75, 2.6)] },
   /* 4: the waterfall: drop through the gap to the middle terrace, round the wall, drop to the cup; or the tunnel */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 6.9], shape: rect(-1, 0, 1, 7.6),
+  { par: 3, sol: [[14,0.84,0]], tee: [0, 0.5], cup: [0.4, 6.9], shape: rect(-1, 0, 1, 7.6),
     tiers: [{ poly: rect(-1, 0, 1, 2.6), h: 0.4 }, { poly: rect(-1, 2.6, 1, 4.6), h: 0.2 }],
     inner: [[[-1, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1, 2.6]], [[-0.4, 4.6], [1, 4.6]]],
     zones: [J13_WATER(rect(0.3, 2.6, 1, 3.3)), J13_MUD(rect(-1, 3.5, -0.2, 4.0))],

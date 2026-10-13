@@ -6,13 +6,13 @@ const C2_ROCK = (x, z, r = 0.14) => ({ x, z, r, top: 0.2, look: 'rock' });
 const C2_WEED = (ax, az, bx, bz, period, phase = 0, r = 0.17) => ({ kind: 'slide', ax, az, bx, bz, r, period, phase, look: 'weed' });
 registerWorld(2, { holes: [
   /* 1. up the first ramp onto a mesa, a cactus and a sand trap guard the cup */
-  { par: 2, sol: [[18,0.75,0]], tee: [0, 0.5], cup: [-0.4, 5.6], shape: rect(-0.8, 0, 0.8, 6.4),
+  { par: 2, sol: [[18,0.8,0]], tee: [0, 0.5], cup: [-0.4, 5.6], shape: rect(-0.8, 0, 0.8, 6.4),
     ramps: [{ x0: -0.8, z0: 2.2, x1: 0.8, z1: 3.2, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.9, 3.2, 0.9, 6.5), h: 0.3 }],
     zones: [{ surf: 'sand', poly: rect(0.1, 4.7, 0.8, 5.9) }],
     posts: [C2_CACTUS(-0.27, 4.5)] },
   /* 2. ride off the mesa: a canyon drop onto a green that tilts to the right, the cup tucked behind a rock spur */
-  { par: 3, sol: [[350,0.64,0],[22,0.72,0]], tee: [0, 0.6], cup: [1.2, 6.8],
+  { par: 3, sol: [[348,0.68,0],[22,0.76,0]], tee: [0, 0.6], cup: [1.2, 6.8],
     shape: [[-0.7, 0], [0.7, 0], [0.7, 2.6], [1.8, 2.6], [1.8, 7.6], [-1.8, 7.6], [-1.8, 2.6], [-0.7, 2.6]],
     inner: [[[1.8, 5.2], [-0.3, 5.2]]],
     tiers: [{ poly: rect(-0.75, -0.1, 0.75, 2.6), h: 0.42 }, { poly: rect(-1.9, 2.6, 1.9, 7.7), h: 0.08, sx: 0.042 }],

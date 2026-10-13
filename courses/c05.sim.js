@@ -70,7 +70,7 @@ registerWorld(5, (() => {
       zones: [lagoon(rect(-1.4, 3.6, 1.0, 4.8)), sand(rect(-1.4, 4.8, 1.0, 6.4))],
       bumps: [{ x: 0.4, z: 7.0, r: 0.5, h: 0.25 }], posts: [BARREL(-0.1, 7.8), ANCHOR(1.15, 6.6)] },
     /* 13 crow's nest: two gangplanks to the top deck, where the wheel turns */
-    { par: 4, sol: [[39,0.95,0],[36,1,0],[0,0.05,0]], tee: [0, 0.6], cup: [-0.8, 7.35], aim0: 25,
+    { par: 4, crazy: true, sol: [[39,0.95,0],[36,1,0],[0,0.05,0]], tee: [0, 0.6], cup: [-0.8, 7.35], aim0: 25,
       shape: [[-1.6, 0], [1.6, 0], [1.6, 3], [1.6, 5.6], [1.6, 8], [0, 8], [-1.6, 8], [-1.6, 5.6], [-1.6, 4.4], [-1.6, 3]],
       tiers: [{ poly: rect(-1.7, 3, 1.7, 8.1), h: 0.25 }, { poly: rect(-1.7, 5.6, 0, 8.1), h: 0.5 }],
       ramps: [{ x0: 1.0, z0: 1.8, x1: 1.6, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: -1.6, z0: 4.4, x1: -1.0, z1: 5.6, axis: 'z', h0: 0.25, h1: 0.5 }],
@@ -85,13 +85,13 @@ registerWorld(5, (() => {
       zones: [sand(rect(0.4, 4.4, 1.4, 5.6)), lagoon(rect(-1.4, 6.6, -0.2, 7.6))],
       posts: [ANCHOR(0.2, 7.6), ANCHOR(1.15, 7.4)] },
     /* 15 lagoon islands: drawbridge, then the cave or the plank to the last island */
-    { par: 4, sol: [[0,0.55,1.5],[240,0.55,0],[30,0.95,0]], tee: [0, 0.5], cup: [0.6, 8.2], shape: [[-2, 0], [2, 0], [2, 4.5], [2, 9], [-2, 9], [-2, 4.5]],
+    { par: 4, crazy: true, sol: [[0,0.55,1.5],[240,0.55,0],[30,0.95,0]], tee: [0, 0.5], cup: [0.6, 8.2], shape: [[-2, 0], [2, 0], [2, 4.5], [2, 9], [-2, 9], [-2, 4.5]],
       zones: [lagoon(rect(-2, 2.2, -0.3, 3.4)), lagoon(rect(0.3, 2.2, 2, 3.4)), lagoon(rect(-2, 5.6, 1.6, 6.6))],
       movers: [BRIDGE(0, 2.0, 0.9, 2.0, 0.3, 90, 3.4)],
       tubes: [{ a: [-1.2, 5.0], b: [-1.2, 7.1], dir: 0 }],
       bumps: [{ x: 0.5, z: 4.4, r: 0.5, h: 0.2 }], posts: [BARREL(0.2, 7.5)] },
     /* 16 the shipwreck: up the gangplank onto the listing wreck, through the hull or off the stern */
-    { par: 4, sol: [[357,0.9,0],[150,1,0]], tee: [0.8, 0.5], cup: [1.0, 9.1], aim0: 0, shape: [[-1.8, 0], [1.8, 0], [1.8, 3.2], [1.8, 7], [1.8, 10], [-1.8, 10], [-1.8, 7], [-1.8, 3.2]],
+    { par: 4, crazy: true, sol: [[357,0.9,0],[150,1,0]], tee: [0.8, 0.5], cup: [1.0, 9.1], aim0: 0, shape: [[-1.8, 0], [1.8, 0], [1.8, 3.2], [1.8, 7], [1.8, 10], [-1.8, 10], [-1.8, 7], [-1.8, 3.2]],
       tiers: [{ poly: rect(-1.9, 3.2, 1.9, 7), h: 0.3, sx: 0.06 }],
       ramps: [{ x0: 0.4, z0: 2.0, x1: 1.0, z1: 3.2, axis: 'z', h0: 0, h1: 0.34 }],
       inner: [[[-1.8, 3.2], [0.4, 3.2]], [[1.0, 3.2], [1.8, 3.2]]],
@@ -105,7 +105,7 @@ registerWorld(5, (() => {
       tubes: [{ a: [1.4, 1.6], b: [-1.2, 6.0], dir: 30 }],
       zones: [sand(rect(-1.8, 5.2, -0.6, 6.2)), lagoon(rect(-1.8, 7.4, -0.8, 9))], posts: [ANCHOR(1.3, 7.6)] },
     /* 18 board the ship: gangplank up, past the wheel, down the hatch (or walk the plank and jump) to treasure island */
-    { par: 4, sol: [[327,0.95,0],[325.5,0.91,0]], tee: [0, 0.5], cup: [-0.8, 12.0], aim0: -20,
+    { par: 4, crazy: true, sol: [[327,0.95,0],[325.5,0.91,0]], tee: [0, 0.5], cup: [-0.8, 12.0], aim0: -20,
       shape: [[-2, 0], [2, 0], [2, 4], [2, 8.4], [2, 13], [-2, 13], [-2, 8.4], [-2, 4]],
       tiers: [{ poly: rect(-2.1, 4, 2.1, 8.4), h: 0.4 }, { poly: rect(-0.2, 8.4, 0.2, 9.2), h: 0.4 }],
       ramps: [{ x0: -2, z0: 2.6, x1: -1.3, z1: 4, axis: 'z', h0: 0, h1: 0.4 }],

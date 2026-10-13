@@ -32,7 +32,7 @@
       bumps: [{ x: -0.3, z: 4.8, r: 0.5, h: -0.18 }],
       posts: [ALIEN(1.95, 4.85)] },
     /* 2. crater steps: three drops, deck to deck, each one turning */
-    { par: 3, sol: [[314,1,0],[66,0.96,0]], tee: [0, 0.5], cup: [1.5, 6.6],
+    { par: 3, sol: [[210,1,0],[56,0.84,0]], tee: [0, 0.5], cup: [1.5, 6.6],
       floors: [rect(-0.6, 0, 0.6, 2.2), rect(-1.4, 2.2, 1.2, 4.4), rect(1.2, 1.6, 3.4, 5), rect(0.4, 5, 3.4, 7.4)],
       walls: [[[-0.6, 2.2], [-0.6, 0], [0.6, 0], [0.6, 2.2]], [[-0.8, 2.2], [-1.4, 2.2], [-1.4, 4.4], [1.1, 4.4]],
         [[1.2, 2.1], [1.2, 1.6], [3.4, 1.6], [3.4, 7.4], [0.4, 7.4], [0.4, 5], [1.3, 5]]],
@@ -51,7 +51,7 @@
       posts: [ALIEN(1.4, 6.3), ALIEN(2.55, 5.5)],
       tubes: [{ a: [0.55, 2.15], b: [2.55, 4.2], dir: 270 }] },
     /* 4. asteroid bridge: cross the drifting rocks, then the tube is the only way into the crater pocket */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [2.15, 5.55],
+    { par: 3, sol: [[5,1,0],[285,0.93,0]], tee: [0, 0.5], cup: [2.15, 5.55],
       floors: [rect(-0.9, 0, 0.9, 1.6), rect(-0.5, 1.6, 0.5, 4.6), rect(-1.2, 4.6, 1.2, 6.4), rect(1.7, 3, 3.5, 6.6)],
       walls: [[[-0.5, 1.6], [-0.9, 1.6], [-0.9, 0], [0.9, 0], [0.9, 1.6], [0.5, 1.6]], [[-0.5, 4.6], [-1.2, 4.6], [-1.2, 6.4], [1.2, 6.4], [1.2, 4.6], [0.5, 4.6]],
         ring(rect(1.7, 3, 3.5, 6.6))],
@@ -68,7 +68,7 @@
       posts: [ALIEN(0.2, 6.9), ALIEN(1.0, 6.0)],
       zones: [{ push: [-0.9, 0], poly: rect(-0.6, 1.8, 0.6, 3.6) }] },
     /* 6. airlock double jump: launch, slip the door, launch off the side ramp, or tube across */
-    { par: 4, sol: [], tee: [0, 0.5], cup: [-2.8, 7.4],
+    { par: 4, sol: [[10,1,0],[5,0.36,0]], tee: [0, 0.5], cup: [-2.8, 7.4],
       floors: [rect(-0.6, 0, 0.6, 3), rect(-1, 3.8, 1, 7.2), rect(-3.6, 5.4, -1.6, 8.4)],
       walls: [...box(-0.6, 0, 0.6, 3, 'n'), [[-1, 5.9], [-1, 3.8], [1, 3.8], [1, 7.2], [-1, 7.2]], [[-1.6, 8.4], [-1.6, 5.4], [-3.6, 5.4], [-3.6, 8.4], [-1.6, 8.4]]],
       ramps: [{ x0: -0.6, z0: 2.2, x1: 0.6, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1, z0: 5.9, x1: -0.3, z1: 7.2, axis: 'x', h0: 0.22, h1: 0 }],
@@ -85,7 +85,7 @@
       posts: [ALIEN(2.25, 3.45), ALIEN(3.75, 3.45)],
       tubes: [{ a: [0, 6], b: [3, 6.5], dir: 180, keep: 0.3, add: 0.5 }] },
     /* 8. satellite crater: slip the spinning satellite through the bulkhead, or tube round it */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [1, 5.6],
+    { par: 3, sol: [[306,0.64,0]], tee: [0, 0.5], cup: [1, 5.6],
       shape: [[-1, 0], [1, 0], [2, 1.6], [2, 5.4], [1, 7], [-1, 7], [-2, 5.4], [-2, 1.6]],
       inner: [[[-2, 3.6], [-0.4, 3.6]], [[0.4, 3.6], [2, 3.6]]],
       bumps: [{ x: -0.6, z: 5.3, r: 0.45, h: -0.2 }, { x: 1.2, z: 4.5, r: 0.4, h: -0.15 }],
@@ -93,7 +93,7 @@
       tubes: [{ a: [-1.5, 2.6], b: [-0.95, 6.2], dir: 90 }],
       movers: [SAT(0, 2.2, 0.7, 1.3, 0, 2)] },
     /* 9. switchback climb: up the ramp, hairpin, up again, then drop to the crater green */
-    { par: 4, sol: [], tee: [0, 0.4], cup: [3.3, 3.5],
+    { par: 4, sol: [[335,1,0],[130,0.9285714285714286,0]], tee: [0, 0.4], cup: [3.3, 3.5],
       floors: [rect(-0.5, 0, 0.5, 3), rect(-0.5, 3, 1.9, 4), rect(0.9, 0, 1.9, 3), rect(1.9, 0, 3.9, 1.4), rect(2.3, 1.4, 4.3, 4.6)],
       walls: [[[0.5, 3], [0.5, 0], [-0.5, 0], [-0.5, 4], [1.9, 4], [1.9, 1.4]], [[0.9, 3], [0.9, 0], [3.9, 0], [3.9, 1.4]],
         [[2.3, 1.4], [2.3, 4.6], [4.3, 4.6], [4.3, 1.4], [3.9, 1.4]]],
@@ -102,7 +102,7 @@
       bumps: [{ x: 3.3, z: 3.5, r: 0.8, h: -0.15 }],
       posts: [ALIEN(1.4, 3.5), ALIEN(2.9, 2.3)] },
     /* 10. tube relay: tee deck, tube, asteroid deck, jump, then past the satellite on the cup deck */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [1.6, 6.4],
+    { par: 3, sol: [[345,1,0],[75,0.57,0]], tee: [0, 0.5], cup: [1.6, 6.4],
       floors: [rect(-0.8, 0, 0.8, 2.4), rect(2, 0, 3.6, 4), rect(1, 4.8, 3.8, 7)],
       walls: [...box(-0.8, 0, 0.8, 2.4), ...box(2, 0, 3.6, 4, 'n'), ...box(1, 4.8, 3.8, 7, 's')],
       ramps: [{ x0: 2, z0: 3.2, x1: 3.6, z1: 4, axis: 'z', h0: 0, h1: 0.2 }],
@@ -111,7 +111,7 @@
       tubes: [{ a: [-0.45, 2.0], b: [2.8, 0.5], dir: 0 }],
       movers: [ROCK(2.4, 2.2, 3.2, 2.2, 2.2, 0, 0.16), SAT(3.05, 6.05, 0.5, 1.1)] },
     /* 11. tilted greenhouse: the whole module leans, the planter sand waits by the bend, aliens kick */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [3, 5.05],
+    { par: 3, sol: [[9,0.8333333333333334,0],[3,0.83,0]], tee: [0, 0.5], cup: [3, 5.05],
       shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [3.6, 4], [3.6, 6], [-0.8, 6]],
       inner: [[[1.6, 6], [1.6, 5.2]]],
       tiers: [{ poly: rect(-1, -1, 4, 7), h: 0, sx: -0.06, sz: 0 }],
@@ -119,12 +119,12 @@
       zones: [{ surf: 'sand', poly: rect(0.8, 4, 1.5, 4.7) }],
       posts: [ALIEN(2.25, 4.55), ALIEN(-0.3, 2.6), ALIEN(2.4, 5.6)] },
     /* 12. moon dome: the cup sits on a hill ringed by aliens, with an asteroid drifting across the approach */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [0, 4.6], shape: rect(-1.6, 0, 1.6, 6.6),
+    { par: 3, sol: [[9,0.6666666666666666,0]], tee: [0, 0.5], cup: [0, 4.6], shape: rect(-1.6, 0, 1.6, 6.6),
       bumps: [{ x: 0, z: 4.6, r: 0.95, h: 0.3 }],
       posts: [ALIEN(0, 3.55), ALIEN(-0.85, 3.95), ALIEN(0.85, 3.95), ALIEN(-1.05, 4.95), ALIEN(1.05, 4.95), ALIEN(-0.5, 5.75), ALIEN(0.5, 5.75)],
       movers: [ROCK(-1.2, 2.2, 1.2, 2.2, 3, 0, 0.18)] },
     /* 13. the abyss: jump the void through the narrow launch, or ride the long way round past the airlock */
-    { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [-0.55, 6],
+    { par: 4, crazy: true, sol: [[130,1,0],[50,0.86,0]], tee: [0, 0.5], cup: [-0.55, 6],
       floors: [[[-0.7, 0], [2.6, 0], [2.6, 6.6], [-1.2, 6.6], [-1.2, 4.4], [1.6, 4.4], [1.6, 1.2], [0.7, 1.2], [0.7, 3], [-0.7, 3]]],
       walls: [[[-0.7, 3], [-0.7, 0], [2.6, 0], [2.6, 6.6], [1, 6.6]], [[-1.2, 6.6], [-1.2, 4.4]], [[0.7, 3], [0.7, 1.2], [1.6, 1.2], [1.6, 4.4], [-1.2, 4.4]]],
       inner: [[[-0.7, 2.3], [-0.3, 2.3], [-0.3, 3]], [[0.7, 2.3], [0.3, 2.3], [0.3, 3]]],
@@ -132,15 +132,15 @@
       bumps: [{ x: 2.1, z: 3, r: 0.5, h: -0.18 }, { x: 0.2, z: 5.5, r: 0.4, h: -0.14 }],
       posts: [ALIEN(-0.95, 5.3)],
       movers: [LOCK(2.1, 4.9, 3.45, 4.9, 0.45, 90, 3)] },
-    /* 14. satellite ring: a long arm sweeps the track; the tube in the left lane jumps you across */
-    { par: 4, sol: [], tee: [-2, 0.45], cup: [2, 4.75], aim0: 90,
+    /* 14. satellite ring: a long arm sweeps the track; a tailwind up the left lane, a headwind down the right */
+    { par: 4, sol: [[18,0.2222222222222222,0]], tee: [-2, 0.45], cup: [2, 4.75], aim0: 90,
       floors: [rect(-2.5, 0, 2.5, 0.9), rect(-2.5, 4.3, 2.5, 5.2), rect(-2.5, 0.9, -1.6, 4.3), rect(1.6, 0.9, 2.5, 4.3)],
       walls: [ring([[-2.5, 0], [2.5, 0], [2.5, 5.2], [-2.5, 5.2]])],
-      posts: [ALIEN(2.05, 0.45), ALIEN(-2.05, 4.75), ALIEN(2.05, 3.45)],
-      tubes: [{ a: [-2.05, 2.7], b: [2.05, 1.5], dir: 180, keep: 0.4, add: 0.2 }],
+      posts: [ALIEN(2.05, 0.45), ALIEN(-2.05, 4.75)],
+      zones: [{ push: [0, -0.7], poly: rect(1.6, 1.3, 2.5, 3.7) }, { push: [0, 0.7], poly: rect(-2.5, 1.3, -1.6, 3.7) }],
       movers: [SAT(0, 2.6, 2.28, 0.8, 0, 2)] },
     /* 15. the descent: high deck, crater deck past the airlock, then tube or drop to the rock garden */
-    { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [0.5, 8],
+    { par: 4, crazy: true, sol: [[9,1,0]], tee: [0, 0.5], cup: [0.5, 8],
       floors: [rect(-0.6, 0, 0.6, 2.4), rect(-1.6, 2.8, 1.6, 5.6), rect(-0.2, 6.4, 3, 8.6)],
       walls: [...box(-0.6, 0, 0.6, 2.4, 'n'), [[0.2, 5.6], [-1.6, 5.6], [-1.6, 2.8], [1.6, 2.8], [1.6, 5.6]], ...box(-0.2, 6.4, 3, 8.6)],
       tiers: [DECK(-0.6, 0, 0.6, 2.4, 0.7), DECK(-1.6, 2.8, 1.6, 5.6, 0.3)],
@@ -148,7 +148,7 @@
       tubes: [{ a: [-1.15, 5.15], b: [2.6, 6.85], dir: 0, keep: 0.5, add: 0.2 }],
       movers: [ROCK(0.25, 7.1, 2.05, 7.1, 2.6), LOCK(0.7, 4.75, 2.1, 4.75, 0.45, 90, 3.2)] },
     /* 16. solar wind: a rail-less slab, a crosswind toward the void, rocks and an airlock drifting through it */
-    { par: 3, sol: [], tee: [0, 0.5], cup: [0.35, 7.1],
+    { par: 3, sol: [[18,0.78,0.8]], tee: [0, 0.5], cup: [0.35, 7.1],
       floors: [rect(-1.2, 0, 1.2, 7.9)],
       walls: [],
       bumps: [{ x: -0.35, z: 6.1, r: 0.4, h: -0.2 }],
@@ -156,14 +156,14 @@
       zones: [{ push: [1.1, 0], poly: rect(-1.2, 1.5, 1.2, 5.6) }],
       movers: [ROCK(-0.9, 2.4, 0.9, 2.4, 2.8, 0, 0.2), LOCK(-1.6, 3.6, 1.6, 3.6, 0.4, 90, 3.6), ROCK(0.9, 4.8, -0.9, 4.8, 2.2, 0, 0.2)] },
     /* 17. airlock maze: three bulkheads, three doors to time, or thread the rock to the tube */
-    { par: 4, crazy: true, sol: [], tee: [0, 0.5], cup: [1.1, 8.4], shape: rect(-1.8, 0, 1.8, 9),
+    { par: 4, crazy: true, sol: [[295,0.9285714285714286,0],[0,0.42857142857142855,0]], tee: [0, 0.5], cup: [1.1, 8.4], shape: rect(-1.8, 0, 1.8, 9),
       inner: [[[-1.8, 2.2], [0.9, 2.2]], [[-0.9, 4.4], [1.8, 4.4]], [[-1.8, 6.6], [0.9, 6.6]]],
       posts: [ALIEN(0.2, 5.6), ALIEN(-0.5, 3.3), ALIEN(0.3, 7.8)],
       tubes: [{ a: [-1.35, 1.6], b: [-1.3, 5.2], dir: 90, keep: 0.6, add: 0.2 }],
       movers: [LOCK(1.35, 2.2, 0.45, 2.2, 0.45, 90, 2.8), LOCK(-1.35, 4.4, -0.45, 4.4, 0.45, 90, 3.3, 2), LOCK(1.35, 6.6, 0.45, 6.6, 0.45, 90, 2.6, 1),
         ROCK(-1.35, 0.55, -1.35, 1.05, 2, 0, 0.15)] },
     /* 18. the grand tour: three turning jumps between floating decks, a tube shortcut, then the crater cup */
-    { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [-3, 8.8],
+    { par: 5, crazy: true, sol: [[6,1,0]], tee: [0, 0.5], cup: [-3, 8.8],
       floors: [rect(-0.6, 0, 0.6, 2.8), rect(-1, 3.6, 1, 6), rect(-3.8, 4.2, -1.6, 6.6), rect(-4.4, 7.4, -1.8, 9.8)],
       walls: [...box(-0.6, 0, 0.6, 2.8, 'n'), [[-1, 4.6], [-1, 3.6], [1, 3.6], [1, 6], [-0.15, 6], [-1, 6]],
         [[-2.6, 6.6], [-2.45, 6.6], [-1.6, 6.6], [-1.6, 4.2], [-3.8, 4.2], [-3.8, 5.65], [-3.8, 6.6]], ring(rect(-4.4, 7.4, -1.8, 9.8))],

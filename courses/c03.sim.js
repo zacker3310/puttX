@@ -54,7 +54,7 @@ registerWorld(3, { holes: [
     posts: [J3_IDOL(0.56, 4.08), J3_IDOL(-0.56, 4.08), J3_IDOL(0.4, 4.95), J3_IDOL(-0.4, 4.95)],
     zones: [J3_MUD(rect(-1.5, 3.1, -0.9, 4.2)), J3_MUD(rect(0.9, 4.6, 1.5, 5.6))] },
   /* 11: twin tunnels out of the sealed shrine: the left one to the long green, the right one up by the cup */
-  { par: 4, sol: [[58,0.52,0],[8,0.68,0]], tee: [0, 0.5], cup: [2.3, 6.4], aim0: 20,
+  { par: 4, crazy: true, sol: [[58,0.52,0],[8,0.68,0]], tee: [0, 0.5], cup: [2.3, 6.4], aim0: 20,
     floors: [rect(-1, 0, 1, 2), rect(-1, 3, 3, 8)],
     walls: [ring(rect(-1, 0, 1, 2)), [[1, 3], [-1, 3], [-1, 8], [1, 8], [3, 8], [3, 5.5], [3, 3], [1, 3]], [[1, 5.5], [3, 5.5]], [[1, 5.5], [1, 6.6]], [[1, 7.4], [1, 8]]],
     ramps: [{ x0: 0.2, z0: 6.6, x1: 1.0, z1: 7.4, axis: 'x', h0: 0, h1: 0.3 }], tiers: [{ poly: rect(1, 5.5, 3, 8), h: 0.3 }],
@@ -76,14 +76,14 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-0.4, 0, 0.4, 2.6)), J3_WATER(rect(-0.4, 3.0, 0.4, 6.0)), J3_WATER(rect(-0.4, 6.7, 0.4, 8)), J3_MUD(rect(-1.6, 4.2, -0.4, 4.8))],
     movers: [J3_ROCK(0.6, 4.4, 1.25, 4.4, 2.0)], posts: [J3_IDOL(0.75, 6.8, 0.11)], bumps: [{ x: 1.0, z: 2.0, r: 0.5, h: 0.2 }] },
   /* 15: the idol's eye. Drop off the deck, thread the tunnel between the idols, or leap the river */
-  { par: 4, sol: [[314,1,0],[0,0.2,0]], tee: [0, 0.5], cup: [-0.5, 7.4], shape: rect(-1, 0, 1, 8.2),
+  { par: 4, crazy: true, sol: [[314,1,0],[0,0.2,0]], tee: [0, 0.5], cup: [-0.5, 7.4], shape: rect(-1, 0, 1, 8.2),
     tiers: [{ poly: rect(-1, 0, 1, 2.5), h: 0.4 }, { poly: rect(-1, 2.5, 1, 4.5), h: 0.2 }],
     inner: [[[-1, 2.5], [-0.35, 2.5]], [[0.35, 2.5], [1, 2.5]], [[-1, 4.5], [0.2, 4.5]]],
     zones: [J3_WATER(rect(-1, 4.5, 1, 5.1)), J3_MUD(rect(0.2, 5.1, 1, 6.0))],
     tubes: [{ a: [0.6, 4.05], b: [-0.6, 5.6], dir: 0, keep: 0.4 }], posts: [J3_IDOL(0.6, 3.6), J3_IDOL(0.25, 3.95), J3_IDOL(-0.1, 6.9)],
     bumps: [{ x: 0.5, z: 6.9, r: 0.5, h: 0.2 }] },
   /* 16: the lost city: over the hill, across the stream, up to the plaza, through the gate tunnel */
-  { par: 5, sol: [[348,0.68,0],[34,1,0],[0,0.4,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[348,0.68,0],[34,1,0],[0,0.4,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [0.8, 6.0], [1.8, 6.0], [1.8, 0], [3.4, 0], [3.4, 2.4], [3.4, 7.8], [-0.8, 7.8], [-0.8, 3.6]],
     bumps: [{ x: 0, z: 2.0, r: 0.6, h: 0.35 }],
     ramps: [{ x0: 0.8, z0: 6.0, x1: 1.8, z1: 7.8, axis: 'x', h0: 0, h1: 0.3 }],
@@ -99,7 +99,7 @@ registerWorld(3, { holes: [
     movers: [J3_ROCK(-0.27, 2.9, 0.27, 2.9, 1.8, 0, 0.16), J3_ROCK(0.27, 4.9, -0.27, 4.9, 2.2, 1, 0.16), J3_ROCK(0, 6.3, 0, 7.9, 2.6, 0, 0.16)],
     bumps: [{ x: -1.4, z: 7.6, r: 0.45, h: -0.1 }] },
   /* 18: the temple. Climb the steps, through the idol's mouth tunnel, then leap the river to the cup */
-  { par: 5, sol: [[8,0.76,0],[38,0.64,0],[2,0.56,0]], tee: [0, 0.5], cup: [0.3, 9.4], shape: [[-1.5, 0], [1.5, 0], [1.5, 3], [1.5, 5], [1.5, 6.5], [1.5, 10], [-1.5, 10], [-1.5, 6.5], [-1.5, 5], [-1.5, 3]],
+  { par: 5, crazy: true, sol: [[8,0.76,0],[38,0.64,0],[2,0.56,0]], tee: [0, 0.5], cup: [0.3, 9.4], shape: [[-1.5, 0], [1.5, 0], [1.5, 3], [1.5, 5], [1.5, 6.5], [1.5, 10], [-1.5, 10], [-1.5, 6.5], [-1.5, 5], [-1.5, 3]],
     ramps: [{ x0: -0.35, z0: 2.2, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.9, z0: 4.3, x1: 1.5, z1: 5.0, axis: 'z', h0: 0.2, h1: 0.4 },
       { x0: -0.4, z0: 7.4, x1: 0.4, z1: 8.0, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-1.5, 3, 1.5, 5), h: 0.2 }, { poly: rect(-1.5, 5, 1.5, 6.5), h: 0.4 }],

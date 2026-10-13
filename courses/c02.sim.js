@@ -20,27 +20,27 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.8, 6.6, -0.5, 7.6) }],
     posts: [C2_CACTUS(1.3, 4.0), C2_CACTUS(0.3, 6.2)] },
   /* 3. a sea of dunes, then a pocket to the right behind the biggest dune */
-  { par: 3, sol: [[350,0.96,0]], tee: [0, 0.5], cup: [-2.5, 7.1], aim0: -10,
+  { par: 3, sol: [[346,0.84,0]], tee: [0, 0.5], cup: [-2.5, 7.1], aim0: -10,
     shape: [[-1.4, 0], [1.4, 0], [1.4, 8], [-3.3, 8], [-3.3, 6.0], [-1.4, 6.0]],
     bumps: [{ x: -0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: 0.75, z: 3.7, r: 0.6, h: 0.33 }, { x: -0.4, z: 5.0, r: 0.55, h: 0.3 },
       { x: -1.2, z: 7.0, r: 0.5, h: 0.35 }, { x: 0.7, z: 6.7, r: 0.55, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.4, 3.4, -0.6, 4.0) }, { surf: 'sand', poly: rect(-3.3, 6.0, -2.3, 6.5) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.4, 8) }],
     posts: [C2_CACTUS(1.05, 1.6), C2_ROCK(-3.0, 7.6, 0.13)] },
   /* 4. tumbleweed pass, then up the ramp to a mesa green */
-  { par: 3, sol: [[18,0.875,0]], tee: [0, 0.5], cup: [-0.45, 6.75], shape: rect(-0.9, 0, 0.9, 7.4),
+  { par: 3, sol: [[14,1,0]], tee: [0, 0.5], cup: [-0.45, 6.75], shape: rect(-0.9, 0, 0.9, 7.4),
     ramps: [{ x0: -0.15, z0: 4.8, x1: 0.9, z1: 5.7, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1, 5.7, 1, 7.5), h: 0.3 }],
     movers: [C2_WEED(-0.55, 2.3, 0.55, 2.3, 2.6), C2_WEED(0.55, 3.7, -0.55, 3.7, 2.1, 1.3)],
     posts: [C2_CACTUS(0.05, 6.4)] },
   /* 5. a tilted canyon floor: the long dogleg left leans toward you */
-  { par: 3, sol: [[320,0.96,0],[70,0.92,0]], tee: [0, 0.5], cup: [3.6, 5.0], aim0: 20,
+  { par: 3, sol: [[324,0.92,0],[152,1,0]], tee: [0, 0.5], cup: [3.6, 5.0], aim0: 20,
     shape: [[-0.9, 0], [0.9, 0], [0.9, 3.6], [4.2, 3.6], [4.2, 5.5], [-0.9, 5.5]],
     tiers: [{ poly: rect(-1, -0.1, 4.3, 5.6), h: 0, sz: 0.045, sx: -0.012 }],
     zones: [{ surf: 'sand', poly: rect(2.0, 3.6, 2.9, 4.2) }],
     inner: [[[2.9, 5.5], [2.9, 4.55]]],
     posts: [C2_CACTUS(-0.3, 4.6), C2_CACTUS(2.2, 5.05), C2_ROCK(0.45, 2.2)] },
   /* 6. up onto a cactus mesa, then off a gap in its far edge onto a sloping green */
-  { par: 3, sol: [[24,0.96,0],[32,0.36,0]], tee: [0, 0.5], cup: [0.5, 8.3],
+  { par: 3, sol: [[342,1,0],[8,0.52,0]], tee: [0, 0.5], cup: [0.5, 8.3],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 2.2], [1.4, 2.2], [1.4, 6], [1.0, 6], [1.0, 9], [-1.0, 9], [-1.0, 6], [-1.4, 6], [-1.4, 2.2], [-0.8, 2.2]],
     inner: [[[1.4, 6], [-0.35, 6]]],
     ramps: [{ x0: -0.8, z0: 1.2, x1: 0.8, z1: 2.2, axis: 'z', h0: 0, h1: 0.32 }],
@@ -105,7 +105,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(1.4, 5.6, 2.2, 6.2) }],
     posts: [C2_CACTUS(2.9, 5.8), C2_CACTUS(1.8, 7.0)] },
   /* 14. flash flood: jump the river off the kicker, or take the plank bridge round the side */
-  { par: 4, sol: [[31,0.96,0]], tee: [0, 0.5], cup: [-1.0, 7.9], shape: rect(-1.6, 0, 1.6, 9),
+  { par: 4, crazy: true, sol: [[31,0.96,0]], tee: [0, 0.5], cup: [-1.0, 7.9], shape: rect(-1.6, 0, 1.6, 9),
     ramps: [{ x0: -0.45, z0: 2.4, x1: 0.45, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 }],
     zones: [{ surf: 'fast', poly: rect(0.85, 3.3, 1.35, 4.5) }, { surf: 'fast', poly: rect(-0.45, 2.4, 0.45, 3.4) }, { surf: 'water', poly: rect(-1.6, 3.5, 1.6, 4.3) }],
     inner: [[[-1.6, 6.9], [-0.3, 6.9]]],
@@ -117,7 +117,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.6, 3.4, -0.75, 4.3) }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
-  { par: 5, sol: [[36,1,0],[120,1,3],[0,0.5625,0]], tee: [0, 0.5], cup: [3.1, 9.2],
+  { par: 5, crazy: true, sol: [[36,1,0],[120,1,3],[0,0.5625,0]], tee: [0, 0.5], cup: [3.1, 9.2],
     shape: [[-0.5, 0], [0.5, 0], [0.5, 4.2], [3.6, 4.2], [3.6, 10], [2.7, 10], [2.7, 5.0], [-0.5, 5.0]],
     ramps: [{ x0: 3.0, z0: 6.6, x1: 3.6, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.6, -0.1, 0.6, 2.6), h: 0.35 }, { poly: rect(2.6, 7.6, 3.7, 10.1), h: 0.3 }],
@@ -126,7 +126,7 @@ registerWorld(2, { holes: [
     movers: [C2_WEED(-0.18, 3.4, 0.18, 3.4, 1.8, 0, 0.13), C2_WEED(3.15, 5.4, 3.15, 6.3, 2.2, 0, 0.13)],
     posts: [C2_CACTUS(1.2, 4.75), C2_CACTUS(3.35, 8.4)] },
   /* 17. the gap jump: fly the kicker over the canyon, or walk the ledge round the left */
-  { par: 4, sol: [[24,0.875,0]], tee: [0, 0.5], cup: [-0.75, 6.95],
+  { par: 4, crazy: true, sol: [[24,0.875,0]], tee: [0, 0.5], cup: [-0.75, 6.95],
     floors: [[[-0.8, 0], [1.4, 0], [1.4, 3.9], [0.9, 3.9], [0.9, 3.0], [-0.8, 3.0]], rect(-1.2, 3.8, 1.4, 7.6)],
     walls: [[[-0.8, 3.0], [-0.8, 0], [1.4, 0], [1.4, 3.8]], [[0.9, 1.4], [0.9, 2.1]], [[-1.2, 3.8], [-1.2, 7.6], [1.4, 7.6], [1.4, 3.8]], [[-1.2, 6.2], [-0.1, 6.2]]],
     ramps: [{ x0: -0.35, z0: 2.2, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }],
@@ -135,7 +135,7 @@ registerWorld(2, { holes: [
     posts: [C2_CACTUS(-0.75, 5.4), C2_CACTUS(0.1, 7.0)] },
   /* 18. the three-mesa descent: off the high mesa, across the middle mesa past a tumbleweed,
      down a narrow gap to the dune green and round the rock spur to the cup */
-  { par: 4, sol: [[162,1,0],[36,0.875,0]], tee: [-0.3, 0.6], cup: [0.55, 9.35],
+  { par: 4, crazy: true, sol: [[162,1,0],[36,0.875,0]], tee: [-0.3, 0.6], cup: [0.55, 9.35],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [1.2, 3], [1.2, 6.5], [1.2, 10], [-1.8, 10], [-1.8, 6.5], [-1.8, 3], [-0.8, 3]],
     inner: [[[-0.8, 3], [0.2, 3]], [[-1.15, 6.5], [1.2, 6.5]], [[-0.45, 8.5], [1.2, 8.5]]],
     tiers: [{ poly: rect(-1.9, 2.9, 1.3, 6.5), h: 0.35 }, { poly: rect(-0.9, -0.1, 0.9, 3), h: 0.7 }, { poly: rect(-1.9, 6.5, 1.3, 10.1), h: 0.05, sx: 0.03 }],

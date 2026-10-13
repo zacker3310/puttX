@@ -65,7 +65,7 @@ registerWorld(10, { holes: [
     movers: [{ kind: 'spin', x: 0, z: 3.7, len: 0.36, w: 1.9, phase: 0.5, blades: 2, look: 'windmill' }] },
   /* 9. twin tubes: the walled high tee has no way out but two tubes; gold lands by the windmill
      on the cup island, blue on a side island with a ramp bridge down */
-  { par: 3, sol: [[222,0.85,0],[15,0.95,0]], tee: [0, 0.5], cup: [-0.4, 6.4], aim0: 20,
+  { crazy: true, par: 3, sol: [[222,0.85,0],[15,0.95,0]], tee: [0, 0.5], cup: [-0.4, 6.4], aim0: 20,
     floors: [rect(-1, 0, 1, 1.8), rect(-1.2, 3.6, 1.2, 7.2), rect(-3.2, 1, -1.8, 5), rect(-1.8, 4.1, -1.2, 4.8)],
     walls: [ring(rect(-1, 0, 1, 1.8)), [[-1.8, 4.1], [-1.8, 1], [-3.2, 1], [-3.2, 5], [-1.8, 5], [-1.8, 4.8]], [[-1.2, 6.2], [-1.2, 7.2], [1.2, 7.2], [1.2, 6.4]]],
     tiers: [{ poly: C10_PAD(-1, 0, 1, 1.8), h: 0.4 }, { poly: C10_PAD(-3.2, 1, -1.8, 5), h: 0.25 }],
@@ -101,7 +101,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 3.1, r: 0.35, h: 0.08 }, { x: 0.65, z: 8.05, r: 0.3, h: -0.05 }] },
   /* 13. thunder run: up a diagonal rainbow into a headwind, past a windmill on the high island,
      then off the kicker down onto a tilted crater green */
-  { par: 4, sol: [[212,0.92,0],[158,0.96,0],[260,0.96,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
+  { crazy: true, par: 4, sol: [[212,0.92,0],[158,0.96,0],[260,0.96,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 7, 2.8, 9.4)],
     walls: [[[-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 8.4]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
@@ -139,7 +139,7 @@ registerWorld(10, { holes: [
       { surf: 'fast', push: [-0.9, 0], poly: rect(2.85, 5.6, 3.35, 6.8) }, { surf: 'fast', poly: rect(2.85, 5.2, 3.35, 5.6) }, { surf: 'fast', poly: rect(2.85, 6.8, 3.35, 7.2) }],
     bumps: [{ x: 3.3, z: 8.2, r: 0.35, h: -0.05 }] },
   /* 17. sky locks: two gates lock the bare neck; then the windmill-guarded tube, or the kicker jump, to the fan-swept cup island */
-  { par: 4, sol: [[180,0.85,2],[72,0.25,0]], tee: [0, 0.6], cup: [0.6, 8.3],
+  { crazy: true, par: 4, sol: [[180,0.85,2],[72,0.25,0]], tee: [0, 0.6], cup: [0.6, 8.3],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.3, 2, 0.3, 4), rect(-1.3, 4, 1.3, 6), rect(-1.4, 6.8, 1.4, 9)],
     walls: [[[-0.3, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.3, 2]], [[1.4, 8.4], [1.4, 9], [-1.4, 9], [-1.4, 6.8]]],
     ramps: [{ x0: -1.0, z0: 5.6, x1: -0.2, z1: 6, axis: 'z', h0: 0, h1: 0.12 }],
@@ -151,7 +151,7 @@ registerWorld(10, { holes: [
     tubes: [{ a: [0.5, 5.6], b: [-0.8, 7.0], dir: 25 }] },
   /* 18. the crown kingdom: tube or windy rainbow to the windmill isle, off the kicker onto the
      cloud-ice court past the golden gate, then up the royal ramp to the crater cup on the crown */
-  { par: 5, sol: [[212,1,0],[237,0.86,2]], tee: [0, 0.6], cup: [0.3, 11.8],
+  { crazy: true, par: 5, sol: [[212,1,0],[237,0.86,2]], tee: [0, 0.6], cup: [0.3, 11.8],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.6, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
     /* the finale is hard, not hopeless: railed rainbow, walled windmill isle (only the kicker open), walled ice court, railed crown ramp */
     walls: [[[-0.26, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.26, 2.2]],

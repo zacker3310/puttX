@@ -11,29 +11,29 @@ const C24_POOL = (cx, cz, rx, rz = rx, n = 10) => Array.from({ length: n }, (_, 
 });
 registerWorld(24, { holes: [
   /* 1. gondola deck: off the deck, over the ice past the snowball, up the ramp to the cup shelf */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 6.7], shape: rect(-1, 0, 1, 7.6),
+  { par: 3, sol: [[4,1,0]], tee: [0, 0.5], cup: [0.4, 6.7], shape: rect(-1, 0, 1, 7.6),
     tiers: [{ poly: rect(-1, 0, 1, 1.6), h: 0.3 }, { poly: rect(-1, 5.0, 1, 7.6), h: 0.22 }],
     ramps: [{ x0: -1, z0: 4.2, x1: 1, z1: 5.0, axis: 'z', h0: 0, h1: 0.22 }],
     zones: [{ surf: 'ice', poly: rect(-1, 1.6, 1, 4.2) }], movers: [C24_BALL(-0.55, 3.0, 0.55, 3.0, 2.8)], posts: [C24_MAN(-0.3, 6.3)] },
   /* 2. switchback stair: up the first ramp through the fence, across, up the second ramp to the top terrace */
-  { par: 3, sol: [], tee: [-0.6, 0.5], cup: [0.6, 5.8], aim0: 20, shape: rect(-1.4, 0, 1.4, 6.6),
+  { par: 3, sol: [[44,0.64,0],[310,1,0]], tee: [-0.6, 0.5], cup: [0.6, 5.8], aim0: 20, shape: rect(-1.4, 0, 1.4, 6.6),
     inner: [[[-1.4, 2.2], [0.6, 2.2]], [[-0.6, 4.4], [1.4, 4.4]]],
     tiers: [{ poly: rect(-1.4, 2.2, 1.4, 4.4), h: 0.2 }, { poly: rect(-1.4, 4.4, 1.4, 6.6), h: 0.4 }],
     ramps: [{ x0: 0.6, z0: 1.6, x1: 1.4, z1: 2.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.4, z0: 3.8, x1: -0.6, z1: 5.0, axis: 'z', h0: 0.2, h1: 0.4 }],
     bumps: [{ x: 0.6, z: 5.8, r: 0.5, h: 0.06 }], posts: [C24_MAN(0, 3.3)] },
   /* 3. cave relay: the first cave fires you across the middle chamber into the second; the lift bar decides */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.4, 6.3], aim0: 50, shape: rect(-1.6, 0, 1.6, 7.2), inner: [[[-1.6, 2.4], [1.6, 2.4]], [[-1.6, 4.8], [1.6, 4.8]]],
+  { par: 3, sol: [[30,0.68,0],[0,0.44,0]], tee: [0, 0.5], cup: [0.4, 6.3], aim0: 50, shape: rect(-1.6, 0, 1.6, 7.2), inner: [[[-1.6, 2.4], [1.6, 2.4]], [[-1.6, 4.8], [1.6, 4.8]]],
     tubes: [{ a: [0.9, 1.9], b: [-0.9, 3.0], dir: 90 }, { a: [0.9, 3.0], b: [-0.9, 5.4], dir: 45 }],
     movers: [C24_LIFT(0, 3.0, 0, 4.0, 0.3, 0, 2.8)], zones: [{ surf: 'ice', poly: rect(-1.6, 4.8, 1.6, 7.2) }],
     bumps: [{ x: 0.4, z: 6.3, r: 0.5, h: 0.08 }], posts: [C24_MAN(-0.2, 6.6), C24_MAN(-0.3, 1.4)] },
   /* 4. drop gates: the deck's snow fence has two gaps and a lift bar sliding across them; drop to the lake */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.5, 5.8], shape: rect(-1.4, 0, 1.4, 6.8),
+  { par: 3, sol: [[154,1,0.5]], tee: [0, 0.5], cup: [-0.5, 5.8], shape: rect(-1.4, 0, 1.4, 6.8),
     inner: [[[-1.4, 3.0], [-0.9, 3.0]], [[-0.3, 3.0], [0.3, 3.0]], [[0.9, 3.0], [1.4, 3.0]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 3.0), h: 0.35 }], movers: [C24_LIFT(-0.6, 2.75, 0.6, 2.75, 0.3, 90, 3.0)],
     zones: [{ surf: 'water', poly: C24_POOL(0.5, 5.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 3.0, 1.4, 4.4) }],
     bumps: [{ x: -0.5, z: 5.8, r: 0.5, h: 0.08 }], posts: [C24_MAN(0.3, 6.2)] },
   /* 5. sinkhole lift: roll into the sinkhole and its cave lifts you to the high shelf; drop off the shelf to the cup */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
+  { par: 3, sol: [[358,1,0],[104,0.92,0]], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }], ramps: [{ x0: -1.4, z0: 3.8, x1: -0.4, z1: 4.6, axis: 'z', h0: 0, h1: 0.3 }],
     bumps: [{ x: -0.6, z: 2.6, r: 0.6, h: -0.25 }, { x: 0.9, z: 2.0, r: 0.5, h: 0.06 }], tubes: [{ a: [-0.6, 2.6], b: [-0.4, 5.6], dir: 90 }],
     zones: [{ surf: 'ice', poly: rect(-1.4, 4.6, 1.4, 6.6) }], posts: [C24_MAN(0.9, 5.6)] },
@@ -49,7 +49,7 @@ registerWorld(24, { holes: [
     tiers: [{ poly: rect(-0.6, 4.0, 1.8, 6.6), h: 0.3 }, { poly: rect(0.6, 0, 3, 1.2), h: 0.1 }, { poly: rect(1.8, 2.0, 3, 6.6), h: 0.2 }],
     zones: [{ surf: 'ice', poly: rect(0.6, 1.2, 1.8, 4.0) }], movers: [C24_BALL(2.06, 3.6, 2.74, 3.6, 2.4, 0, 0.14)], bumps: [{ x: 2.4, z: 5.7, r: 0.5, h: 0.06 }] },
   /* 8. crevasse: cross one of the two ice bridges over the crevasse, then up the narrow ramp to the cup shelf */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [0.6, 7.0], aim0: 0,
+  { par: 3, sol: [[345,0.917,0]], tee: [0, 0.5], cup: [0.6, 7.0], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 3.0), rect(-0.8, 3.0, -0.4, 4.2), rect(0.4, 3.0, 0.8, 4.2), rect(-1.2, 4.2, 1.2, 7.8)],
     walls: [[[-0.8, 4.2], [-0.8, 0], [0.8, 0], [0.8, 4.2]], [[-0.8, 4.2], [-1.2, 4.2], [-1.2, 7.8], [1.2, 7.8], [1.2, 4.2], [0.8, 4.2]]],
     tiers: [{ poly: rect(-1.2, 6.2, 1.2, 7.8), h: 0.2 }], ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],

@@ -114,7 +114,7 @@ registerWorld(14, { holes: [
     zones: [{ surf: 'ice', poly: rect(-1.4, 6.4, 1.4, 8.0) }, { surf: 'water', poly: C14_POOL(0.6, 9.7, 0.35, 0.3) }], posts: [C14_MAN(0.6, 4.6)] },
   /* 18. the summit run: tee off the summit, down the ice chute, over the mogul terrace, then drop to the lake or take
      the cave down to it; the cup sits by the water past a rolling snowball */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0.6, 10.0], shape: rect(-1.6, 0, 1.6, 11),
+  { par: 5, crazy: true, sol: [[50,0.5,0],[10,0.417,0]], tee: [0, 0.5], cup: [0.6, 10.0], shape: rect(-1.6, 0, 1.6, 11),
     inner: [[[-1.6, 2.6], [-0.5, 4.4]], [[1.6, 2.6], [0.5, 4.4]]],
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.4), h: 0.42 }, { poly: rect(-1.6, 4.4, 1.6, 7.0), h: 0.22 }],
     ramps: [{ x0: -1.6, z0: 1.4, x1: 1.6, z1: 4.4, axis: 'z', h0: 0.42, h1: 0.22 }],

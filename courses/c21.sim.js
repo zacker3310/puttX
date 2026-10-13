@@ -56,7 +56,7 @@ registerWorld(21, { holes: [
             { push: [0, 1.2], poly: rect(-3, 1, -0.8, 5.6) }],
     bumps: [{ x: -2.2, z: 7.6, r: 0.75, h: -0.25 }] },
   /* 7: double trench (4 parts, open). Two plank launches over two trenches, or the side planks the long way */
-  { par: 4, crazy: true, sol: [[208,0.93,0],[340,0.64,0],[12,0.71,0]], tee: [0, 0.5], cup: [0.2, 10.6],
+  { par: 4, crazy: true, sol: [[208,0.93,0],[340,0.64,0],[12,0.6,0]], tee: [0, 0.5], cup: [0.2, 10.6],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 7.5), rect(-1.35, 6.6, -0.75, 9.3), rect(-0.8, 8.3, 0.8, 11.5)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 6.6]], [[0.8, 5.3], [0.8, 7.5]],
             [[0.8, 8.3], [0.8, 11.5], [-0.8, 11.5], [-0.8, 9.3]]],
@@ -71,7 +71,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [1.2, 0], poly: rect(-1.2, 4, 1.2, 5) }, { surf: 'sand', poly: rect(-1.2, 8.4, -0.3, 9) }],
     bumps: [{ x: -0.3, z: 7.2, r: 0.35, h: 0.12 }] },
   /* 9: tier cascade (3 parts). Two drops each guarded by a boom, or the pipe off the middle deck, then the jib */
-  { par: 3, crazy: true, sol: [[355.5,0.73,0]], tee: [0, 0.5], cup: [0.5, 9.2], shape: c21Box(-1.4, 0, 1.4, 10, [2.8, 5.6]),
+  { par: 3, crazy: true, sol: [[355.5,0.76,0]], tee: [0, 0.5], cup: [0.5, 9.2], shape: c21Box(-1.4, 0, 1.4, 10, [2.8, 5.6]),
     tiers: [{ poly: rect(-1.4, 0, 1.4, 2.8), h: 0.42 }, { poly: rect(-1.4, 2.8, 1.4, 5.6), h: 0.21 }],
     inner: [[[-1.4, 2.8], [-0.25, 2.8]], [[0.25, 2.8], [1.4, 2.8]], [[-1.4, 5.6], [-0.9, 5.6]], [[-0.4, 5.6], [1.4, 5.6]]],
     movers: [{ kind: 'gate', ax: 0.5, az: 2.8, bx: 0, bz: 2.8, len: 0.26, ang: 90, period: 3, look: 'boom' },
@@ -134,7 +134,7 @@ registerWorld(21, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.4, 4, 0.4, 4.8) }],
     bumps: [{ x: -0.6, z: 1.2, r: 0.35, h: 0.1 }] },
   /* 16: the crane deck (4 parts). Belt to the ramp, round the jib, the boom over the narrow ramp, past the slider into the pocket */
-  { par: 5, crazy: true, sol: [[308,1,0],[252,0.57,0],[16,0.93,0]], tee: [1, 0.5], cup: [1.2, 10], aim0: 0, shape: c21Box(-2, 0, 2, 11, [3.2, 6.4]),
+  { par: 5, crazy: true, sol: [[308,1,0],[252,0.57,0],[16,0.94,0]], tee: [1, 0.5], cup: [1.2, 10], aim0: 0, shape: c21Box(-2, 0, 2, 11, [3.2, 6.4]),
     tiers: [{ poly: rect(-2, 3.2, 2, 6.4), h: 0.22 }, { poly: rect(-2, 6.4, 2, 11), h: 0.44 }],
     ramps: [{ x0: -2, z0: 2, x1: -1, z1: 3.2, axis: 'z', h0: 0, h1: 0.22 }, { x0: 0.9, z0: 5.2, x1: 1.5, z1: 6.4, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[2, 3.2], [-1, 3.2]], [[2, 6.4], [1.5, 6.4]], [[0.9, 6.4], [-2, 6.4]], [[2, 8.6], [-0.8, 8.6]]],

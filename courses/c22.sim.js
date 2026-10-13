@@ -50,7 +50,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(-1.0, 4.5, 1.0, 4.5, 2.4)],
     posts: [C22_CACTUS(0.5, 7.6), C22_CACTUS(-0.4, 7.4), C22_ROCK(0.9, 1.4)] },
   /* 6. the staircase down: three lanes, each a step below the last */
-  { par: 5, sol: [], tee: [2.0, 0.5], cup: [0, 6.4], aim0: 0,
+  { par: 4, sol: [[15,0.75,0],[350,0.75,0],[275,0.9375,0],[0,0.375,0]], tee: [2.0, 0.5], cup: [0, 6.4], aim0: 0,
     shape: rect(-0.5, 0, 2.5, 7.2),
     inner: [[[1.5, 0], [1.5, 6]], [[0.5, 1.2], [0.5, 7.2]]],
     ramps: [{ x0: 1.5, z0: 4.8, x1: 2.6, z1: 6, axis: 'z', h0: 0.6, h1: 0.4 }, { x0: 0.5, z0: 2.4, x1: 1.5, z1: 3.6, axis: 'z', h0: 0.2, h1: 0.4 },
@@ -76,7 +76,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(-1.1, 1.8, 1.1, 1.8, 2.0), C22_WEED(1.1, 2.9, -1.1, 2.9, 2.4, 0.7), C22_WEED(-1.1, 4.0, 1.1, 4.0, 2.8, 1.4)],
     posts: [C22_CACTUS(-0.45, 7.4), C22_CACTUS(-1.25, 7.5), C22_ROCK(0.7, 7.8)] },
   /* 9. the two sluice gates: down deck by deck, a gate guarding each drop, then round the spur */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0.8, 10.3], shape: rect(-1.6, 0, 1.6, 11),
+  { par: 4, crazy: true, sol: [[40,0.875,1.5],[-0.25,0.9675,0]], tee: [0, 0.5], cup: [0.8, 10.3], shape: rect(-1.6, 0, 1.6, 11),
     inner: [[[-1.6, 3.5], [0.125, 3.5]], [[0.875, 3.5], [1.6, 3.5]], [[-1.6, 7], [-0.875, 7]], [[-0.125, 7], [1.6, 7]], [[1.6, 9.4], [0.2, 9.4]]],
     tiers: [{ poly: rect(-1.7, -0.1, 1.7, 3.5), h: 0.4 }, { poly: rect(-1.7, 3.5, 1.7, 7), h: 0.2 }, { poly: rect(-1.7, 7, 1.7, 11.1), h: 0.03, sx: 0.015 }],
     bumps: [{ x: -0.6, z: 8.6, r: 0.45, h: 0.18 }],

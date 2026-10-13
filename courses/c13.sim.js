@@ -111,7 +111,7 @@ registerWorld(13, { holes: [
     posts: [J13_IDOL(0.2, 6.6), J13_IDOL(-0.9, 6.0, 0.11)], bumps: [{ x: 0.5, z: 5.6, r: 0.5, h: 0.18 }],
     movers: [J13_ROCK(-0.7, 5.2, 0.0, 5.2, 2.6, 0, 0.15)] },
   /* 16: the lost city: over the hill, across the stream, up to the plaza, past the stone door into the gate tunnel */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[354, 0.7, 0], [39, 1, 0], [0, 1, 0], [0, 0.4, 0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [0.8, 6.0], [1.8, 6.0], [1.8, 0], [3.4, 0], [3.4, 2.4], [3.4, 7.8], [-0.8, 7.8], [-0.8, 3.6]],
     bumps: [{ x: 0, z: 2.0, r: 0.6, h: 0.3 }],
     ramps: [{ x0: 0.8, z0: 6.0, x1: 1.8, z1: 7.8, axis: 'x', h0: 0, h1: 0.3 }],

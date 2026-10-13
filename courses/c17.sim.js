@@ -132,7 +132,7 @@ registerWorld(17, { holes: [
     movers: [C17_GATE(0, 3.0, 0.39, 3.0, 0.25, 2.8, 0), C17_MILL(0, 5.0, 0.5, 1.4, 0)] },
   /* 18: the showpiece: through the gate, up the switchback stair, into the right passage and
      onto the throne dais past a ghost */
-  { par: 5, crazy: true, sol: [], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
+  { par: 5, crazy: true, sol: [[295,1,0],[275,1,0],[310,0.91,1.5]], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
     inner: [[[-2.0, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [2.0, 2.6]], [[-2.0, 3.6], [1.0, 3.6]], [[-1.0, 4.6], [2.0, 4.6]], [[-2.0, 5.6], [2.0, 5.6]]],
     tiers: [{ poly: [[1.0, 2.6], [2.0, 2.6], [2.0, 4.6], [0.6, 4.6], [0.6, 3.6], [1.0, 3.6]], h: 0.15 },
       { poly: [[-2.0, 3.6], [-1.0, 3.6], [-1.0, 4.6], [2.0, 4.6], [2.0, 5.6], [-2.0, 5.6]], h: 0.3 },

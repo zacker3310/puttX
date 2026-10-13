@@ -40,7 +40,7 @@ check('drift off the edge returns the ball free of charge', out === 'oob' && r.s
 
 S.registerWorld(99, { g: 0.5, feltMu: 0.2, holes: [{ par: 3, tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 4) }] });
 const hh = S.holeAt('99-1');
-check('registerWorld keys holes and applies world gravity and felt', hh && hh.key === '99-1' && hh.g === 0.5 && hh.feltMu === 0.2 && hh.par === 3);
+check('registerWorld keys holes and applies world gravity and felt', hh && hh.key === '99-1' && hh.g === 0.5 && Math.abs(hh.feltMu - 0.2 * S.GLIDE) < 1e-12 && hh.par === 3);
 check('holeAt misses cleanly', S.holeAt('99-2') === undefined && S.holeAt('42-1') === undefined);
 S.registerWorld(98, { holes: Array.from({ length: 18 }, () => ({ par: 3, tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 4) })) });
 check('nextKey walks 1..18 then stops', S.nextKey('98-9') === '98-10' && S.nextKey('98-17') === '98-18' && S.nextKey('98-18') === null && S.nextKey('99-1') === null);
@@ -56,7 +56,7 @@ const list = S.playable().filter(w => w < 90), second = list[1], last = S.WORLDS
 S.recordHole(p, k(last - 1 > 0 ? last - 1 : 1), 4, 3);
 check('a hole before the last opens nothing new', p.worlds.length === 1, p.worlds.join());
 S.recordHole(p, k(last), 4, 3);
-check('finishing the last hole opens the next playable course and its own night remix', !second || (p.worlds.join() === [first, second, S.NIGHT + first].join() && S.holeUnlocked(p, second + '-1')), p.worlds.join());
+check('finishing the last hole opens the next playable course and its own night remix', !second || (p.worlds.join() === [first, second].concat(S.WORLDS[first + S.COURSE_STEP] ? [first + S.COURSE_STEP] : [], [S.NIGHT + first]).join() && S.holeUnlocked(p, second + '-1')), p.worlds.join());
 check('ten courses in order', S.WORLD_ORDER.join() === '1,2,3,4,5,6,7,8,9,10' && S.HOLES_PER === 18);
 
 done();

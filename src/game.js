@@ -23,12 +23,12 @@ function showScene(id) {
 
 /* ---- 2a. constants ---- */
 const SIM_DT = 1 / 240;          /* fixed physics step */
-const BALL_R = 0.051;            /* toy-sized ball, about 2.4x a real one (0.021) like the whole course */
+const BALL_R = 0.0255;           /* a small, quick ball: about 1.2x a real one (0.021) */
 const CUP_R = 0.11, CUP_DEPTH = 0.12;
 const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
 const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
-const MIN_V = 0.35, MAX_V = 5;   /* putt speed at power 0 and power 1: full power rolls about 14.5 m of felt */
-const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step < BALL_R */
+const MIN_V = 0.3, MAX_V = 4.27; /* putt speed at power 0 and power 1: full power still rolls about 14.5 m of (slicker) felt */
+const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step, well under a wall's reach (BALL_R + WALL_HALF) */
 const STOP_V = 0.03;
 const SETTLE_T = 0.4;            /* slower than STOP_V this long = at rest, even pressed on a wall or a lip */
 const STATIC_MU = 0.1;           /* a stopped ball stays put on slopes gentler than this */
@@ -38,7 +38,9 @@ const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slo
 const SKID_MU = 0.22, SKID_END = 0.88;  /* the struck ball slides (sliding friction) until it has shed 12% and rolls */
 /* water is a hazard (the ball goes back where it was putted from, plus one); push zones are
    conveyors and fans: a constant acceleration [ax, az] while the ball rolls on them */
-const SURF = { felt: { mu: 0.075 }, ice: { mu: 0.02 }, sand: { mu: 0.4 }, mud: { mu: 0.75 }, fast: { mu: 0.04 }, water: { mu: 0.075 } };
+/* GLIDE: every surface is slicker than a real green, so the ball coasts; ice is nearly frictionless */
+const GLIDE = 0.73, FELT_MU = 0.075;
+const SURF = { felt: { mu: FELT_MU * GLIDE }, ice: { mu: 0.006 }, sand: { mu: 0.4 * GLIDE }, mud: { mu: 0.75 * GLIDE }, fast: { mu: 0.04 * GLIDE }, water: { mu: FELT_MU * GLIDE } };
 const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.7, WALL_SLIP = 0.92;
 const POST_E = 0.6, MOVER_E = 0.8;
 const STEP_MAX = 0.03;           /* ground rising more than this under the ball's leading edge is a cliff face */
@@ -373,8 +375,9 @@ const WORLD_ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];   /* ten courses of 18; a c
 const HOLES_PER = 18;
 const WORLDS = {};
 function registerWorld(w, def) {
-  const g = def.g || 1, feltMu = def.feltMu || SURF.felt.mu;
-  WORLDS[w] = { g, feltMu, defs: def.holes, holes: def.holes.map((d, i) => Object.assign(makeHole(Object.assign({ g, feltMu }, d)), { key: w + '-' + (i + 1) })) };
+  /* a course's own feltMu is written in old units; GLIDE makes it slicker like everything else */
+  const g = def.g || 1, raw = def.feltMu || FELT_MU, feltMu = raw * GLIDE;
+  WORLDS[w] = { g, feltMu: raw, defs: def.holes, holes: def.holes.map((d, i) => Object.assign(makeHole(Object.assign({ g, feltMu }, d)), { key: w + '-' + (i + 1) })) };
 }
 function holeAt(key) {
   const [w, n] = String(key).split('-').map(Number);
@@ -546,13 +549,15 @@ const DEFAULT_LOOK = { felt: '#36803a', wall: '#ffd66e', ground: '#c9a476', sky:
   flag: '#ef7d6d', jingle: [523, 659, 784, 1047], icon: '' };
 const dayOf = w => w > NIGHT ? w - NIGHT : w;
 /* a night remix wears its day course's look under a moon: deep sky, dimmer ground, a lit cup */
-const NIGHT_SKY = ['#0d1538', '#33407a'];
-const dim = (c, k) => '#' + new THREE.Color(c).lerp(new THREE.Color('#1b2246'), k).getHexString();
+const NIGHT_SKY = ['#05020f', '#2a0b4d'];
+const NEON = ['#ff3df2', '#2ef2ff', '#b6ff2e', '#ffb02e', '#8b5cff'];
 const lookOf = w => {
   /* a world's later courses inherit its first course's look and override what they like */
   const d = dayOf(w), day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[worldOf(d)], d !== worldOf(d) ? WORLD_LOOK[d] : null);
   if (w <= NIGHT) return day;
-  return Object.assign(day, { night: true, sky: NIGHT_SKY.slice(), fog: true, felt: dim(day.felt, 0.25), ground: day.ground && dim(day.ground, 0.6), skirt: dim(day.skirt, 0.45), wall: dim(day.wall, 0.2) });
+  /* night is cosmic bowling: black-light carpet, neon tube walls, a glowing ball, a grid to the horizon */
+  return Object.assign(day, { night: true, sky: NIGHT_SKY.slice(), fog: true, felt: '#120b2e', ground: '#06030f', skirt: '#1a0f3d', wall: '#1d1240',
+    sand: '#5b2a8f', ice: '#1fd4ff', mud: '#3b1d55', fast: '#d13bff', water: '#2a4dff', push: '#ffb02e', tube: '#b6ff2e', flag: '#ff3df2' });
 };
 /* what the player has equipped; the pro shop fills these in (see applyGear) */
 const GEAR = { ball: { base: '#fffdf7', band: '#ffd66e', mark: '#ef7d6d' }, putter: { head: '#c9ced6', metal: 0.85, shaft: '#d9dde3', grip: '#4a3826', shape: 'blade' } };
@@ -834,8 +839,8 @@ function buildHoleScene(h) {
   scene.background = skyTexture(look.sky[0], look.sky[1]);
   scene.fog = look.fog ? new THREE.Fog(look.sky[1], 16, 55) : null;
   /* night: moonlight, stars, and a warm lamp in the cup */
-  hemi.intensity = look.night ? 0.6 : 1.4; hemi.color.set(look.night ? 0xaab8ff : 0xfff4e0);
-  sun.intensity = look.night ? 1.0 : 2.4; sun.color.set(look.night ? 0xc8d4ff : 0xffe2b8);
+  hemi.intensity = look.night ? 0.45 : 1.4; hemi.color.set(look.night ? 0x9a7cff : 0xfff4e0);
+  sun.intensity = look.night ? 0.7 : 2.4; sun.color.set(look.night ? 0xb89cff : 0xffe2b8);
   if (look.night) nightDecor(holeGroup, h);
   const B = holeBounds(h), ext = B.ext + 1.5;
   sun.position.set(B.cx + 3, 9, B.cz - 2.5); sun.target.position.set(B.cx, 0, B.cz);
@@ -893,7 +898,7 @@ function cameraGoal() {
   if (cd > 0.05 && (cdx * ux + cdz * uz) / cd > Math.cos(35 * Math.PI / 180)) ahead = cd;
   ahead = clamp(ahead, AHEAD_MIN, AHEAD_MAX);
   const by = b.tube ? groundH(h, b.tube.def.b[0], b.tube.def.b[1]) : b.y, bx = b.tube ? b.tube.def.b[0] : b.x, bz = b.tube ? b.tube.def.b[1] : b.z;
-  const z = play.camZoom || 0, back = (aiming ? 0.8 + 0.22 * ahead : 1.5) * (1 + z * 0.9), high = (aiming ? 0.75 + 0.3 * ahead : 1.15) * (1 + z * 1.3);
+  const z = play.camZoom || 0, back = (aiming ? 0.62 + 0.2 * ahead : 1.25) * (1 + z * 0.9), high = (aiming ? 0.6 + 0.27 * ahead : 1.0) * (1 + z * 1.3);
   const pos = new THREE.Vector3(bx - ux * back, by + high, bz - uz * back);
   /* never inside a hill or a raised tier behind the ball */
   pos.y = Math.max(pos.y, groundH(h, pos.x, pos.z) + 0.45);
@@ -926,7 +931,7 @@ function renderFrame(dt) {
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
   const lk = lookOf(holeWorld(play.hole)); if (lk.tick) lk.tick(holeGroup, dt, play.time);
-  syncLost(dt);
+  syncLost(dt); tickNight(dt, play.time);
   syncBall(dt);
   syncGhost();
   updatePuffs(dt);
@@ -958,6 +963,7 @@ const SWING_FULL = 240, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeLoss: 0.15, twist: 4 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
+const PUTTER_SCALE = 0.72;   /* the club shrank with the ball; it is built full size and scaled */
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
 let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimLine = null, aimRing = null, putter = null;
 
@@ -1068,7 +1074,7 @@ function buildPutter(gear) {
   g.add(head, line, shaft);
   g.visible = false;
   /* a left-hander stands on the other side of the line: mirror the whole club */
-  g.scale.x = progress.hand === 'L' ? -1 : 1;
+  g.scale.set((progress.hand === 'L' ? -1 : 1) * PUTTER_SCALE, PUTTER_SCALE, PUTTER_SCALE);
   return g;
 }
 function setPutter(gear) {
@@ -1176,7 +1182,7 @@ function nudge(dir) { if (play.phase === 'aim') { play.aim -= dir * NUDGE_DEG; s
 /* handedness: mirrors the club and puts the swing pad on the player's side of the screen */
 function setHand(h) {
   progress.hand = h === 'L' ? 'L' : 'R'; saveProgress();
-  if (putter) putter.scale.x = progress.hand === 'L' ? -1 : 1;
+  if (putter) putter.scale.x = (progress.hand === 'L' ? -1 : 1) * PUTTER_SCALE;
   document.getElementById('hole').classList.toggle('lefty', progress.hand === 'L');
   handR.classList.toggle('on', progress.hand !== 'L'); handL.classList.toggle('on', progress.hand === 'L');
   if (camera) camera.setViewOffset(1200, 700, progress.hand === 'L' ? -60 : 60, 0, 1200, 700);
@@ -1701,21 +1707,92 @@ function shareShot() {
   else if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, () => {});
 }
 
-/* night: a starfield dome and a warm lamp glowing in the cup */
+/* night: cosmic bowling. Neon tube walls with a soft additive halo, a black-light carpet whose
+   paint splatters glow, a neon grid to the horizon, a glowing ball, a cyan lamp in the cup,
+   stars, and neon shapes drifting round the course. */
+function glowTexture() {
+  return canvasTex(64, 64, x => { const g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.35)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64); });
+}
+function neonCarpet() {
+  const t = canvasTex(256, 256, x => {
+    const r = rng32(11); x.fillStyle = '#120b2e'; x.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 1800; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.12)'; x.fillRect(r() * 256, r() * 256, 1.5, 1.5); }
+    x.lineCap = 'round'; x.lineJoin = 'round';
+    for (let i = 0; i < 18; i++) {
+      const c = NEON[i % NEON.length], cx = r() * 256, cy = r() * 256, k = r();
+      x.strokeStyle = c; x.fillStyle = c; x.lineWidth = 2.5 + r() * 1.5; x.globalAlpha = 0.6;
+      if (k < 0.3) { x.beginPath(); x.arc(cx, cy, 6 + r() * 10, 0, Math.PI * 2); x.stroke(); }
+      else if (k < 0.55) { x.beginPath(); x.moveTo(cx, cy); for (let j = 1; j < 5; j++) x.lineTo(cx + j * 7, cy + (j % 2 ? -8 : 8)); x.stroke(); }
+      else if (k < 0.75) { x.beginPath(); for (let j = 0; j < 3; j++) { const a = r() * 0 + j * 2.094 + i; x.lineTo(cx + Math.cos(a) * 11, cy + Math.sin(a) * 11); } x.closePath(); x.stroke(); }
+      else { x.beginPath(); x.arc(cx, cy, 2 + r() * 3, 0, Math.PI * 2); x.fill(); }
+    }
+    x.globalAlpha = 1;
+  });
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
+}
+function neonGrid() {
+  const t = canvasTex(128, 128, x => { x.fillStyle = '#06030f'; x.fillRect(0, 0, 128, 128); x.strokeStyle = '#ff3df2'; x.globalAlpha = 0.55; x.lineWidth = 3; x.strokeRect(1.5, 1.5, 125, 125); });
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(40, 40); return t;
+}
+let ballHalo = null;
 function nightDecor(group, h) {
-  const B = holeBounds(h), pos = [];
-  let seed = 7;
-  const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const B = holeBounds(h), pos = [], r = rng32(7);
+  /* the carpet: the floor's felt becomes black-light paint */
+  const floor = group.getObjectByName('floor');
+  if (floor) { const t = neonCarpet(); floor.material.map.dispose(); floor.material.map = t; floor.material.emissiveMap = t; floor.material.emissive.set('#ffffff'); floor.material.emissiveIntensity = 0.8; floor.material.color.set('#ffffff'); }
+  /* neon tube walls: each wall line its own colour, glowing, inside a soft halo */
+  const walls = group.getObjectByName('walls'), mats = NEON.map(c => mat('#160c33', { emissive: c, emissiveIntensity: 0.95, roughness: 0.4 }));
+  const halos = NEON.map(c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false }));
+  if (walls) {
+    const old = walls.children[0] && walls.children[0].material;
+    let seg = 0;
+    const lineOf = []; h.walls.forEach((wl, li) => { for (let i = 0; i + 1 < wl.length; i++) lineOf[seg++] = li; });
+    const boxes = walls.children.filter(c => c.geometry.type === 'BoxGeometry'), caps = walls.children.filter(c => c.geometry.type !== 'BoxGeometry');
+    boxes.forEach((w, i) => {
+      const k = lineOf[i] % NEON.length; w.material = mats[k];
+      const halo = new THREE.Mesh(w.geometry, halos[k]); halo.position.copy(w.position); halo.rotation.copy(w.rotation); halo.scale.set(2.6, 1.15, 1.02); halo.name = 'halo'; walls.add(halo);
+    });
+    let ci = 0; h.walls.forEach((wl, li) => wl.forEach(() => { if (caps[ci]) caps[ci].material = mats[li % NEON.length]; ci++; }));
+    if (old) old.dispose();
+  }
+  /* the grid to the horizon */
+  group.children.forEach(c => { if (c.isMesh && c.geometry.type === 'PlaneGeometry' && c.renderOrder === -1) { const t = neonGrid(); c.material.map = t; c.material.emissiveMap = t; c.material.emissive.set('#ffffff'); c.material.emissiveIntensity = 0.9; c.material.color.set('#ffffff'); } });
+  /* zones glow in their own colour */
+  group.children.forEach(c => { if (c.isMesh && c.material && c.material.emissive && c.name === '' && c.geometry.type === 'BufferGeometry' && c.material.color) { c.material.emissive.copy(c.material.color); c.material.emissiveIntensity = Math.max(c.material.emissiveIntensity || 0, 0.35); } });
   for (let i = 0; i < 420; i++) {
     const th = r() * Math.PI * 2, ph = 0.12 + r() * 1.3, R = 70;
     pos.push(B.cx + Math.cos(th) * Math.cos(ph) * R, Math.sin(ph) * R, B.cz + Math.sin(th) * Math.cos(ph) * R);
   }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  group.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xfff6d8, size: 0.45, fog: false })));
+  group.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xfff6d8, size: 0.4, fog: false })));
   const y = groundH(h, ...h.cup);
-  const lamp = new THREE.PointLight(0xffd27a, 2.4, 3.2, 1.6); lamp.position.set(h.cup[0], y + 0.3, h.cup[1]); group.add(lamp);
-  const glow = new THREE.Mesh(new THREE.RingGeometry(CUP_R + 0.004, CUP_R + 0.04, 40), new THREE.MeshBasicMaterial({ color: 0xffd66e, transparent: true, opacity: 0.85, depthWrite: false }));
-  glow.rotation.x = -Math.PI / 2; glow.position.set(h.cup[0], y + 0.003, h.cup[1]); group.add(glow);
+  const lamp = new THREE.PointLight(0x2ef2ff, 2.6, 3.2, 1.6); lamp.position.set(h.cup[0], y + 0.3, h.cup[1]); group.add(lamp);
+  const glow = new THREE.Mesh(new THREE.RingGeometry(CUP_R + 0.004, CUP_R + 0.045, 40), new THREE.MeshBasicMaterial({ color: 0x2ef2ff, transparent: true, opacity: 0.95, depthWrite: false, toneMapped: false }));
+  glow.rotation.x = -Math.PI / 2; glow.position.set(h.cup[0], y + 0.003, h.cup[1]); glow.name = 'cupGlow'; group.add(glow);
+  /* neon shapes drifting round the course, out of the way of play */
+  const drift = new THREE.Group(); drift.name = 'neonDrift';
+  for (let i = 0; i < 9; i++) {
+    const c = NEON[i % NEON.length], m = new THREE.MeshBasicMaterial({ color: c, toneMapped: false });
+    const geo = i % 3 === 0 ? new THREE.TorusGeometry(0.45, 0.05, 8, 32) : i % 3 === 1 ? new THREE.TorusGeometry(0.35, 0.05, 3, 3) : new THREE.TorusGeometry(0.3, 0.05, 8, 4);
+    const o = new THREE.Mesh(geo, m), a = i / 9 * Math.PI * 2, d = B.ext + 2.5 + r() * 2;
+    o.position.set(B.cx + Math.cos(a) * d, 1.4 + r() * 2.2, B.cz + Math.sin(a) * d); o.userData.spin = 0.3 + r() * 0.6;
+    drift.add(o);
+  }
+  group.add(drift);
+}
+/* per frame at night: the ball glows, the cup ring and wall halos breathe, the shapes turn */
+function tickNight(dt, t) {
+  const on = !!(holeGroup && holeGroup.getObjectByName('neonDrift'));
+  if (!ballHalo) {
+    ballHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color: 0xd8f6ff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    ballHalo.scale.setScalar(BALL_R * 12); ballMesh.add(ballHalo);
+  }
+  ballHalo.visible = on;
+  ballMesh.material.emissive.set(on ? 0x9a9ab0 : 0x000000);
+  if (!on || reducedMotion()) return;
+  const k = 0.5 + 0.5 * Math.sin(t * 2.2);
+  const glow = holeGroup.getObjectByName('cupGlow'); if (glow) glow.material.opacity = 0.7 + 0.3 * k;
+  for (const o of holeGroup.getObjectByName('neonDrift').children) { o.rotation.x += dt * o.userData.spin; o.rotation.y += dt * o.userData.spin * 0.7; }
 }
 
 /* the tracker: birdies, eagles, albatrosses and aces, counted for life, and the best on every

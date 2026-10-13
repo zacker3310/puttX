@@ -43,7 +43,7 @@ const { check, done, open } = require('./lib.cjs');
   check('the frame is not blank (> 40 distinct colours)', px > 40, 'colours: ' + px);
 
   const b = await page.evaluate(() => ({ m: ballMesh.position.toArray(), x: play.ball.x, y: play.ball.y + BALL_R, z: play.ball.z, r: ballMesh.geometry.parameters.radius }));
-  check('ball mesh sits on the physics ball, at the new size', Math.abs(b.m[0] - b.x) < 1e-6 && Math.abs(b.m[1] - b.y) < 1e-6 && Math.abs(b.m[2] - b.z) < 1e-6 && b.r === 0.051, JSON.stringify(b));
+  check('ball mesh sits on the physics ball, at the new size', Math.abs(b.m[0] - b.x) < 1e-6 && Math.abs(b.m[1] - b.y) < 1e-6 && Math.abs(b.m[2] - b.z) < 1e-6 && b.r === 0.0255, JSON.stringify(b));
   const hid = await page.evaluate(() => { play.ball = newBall(play.hole, 0, 3); play.ball.tube = { def: play.hole.tubes[0], t: 0.3, v: 1 }; renderFrame(0.016); const v = ballMesh.visible; play.ball = newBall(play.hole, ...play.hole.tee); renderFrame(0.016); return [v, ballMesh.visible]; });
   check('the ball hides inside a tube', hid[0] === false && hid[1] === true, JSON.stringify(hid));
 

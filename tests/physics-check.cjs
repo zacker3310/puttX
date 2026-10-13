@@ -10,7 +10,7 @@ const { loadSim, regionSource } = require('./sim.cjs');
 const S = loadSim();
 const R = S.BALL_R + S.WALL_HALF;
 
-check('ball is 15% smaller than v1 (0.06)', Math.abs(S.BALL_R - 0.051) < 1e-9, String(S.BALL_R));
+check('ball is half the v2 ball (0.051)', Math.abs(S.BALL_R - 0.0255) < 1e-9, String(S.BALL_R));
 const straight = S.makeHole({ par: 2, tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 4) });
 
 /* 1. a soft putt stops on the felt; a struck ball skids before it rolls */
@@ -67,7 +67,7 @@ check('groundH matches the bump peak', Math.abs(S.groundH(hill, 0.3, 2.5) - 0.12
 
 /* 7. crests: a fast ball leaves the ground over a sharp hilltop and bounces on landing */
 const crest = S.makeHole({ tee: [0, 0.5], cup: [0, 9.5], shape: S.rect(-1, 0, 1, 10), bumps: [{ x: 0, z: 3, r: 0.5, h: 0.3 }] });
-const jump = S.simulatePutt(crest, [0, 0.5], 0, 0.75);
+const jump = S.simulatePutt(crest, [0, 0.5], 0, 0.95);
 check('a fast ball takes off over a crest and lands', jump.hits.some(h => h[0] === 'land'), JSON.stringify(jump.hits.slice(0, 4)));
 check('a slow ball rolls over the same crest without leaving it', !S.simulatePutt(crest, [0, 0.5], 0, 0.42).hits.some(h => h[0] === 'land'));
 

@@ -57,7 +57,7 @@ registerWorld(2, { holes: [
     movers: [C2_WEED(2.25, 4.0, 2.95, 4.0, 2.4)],
     posts: [C2_CACTUS(0.45, 5.0), C2_CACTUS(3.05, 5.6)] },
   /* 8. the narrow bridge straight up the mesa, or the wide ramp the long way round */
-  { par: 3, sol: [[24,0.875,0]], tee: [0, 0.5], cup: [-0.8, 6.4], shape: rect(-1.6, 0, 1.6, 7.2),
+  { par: 3, sol: [[24,0.96,0]], tee: [0, 0.5], cup: [-0.8, 6.4], shape: rect(-1.6, 0, 1.6, 7.2),
     ramps: [{ x0: -0.17, z0: 3, x1: 0.17, z1: 4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.9, z0: 2.6, x1: 1.6, z1: 4, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.7, 4, 1.7, 7.3), h: 0.3 }],
     bumps: [{ x: 0.7, z: 6.2, r: 0.4, h: 0.15 }],
@@ -74,7 +74,7 @@ registerWorld(2, { holes: [
     movers: [C2_WEED(2.25, 5.6, 0.95, 5.6, 2.8)],
     posts: [C2_CACTUS(-0.2, 6.6), C2_CACTUS(-0.85, 6.5), C2_CACTUS(0.15, 7.45), C2_ROCK(0.45, 2.5)] },
   /* 10. the cactus garden on a leaning canyon floor: the cup sits up on the high side */
-  { par: 3, sol: [[28.5,0.67,0]], tee: [-0.7, 0.5], cup: [1.05, 5.9],
+  { par: 3, sol: [[28,0.76,0]], tee: [-0.7, 0.5], cup: [1.05, 5.9],
     shape: [[-1.0, 0], [1.5, 0], [1.5, 6.0], [0.9, 6.8], [-1.6, 6.8], [-1.6, 1.0]],
     tiers: [{ poly: rect(-1.7, -0.1, 1.6, 6.9), h: 0.08, sx: 0.05, sz: 0.008 }],
     posts: [C2_CACTUS(-0.2, 1.9), C2_CACTUS(0.6, 2.3), C2_CACTUS(-1.0, 2.9), C2_CACTUS(0.15, 3.4), C2_CACTUS(1.05, 3.7),

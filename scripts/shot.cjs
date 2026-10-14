@@ -4,7 +4,7 @@
    and the top-down overview (and, with --swing, the putter mid-backswing).
    Usage: node scripts/shot.cjs --course 3 [--hole 3-7] [--swing] [--out dir]
    Prints the PNG paths and any console errors. Safe to run while other courses are being edited:
-   it only builds the courses you ask for. */
+   it only builds the course you ask for, plus its world's first course (whose look the others inherit). */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +17,7 @@ if (!course) { console.error('shot: --course N or --hole N-M'); process.exit(2);
 const only = val('--hole'), out = path.resolve(val('--out') || path.join(ROOT, 'preview', 'shots', 'c' + String(course).padStart(2, '0')));
 fs.mkdirSync(out, { recursive: true });
 const page = `preview/c${String(course).padStart(2, '0')}-${process.pid}.html`;
-fs.writeFileSync(path.join(ROOT, page), build([course]));
+fs.writeFileSync(path.join(ROOT, page), build([...new Set([((course - 1) % 10) + 1, course])]));
 
 const srv = http.createServer((req, res) => {
   const p = path.normalize(path.join(ROOT, decodeURIComponent(req.url.split('?')[0])));

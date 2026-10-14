@@ -7,7 +7,7 @@ function c21Box(x0, z0, x1, z1, cuts) {
 }
 registerWorld(21, { holes: [
   /* 1: gate drop. A boom barrier slides across the only gap off the scaffold deck */
-  { par: 2, sol: [[182,0.8,0.5]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.4),
+  { par: 2, sol: [[204,0.84,0.5]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.4),
     tiers: [{ poly: rect(-1, 0, 1, 3.5), h: 0.3 }],
     inner: [[[-1, 3.5], [-0.25, 3.5]], [[0.25, 3.5], [1, 3.5]]],
     movers: [{ kind: 'gate', ax: 0.5, az: 3.5, bx: 0, bz: 3.5, len: 0.26, ang: 90, period: 3, look: 'boom' }],
@@ -38,7 +38,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [0, 0.8], poly: rect(-1.6, 2.6, 0, 4) }, { surf: 'sand', poly: rect(-1.6, 4.2, -1.1, 5.4) }] },
   /* 5: the pour (long green). Three broad slabs stepping up by gentle banks, the first leaning left and
      the second right, a dirt ridge on each and a swale beside the cup */
-  { par: 3, sol: [[346,0.92,0]], tee: [0, 0.5], cup: [-0.6, 12.4], shape: rect(-2, 0, 2, 13.5),
+  { par: 3, sol: [[346,0.96,0]], tee: [0, 0.5], cup: [-0.6, 12.4], shape: rect(-2, 0, 2, 13.5),
     tiers: [{ poly: rect(-2, 0, 2, 4.2), h: 0, sx: 0.01 }, { poly: rect(-2, 5.4, 2, 9), h: 0.15, sx: -0.01 }, { poly: rect(-2, 10, 2, 13.5), h: 0.26 }],
     ramps: [{ x0: -2, z0: 4.2, x1: 2, z1: 5.4, axis: 'z', h0: 0, h1: 0.15 }, { x0: -2, z0: 9, x1: 2, z1: 10, axis: 'z', h0: 0.15, h1: 0.26 }],
     bumps: [{ x: 1.4, z: 2.5, r: 1.5, h: 0.12 }, { x: -1.3, z: 7.2, r: 1.3, h: 0.12 }, { x: 0.8, z: 11.4, r: 1.1, h: -0.07 }] },

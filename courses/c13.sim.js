@@ -24,7 +24,7 @@ registerWorld(13, { holes: [
     ramps: [{ x0: -2.5, z0: 6.5, x1: 1.5, z1: 7.3, axis: 'z', h0: 0.05, h1: 0.2 }],
     bumps: [{ x: 0.3, z: 3.5, r: 1.4, h: 0.12 }, { x: -0.6, z: 8.6, r: 1.0, h: -0.07 }] },
   /* 4: the waterfall: drop through the gap to the middle terrace, round the wall, drop to the cup; or the tunnel */
-  { par: 3, sol: [[14,0.68,0],[330,0.6,0]], tee: [0, 0.5], cup: [0.4, 6.9], shape: rect(-1, 0, 1, 7.6),
+  { par: 3, sol: [[42,0.96,0],[0,0.56,0]], tee: [0, 0.5], cup: [0.4, 6.9], shape: rect(-1, 0, 1, 7.6),
     tiers: [{ poly: rect(-1, 0, 1, 2.6), h: 0.4 }, { poly: rect(-1, 2.6, 1, 4.6), h: 0.2 }],
     inner: [[[-1, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1, 2.6]], [[-0.4, 4.6], [1, 4.6]]],
     zones: [J13_WATER(rect(0.3, 2.6, 1, 3.3)), J13_MUD(rect(-1, 3.5, -0.2, 4.0))],

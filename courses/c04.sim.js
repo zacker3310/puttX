@@ -32,7 +32,7 @@ registerWorld(4, { holes: [
     zones: [{ surf: 'water', poly: C4_POOL(0.05, 3.0, 0.55, 0.5) }, { surf: 'water', poly: C4_POOL(-0.4, 6.0, 0.55, 0.22) }, { surf: 'water', poly: C4_POOL(0.85, 4.5, 0.3, 0.35, 8) },
       { surf: 'ice', poly: rect(-1.4, 1.6, 1.4, 6.4) }], bumps: [{ x: -0.3, z: 5.1, r: 0.6, h: 0.1 }] },
   /* 7. terraces: drop off the tee deck onto an ice shelf, then drop again and come back to the cup */
-  { par: 3, sol: [[325,0.8,0]], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
+  { par: 3, sol: [[326,0.84,0]], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
     tiers: [{ poly: rect(-0.6, 0, 0.6, 3), h: 0.4 }, { poly: rect(-0.6, 3, 3, 4.6), h: 0.2 }],
     zones: [{ surf: 'ice', poly: rect(-0.6, 3, 3, 4.6) }], bumps: [{ x: 1.2, z: 3.8, r: 0.3, h: 0.1 }, { x: 2.4, z: 1.1, r: 0.55, h: 0.08 }] },
   /* 8. ski lift: a lift bar sweeps across the gap, then a climb to the summit deck */
@@ -69,7 +69,7 @@ registerWorld(4, { holes: [
       { surf: 'water', poly: C4_POOL(0.3, 5.9, 0.35) }, { surf: 'ice', poly: rect(-2, 2, 2, 6.4) }],
     posts: [C4_MAN(0.7, 7.0), C4_MAN(1.55, 6.6)], bumps: [{ x: 1.2, z: 7.2, r: 0.55, h: 0.1 }] },
   /* 15. mogul descent: down a steep slope of moguls into a ring of snowmen */
-  { par: 3, sol: [[10,0.8,0]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[12,0.64,0]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 1.4), h: 0.4 }], ramps: [{ x0: -1.2, z0: 1.4, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.4, h1: 0 }],
     bumps: [{ x: 0.4, z: 2.4, r: 0.35, h: 0.14 }, { x: -0.5, z: 3.2, r: 0.4, h: 0.16 }, { x: 0.3, z: 4.2, r: 0.4, h: 0.15 }, { x: -0.2, z: 5.0, r: 0.35, h: 0.12 }],
     inner: [[[-1.2, 6.0], [0.5, 6.0]]], posts: [C4_MAN(-0.05, 7.5), C4_MAN(-0.6, 8.45)], movers: [C4_BALL(0.1, 5.6, 0.8, 5.6, 2.8)] },

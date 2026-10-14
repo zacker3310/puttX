@@ -125,7 +125,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(1.1, 1.8), C12_CACTUS(-1.1, 2.0), C12_CACTUS(0.2, 7.5), C12_ROCK(-1.0, 8.0, 0.12)] },
   /* 14. the gap jumps: kick over the first canyon to the island, then the second kicker or the shaft to the green;
      the cautious walk the left ledge */
-  { par: 4, crazy: true, sol: [[216,0.85,2]], tee: [0, 0.5], cup: [0.6, 9.0],
+  { par: 4, crazy: true, sol: [[26,0.52,0],[4,0.8,0]], tee: [0, 0.5], cup: [0.6, 9.0],
     floors: [[[-0.8, 0], [1.4, 0], [1.4, 4.1], [0.9, 4.1], [0.9, 3.0], [-0.8, 3.0]], rect(-1.2, 3.9, 1.4, 6.4), rect(-1.2, 7.1, 1.4, 9.8)],
     walls: [[[-0.8, 3.0], [-0.8, 0], [1.4, 0], [1.4, 6.4]], [[0.9, 1.4], [0.9, 2.1]], [[-1.2, 3.9], [-1.2, 6.4]], [[-1.2, 7.1], [-1.2, 9.8], [1.4, 9.8], [1.4, 7.1]]],
     ramps: [{ x0: -0.35, z0: 2.2, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.2, z0: 5.6, x1: 0.8, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],

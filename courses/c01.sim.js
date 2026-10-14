@@ -89,7 +89,7 @@ registerWorld(1, { holes: [
     zones: [{ push: [1.5, 0], poly: rect(-1.8, 2, 1.8, 2.8) }, { push: [-1.5, 0], poly: rect(-1.8, 3.8, 1.8, 4.6) },
             { push: [1.5, 0], poly: rect(-1.8, 5.6, 1.8, 6.4) }, { surf: 'sand', poly: rect(-0.2, 6.8, 0.6, 8) }] },
   /* 15: boom gate climb (3 parts). Ramp to the deck, beat the barrier, then the chute or the pipe to the green */
-  { crazy: true, par: 3, sol: [[2,0.92,1]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.4, 0, 1.4, 9.6),
+  { crazy: true, par: 3, sol: [[2,0.96,1]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.4, 0, 1.4, 9.6),
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.4), h: 0.35 }],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.6, axis: 'z', h0: 0, h1: 0.35 }],
     inner: [[[-1.4, 3.6], [-0.35, 3.6]], [[0.35, 3.6], [1.4, 3.6]], [[-1.4, 4.6], [-0.3, 4.6]], [[0.3, 4.6], [1.4, 4.6]], [[-1.4, 6.4], [-0.45, 6.4]], [[0.35, 6.4], [1.4, 6.4]]],

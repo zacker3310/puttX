@@ -417,6 +417,56 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #doneBadge.eagle { background: #f3e2c2; border-color: #a8804e; }
 #doneBadge.alb { background: #e6defa; border-color: #7d6bb8; }
 @media (prefers-reduced-motion: reduce) { #trackPanel, #doneBadge.show { animation: none; } }
+/* ---------- 17. WORLDS AND THE WORLD MAP ---------- */
+#worlds { background: var(--v-surface); background-image: var(--v-dots); background-size: var(--v-dots-size); }
+#worldsHome { left: 24px; top: 24px; }
+#worlds #mapWallet { right: 224px; top: 30px; }
+#worlds #shopBtn { right: 124px; top: 24px; }
+#worldGrid { position: absolute; left: 52px; top: 136px; width: 1096px; display: grid; grid-template-columns: repeat(5, 200px); gap: 24px; }
+#worldGrid .wcard { position: relative; width: 200px; height: 248px; border-radius: var(--v-r-xl); border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; padding: 0; overflow: hidden;
+  animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#worldGrid .wcard:active { transform: translateY(4px); }
+#worldGrid .wcard .art { width: 116px; height: 116px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 253, 247, .85); }
+#worldGrid .wcard .art svg { width: 84px; height: 84px; }
+#worldGrid .wcard .num { position: absolute; left: 12px; top: 8px; font: 800 30px var(--v-font); color: var(--v-ink-strong); }
+#worldGrid .wcard .tally { display: flex; align-items: center; gap: 4px; padding: 2px 12px; border-radius: 999px; background: rgba(255, 253, 247, .9); font: 800 26px var(--v-font); color: var(--v-ink-strong); }
+#worldGrid .wcard .tally .star { width: 26px; height: 26px; fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 4; }
+#worldGrid .wcard .moon { position: absolute; right: 10px; top: 10px; width: 34px; height: 34px; }
+#worldGrid .wcard.locked { background: var(--v-mute) !important; border-color: var(--v-mute-line); }
+#worldGrid .wcard.locked .art { opacity: .45; }
+#worldGrid .wcard .lock { position: absolute; right: 12px; top: 12px; width: 40px; height: 40px; }
+#world { background: var(--v-surface); }
+#worldBack { left: 24px; top: 24px; }
+#worldBadge { left: 128px; top: 30px; font-size: 40px; }
+#worldBadge .ic svg, #mapBadge .ic svg { width: 54px; height: 54px; display: block; }
+#world #trophyBtn { left: auto; right: 24px; top: 24px; }
+#worldPath, #worldDecor { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#worldDecor svg { position: absolute; width: 80px; height: 80px; opacity: .22; }
+#worldNodes .cnode { position: absolute; width: 168px; height: 168px; margin: -84px 0 0 -84px; border-radius: 50%; font: 900 80px var(--v-font);
+  animation: popIn .4s cubic-bezier(.3, 1.6, .5, 1) both; }
+#worldNodes .cnode.go { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 8px 0 var(--v-green-down); color: #fff; }
+#worldNodes .cnode.done { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 8px 0 var(--v-yellow-down); }
+#worldNodes .cnode.night { width: 128px; height: 128px; margin: -64px 0 0 -64px; font-size: 56px; background: #1d1240; border-color: #ff3df2; box-shadow: 0 0 18px #ff3df2, 0 6px 0 #0b0620; color: #2ef2ff; }
+#worldNodes .cnode.night.locked { background: #3a3358; border-color: #5a4f80; box-shadow: 0 6px 0 #1b1730; color: #8a80b0; }
+#worldNodes .cnode .lock { position: absolute; right: -6px; top: -6px; width: 44px; height: 44px; }
+#worldNodes .cnode .tally { position: absolute; top: calc(100% + 10px); left: 50%; translate: -50% 0; white-space: nowrap; display: flex; align-items: center; gap: 4px;
+  padding: 2px 12px; border-radius: 999px; background: var(--v-surface); border: 3px solid var(--v-surface-line); font: 800 24px var(--v-font); color: var(--v-ink-strong); }
+#worldNodes .cnode .tally .star { width: 24px; height: 24px; fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 4; }
+#worldNodes .cnode.night .tally { top: calc(100% + 6px); font-size: 20px; }
+#worldNodes .cnode .crazyN { position: absolute; left: -14px; bottom: -6px; display: flex; align-items: center; font: 800 20px var(--v-font); color: var(--v-ink-strong); }
+#worldNodes .cnode .crazyN svg { width: 34px; height: 34px; }
+#worldBall { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #e6d2ab);
+  box-shadow: 0 6px 0 rgba(47, 36, 26, .25); pointer-events: none; display: none; animation: hop 1s ease-in-out infinite; }
+#worldBall.show { display: block; }
+@keyframes hop { 50% { translate: 0 -14px; } }
+#mapBack { left: 24px; top: 24px; }
+#mapBadge { left: 128px; top: 30px; font-size: 40px; gap: 6px; }
+#mapBadge.night { background: #1d1240; border-color: #ff3df2; color: #2ef2ff; }
+#practiceBtn { left: auto; right: 24px; top: 24px; }
+#mapLost { left: 316px; top: 30px; }
+#map #trophyBtn { display: none; }
+@media (prefers-reduced-motion: reduce) { #worldGrid .wcard, #worldNodes .cnode, #worldBall { animation: none; } }
 </style>
 </head>
 <body>
@@ -467,9 +517,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     </div>
   </section>
-  <section class="scene panel" id="map">
-    <div id="worldTabs"></div>
+  <section class="scene panel" id="worlds" aria-label="worlds">
+    <button class="btn" id="worldsHome" aria-label="title"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
     <button class="btn" id="setBtn" aria-label="settings"><svg viewBox="0 0 64 64"><path d="M32 6 l5 7 8-3 1 9 8 3-4 8 4 8-8 3-1 9-8-3-5 7-5-7-8 3-1-9-8-3 4-8-4-8 8-3 1-9 8 3z" fill="#a8804e"/><circle cx="32" cy="32" r="10" fill="#fff8ec"/></svg></button>
+    <div class="chip" id="mapWallet" aria-label="coins"><svg class="coin" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="35" r="26" fill="#c69334"/><circle cx="32" cy="30" r="26" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="32" cy="30" r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M32 20 L35 27 L42 27 L36.5 31.5 L38.5 39 L32 34.5 L25.5 39 L27.5 31.5 L22 27 L29 27 Z" fill="#dca63f"/></svg><span id="mapCoinsN">0</span></div>
+    <button class="btn" id="shopBtn" aria-label="pro shop"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="11" y="28" width="42" height="28" rx="4" fill="#fff8ec" stroke="#a8804e" stroke-width="4"/><rect x="26" y="36" width="12" height="20" rx="3" fill="#6fc0df"/><path d="M6 12 H58 L58 24 H6 Z" fill="#ef7d6d"/><path d="M19 12 V24 M32 12 V24 M45 12 V24" stroke="#fff8ec" stroke-width="6"/><path d="M6 24 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 Z" fill="#c95a4c"/></svg></button>
+    <div id="worldGrid"></div>
     <div id="settings" class="live" aria-label="settings">
       <div id="setPanel">
         <button class="btn" id="soundBtn" aria-label="sound"><svg viewBox="0 0 64 64"><path d="M10 24 H22 L36 12 V52 L22 40 H10 Z" fill="#8a7360"/><path class="wave" d="M44 22 Q52 32 44 42 M50 16 Q62 32 50 48" fill="none" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path class="cross" d="M44 24 L58 40 M58 24 L44 40" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></button>
@@ -478,13 +531,21 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
         <button class="btn go" id="setClose" aria-label="close"><svg viewBox="0 0 64 64"><path d="M14 34 L26 46 L50 20" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
-    <div class="chip" id="mapWallet" aria-label="coins"><svg class="coin" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="35" r="26" fill="#c69334"/><circle cx="32" cy="30" r="26" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="32" cy="30" r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M32 20 L35 27 L42 27 L36.5 31.5 L38.5 39 L32 34.5 L25.5 39 L27.5 31.5 L22 27 L29 27 Z" fill="#dca63f"/></svg><span id="mapCoinsN">0</span></div>
-    <button class="btn" id="shopBtn" aria-label="pro shop"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="11" y="28" width="42" height="28" rx="4" fill="#fff8ec" stroke="#a8804e" stroke-width="4"/><rect x="26" y="36" width="12" height="20" rx="3" fill="#6fc0df"/><path d="M6 12 H58 L58 24 H6 Z" fill="#ef7d6d"/><path d="M19 12 V24 M32 12 V24 M45 12 V24" stroke="#fff8ec" stroke-width="6"/><path d="M6 24 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 Z" fill="#c95a4c"/></svg></button>
-    <button class="btn" id="nightBtn" aria-label="night courses"><svg viewBox="0 0 64 64"><path d="M40 8 A24 24 0 1 0 56 42 A20 20 0 0 1 40 8 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4" stroke-linejoin="round"/><circle cx="16" cy="14" r="3" fill="#ffd66e"/><circle cx="54" cy="16" r="2.5" fill="#ffd66e"/></svg></button>
-    <button class="btn" id="practiceBtn" aria-label="practice"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#fffdf7" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="15" fill="none" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="5" fill="#ef7d6d"/></svg></button>
-    <div id="courseTabs"></div>
+  </section>
+  <section class="scene panel" id="world" aria-label="world">
+    <button class="btn" id="worldBack" aria-label="worlds"><svg viewBox="0 0 64 64"><path d="M38 12 L18 32 L38 52" fill="none" stroke="#a8804e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="chip" id="worldBadge" aria-label="world"><span class="ic"></span><span id="worldBadgeN">1</span></div>
     <button class="btn" id="trophyBtn" aria-label="birdie tracker"><svg viewBox="0 0 64 64"><path d="M18 8 H46 V22 A14 14 0 0 1 18 22 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><path d="M18 12 H8 Q8 26 20 28 M46 12 H56 Q56 26 44 28" fill="none" stroke="#dca63f" stroke-width="4"/><path d="M32 36 V46 M20 56 H44 L40 46 H24 Z" fill="#dca63f" stroke="#dca63f" stroke-width="4" stroke-linejoin="round"/></svg></button>
+    <svg id="worldPath" viewBox="0 0 1200 700" aria-hidden="true"></svg>
+    <div id="worldDecor" aria-hidden="true"></div>
+    <div id="worldNodes"></div>
+    <div id="worldBall" aria-hidden="true"></div>
     <div id="tracker" class="live" aria-label="tracker"><div id="trackPanel"><div id="trackTotals"></div><div id="trackGrid"></div><button class="btn go" id="trackClose" aria-label="close"><svg viewBox="0 0 64 64"><path d="M14 34 L26 46 L50 20" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+  </section>
+  <section class="scene panel" id="map">
+    <button class="btn" id="mapBack" aria-label="world"><svg viewBox="0 0 64 64"><path d="M38 12 L18 32 L38 52" fill="none" stroke="#a8804e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="chip" id="mapBadge" aria-label="course"><span class="ic"></span><span id="mapBadgeN">1</span></div>
+    <button class="btn" id="practiceBtn" aria-label="practice"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#fffdf7" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="15" fill="none" stroke="#ef7d6d" stroke-width="6"/><circle cx="32" cy="32" r="5" fill="#ef7d6d"/></svg></button>
     <div class="chip" id="mapLost" aria-label="lost balls found"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg><span id="mapLostN">0</span></div>
     <svg id="pathLine" viewBox="0 0 1200 700" aria-hidden="true"></svg>
     <div id="holePath"></div>

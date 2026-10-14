@@ -1829,7 +1829,6 @@ function openTracker() {
 }
 
 function initExtras() {
-  nightBtn.addEventListener('click', () => { sfx('tap'); mapNight = !mapNight; mapWorld = mapNight ? NIGHT + dayOf(mapWorld) : dayOf(mapWorld); renderMap(); });
   practiceBtn.addEventListener('click', () => { sfx('tap'); practiceMode = !practiceMode; renderMap(); });
   dailyBtn.addEventListener('click', () => { const ds = dayStr(); goHole(dailyKey(ds), { daily: ds }); });
   doneShare.addEventListener('click', shareShot);
@@ -1839,6 +1838,7 @@ function initExtras() {
 
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
+const MOON_SVG = '<svg class="moon" viewBox="0 0 64 64" aria-hidden="true"><path d="M40 8 A24 24 0 1 0 56 42 A20 20 0 0 1 40 8 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/></svg>';
 const CRAZY_SVG = '<svg class="crazy" viewBox="0 0 64 64" aria-hidden="true"><path d="M36 2 L12 36 H30 L24 62 L52 24 H34 Z" fill="#ffd66e" stroke="#c95a4c" stroke-width="4" stroke-linejoin="round"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
@@ -1862,7 +1862,7 @@ function renderTitleStrip(cur) {
     b.className = 'btn' + (w === cur ? ' on' : '') + (open ? '' : ' locked');
     b.setAttribute('aria-label', 'course ' + w);
     b.innerHTML = (lookOf(w).icon || `<span class="n">${w}</span>`) + (open ? (stars ? `<span class="tally">${stars}</span>` : '') : LOCK_SVG);
-    b.onclick = () => { if (open) { sfx('tap'); showMap(w); } else sfx('boink'); };
+    b.onclick = () => { if (open) { sfx('tap'); showWorld(w); } else sfx('boink'); };
     titleStrip.append(b);
   }
 }
@@ -1870,36 +1870,84 @@ function tickTitle(dt) {
   if ((titleT += dt) < 8 || reducedMotion()) return;
   titleCourse++; wipe(); showTitle();
 }
+/* the ten worlds as big cards; each opens its world map */
+function showWorlds() {
+  if (currentScene === 'title' || currentScene === 'world' || currentScene === 'card') wipe();
+  setRead(false); play.swing = null; play.aimDrag = null; hideAim();
+  showScene('worlds');
+  worldGrid.innerHTML = '';
+  WORLD_ORDER.forEach((w, i) => {
+    const open = progress.worlds.includes(w) && !!WORLDS[w], look = lookOf(w), b = document.createElement('button');
+    const stars = coursesOf(w).flatMap(c => [c, NIGHT + c]).reduce((a, c) => a + (WORLDS[c] ? WORLDS[c].holes.reduce((t, h) => t + ((progress.holes[h.key] || {}).stars || 0), 0) : 0), 0);
+    const night = coursesOf(w).some(c => progress.worlds.includes(NIGHT + c));
+    b.className = 'wcard' + (open ? '' : ' locked');
+    b.style.background = `linear-gradient(${look.sky[0]}, ${look.sky[1]})`; b.style.animationDelay = (i * 0.03) + 's';
+    b.setAttribute('aria-label', 'world ' + w);
+    b.innerHTML = `<span class="num">${w}</span><span class="art">${look.icon || ''}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}</span>` : LOCK_SVG) + (night ? MOON_SVG : '');
+    b.onclick = () => { if (open) { sfx('tap'); showWorld(w); } else sfx('boink'); };
+    worldGrid.append(b);
+  });
+  soundBtn.classList.toggle('off', !progress.sound);
+  renderWallet();
+}
+/* a world's map, Mario style: its three courses along a winding path by day, their neon night
+   remixes below, and the ball hopping on the course to play next */
+const WORLD_POS = [[230, 300], [600, 236], [970, 300]], NIGHT_POS = [[230, 560], [600, 600], [970, 560]];
+function showWorld(w) {
+  if (currentScene !== 'world') wipe();
+  mapWorld = w; mapNight = false;
+  setRead(false); play.swing = null; play.aimDrag = null; hideAim();
+  showScene('world');
+  const look = lookOf(w), cs = coursesOf(w);
+  world.style.background = `linear-gradient(${look.sky[0]}, ${look.sky[1]} 55%, ${look.felt} 55%, ${look.felt})`;
+  worldBadge.querySelector('.ic').innerHTML = look.icon || ''; worldBadgeN.textContent = w;
+  const curve = ps => 'M' + ps.map(p => p.join(' ')).join(' L');
+  worldPath.innerHTML = `<path d="${curve(WORLD_POS.slice(0, cs.length))}" fill="none" stroke="#fffdf7" stroke-width="26" stroke-linecap="round" stroke-dasharray="2 38" opacity=".9"/>`
+    + `<path d="${curve(NIGHT_POS.slice(0, cs.length))}" fill="none" stroke="#ff3df2" stroke-width="18" stroke-linecap="round" stroke-dasharray="2 30" opacity=".7"/>`
+    + cs.map((_, k) => `<path d="M${WORLD_POS[k][0]} ${WORLD_POS[k][1] + 100} L${NIGHT_POS[k][0]} ${NIGHT_POS[k][1] - 80}" stroke="#fffdf7" stroke-width="8" stroke-dasharray="2 16" stroke-linecap="round" opacity=".6"/>`).join('');
+  /* scenery: the world's emblem scattered faintly round the paths */
+  const r = rng32(w * 97);
+  const spots = [];
+  for (let i = 0; i < 200 && spots.length < 9; i++) {
+    const x = 40 + r() * 1080, y = 120 + r() * 500;
+    if (WORLD_POS.concat(NIGHT_POS).every(([nx, ny]) => Math.hypot(x + 40 - nx, y + 40 - ny) > 170) && spots.every(([sx, sy]) => Math.hypot(x - sx, y - sy) > 110)) spots.push([x, y]);
+  }
+  worldDecor.innerHTML = spots.map(([x, y]) => `<span style="position:absolute;left:${x.toFixed(0)}px;top:${y.toFixed(0)}px">${look.icon || ''}</span>`).join('');
+  worldNodes.innerHTML = '';
+  let next = null;
+  cs.forEach((c, k) => {
+    for (const night of [false, true]) {
+      const id = night ? NIGHT + c : c, open = progress.worlds.includes(id) && !!WORLDS[id], hs = WORLDS[id] ? WORLDS[id].holes : [];
+      const stars = hs.reduce((t, h) => t + ((progress.holes[h.key] || {}).stars || 0), 0), done = hs.length && hs.every(h => progress.holes[h.key]);
+      const crazy = hs.filter(h => h.crazy).length, [x, y] = (night ? NIGHT_POS : WORLD_POS)[k], b = document.createElement('button');
+      b.className = 'btn cnode' + (night ? ' night' : '') + (open ? (done ? ' done' : night ? '' : ' go') : ' locked');
+      b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.animationDelay = (k * 0.08 + (night ? 0.2 : 0)) + 's';
+      b.setAttribute('aria-label', (night ? 'night course ' : 'course ') + (k + 1));
+      b.innerHTML = `<span class="n">${k + 1}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}/${hs.length * 3}</span>` + (crazy && !night ? `<span class="crazyN">${CRAZY_SVG.replace('class="crazy"', '')}${crazy}</span>` : '') : LOCK_SVG);
+      b.onclick = () => { if (open) { sfx('tap'); showMap(id); } else sfx('boink'); };
+      worldNodes.append(b);
+      if (!night && open && !done && !next) next = [x, y];
+    }
+  });
+  worldBall.classList.toggle('show', !!next);
+  if (next) { worldBall.style.left = next[0] + 'px'; worldBall.style.top = (next[1] - 118) + 'px'; }
+}
 function showMap(w) {
-  if (currentScene === 'hole' || currentScene === 'card') wipe();
+  if (currentScene !== 'map') wipe();
   setRead(false);
-  if (w) { mapWorld = w; mapNight = isNight(w); }
-  if (!WORLDS[mapWorld]) { mapWorld = playable()[0]; mapNight = false; }
+  if (w) mapWorld = w;
+  if (!WORLDS[mapWorld]) mapWorld = playable()[0];
+  mapNight = isNight(mapWorld);
   play.swing = null; play.aimDrag = null; hideAim();
   showScene('map');
   renderMap();
 }
 function renderMap() {
-  worldTabs.innerHTML = '';
-  const off = mapNight ? NIGHT : 0, curW = worldOf(dayOf(mapWorld));
-  for (const d of WORLD_ORDER) {
-    const w = off + d, open = progress.worlds.includes(w) && !!WORLDS[w], b = document.createElement('button');
-    b.className = 'btn' + (mapNight ? ' night' : '') + (d === curW ? ' on' : '') + (open ? '' : ' locked');
-    b.setAttribute('aria-label', (mapNight ? 'night course ' : 'course ') + d);
-    b.innerHTML = (lookOf(d).icon || `<span class="n">${d}</span>`) + (open ? '' : LOCK_SVG);
-    b.onclick = () => { if (open) { mapWorld = w; sfx('tap'); renderMap(); } else sfx('boink'); };
-    worldTabs.append(b);
-  }
-  /* the world's three courses: 1, 2, 3, each opened by finishing the one before */
-  courseTabs.innerHTML = '';
-  coursesOf(curW).forEach((c, k) => {
-    const id = off + c, open = progress.worlds.includes(id) && !!WORLDS[id], b = document.createElement('button');
-    b.className = 'btn' + (id === mapWorld ? ' on' : '') + (open ? '' : ' locked');
-    b.setAttribute('aria-label', 'course ' + (k + 1));
-    b.innerHTML = `<span class="n">${k + 1}</span>` + (open ? '' : LOCK_SVG);
-    b.onclick = () => { if (open) { mapWorld = id; sfx('tap'); renderMap(); } else sfx('boink'); };
-    courseTabs.append(b);
-  });
+  const w = worldOf(dayOf(mapWorld)), k = coursesOf(w).indexOf(dayOf(mapWorld)) + 1;
+  mapBadge.querySelector('.ic').innerHTML = lookOf(w).icon || ''; mapBadgeN.textContent = k;
+  mapBadge.classList.toggle('night', mapNight);
+  const sky = lookOf(w).sky;
+  map.style.background = mapNight ? 'linear-gradient(#05020f, #2a0b4d)' : `linear-gradient(${sky[0]}, ${sky[1]})`;
   const holes = WORLDS[mapWorld] ? WORLDS[mapWorld].holes : [], pts = NODE_POS.slice(0, holes.length);
   pathLine.innerHTML = `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="var(--v-surface-line)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 34"/>`;
   holePath.innerHTML = '';
@@ -1917,11 +1965,12 @@ function renderMap() {
   });
   soundBtn.classList.toggle('off', !progress.sound);
   map.classList.toggle('night', mapNight); map.classList.toggle('practice', practiceMode);
-  nightBtn.classList.toggle('on', mapNight); practiceBtn.classList.toggle('on', practiceMode);
+  practiceBtn.classList.toggle('on', practiceMode);
   mapLostN.textContent = holes.filter(h => progress.lost[h.key]).length + '/' + holes.length;
   renderWallet();
 }
 function showCard(w) {
+  mapWorld = w;
   const holes = WORLDS[w].holes;
   /* a course played out of order (?hole=, or a gapped save) has no full card yet: back to its map */
   if (holes.some(h => !progress.holes[h.key])) { showMap(w); return; }
@@ -1940,7 +1989,7 @@ function showCard(w) {
   cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
   const list = playable(), d = dayOf(w), nd = WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd && (isNight(w) ? NIGHT + nd : nd);
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
-  cardNext.onclick = () => { sfx('tap'); showMap(next); };
+  cardNext.onclick = () => { sfx('tap'); showWorld(worldOf(dayOf(next))); };
   showScene('card');
   burst(new THREE.Vector3().copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(1.6)), 140);
   sfx('fanfare');
@@ -2076,8 +2125,11 @@ function boot() {
   setHand(progress.hand);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
-  titleGo.addEventListener('click', () => { sfx('tap'); showMap(); });
-  cardMap.addEventListener('click', () => { sfx('tap'); showMap(); });
+  titleGo.addEventListener('click', () => { sfx('tap'); showWorlds(); });
+  worldsHome.addEventListener('click', () => { sfx('tap'); wipe(); showTitle(); });
+  worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
+  mapBack.addEventListener('click', () => { sfx('tap'); showWorld(worldOf(dayOf(mapWorld))); });
+  cardMap.addEventListener('click', () => { sfx('tap'); showWorld(worldOf(dayOf(mapWorld))); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
   doneRetry.addEventListener('click', () => goHole(play.key, { daily: play.daily, friend: play.friend }));
   initExtras();

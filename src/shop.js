@@ -914,7 +914,7 @@ function initShop() {
   saveProgress();
   holeDone.insertAdjacentHTML('beforeend', `<div class="chip" id="doneCoins" aria-label="coins won">${COIN_SVG}<span class="n">+0</span></div>`);
   shopBtn.addEventListener('click', openShop);
-  shopBack.addEventListener('click', () => { sfx('tap'); showMap(); });
+  shopBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
   shopTabPutters.addEventListener('click', () => shopSetTab('putter'));
   shopTabBalls.addEventListener('click', () => shopSetTab('ball'));
   shopTabMull.addEventListener('click', () => shopSetTab('mull'));

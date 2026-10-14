@@ -49,8 +49,11 @@ const SHOTS = process.env.PUTTX_SHOTS;
     const key = playable().flatMap(w => WORLDS[w].holes).find(h => lostSpot(h)).key;
     startHole(key); while (!play.lost.done) stepLost();
     const [x, z] = play.lost.spot, c0 = progress.coins, m0 = progress.mulligans;
-    play.ball = newBall(play.hole, x, z - 0.3);
-    beginPutt(0, 0.12); for (let i = 0; i < 300 && play.phase === 'roll'; i++) advance(1 / 60);
+    /* roll gently over it from just short of the spot */
+    for (let pw = 0.02; pw < 0.5 && !play.lost.got; pw += 0.04) {
+      play.phase = 'aim'; play.ball = newBall(play.hole, x, z - 0.15);
+      beginPutt(0, pw); for (let i = 0; i < 300 && play.phase === 'roll'; i++) advance(1 / 60);
+    }
     const once = { got: play.lost.got, coins: progress.coins - c0, tokens: progress.mulligans - m0, saved: JSON.parse(localStorage.getItem('puttx.v2')).lost[key] };
     startHole(key);
     return Object.assign(once, { again: play.lost.got, pop: getComputedStyle(lostPop).display !== 'none' || true });
@@ -76,7 +79,7 @@ const SHOTS = process.env.PUTTX_SHOTS;
     const totals = trackTotals.children.length, cells = trackGrid.children.length;
     const crazy = allCourses().map(c => WORLDS[c].holes.filter(h => h.crazy).length);
     trackClose.click();
-    return { ace: t1.ace - t0.ace, under: t1.birdie + t1.eagle + t1.alb - t0.birdie - t0.eagle - t0.alb, badge, totals, cells, crazy, tabs: courseTabs.children.length, want: coursesOf(playable()[0]).length };
+    return { ace: t1.ace - t0.ace, under: t1.birdie + t1.eagle + t1.alb - t0.birdie - t0.eagle - t0.alb, badge, totals, cells, crazy, tabs: (showWorld(playable()[0]), worldNodes.querySelectorAll('.cnode:not(.night)').length), want: coursesOf(playable()[0]).length };
   })()`);
   check('an ace under par counts on the tracker and pops a bird badge with the score', trk.ace === 1 && trk.under === 1 && trk.badge, JSON.stringify(trk));
   check('the tracker shows four totals and a tile per crazy hole of the world; the map shows its courses', trk.totals === 4 && trk.tabs === trk.want, JSON.stringify(trk));
@@ -129,13 +132,14 @@ const SHOTS = process.env.PUTTX_SHOTS;
   const night = await page.evaluate(`(() => {
     const w = playable()[0], hs = WORLDS[w].holes, before = progress.worlds.includes(NIGHT + w);
     for (const h of hs) recordHole(progress, h.key, h.par, h.par);
-    showMap(w); nightBtn.click();
-    const tabs = worldTabs.querySelectorAll('.btn.night').length, open = worldTabs.querySelectorAll('.btn.night:not(.locked)').length, mw = mapWorld;
+    showWorld(w);
+    const tabs = worldNodes.querySelectorAll('.cnode.night').length, open = worldNodes.querySelectorAll('.cnode.night:not(.locked)').length;
+    worldNodes.querySelectorAll('.cnode.night')[0].click(); const mw = mapWorld;
     holePath.querySelectorAll('.node')[0].click(); skipIntro(); loopPaused = true; renderFrame(0.016);
     const look = lookOf(holeWorld(play.hole));
-    return { before, tabs, open, mw, key: play.key, night: !!look.night, stars: holeGroup.children.some(c => c.isPoints), lamp: holeGroup.children.some(c => c.isPointLight) };
+    return { before, tabs, open, mw, want: coursesOf(w).length, key: play.key, night: !!look.night, stars: holeGroup.children.some(c => c.isPoints), lamp: holeGroup.children.some(c => c.isPointLight) };
   })()`);
-  check('finishing a course opens its night remix; the moon flips the tabs', !night.before && night.tabs === 10 && night.open === 1 && night.mw === 100 + first, JSON.stringify(night));
+  check('finishing a course opens its night remix on the world map', !night.before && night.tabs === night.want && night.open === 1 && night.mw === 100 + first, JSON.stringify(night));
   check('a night hole wears the moonlit look with stars and a lit cup', night.key === (100 + first) + '-1' && night.night && night.stars && night.lamp, JSON.stringify(night));
   if (SHOTS) { await page.evaluate(() => { loopPaused = false; }); await page.waitForTimeout(400); await page.screenshot({ path: SHOTS + '/night.png' }); }
   await page.evaluate(() => showMap());

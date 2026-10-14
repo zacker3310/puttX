@@ -1,7 +1,7 @@
 /* ui-check (browser): title -> map -> hole -> result -> next -> card, with no words and no tap
    target under 64 px anywhere; ten course tabs, 18 holes per course; locked holes and courses
    boink; a course's last hole opens its card, which totals 18 holes and leads to the next
-   course; the speaker toggle persists. */
+   course; the speaker toggle persists. Title -> worlds -> world map -> course map -> hole. */
 'use strict';
 const { check, done, open, fresh, visibleLetters, smallTargets } = require('./lib.cjs');
 const tap = (page, id) => page.evaluate(i => document.getElementById(i).click(), id);
@@ -18,21 +18,36 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   check('title: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0);
 
   await tap(page, 'titleGo');
-  const map = await page.evaluate(() => ({ scene: currentScene, tabs: worldTabs.children.length, nodes: holePath.querySelectorAll('.node').length, holes: WORLDS[mapWorld].holes.length,
-    open: holePath.querySelectorAll('.node:not(.locked)').length, lockedTabs: worldTabs.querySelectorAll('.locked').length }));
-  check('map: 10 course tabs, a node per hole, only hole 1 open, the other courses locked', map.scene === 'map' && map.tabs === 10 && map.nodes === map.holes && map.open === 1 && map.lockedTabs === 9, JSON.stringify(map));
+  const worlds = await page.evaluate(() => ({ scene: currentScene, cards: worldGrid.children.length, locked: worldGrid.querySelectorAll('.locked').length }));
+  check('worlds: ten world cards, only the first open', worlds.scene === 'worlds' && worlds.cards === 10 && worlds.locked === 9, JSON.stringify(worlds));
+  check('worlds: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
+  await page.evaluate(() => worldGrid.children[9].click());
+  check('a locked world boinks and stays put', await page.evaluate(() => currentScene === 'worlds' && sfxLog.slice(-1)[0] === 'boink'));
+  await page.evaluate(() => worldGrid.children[0].click());
+  const wm = await page.evaluate(() => ({ scene: currentScene, nodes: worldNodes.children.length, want: coursesOf(playable()[0]).length * 2, open: worldNodes.querySelectorAll('.cnode:not(.locked)').length, ball: worldBall.classList.contains('show') }));
+  check('world map: a day and a night node per course, only course 1 open, the ball on it', wm.scene === 'world' && wm.nodes === wm.want && wm.open === 1 && wm.ball, JSON.stringify(wm));
+  check('world map: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
+  const wOverlap = await page.evaluate(() => {
+    const rs = [...worldNodes.children, worldBack, trophyBtn, worldBadge].map(b => b.getBoundingClientRect()), bad = [];
+    rs.forEach((a, i) => rs.forEach((b, j) => { if (j > i && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) bad.push(i + '/' + j); }));
+    return bad;
+  });
+  check('world map buttons never overlap', wOverlap.length === 0, wOverlap.join());
+  await page.evaluate(() => worldNodes.children[0].click());
+  const map = await page.evaluate(() => ({ scene: currentScene, nodes: holePath.querySelectorAll('.node').length, holes: WORLDS[mapWorld].holes.length,
+    open: holePath.querySelectorAll('.node:not(.locked)').length }));
+  check('course map: a node per hole, only hole 1 open', map.scene === 'map' && map.nodes === map.holes && map.open === 1, JSON.stringify(map));
   check('map: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
   const overlap = await page.evaluate(() => {
-    const rs = [...holePath.querySelectorAll('.node'), ...worldTabs.children].map(b => b.getBoundingClientRect()), bad = [];
+    const rs = [...holePath.querySelectorAll('.node'), mapBack, mapBadge, practiceBtn, mapLost].map(b => b.getBoundingClientRect()), bad = [];
     rs.forEach((a, i) => rs.forEach((b, j) => { if (j > i && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) bad.push(i + '/' + j); }));
     return bad;
   });
   check('map buttons never overlap each other', overlap.length === 0, overlap.join());
 
   await page.evaluate(() => holePath.querySelectorAll('.node')[4].click());
-  await page.evaluate(() => worldTabs.children[9].click());
-  const boink = await page.evaluate(() => ({ scene: currentScene, world: mapWorld, log: sfxLog.slice(-2).join() }));
-  check('locked hole and locked course boink and stay put', boink.scene === 'map' && boink.world === first && boink.log === 'boink,boink', JSON.stringify(boink));
+  const boink = await page.evaluate(() => ({ scene: currentScene, world: mapWorld, log: sfxLog.slice(-1).join() }));
+  check('a locked hole boinks and stays put', boink.scene === 'map' && boink.world === first && boink.log === 'boink', JSON.stringify(boink));
 
   await page.evaluate(() => holePath.querySelectorAll('.node')[0].click());
   check('hole 1 opens the hole scene', await page.evaluate(f => currentScene === 'hole' && play.key === f + '-1', first));
@@ -57,15 +72,15 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
     doneNext.click();
     const pars = hs.reduce((a, h) => a + h.par, 0), total = hs.reduce((a, h) => a + progress.holes[h.key].best, 0);
     return { scene: currentScene, cells: cardRow.children.length, holes: hs.length, total: cardTotal.textContent, want: String(total), diff: cardDiff.textContent, wantDiff: total - pars,
-      next: getComputedStyle(cardNext).display !== 'none', worlds: progress.worlds.join(), second: playable()[1] };
+      next: getComputedStyle(cardNext).display !== 'none', worlds: progress.worlds.join(), second: playable()[1], c2: WORLDS[w + COURSE_STEP] ? w + COURSE_STEP : 0 };
   })()`);
   check('after the last hole the card shows every hole and the total', card.scene === 'card' && card.cells === card.holes && card.total === card.want, JSON.stringify(card));
   check('card shows strokes against par with a sign', card.diff === (card.wantDiff > 0 ? '+' : '') + card.wantDiff, JSON.stringify(card));
-  if (count > 1) check('the next course unlocked; the card offers it', card.worlds === [first, card.second, 100 + first].join() && card.next, JSON.stringify(card));
+  if (count > 1) check('the next world and the next course unlocked; the card offers them', card.worlds === [first, card.second].concat(card.c2 ? [card.c2] : [], [100 + first]).join() && card.next, JSON.stringify(card));
   check('card: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0);
   if (count > 1) {
     await tap(page, 'cardNext');
-    check('next course opens the map on it', await page.evaluate(() => currentScene === 'map' && mapWorld === playable()[1]));
+    check('next opens the world map with the next course waiting', await page.evaluate(() => currentScene === 'world' && worldNodes.querySelectorAll('.cnode:not(.locked)').length >= 2));
   }
 
   await page.evaluate(() => showMap());

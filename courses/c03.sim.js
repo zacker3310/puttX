@@ -65,25 +65,25 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-1.2, 2.6, -0.2, 3.7)), J3_WATER(rect(0.22, 2.6, 0.7, 3.7)), J3_MUD(rect(0.7, 2.6, 1.2, 3.7))],
     posts: [J3_IDOL(-0.2, 5.1)], bumps: [{ x: -0.9, z: 4.6, r: 0.5, h: 0.15 }] },
   /* 13: three temple terraces, each ramp on the other side, a boulder guarding the top */
-  { par: 4, sol: [[44,1,0],[0,0.52,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: [[-1.2, 0], [1.2, 0], [1.2, 2.5], [1.2, 5], [1.2, 7], [1.2, 9], [-1.2, 9], [-1.2, 7], [-1.2, 5], [-1.2, 2.5]],
+  { par: 4, sol: [[44,0.84,0],[14,0.64,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: [[-1.2, 0], [1.2, 0], [1.2, 2.5], [1.2, 5], [1.2, 7], [1.2, 9], [-1.2, 9], [-1.2, 7], [-1.2, 5], [-1.2, 2.5]],
     ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.15, h1: 0.3 },
       { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.42 }],
     tiers: [{ poly: rect(-1.2, 2.5, 1.2, 5), h: 0.15 }, { poly: rect(-1.2, 5, 1.2, 7), h: 0.3 }, { poly: rect(-1.2, 7, 1.2, 9), h: 0.42 }],
     zones: [J3_MUD(rect(-0.2, 3.3, 1.2, 3.9)), J3_MUD(rect(0.5, 5.6, 1.2, 6.3))], posts: [J3_IDOL(-0.6, 5.9), J3_IDOL(0.75, 4.6)],
     movers: [J3_ROCK(-0.8, 7.75, 0.8, 7.75, 2.4)], bumps: [{ x: 0.5, z: 8.4, r: 0.45, h: -0.08 }] },
   /* 14: down the river bank: a skinny bridge early, a wide one late behind the boulder */
-  { par: 4, sol: [[6,0.88,0],[82,1,0]], tee: [-1.0, 0.6], cup: [1.0, 7.3], shape: rect(-1.6, 0, 1.6, 8),
+  { par: 4, sol: [[342,1,0],[124,0.84,1]], tee: [-1.0, 0.6], cup: [1.0, 7.3], shape: rect(-1.6, 0, 1.6, 8),
     zones: [J3_WATER(rect(-0.4, 0, 0.4, 2.6)), J3_WATER(rect(-0.4, 3.0, 0.4, 6.0)), J3_WATER(rect(-0.4, 6.7, 0.4, 8)), J3_MUD(rect(-1.6, 4.2, -0.4, 4.8))],
     movers: [J3_ROCK(0.6, 4.4, 1.25, 4.4, 2.0)], posts: [J3_IDOL(0.75, 6.8, 0.11)], bumps: [{ x: 1.0, z: 2.0, r: 0.5, h: 0.2 }] },
   /* 15: the idol's eye. Drop off the deck, thread the tunnel between the idols, or leap the river */
-  { par: 4, crazy: true, sol: [[314,1,0],[0,0.2,0]], tee: [0, 0.5], cup: [-0.5, 7.4], shape: rect(-1, 0, 1, 8.2),
+  { par: 4, crazy: true, sol: [[352,0.99,0]], tee: [0, 0.5], cup: [-0.5, 7.4], shape: rect(-1, 0, 1, 8.2),
     tiers: [{ poly: rect(-1, 0, 1, 2.5), h: 0.4 }, { poly: rect(-1, 2.5, 1, 4.5), h: 0.2 }],
     inner: [[[-1, 2.5], [-0.35, 2.5]], [[0.35, 2.5], [1, 2.5]], [[-1, 4.5], [0.2, 4.5]]],
     zones: [J3_WATER(rect(-1, 4.5, 1, 5.1)), J3_MUD(rect(0.2, 5.1, 1, 6.0))],
     tubes: [{ a: [0.6, 4.05], b: [-0.6, 5.6], dir: 0, keep: 0.4 }], posts: [J3_IDOL(0.6, 3.6), J3_IDOL(0.25, 3.95), J3_IDOL(-0.1, 6.9)],
     bumps: [{ x: 0.5, z: 6.9, r: 0.5, h: 0.2 }] },
   /* 16: the lost city: over the hill, across the stream, up to the plaza, through the gate tunnel */
-  { par: 5, crazy: true, sol: [[348,0.68,0],[34,1,0],[0,0.4,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[322,0.96,0],[38,1,0],[0,0.4,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [0.8, 6.0], [1.8, 6.0], [1.8, 0], [3.4, 0], [3.4, 2.4], [3.4, 7.8], [-0.8, 7.8], [-0.8, 3.6]],
     bumps: [{ x: 0, z: 2.0, r: 0.6, h: 0.35 }],
     ramps: [{ x0: 0.8, z0: 6.0, x1: 1.8, z1: 7.8, axis: 'x', h0: 0, h1: 0.3 }],
@@ -93,7 +93,7 @@ registerWorld(3, { holes: [
     tubes: [{ a: [2.6, 3.0], b: [2.6, 2.0], dir: 180, keep: 0, add: 0.5 }],
     posts: [J3_IDOL(3.1, 3.4), J3_IDOL(2.1, 3.4), J3_IDOL(2.15, 0.8)] },
   /* 17: the boulder gauntlet down the temple corridor */
-  { par: 4, sol: [[352,0.96,0]], tee: [0, 0.5], cup: [-1.4, 7.6], aim0: 0,
+  { par: 4, sol: [[352,1,0]], tee: [0, 0.5], cup: [-1.4, 7.6], aim0: 0,
     shape: [[-0.6, 0], [0.6, 0], [0.6, 8.4], [-2.0, 8.4], [-2.0, 6.8], [-0.6, 6.8]],
     zones: [J3_MUD(rect(-0.6, 1.8, -0.15, 2.4)), J3_MUD(rect(0.15, 3.6, 0.6, 4.2)), J3_WATER(rect(-2.0, 6.8, -1.0, 7.1))],
     movers: [J3_ROCK(-0.27, 2.9, 0.27, 2.9, 1.8, 0, 0.16), J3_ROCK(0.27, 4.9, -0.27, 4.9, 2.2, 1, 0.16), J3_ROCK(0, 6.3, 0, 7.9, 2.6, 0, 0.16)],

@@ -80,8 +80,8 @@ unlocks the next course.
 - **Shot codes.** The share button on the done card makes a link (`?shot=1-7_12.5~0.62~0_...`).
   Opening it plays that hole with the putts as a pink ghost and their score in the HUD.
 - **Practice.** The target on the map: every hole of an open course, free take-backs, nothing saved.
-- **Night remixes.** Finishing a course opens course 100 + n: the same holes mirrored left to
-  right under moonlight, stars and a lit cup. The moon on the map flips the course tabs.
+- **Neon night.** A display mode for any course (the moon on a world map, or in settings): black-light
+  carpet, neon tube walls, a glowing ball and a lit cup. Saved with the progress.
 
 ## Pro shop
 
@@ -92,7 +92,7 @@ cosmetic. Wordless, prices in numerals.
 ## Persistence
 
 `localStorage` key `puttx.v2`: per-hole best and stars, unlocked courses, sound, coins and gear,
-mulligan tokens, lost balls found, goal bits per hole, the daily record and ghosts.
+mulligan tokens, lost balls found, goal bits per hole, the daily record, ghosts and the neon setting.
 Missing or corrupt data falls back to a fresh save. v1 saves are left alone.
 
 ## Verification

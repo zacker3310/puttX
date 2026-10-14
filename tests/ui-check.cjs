@@ -24,8 +24,8 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   await page.evaluate(() => worldGrid.children[9].click());
   check('a locked world boinks and stays put', await page.evaluate(() => currentScene === 'worlds' && sfxLog.slice(-1)[0] === 'boink'));
   await page.evaluate(() => worldGrid.children[0].click());
-  const wm = await page.evaluate(() => ({ scene: currentScene, nodes: worldNodes.children.length, want: coursesOf(playable()[0]).length * 2, open: worldNodes.querySelectorAll('.cnode:not(.locked)').length, ball: worldBall.classList.contains('show') }));
-  check('world map: a day and a night node per course, only course 1 open, the ball on it', wm.scene === 'world' && wm.nodes === wm.want && wm.open === 1 && wm.ball, JSON.stringify(wm));
+  const wm = await page.evaluate(() => ({ scene: currentScene, nodes: worldNodes.children.length, want: coursesOf(playable()[0]).length, open: worldNodes.querySelectorAll('.cnode:not(.locked)').length, ball: worldBall.classList.contains('show') }));
+  check('world map: a node per course, only course 1 open, the ball on it', wm.scene === 'world' && wm.nodes === wm.want && wm.open === 1 && wm.ball, JSON.stringify(wm));
   check('world map: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
   const wOverlap = await page.evaluate(() => {
     const rs = [...worldNodes.children, worldBack, trophyBtn, worldBadge].map(b => b.getBoundingClientRect()), bad = [];
@@ -76,7 +76,7 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   })()`);
   check('after the last hole the card shows every hole and the total', card.scene === 'card' && card.cells === card.holes && card.total === card.want, JSON.stringify(card));
   check('card shows strokes against par with a sign', card.diff === (card.wantDiff > 0 ? '+' : '') + card.wantDiff, JSON.stringify(card));
-  if (count > 1) check('the next world and the next course unlocked; the card offers them', card.worlds === [first, card.second].concat(card.c2 ? [card.c2] : [], [100 + first]).join() && card.next, JSON.stringify(card));
+  if (count > 1) check('the next world and the next course unlocked; the card offers them', card.worlds === [first, card.second].concat(card.c2 ? [card.c2] : []).join() && card.next, JSON.stringify(card));
   check('card: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0);
   if (count > 1) {
     await tap(page, 'cardNext');

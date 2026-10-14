@@ -177,8 +177,6 @@ check('a ball held at the lip of a mound cup settles', lip.end !== 'timeout', JS
   }
   check('a drain is flat under the cup and steepens toward it', flat && steeper);
   check('a ball fed sideways into a drain spirals at least a lap and drops', !!best && laps >= 1, JSON.stringify({ best, laps: +laps.toFixed(2) }));
-  const m = S.mirrorDef({ tee: [0.5, 0.4], cup: [1, 2], shape: S.rect(-2, 0, 2, 4), drains: [{ x: 1, z: 2, r: 1, depth: 0.2 }] });
-  check('night remixes mirror drains', m.drains[0].x === -1);
 }
 
 done();

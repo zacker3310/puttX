@@ -408,7 +408,7 @@ const allCourses = () => WORLD_ORDER.flatMap(coursesOf);
 const worldOf = c => ((c % 100) - 1) % COURSE_STEP + 1;
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
-function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R', mulligans: 5, lost: {}, obj: {}, daily: null }; }
+function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R', mulligans: 5, lost: {}, obj: {}, daily: null, neon: false }; }
 function recordHole(p, key, score, par, maxStars = 3) {
   const prev = p.holes[key];
   const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, Math.min(maxStars, starsFor(score, par))) };
@@ -416,12 +416,10 @@ function recordHole(p, key, score, par, maxStars = 3) {
   /* the last hole of a course opens the next playable course */
   const [w, n] = key.split('-').map(Number), list = playable(), i = list.indexOf(w);
   const open = c => { if (WORLDS[c] && !p.worlds.includes(c)) p.worlds.push(c); };
-  if (WORLDS[w] && n === WORLDS[w].holes.length && w < NIGHT) {
+  if (WORLDS[w] && n === WORLDS[w].holes.length) {
     /* a world's first course opens the next world; each course opens the next one in its world */
     if (i >= 0 && i + 1 < list.length) open(list[i + 1]);
     if (w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
-    /* finishing a course also opens its night remix */
-    open(NIGHT + w);
   }
   return rec;
 }
@@ -433,38 +431,6 @@ function holeUnlocked(p, key) {
 /* Each courses/cNN.sim.js registers one course here (scripts/build.cjs inlines them). */
 /* @@COURSES_SIM@@ */
 
-/* ---- 2i. night remixes ---- */
-/* Course NIGHT + n is course n mirrored left to right (x -> -x). The physics is symmetric under
-   that mirror, so each proof carries over by mirroring its aims; tests/night-check.cjs replays all
-   of them. Spinners turn the other way, gates and tubes and pushes flip, ramps along x swap ends. */
-const NIGHT = 100;
-const mx = p => [-p[0], p[1]], mpoly = poly => poly.map(mx);
-function mirrorDef(d) {
-  const m = Object.assign({}, d);
-  for (const k of ['tee', 'cup']) if (d[k]) m[k] = mx(d[k]);
-  if (d.shape) m.shape = mpoly(d.shape);
-  if (d.floors) m.floors = d.floors.map(mpoly);
-  if (d.walls) m.walls = d.walls.map(mpoly);
-  if (d.inner) m.inner = d.inner.map(mpoly);
-  if (d.tiers) m.tiers = d.tiers.map(t => Object.assign({}, t, { poly: mpoly(t.poly), sx: t.sx ? -t.sx : t.sx }));
-  if (d.ramps) m.ramps = d.ramps.map(r => {
-    const h0 = r.h0 || 0, h1 = r.h1 !== undefined ? r.h1 : r.h, o = Object.assign({}, r, { x0: -r.x1, x1: -r.x0 });
-    delete o.h;
-    return r.axis === 'x' ? Object.assign(o, { h0: h1, h1: h0 }) : Object.assign(o, { h0, h1 });
-  });
-  if (d.bumps) m.bumps = d.bumps.map(b => Object.assign({}, b, { x: -b.x }));
-  if (d.drains) m.drains = d.drains.map(b => Object.assign({}, b, { x: -b.x }));
-  if (d.zones) m.zones = d.zones.map(z => Object.assign({}, z, { poly: mpoly(z.poly) }, z.push ? { push: [-z.push[0], z.push[1]] } : {}));
-  if (d.posts) m.posts = d.posts.map(q => Object.assign({}, q, { x: -q.x }));
-  if (d.movers) m.movers = d.movers.map(v => v.kind === 'spin' ? Object.assign({}, v, { x: -v.x, w: -v.w, phase: -(v.phase || 0) })
-    : Object.assign({}, v, { ax: -v.ax, bx: -v.bx }, v.kind === 'gate' ? { ang: -(v.ang || 0) } : {}));
-  if (d.tubes) m.tubes = d.tubes.map(t => Object.assign({}, t, { a: mx(t.a), b: mx(t.b), dir: -t.dir }));
-  if (d.aim0 !== undefined) m.aim0 = -d.aim0;
-  if (d.sol) m.sol = d.sol.map(([a, p, t0]) => [(360 - a) % 360, p, t0]);
-  return m;
-}
-for (const w of allCourses()) registerWorld(NIGHT + w, { g: WORLDS[w].g, feltMu: WORLDS[w].feltMu, holes: WORLDS[w].defs.map(mirrorDef) });
-const isNight = w => w > NIGHT;
 // #endregion sim
 
 /* ============ 3. SAVE ============ */
@@ -566,14 +532,13 @@ const WORLD_LOOK = {};
 const DEFAULT_LOOK = { felt: '#36803a', wall: '#ffd66e', ground: '#c9a476', sky: ['#9fd8ef', '#fff1d6'], fog: true,
   sand: '#8a6236', ice: '#2f7ea6', mud: '#5b4630', fast: '#3f5f86', water: '#2f86c8', push: '#e9a23b', skirt: '#8a6538', tube: '#ef7d6d',
   flag: '#ef7d6d', jingle: [523, 659, 784, 1047], icon: '' };
-const dayOf = w => w > NIGHT ? w - NIGHT : w;
 /* a night remix wears its day course's look under a moon: deep sky, dimmer ground, a lit cup */
 const NIGHT_SKY = ['#05020f', '#2a0b4d'];
 const NEON = ['#ff3df2', '#2ef2ff', '#b6ff2e', '#ffb02e', '#8b5cff'];
 const lookOf = w => {
   /* a world's later courses inherit its first course's look and override what they like */
-  const d = dayOf(w), day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[worldOf(d)], d !== worldOf(d) ? WORLD_LOOK[d] : null);
-  if (w <= NIGHT) return day;
+  const day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[worldOf(w)], w !== worldOf(w) ? WORLD_LOOK[w] : null);
+  if (!progress.neon) return day;
   /* night is cosmic bowling: black-light carpet, neon tube walls, a glowing ball, a grid to the horizon */
   return Object.assign(day, { night: true, sky: NIGHT_SKY.slice(), fog: true, felt: '#120b2e', ground: '#06030f', skirt: '#1a0f3d', wall: '#1d1240',
     sand: '#5b2a8f', ice: '#1fd4ff', mud: '#3b1d55', fast: '#d13bff', water: '#2a4dff', push: '#ffb02e', tube: '#b6ff2e', flag: '#ff3df2' });
@@ -1337,7 +1302,7 @@ function startHole(key, opts = {}) {
   return true;
 }
 function goHole(key, opts) {
-  sfx('tap'); wipe(); startHole(key, opts); sfx('jingle', dayOf(Number(key.split('-')[0])));
+  sfx('tap'); wipe(); startHole(key, opts); sfx('jingle', (Number(key.split('-')[0])));
   /* the hole introduces itself: a sweep from over the cup back to the tee, with its number and par */
   if (!reducedMotion()) { play.intro = { t: 0, dur: 2.4 }; snapCamera(); }
   holeBannerN.textContent = key.split('-')[1]; holeBannerPar.textContent = play.hole.par;
@@ -1683,11 +1648,12 @@ function wipe() {
 
 
 /* ---- 6c. extras: modes, lost balls, goals, the daily hole, shot codes, night ---- */
-let practiceMode = false, mapNight = false;
+let practiceMode = false;
 /* save fields this section owns: mulligans (tokens), lost (key -> 1), obj (key -> goal bits), daily */
 function repairExtras(p) {
   if (!Number.isInteger(p.mulligans) || p.mulligans < 0) p.mulligans = 5;
   p.mulligans = Math.min(p.mulligans, 9999);
+  p.neon = p.neon === true;
   const keyed = (o, ok) => { const out = {}; if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) if (/^\d+-\d+$/.test(k) && ok(v)) out[k] = v; return out; };
   p.lost = keyed(p.lost, v => v === 1);
   p.obj = keyed(p.obj, v => Number.isInteger(v) && v >= 1 && v <= 7);
@@ -1946,10 +1912,10 @@ function openTracker() {
   sfx('tap');
   const t = Object.assign({ birdie: 0, eagle: 0, alb: 0, ace: 0 }, progress.tally);
   trackTotals.innerHTML = BIRD_KINDS.map(k => `<div class="tt ${k}" aria-label="${k}">${BIRD_SVG[k]}<span>${t[k]}</span></div>`).join('');
-  const w = worldOf(dayOf(mapWorld)), night = mapNight ? NIGHT : 0, cells = [];
+  const w = worldOf(mapWorld), cells = [];
   coursesOf(w).forEach((c, ci) => WORLDS[c].holes.forEach((h, i) => {
     if (!h.crazy) return;
-    const key = (night + c) + '-' + (i + 1), r = progress.holes[key], b = r && (r.best === 1 && !birdFor(1, h.par) ? 'ace' : birdFor(r.best, h.par));
+    const key = c + '-' + (i + 1), r = progress.holes[key], b = r && (r.best === 1 && !birdFor(1, h.par) ? 'ace' : birdFor(r.best, h.par));
     cells.push(`<div class="tc${b ? ' ' + b : ''}${h.auto ? ' auto' : ''}" aria-label="course ${ci + 1} hole ${i + 1}"><span class="pips">${'<i></i>'.repeat(ci + 1)}</span><span class="n">${i + 1}</span>${b ? BIRD_SVG[b] : `<span class="best">${r ? r.best + '/' + h.par : h.par}</span>`}</div>`);
   }));
   trackGrid.innerHTML = cells.join('');
@@ -1960,12 +1926,13 @@ function initExtras() {
   practiceBtn.addEventListener('click', () => { sfx('tap'); practiceMode = !practiceMode; renderMap(); });
   dailyBtn.addEventListener('click', () => { const ds = dayStr(); goHole(dailyKey(ds), { daily: ds }); });
   trophyBtn.addEventListener('click', openTracker);
+  neonBtn.addEventListener('click', () => { sfx('tap'); setNeon(!progress.neon); });
+  neonSet.addEventListener('click', () => { sfx('tap'); setNeon(!progress.neon); });
   trackClose.addEventListener('click', () => { sfx('tap'); tracker.classList.remove('show'); });
 }
 
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
-const MOON_SVG = '<svg class="moon" viewBox="0 0 64 64" aria-hidden="true"><path d="M40 8 A24 24 0 1 0 56 42 A20 20 0 0 1 40 8 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/></svg>';
 const CRAZY_SVG = '<svg class="crazy" viewBox="0 0 64 64" aria-hidden="true"><path d="M36 2 L12 36 H30 L24 62 L52 24 H34 Z" fill="#ffd66e" stroke="#c95a4c" stroke-width="4" stroke-linejoin="round"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
@@ -2001,76 +1968,76 @@ function showWorlds() {
   worldGrid.innerHTML = '';
   WORLD_ORDER.forEach((w, i) => {
     const open = progress.worlds.includes(w) && !!WORLDS[w], look = lookOf(w), b = document.createElement('button');
-    const stars = coursesOf(w).flatMap(c => [c, NIGHT + c]).reduce((a, c) => a + (WORLDS[c] ? WORLDS[c].holes.reduce((t, h) => t + ((progress.holes[h.key] || {}).stars || 0), 0) : 0), 0);
-    const night = coursesOf(w).some(c => progress.worlds.includes(NIGHT + c));
+    const stars = coursesOf(w).reduce((a, c) => a + (WORLDS[c] ? WORLDS[c].holes.reduce((t, h) => t + ((progress.holes[h.key] || {}).stars || 0), 0) : 0), 0);
     b.className = 'wcard' + (open ? '' : ' locked');
     b.style.background = `linear-gradient(${look.sky[0]}, ${look.sky[1]})`; b.style.animationDelay = (i * 0.03) + 's';
     b.setAttribute('aria-label', 'world ' + w);
-    b.innerHTML = `<span class="num">${w}</span><span class="art">${look.icon || ''}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}</span>` : LOCK_SVG) + (night ? MOON_SVG : '');
+    b.innerHTML = `<span class="num">${w}</span><span class="art">${look.icon || ''}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}</span>` : LOCK_SVG);
     b.onclick = () => { if (open) { sfx('tap'); showWorld(w); } else sfx('boink'); };
     worldGrid.append(b);
   });
   soundBtn.classList.toggle('off', !progress.sound);
   renderWallet();
 }
-/* a world's map, Mario style: its three courses along a winding path by day, their neon night
-   remixes below, and the ball hopping on the course to play next */
-const WORLD_POS = [[230, 300], [600, 236], [970, 300]], NIGHT_POS = [[230, 560], [600, 600], [970, 560]];
+/* a world's map, Mario style: its three courses along one winding road, left to right. Gold when
+   finished, green when it is the one to play (a ball hops on it), grey and locked until reached. */
+const WORLD_POS = [[230, 470], [600, 330], [970, 470]];
 function showWorld(w) {
   if (currentScene !== 'world') wipe();
-  mapWorld = w; mapNight = false;
+  mapWorld = w;
   setRead(false); play.swing = null; play.aimDrag = null; hideAim();
   showScene('world');
   const look = lookOf(w), cs = coursesOf(w);
-  world.style.background = `linear-gradient(${look.sky[0]}, ${look.sky[1]} 55%, ${look.felt} 55%, ${look.felt})`;
+  world.style.background = `linear-gradient(${look.sky[0]}, ${look.sky[1]} 62%, ${look.felt} 62%, ${look.felt})`;
   worldBadge.querySelector('.ic').innerHTML = look.icon || ''; worldBadgeN.textContent = w;
-  const curve = ps => 'M' + ps.map(p => p.join(' ')).join(' L');
-  worldPath.innerHTML = `<path d="${curve(WORLD_POS.slice(0, cs.length))}" fill="none" stroke="#fffdf7" stroke-width="26" stroke-linecap="round" stroke-dasharray="2 38" opacity=".9"/>`
-    + `<path d="${curve(NIGHT_POS.slice(0, cs.length))}" fill="none" stroke="#ff3df2" stroke-width="18" stroke-linecap="round" stroke-dasharray="2 30" opacity=".7"/>`
-    + cs.map((_, k) => `<path d="M${WORLD_POS[k][0]} ${WORLD_POS[k][1] + 100} L${NIGHT_POS[k][0]} ${NIGHT_POS[k][1] - 80}" stroke="#fffdf7" stroke-width="8" stroke-dasharray="2 16" stroke-linecap="round" opacity=".6"/>`).join('');
-  /* scenery: the world's emblem scattered faintly round the paths */
-  const r = rng32(w * 97);
-  const spots = [];
-  for (let i = 0; i < 200 && spots.length < 9; i++) {
-    const x = 40 + r() * 1080, y = 120 + r() * 500;
-    if (WORLD_POS.concat(NIGHT_POS).every(([nx, ny]) => Math.hypot(x + 40 - nx, y + 40 - ny) > 170) && spots.every(([sx, sy]) => Math.hypot(x - sx, y - sy) > 110)) spots.push([x, y]);
+  const P = WORLD_POS.slice(0, cs.length), road = 'M80 560 C 160 560, 160 ' + P[0][1] + ' ' + P[0].join(' ') + P.slice(1).map((p, i) => ` S ${(P[i][0] + p[0]) / 2} ${i % 2 ? p[1] + 120 : p[1] - 40}, ${p.join(' ')}`).join('') + ` S 1100 560, 1140 560`;
+  worldPath.innerHTML = `<path d="${road}" fill="none" stroke="#c9a476" stroke-width="58" stroke-linecap="round" opacity=".85"/><path d="${road}" fill="none" stroke="#fffdf7" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 30"/>`;
+  /* scenery: the world's emblem scattered faintly, away from the road and the courses */
+  const r = rng32(w * 97), spots = [];
+  for (let i = 0; i < 300 && spots.length < 8; i++) {
+    const x = 40 + r() * 1080, y = 120 + r() * 520;
+    if (P.every(([nx, ny]) => Math.hypot(x + 40 - nx, y + 40 - ny) > 190) && spots.every(([sx, sy]) => Math.hypot(x - sx, y - sy) > 120)) spots.push([x, y]);
   }
   worldDecor.innerHTML = spots.map(([x, y]) => `<span style="position:absolute;left:${x.toFixed(0)}px;top:${y.toFixed(0)}px">${look.icon || ''}</span>`).join('');
   worldNodes.innerHTML = '';
   let next = null;
   cs.forEach((c, k) => {
-    for (const night of [false, true]) {
-      const id = night ? NIGHT + c : c, open = progress.worlds.includes(id) && !!WORLDS[id], hs = WORLDS[id] ? WORLDS[id].holes : [];
-      const stars = hs.reduce((t, h) => t + ((progress.holes[h.key] || {}).stars || 0), 0), done = hs.length && hs.every(h => progress.holes[h.key]);
-      const crazy = hs.filter(h => h.crazy).length, [x, y] = (night ? NIGHT_POS : WORLD_POS)[k], b = document.createElement('button');
-      b.className = 'btn cnode' + (night ? ' night' : '') + (open ? (done ? ' done' : night ? '' : ' go') : ' locked');
-      b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.animationDelay = (k * 0.08 + (night ? 0.2 : 0)) + 's';
-      b.setAttribute('aria-label', (night ? 'night course ' : 'course ') + (k + 1));
-      b.innerHTML = `<span class="n">${k + 1}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}/${hs.length * 3}</span>` + (crazy && !night ? `<span class="crazyN">${CRAZY_SVG.replace('class="crazy"', '')}${crazy}</span>` : '') : LOCK_SVG);
-      b.onclick = () => { if (open) { sfx('tap'); showMap(id); } else sfx('boink'); };
-      worldNodes.append(b);
-      if (!night && open && !done && !next) next = [x, y];
-    }
+    const open = progress.worlds.includes(c) && !!WORLDS[c], hs = WORLDS[c].holes;
+    const stars = hs.reduce((t, h) => t + ((progress.holes[h.key] || {}).stars || 0), 0), done = hs.every(h => progress.holes[h.key]);
+    const crazy = hs.filter(h => h.crazy).length, [x, y] = P[k], b = document.createElement('button');
+    b.className = 'btn cnode' + (open ? (done ? ' done' : ' go') : ' locked');
+    b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.animationDelay = (k * 0.08) + 's';
+    b.setAttribute('aria-label', 'course ' + (k + 1));
+    b.innerHTML = `<span class="n">${k + 1}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}/${hs.length * 3}</span>` + (crazy ? `<span class="crazyN">${CRAZY_SVG.replace('class="crazy"', '')}${crazy}</span>` : '') : LOCK_SVG);
+    b.onclick = () => { if (open) { sfx('tap'); showMap(c); } else sfx('boink'); };
+    worldNodes.append(b);
+    if (open && !done && !next) next = [x, y];
   });
   worldBall.classList.toggle('show', !!next);
   if (next) { worldBall.style.left = next[0] + 'px'; worldBall.style.top = (next[1] - 118) + 'px'; }
+  neonBtn.classList.toggle('on', !!progress.neon);
+}
+/* neon night: a display mode for every course, kept in the save */
+function setNeon(on) {
+  progress.neon = !!on; saveProgress();
+  neonBtn.classList.toggle('on', progress.neon); neonSet.classList.toggle('on', progress.neon);
+  if (currentScene === 'world') showWorld(mapWorld);
 }
 function showMap(w) {
   if (currentScene !== 'map') wipe();
   setRead(false);
   if (w) mapWorld = w;
   if (!WORLDS[mapWorld]) mapWorld = playable()[0];
-  mapNight = isNight(mapWorld);
   play.swing = null; play.aimDrag = null; hideAim();
   showScene('map');
   renderMap();
 }
 function renderMap() {
-  const w = worldOf(dayOf(mapWorld)), k = coursesOf(w).indexOf(dayOf(mapWorld)) + 1;
+  const w = worldOf((mapWorld)), k = coursesOf(w).indexOf((mapWorld)) + 1;
   mapBadge.querySelector('.ic').innerHTML = lookOf(w).icon || ''; mapBadgeN.textContent = k;
-  mapBadge.classList.toggle('night', mapNight);
+  mapBadge.classList.toggle('night', !!progress.neon);
   const sky = lookOf(w).sky;
-  map.style.background = mapNight ? 'linear-gradient(#05020f, #2a0b4d)' : `linear-gradient(${sky[0]}, ${sky[1]})`;
+  map.style.background = progress.neon ? 'linear-gradient(#05020f, #2a0b4d)' : `linear-gradient(${sky[0]}, ${sky[1]})`;
   const holes = WORLDS[mapWorld] ? WORLDS[mapWorld].holes : [], pts = NODE_POS.slice(0, holes.length);
   pathLine.innerHTML = `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="var(--v-surface-line)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 34"/>`;
   holePath.innerHTML = '';
@@ -2087,7 +2054,7 @@ function renderMap() {
     holePath.append(b);
   });
   soundBtn.classList.toggle('off', !progress.sound);
-  map.classList.toggle('night', mapNight); map.classList.toggle('practice', practiceMode);
+  map.classList.toggle('night', !!progress.neon); map.classList.toggle('practice', practiceMode);
   practiceBtn.classList.toggle('on', practiceMode);
   mapLostN.textContent = holes.filter(h => progress.lost[h.key]).length + '/' + holes.length;
   renderWallet();
@@ -2110,9 +2077,9 @@ function showCard(w) {
   cardTotal.textContent = total;
   cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
   cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
-  const list = playable(), d = dayOf(w), nd = WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd && (isNight(w) ? NIGHT + nd : nd);
+  const list = playable(), d = w, nd = WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd;
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
-  cardNext.onclick = () => { sfx('tap'); showWorld(worldOf(dayOf(next))); };
+  cardNext.onclick = () => { sfx('tap'); showWorld(worldOf((next))); };
   showScene('card');
   burst(new THREE.Vector3().copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(1.6)), 140);
   sfx('fanfare');
@@ -2246,13 +2213,14 @@ function boot() {
   setBtn.addEventListener('click', () => { sfx('tap'); settings.classList.add('show'); });
   setClose.addEventListener('click', () => { sfx('tap'); settings.classList.remove('show'); });
   setHand(progress.hand);
+  neonSet.classList.toggle('on', !!progress.neon);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   titleGo.addEventListener('click', () => { sfx('tap'); showWorlds(); });
   worldsHome.addEventListener('click', () => { sfx('tap'); wipe(); showTitle(); });
   worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
-  mapBack.addEventListener('click', () => { sfx('tap'); showWorld(worldOf(dayOf(mapWorld))); });
-  cardMap.addEventListener('click', () => { sfx('tap'); showWorld(worldOf(dayOf(mapWorld))); });
+  mapBack.addEventListener('click', () => { sfx('tap'); showWorld(worldOf((mapWorld))); });
+  cardMap.addEventListener('click', () => { sfx('tap'); showWorld(worldOf((mapWorld))); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
   doneRetry.addEventListener('click', () => goHole(play.key, { daily: play.daily, friend: play.friend }));
   initExtras();

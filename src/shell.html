@@ -537,6 +537,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #dailyBtn .stamp svg { width: 100%; height: 100%; }
 #dailyBtn.done .stamp { display: block; }
 @media (prefers-reduced-motion: reduce) { #dailyBtn, #dailyBtn .sun { animation: none; } }
+/* ---------- 21. NEON NIGHT is a display mode ---------- */
+#neonBtn { right: 124px; top: 24px; }
+#neonBtn.on, #neonSet.on { background: #1d1240; border-color: #ff3df2; box-shadow: 0 6px 0 #0b0620, 0 0 18px #ff3df2; }
+#setPanel { left: 320px; width: 560px; }
+#soundBtn { left: 30px; top: 34px; } #neonSet { left: 134px; top: 34px; } #handR { left: 238px; top: 34px; } #handL { left: 342px; top: 34px; } #setClose { left: 446px; top: 34px; }
+#worldNodes .cnode.locked { background: var(--v-mute); border-color: var(--v-mute-line); box-shadow: 0 8px 0 var(--v-mute-down); color: var(--v-ink-soft); }
 </style>
 </head>
 <body>
@@ -662,6 +668,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div id="settings" class="live" aria-label="settings">
       <div id="setPanel">
         <button class="btn" id="soundBtn" aria-label="sound"><svg viewBox="0 0 64 64"><path d="M10 24 H22 L36 12 V52 L22 40 H10 Z" fill="#8a7360"/><path class="wave" d="M44 22 Q52 32 44 42 M50 16 Q62 32 50 48" fill="none" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path class="cross" d="M44 24 L58 40 M58 24 L44 40" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></button>
+        <button class="btn" id="neonSet" aria-label="neon night"><svg viewBox="0 0 64 64"><path d="M40 6 A26 26 0 1 0 58 44 A21 21 0 0 1 40 6 Z" fill="#2ef2ff" stroke="#ff3df2" stroke-width="4" stroke-linejoin="round"/><circle cx="14" cy="14" r="3" fill="#ff3df2"/><circle cx="54" cy="12" r="2.5" fill="#b6ff2e"/><circle cx="8" cy="40" r="2" fill="#ffb02e"/></svg></button>
         <button class="btn" id="handR" aria-label="right handed"><svg viewBox="0 0 64 64"><path d="M22 58 V30 Q22 26 26 26 Q30 26 30 30 V12 Q30 8 34 8 Q38 8 38 12 V28 V14 Q38 10 42 10 Q46 10 46 14 V30 V20 Q46 16 50 16 Q54 16 54 20 V40 Q54 58 38 58 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/><path d="M22 34 L12 26 Q8 24 7 28 Q6 31 9 34 L22 48" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/></svg></button>
         <button class="btn" id="handL" aria-label="left handed"><svg viewBox="0 0 64 64" style="transform:scaleX(-1)"><path d="M22 58 V30 Q22 26 26 26 Q30 26 30 30 V12 Q30 8 34 8 Q38 8 38 12 V28 V14 Q38 10 42 10 Q46 10 46 14 V30 V20 Q46 16 50 16 Q54 16 54 20 V40 Q54 58 38 58 Z" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/><path d="M22 34 L12 26 Q8 24 7 28 Q6 31 9 34 L22 48" fill="#fffdf7" stroke="#8a7360" stroke-width="4" stroke-linejoin="round"/></svg></button>
         <button class="btn go" id="setClose" aria-label="close"><svg viewBox="0 0 64 64"><path d="M14 34 L26 46 L50 20" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -672,6 +679,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <button class="btn" id="worldBack" aria-label="worlds"><svg viewBox="0 0 64 64"><path d="M38 12 L18 32 L38 52" fill="none" stroke="#a8804e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="chip" id="worldBadge" aria-label="world"><span class="ic"></span><span id="worldBadgeN">1</span></div>
     <button class="btn" id="trophyBtn" aria-label="birdie tracker"><svg viewBox="0 0 64 64"><path d="M18 8 H46 V22 A14 14 0 0 1 18 22 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><path d="M18 12 H8 Q8 26 20 28 M46 12 H56 Q56 26 44 28" fill="none" stroke="#dca63f" stroke-width="4"/><path d="M32 36 V46 M20 56 H44 L40 46 H24 Z" fill="#dca63f" stroke="#dca63f" stroke-width="4" stroke-linejoin="round"/></svg></button>
+    <button class="btn" id="neonBtn" aria-label="neon night"><svg viewBox="0 0 64 64"><path d="M40 6 A26 26 0 1 0 58 44 A21 21 0 0 1 40 6 Z" fill="#2ef2ff" stroke="#ff3df2" stroke-width="4" stroke-linejoin="round"/><circle cx="14" cy="14" r="3" fill="#ff3df2"/><circle cx="54" cy="12" r="2.5" fill="#b6ff2e"/><circle cx="8" cy="40" r="2" fill="#ffb02e"/></svg></button>
     <svg id="worldPath" viewBox="0 0 1200 700" aria-hidden="true"></svg>
     <div id="worldDecor" aria-hidden="true"></div>
     <div id="worldNodes"></div>

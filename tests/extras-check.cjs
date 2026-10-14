@@ -2,7 +2,7 @@
    practice is free), lost balls (always a reachable spot or none, rolling over one pays a token and
    15 coins, once), the three goals on the done card, the daily hole (same hole all day, first
    finish pays once, streaks), shot codes (round trip, a friend's ghost, junk rejected), practice
-   (keeps nothing), night remixes (open after the day course, render lit with stars), all wordless. */
+   (keeps nothing), neon night (a display mode for any course), all wordless. */
 'use strict';
 const { check, done, open, fresh, visibleLetters, smallTargets } = require('./lib.cjs');
 const sinkHere = `(() => { loopPaused = true; const h = play.hole, x = h.cup[0], z = h.cup[1] - 0.2; play.ball = newBall(h, x, z);
@@ -128,20 +128,20 @@ const SHOTS = process.env.PUTTX_SHOTS;
   })()`);
   check('practice opens every hole of an open course, takes back for free, keeps nothing', prac.open === 18 && prac.free && !prac.kept && prac.hidden === 'hidden', JSON.stringify(prac));
 
-  /* night */
+  /* neon night: a display mode, not a course */
   const night = await page.evaluate(`(() => {
-    const w = playable()[0], hs = WORLDS[w].holes, before = progress.worlds.includes(NIGHT + w);
-    for (const h of hs) recordHole(progress, h.key, h.par, h.par);
-    showWorld(w);
-    const tabs = worldNodes.querySelectorAll('.cnode.night').length, open = worldNodes.querySelectorAll('.cnode.night:not(.locked)').length;
-    worldNodes.querySelectorAll('.cnode.night')[0].click(); const mw = mapWorld;
-    holePath.querySelectorAll('.node')[0].click(); skipIntro(); loopPaused = true; renderFrame(0.016);
+    const w = playable()[0];
+    showWorld(w); const nodes = worldNodes.children.length, want = coursesOf(w).length;
+    neonBtn.click(); const saved = JSON.parse(localStorage.getItem('puttx.v2')).neon;
+    startHole(w + '-1'); loopPaused = true; renderFrame(0.016);
     const look = lookOf(holeWorld(play.hole));
-    return { before, tabs, open, mw, want: coursesOf(w).length, key: play.key, night: !!look.night, stars: holeGroup.children.some(c => c.isPoints), lamp: holeGroup.children.some(c => c.isPointLight) };
+    return { nodes, want, saved, key: play.key, night: !!look.night, stars: holeGroup.children.some(c => c.isPoints), lamp: holeGroup.children.some(c => c.isPointLight) };
   })()`);
-  check('finishing a course opens its night remix on the world map', !night.before && night.tabs === night.want && night.open === 1 && night.mw === 100 + first, JSON.stringify(night));
-  check('a night hole wears the moonlit look with stars and a lit cup', night.key === (100 + first) + '-1' && night.night && night.stars && night.lamp, JSON.stringify(night));
+  check('the world map shows one node per course; the moon turns neon night on and saves it', night.nodes === night.want && night.saved === true, JSON.stringify(night));
+  check('with neon on, any course wears the blacklight look with stars and a lit cup', night.night && night.stars && night.lamp, JSON.stringify(night));
   if (SHOTS) { await page.evaluate(() => { loopPaused = false; }); await page.waitForTimeout(400); await page.screenshot({ path: SHOTS + '/night.png' }); }
+  await page.evaluate(() => { neonBtn.click(); startHole(playable()[0] + '-1'); });
+  check('turning neon off brings the day look back', await page.evaluate(() => !lookOf(holeWorld(play.hole)).night && progress.neon === false));
   await page.evaluate(() => showMap());
   check('night map: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
   if (SHOTS) await page.screenshot({ path: SHOTS + '/map-night.png' });

@@ -69,7 +69,7 @@ registerWorld(4, { holes: [
       { surf: 'water', poly: C4_POOL(0.3, 5.9, 0.35) }, { surf: 'ice', poly: rect(-2, 2, 2, 6.4) }],
     posts: [C4_MAN(0.7, 7.0), C4_MAN(1.55, 6.6)], bumps: [{ x: 1.2, z: 7.2, r: 0.55, h: 0.1 }] },
   /* 15. mogul descent: down a steep slope of moguls into a ring of snowmen */
-  { par: 3, sol: [[150,0.6,0]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[10,0.8,0]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 1.4), h: 0.4 }], ramps: [{ x0: -1.2, z0: 1.4, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.4, h1: 0 }],
     bumps: [{ x: 0.4, z: 2.4, r: 0.35, h: 0.14 }, { x: -0.5, z: 3.2, r: 0.4, h: 0.16 }, { x: 0.3, z: 4.2, r: 0.4, h: 0.15 }, { x: -0.2, z: 5.0, r: 0.35, h: 0.12 }],
     inner: [[[-1.2, 6.0], [0.5, 6.0]]], posts: [C4_MAN(-0.05, 7.5), C4_MAN(-0.6, 8.45)], movers: [C4_BALL(0.1, 5.6, 0.8, 5.6, 2.8)] },

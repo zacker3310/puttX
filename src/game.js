@@ -292,7 +292,12 @@ function stepBall(h, b, t) {
         const imp = -b.vy;
         b.y = gh;
         if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.95; b.vz *= 0.95; }
-        else { b.vy = 0; b.air = false; const k = 1 - 0.08 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k; }
+        else {
+          /* a soft landing joins the ground: vertical speed follows the slope under it, so the ball rolls on down a
+             ramp or a tilted green instead of skipping along it in the air (where the slope cannot pull it) */
+          const gg = groundGrad(h, b.x, b.z); b.vy = gg[0] * b.vx + gg[1] * b.vz; b.air = false;
+          const k = 1 - 0.08 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k;
+        }
         if (imp > 0.4) b.hits.push(['land', imp]);
       }
     } else if (b.y < OOB_Y) return 'oob';

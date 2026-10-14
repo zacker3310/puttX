@@ -47,7 +47,7 @@ registerWorld(17, { holes: [
     tubes: [{ a: [0.6, 2.7], b: [1.0, 4.6], dir: 0 }, { a: [-0.6, 2.7], b: [-0.6, 0.5], dir: 0 }],
     bumps: [{ x: 0.3, z: 5.6, r: 0.5, h: 0.22 }],
     movers: [C17_GATE(0, 3.2, 0.48, 3.2, 0.25, 2.8, 0), C17_MILL(-0.2, 6.4, 0.45, 1.5, 0)] },
-  /* 8: the ballroom lawn: a long kidney of a green that leans toward the windows, a hollow to
+  /* 8: the ballroom lawn: a long kidney of a green that leans toward the tall glass, a hollow to
      cross and a broad hump before the cup */
   { par: 3, sol: [[344,0.96,0]], tee: [0, 0.5], cup: [1.1, 10.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [0.9, 6.0], [2.4, 8.5], [2.4, 11.2], [-0.4, 11.2], [-0.8, 7.5], [-1.6, 4.0]],
     tiers: [{ poly: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [0.9, 6.0], [2.4, 8.5], [2.4, 11.2], [-0.4, 11.2], [-0.8, 7.5], [-1.6, 4.0]], h: 0.1, sx: 0.03 }],

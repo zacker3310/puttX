@@ -121,7 +121,7 @@ registerWorld(13, { holes: [
     tubes: [{ a: [2.6, 3.0], b: [2.6, 2.0], dir: 180, keep: 0, add: 0.5 }],
     posts: [J13_IDOL(3.1, 3.35, 0.12), J13_IDOL(2.1, 3.35, 0.12), J13_IDOL(2.15, 0.8)] },
   /* 17: the boulder gauntlet down the sloping corridor, then off the ledge to the cup */
-  { par: 4, sol: [[18,0.99,1.5]], tee: [0, 0.5], cup: [-1.6, 7.5], aim0: 0,
+  { par: 4, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [-1.6, 7.5], aim0: 0,
     shape: [[-0.6, 0], [0.6, 0], [0.6, 8.4], [-2.2, 8.4], [-2.2, 6.6], [-0.6, 6.6]],
     tiers: [{ poly: rect(-0.6, 0, 0.6, 8.4), h: 0.35, sz: -0.03 }],
     zones: [J13_MUD(rect(-0.6, 1.8, -0.15, 2.4)), J13_MUD(rect(0.15, 3.6, 0.6, 4.2)), J13_WATER(rect(-2.2, 6.6, -1.1, 6.9))],

@@ -148,7 +148,7 @@
       tubes: [{ a: [-1.15, 5.15], b: [1.6, 6.85], dir: 0, keep: 0.5, add: 0.2 }],
       movers: [ROCK(0.25, 7.6, 1.85, 7.6, 2.6, 0, 0.15)] },
     /* 15. the tube ladder: slip the airlock to the first tube, dodge the satellite to the second, launch to the green */
-    { par: 4, crazy: true, sol: [[0,0.9285714285714286,1.2],[140,0.9285714285714286,0]], tee: [0, 0.4], cup: [4.5, 5.6],
+    { par: 4, crazy: true, sol: [[2,1,1],[0,0.52,0]], tee: [0, 0.4], cup: [4.5, 5.6],
       floors: [rect(-0.4, 0, 0.4, 3), rect(1.4, 0, 3, 2.6), rect(3.6, 0, 5.4, 3.4), rect(3.2, 4.2, 5.8, 6.6)],
       walls: [ring(rect(-0.4, 0, 0.4, 3)), ring(rect(1.4, 0, 3, 2.6)), ...box(3.6, 0, 5.4, 3.4, 'n'), ...box(3.2, 4.2, 5.8, 6.6, 's')],
       tiers: [DECK(3.6, 0, 5.4, 3.4, 0.3), DECK(3.2, 4.2, 5.8, 6.6, 0.1, 0)],

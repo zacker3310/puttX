@@ -179,4 +179,13 @@ check('a ball held at the lip of a mound cup settles', lip.end !== 'timeout', JS
   check('a ball fed sideways into a drain spirals at least a lap and drops', !!best && laps >= 1, JSON.stringify({ best, laps: +laps.toFixed(2) }));
 }
 
+/* a ball rolls down a ramp, it does not skip down it: a soft landing joins the slope */
+{
+  const rh = S.makeHole({ tee: [0, 0.5], cup: [0, 11], shape: S.rect(-1, 0, 1, 12), tiers: [{ poly: S.rect(-1, 0, 1, 2), h: 1 }], ramps: [{ x0: -1, z0: 2, x1: 1, z1: 6, axis: 'z', h0: 1, h1: 0 }] });
+  const b = S.launch(S.newBall(rh, 0, 1.6), 0, 0.12);
+  let t = 0, air = 0, foot = null;
+  for (let i = 0; i < 240 * 8 && foot === null; i++) { S.stepBall(rh, b, t); t += S.SIM_DT; if (b.air) air++; if (b.z >= 6) foot = Math.hypot(b.vx, b.vz); }
+  check('down a 25% ramp the ball rolls (barely leaves the ground) and picks up speed', foot > 2.8 && air < 30, JSON.stringify({ foot, air }));
+}
+
 done();

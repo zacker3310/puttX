@@ -6,7 +6,7 @@ const J3_WATER = poly => ({ surf: 'water', poly });
 const J3_MUD = poly => ({ surf: 'mud', poly });
 registerWorld(3, { holes: [
   /* 1: the stream. A stone bridge off to the left, the cup back on the right behind a mound */
-  { par: 2, sol: [[2,0.8,0]], tee: [0, 0.5], cup: [-0.25, 5.3], aim0: 4, shape: rect(-0.8, 0, 0.8, 6),
+  { par: 2, sol: [[2,0.84,0]], tee: [0, 0.5], cup: [-0.25, 5.3], aim0: 4, shape: rect(-0.8, 0, 0.8, 6),
     zones: [J3_WATER(rect(-0.8, 2.6, 0, 3.2)), J3_WATER(rect(0.45, 2.6, 0.8, 3.2))],
     bumps: [{ x: 0.1, z: 4.4, r: 0.45, h: 0.12 }], posts: [J3_IDOL(0.45, 4.9, 0.12)] },
   /* 2: temple steps: a narrow ramp to the first terrace, a side ramp to the second */

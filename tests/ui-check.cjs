@@ -14,7 +14,7 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   await page.waitForTimeout(300);
   const first = await page.evaluate(() => playable()[0]), count = await page.evaluate(() => playable().length);
   const title = await page.evaluate(() => { for (const a of document.getAnimations()) { try { a.finish(); } catch (e) {} } return { scene: currentScene, phase: play.phase, go: Math.min(titleGo.getBoundingClientRect().width, titleGo.getBoundingClientRect().height) }; });
-  check('title: a showcase hole orbits behind a big GO', title.scene === 'title' && title.phase === 'title' && title.go >= 120, JSON.stringify(title));
+  check('title: the illustrated panorama with a big GO', title.scene === 'title' && title.phase === 'title' && title.go >= 120, JSON.stringify(title));
   check('title: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0);
 
   await tap(page, 'titleGo');

@@ -105,7 +105,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
-  { crazy: true, par: 3, sol: [[352,0.64,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
+  { crazy: true, par: 3, sol: [[26,0.68,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],
     walls: [[[-0.7, 4.6], [-0.7, 0], [0.7, 0], [0.7, 6], [-2, 6]], [[-0.7, 4.6], [-3.6, 4.6], [-3.6, 6]],
             [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]]],

@@ -467,21 +467,138 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #mapLost { left: 316px; top: 30px; }
 #map #trophyBtn { display: none; }
 @media (prefers-reduced-motion: reduce) { #worldGrid .wcard, #worldNodes .cnode, #worldBall { animation: none; } }
+/* ---------- 18. TITLE: an illustrated panorama, day to night, all ten worlds ---------- */
+#title { background: #7cc8ef; }
+#titleArt { position: absolute; inset: 0; width: 100%; height: 100%; }
+#titleStrip { display: none; }
+#titleGo { left: 440px; top: 396px; width: 320px; height: 144px; border-radius: 72px; animation: popIn .5s .3s cubic-bezier(.3, 1.6, .5, 1) both, pulse 1.8s 1.2s ease-in-out infinite; }
+#titleGo svg { width: 76px; height: 76px; }
+#dailyBtn { left: 712px; top: 372px; z-index: 2; }
+#titleArt .t-sign { transform-box: view-box; transform-origin: 600px 0; animation: sway 4s ease-in-out infinite, signDrop .8s cubic-bezier(.3, 1.5, .5, 1) both; }
+@keyframes sway { 50% { rotate: 1.6deg; } }
+@keyframes signDrop { from { translate: 0 -260px; } }
+#titleArt .t-sun { transform-box: fill-box; transform-origin: center; animation: spin 30s linear infinite; }
+@keyframes spin { to { rotate: 360deg; } }
+#titleArt .t-stars { animation: twinkle 2.4s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: .35; } }
+#titleArt .t-cloud { animation: drift 40s linear infinite; }
+#titleArt .t-cloud.c2 { animation-duration: 55s; animation-delay: -20s; }
+@keyframes drift { from { translate: -420px 0; } to { translate: 640px 0; } }
+#titleArt .t-smoke circle { animation: smoke 3s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+#titleArt .t-smoke circle:nth-child(2) { animation-delay: -1s; } #titleArt .t-smoke circle:nth-child(3) { animation-delay: -2s; }
+@keyframes smoke { from { translate: 0 30px; scale: .4; opacity: .9; } to { translate: 10px -40px; scale: 1.3; opacity: 0; } }
+#titleArt .t-island, #titleArt .t-planet { animation: float 5s ease-in-out infinite; }
+#titleArt .t-planet { animation-duration: 7s; }
+@keyframes float { 50% { translate: 0 -10px; } }
+#titleArt .t-bat { animation: bat 3s ease-in-out infinite; }
+@keyframes bat { 50% { translate: 24px -14px; } }
+#titleArt .t-hook { animation: float 3s ease-in-out infinite; }
+#titleArt .t-palm { transform-box: fill-box; transform-origin: 50% 70%; animation: sway 3s ease-in-out infinite; }
+#titleArt .t-flag { transform-box: fill-box; transform-origin: 0 50%; animation: wave 1.1s ease-in-out infinite; }
+@keyframes wave { 50% { scale: .9 1.06; skew: 0 -4deg; } }
+/* the putt, every 6 s: backswing, strike, a rolling run to the cup, the drop, confetti */
+#titleArt .t-putter { transform-box: view-box; transform-origin: 250px 330px; animation: swing 6s ease-in-out infinite; }
+@keyframes swing { 0% { rotate: 0deg; } 12% { rotate: -16deg; } 17% { rotate: 6deg; } 24%, 100% { rotate: 0deg; } }
+#titleArt .t-ball { animation: putt 6s infinite; }
+@keyframes putt {
+  0%, 16% { translate: 0 0; opacity: 1; animation-timing-function: cubic-bezier(.2, .7, .4, 1); }
+  52% { translate: 560px 30px; opacity: 1; }
+  56% { translate: 560px 50px; opacity: 1; scale: 1; }
+  60%, 92% { translate: 560px 60px; opacity: 0; }
+  96% { translate: 0 0; opacity: 0; } 100% { translate: 0 0; opacity: 1; } }
+#titleArt .t-spin { transform-box: view-box; transform-origin: 370px 586px; animation: rollspin 6s infinite; }
+@keyframes rollspin { 0%, 16% { rotate: 0deg; animation-timing-function: cubic-bezier(.2, .7, .4, 1); } 52%, 100% { rotate: 900deg; } }
+#titleArt .t-lines { animation: lines 6s infinite; }
+@keyframes lines { 0%, 16% { opacity: 0; } 22% { opacity: .9; } 44%, 100% { opacity: 0; } }
+#titleArt .t-confetti rect { transform-box: fill-box; transform-origin: center; opacity: 0; animation: pop 6s infinite; }
+#titleArt .t-confetti rect:nth-child(1) { --dx: -80px; --dy: -140px; } #titleArt .t-confetti rect:nth-child(2) { --dx: 60px; --dy: -170px; }
+#titleArt .t-confetti rect:nth-child(3) { --dx: -30px; --dy: -200px; } #titleArt .t-confetti rect:nth-child(4) { --dx: 110px; --dy: -110px; }
+#titleArt .t-confetti rect:nth-child(5) { --dx: -120px; --dy: -90px; } #titleArt .t-confetti rect:nth-child(6) { --dx: 20px; --dy: -150px; }
+@keyframes pop { 0%, 57% { opacity: 0; translate: 0 0; rotate: 0deg; } 60% { opacity: 1; } 80% { opacity: 1; translate: var(--dx) var(--dy); rotate: 280deg; } 90%, 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 60px); rotate: 400deg; } }
+@media (prefers-reduced-motion: reduce) { #titleArt *, #titleGo { animation: none !important; } }
 </style>
 </head>
 <body>
 <div id="stage">
   <canvas id="view" aria-label="golf course"></canvas>
   <section class="scene" id="title">
-    <div id="titleLogo" aria-label="puttx"><svg viewBox="0 0 360 170">
-      <ellipse cx="180" cy="150" rx="150" ry="12" fill="rgba(74,53,35,.16)"/>
-      <path d="M40 132 Q180 112 320 132" fill="none" stroke="#74c465" stroke-width="16" stroke-linecap="round"/>
-      <ellipse cx="270" cy="128" rx="26" ry="8" fill="#3a2c1e"/>
-      <path d="M270 128 V26" stroke="#8a7360" stroke-width="7" stroke-linecap="round"/>
-      <path d="M273 26 L322 42 L273 58 Z" fill="#ef7d6d"/>
-      <g class="trail"><path d="M60 92 H110 M48 108 H104 M70 76 H112" stroke="#e6d2ab" stroke-width="7" stroke-linecap="round"/></g>
-      <g class="ball"><circle cx="150" cy="92" r="36" fill="#fffdf7" stroke="#e6d2ab" stroke-width="6"/><path d="M116 92 H184" stroke="#ffd66e" stroke-width="12"/><circle cx="138" cy="78" r="3" fill="#e6d2ab"/><circle cx="160" cy="76" r="3" fill="#e6d2ab"/><circle cx="168" cy="104" r="3" fill="#e6d2ab"/><circle cx="140" cy="106" r="3" fill="#e6d2ab"/></g>
-    </svg></div>
+    <svg id="titleArt" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="tSky" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#7cc8ef"/><stop offset=".52" stop-color="#bfe7f7"/><stop offset=".7" stop-color="#8a7fd0"/><stop offset=".84" stop-color="#3b2f86"/><stop offset="1" stop-color="#180f45"/></linearGradient>
+        <linearGradient id="tFade" x1="0" x2="0" y1="0" y2="1"><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/></linearGradient>
+        <linearGradient id="tHill" x1="0" x2="1"><stop offset="0" stop-color="#8fd16f"/><stop offset=".62" stop-color="#7bc463"/><stop offset=".85" stop-color="#3f6a5a"/><stop offset="1" stop-color="#2a3f52"/></linearGradient>
+        <linearGradient id="tGreen" x1="0" x2="1"><stop offset="0" stop-color="#4fae4a"/><stop offset=".7" stop-color="#3f9a42"/><stop offset="1" stop-color="#2c6f4a"/></linearGradient>
+        <pattern id="tStripes" width="80" height="200" patternUnits="userSpaceOnUse" patternTransform="skewX(-28)"><rect width="40" height="200" fill="#fff" opacity=".07"/></pattern>
+        <linearGradient id="tWood" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d79a55"/><stop offset="1" stop-color="#a8692f"/></linearGradient>
+      </defs>
+      <rect width="1200" height="700" fill="url(#tSky)"/>
+      <rect width="1200" height="700" fill="url(#tFade)"/>
+      <!-- sun, moon, stars -->
+      <g class="t-sun"><circle cx="110" cy="96" r="42" fill="#ffd66e"/><g stroke="#ffd66e" stroke-width="7" stroke-linecap="round"><path d="M110 30 V42 M110 150 V162 M44 96 H56 M164 96 H176 M63 49 L72 58 M148 134 L157 143 M63 143 L72 134 M148 58 L157 49"/></g></g>
+      <path d="M1100 54 A40 40 0 1 0 1132 120 A32 32 0 1 1 1100 54 Z" fill="#fff3c4"/>
+      <g class="t-stars" fill="#fff8dc"><circle cx="930" cy="60" r="3"/><circle cx="990" cy="130" r="2.5"/><circle cx="1040" cy="40" r="2"/><circle cx="1160" cy="170" r="3"/><circle cx="880" cy="150" r="2"/><circle cx="1180" cy="60" r="2"/><path d="M1010 200 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/><path d="M860 90 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/></g>
+      <!-- clouds drift -->
+      <g class="t-cloud c1" fill="#fff"><ellipse cx="300" cy="120" rx="60" ry="22"/><ellipse cx="330" cy="104" rx="38" ry="26"/><ellipse cx="270" cy="110" rx="30" ry="18"/></g>
+      <g class="t-cloud c2" fill="#fff" opacity=".9"><ellipse cx="620" cy="70" rx="50" ry="18"/><ellipse cx="645" cy="58" rx="30" ry="20"/></g>
+      <!-- the ten worlds on the horizon, day to night -->
+      <g id="tWorlds">
+        <!-- 1 construction: crane and girders -->
+        <g><path d="M40 430 V250 M40 250 H170 M40 270 H150" stroke="#f2b632" stroke-width="10" stroke-linecap="round"/><path d="M40 250 L60 270 L80 250 L100 270 L120 250 L140 270" stroke="#f2b632" stroke-width="5" fill="none"/><path d="M150 270 V320" stroke="#5a4634" stroke-width="3"/><rect class="t-hook" x="138" y="318" width="24" height="16" rx="3" fill="#5a4634"/><rect x="20" y="410" width="100" height="22" fill="#e9893a"/><rect x="60" y="392" width="70" height="20" fill="#d07030"/></g>
+        <!-- 2 desert: mesa arch and cactus -->
+        <g><path d="M140 432 V340 Q140 320 160 320 H260 Q280 320 280 340 V432 H245 V390 A35 32 0 0 0 175 390 V432 Z" fill="#e07b45"/><path d="M150 320 H270 L262 300 H158 Z" fill="#c9653a"/><path d="M290 432 V384 M290 400 H302 V388 M290 410 H280 V396" stroke="#4f9a47" stroke-width="9" stroke-linecap="round" fill="none"/></g>
+        <!-- 3 jungle temple -->
+        <g><path d="M300 432 H420 L410 410 H310 Z M312 410 H408 L398 388 H322 Z M324 388 H396 L386 366 H334 Z M336 366 H384 L376 346 H344 Z" fill="#7d8f6a"/><rect x="350" y="400" width="20" height="32" fill="#3e4a32"/><path d="M300 360 Q310 330 330 345 M420 370 Q412 340 395 350" stroke="#3f8a3a" stroke-width="7" fill="none" stroke-linecap="round"/></g>
+        <!-- 4 snow peak -->
+        <g><path d="M410 432 L500 270 L590 432 Z" fill="#6f9cc8"/><path d="M500 270 L528 320 L512 312 L500 326 L488 312 L472 320 Z" fill="#fff"/><path d="M560 432 L610 350 L660 432 Z" fill="#88b2d8"/><path d="M610 350 L624 374 L610 368 L596 374 Z" fill="#fff"/></g>
+        <!-- 5 pirate cove: palm and ship -->
+        <g><path d="M640 432 Q636 380 650 330" stroke="#8a5a2b" stroke-width="9" fill="none" stroke-linecap="round"/><path class="t-palm" d="M650 330 Q620 312 600 330 M650 330 Q680 308 700 326 M650 330 Q640 300 618 296 M650 330 Q668 298 690 296" stroke="#3f9a42" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M680 420 H770 L756 438 H694 Z" fill="#8a5a2b"/><path d="M722 420 V360 M722 362 L752 404 H722 M722 368 L698 404 H722" stroke="#5a4634" stroke-width="3" fill="#fffdf7"/><path d="M722 360 L740 366 L722 372 Z" fill="#2f241a"/></g>
+        <!-- 6 volcano with smoke -->
+        <g><path d="M740 432 L800 320 H840 L900 432 Z" fill="#6b4a3a"/><path d="M800 320 H840 L832 340 Q826 360 830 380 Q818 362 812 342 Z" fill="#ff7a2e"/><g class="t-smoke" fill="#cfc4c0"><circle cx="820" cy="300" r="12"/><circle cx="830" cy="278" r="16"/><circle cx="816" cy="252" r="20"/></g></g>
+        <!-- 7 haunted castle -->
+        <g><path d="M880 432 V350 H900 V336 H912 V350 H932 V336 H944 V350 H964 V432 Z" fill="#6c5a9a"/><path d="M864 432 V330 L880 304 L896 330 V432 Z M948 432 V320 L966 290 L984 320 V432 Z" fill="#5a4a86"/><rect x="912" y="396" width="20" height="36" rx="10" fill="#2a1f45"/><circle cx="886" cy="356" r="5" fill="#ffd66e"/><circle cx="966" cy="344" r="5" fill="#ffd66e"/><path class="t-bat" d="M920 280 q8 -8 14 0 q6 -8 14 0 q-7 2 -14 8 q-7 -6 -14 -8z" fill="#2a1f45"/></g>
+        <!-- 8 space: ringed planet -->
+        <g class="t-planet"><circle cx="1020" cy="300" r="34" fill="#c7a0ff"/><ellipse cx="1020" cy="300" rx="62" ry="14" fill="none" stroke="#ffd66e" stroke-width="6" transform="rotate(-18 1020 300)"/><circle cx="1010" cy="290" r="6" fill="#a87de6"/></g>
+        <!-- 9 candy: lollipops -->
+        <g><path d="M1000 432 V370 M1040 432 V384" stroke="#fffdf7" stroke-width="7"/><circle cx="1000" cy="360" r="26" fill="#ff7eb6"/><path d="M1000 360 m-16 0 a16 16 0 1 1 16 16 a10 10 0 1 1 -10 -10" stroke="#fff" stroke-width="5" fill="none"/><circle cx="1040" cy="376" r="18" fill="#6fd6e8"/><path d="M1032 376 a8 8 0 1 1 8 8" stroke="#fff" stroke-width="4" fill="none"/></g>
+        <!-- 10 sky kingdom: floating island castle -->
+        <g class="t-island"><path d="M1080 330 Q1130 316 1190 330 Q1180 372 1135 392 Q1092 372 1080 330 Z" fill="#7a5a3a"/><path d="M1078 330 Q1134 312 1192 330 Q1134 342 1078 330 Z" fill="#7bc463"/><rect x="1110" y="270" width="50" height="58" fill="#fff3e4"/><path d="M1104 272 L1118 240 L1132 272 Z M1138 272 L1152 240 L1166 272 Z" fill="#4a6ad8"/><rect x="1128" y="302" width="14" height="26" rx="7" fill="#4a6ad8"/><path d="M1135 392 V412" stroke="#9fd8ef" stroke-width="4" stroke-dasharray="4 6"/></g>
+      </g>
+      <!-- rolling hills and fences -->
+      <path d="M0 450 Q150 410 300 440 T600 440 T900 436 T1200 440 V700 H0 Z" fill="url(#tHill)"/>
+      <g stroke="#a8804e" stroke-width="7" stroke-linecap="round"><path d="M30 470 H230 M40 456 V492 M90 456 V492 M140 456 V492 M190 456 V492"/><path d="M960 470 H1170 M970 456 V492 M1020 456 V492 M1070 456 V492 M1120 456 V492"/></g>
+      <!-- the putting green -->
+      <path d="M60 690 Q40 560 170 540 L1040 520 Q1170 524 1160 660 L1150 700 H70 Z" fill="#c9893f"/>
+      <path d="M78 676 Q62 568 176 552 L1034 534 Q1146 538 1140 650 L1132 688 Z" fill="url(#tGreen)"/>
+      <path d="M78 676 Q62 568 176 552 L1034 534 Q1146 538 1140 650 L1132 688 Z" fill="url(#tStripes)"/>
+      <!-- cup and waving flag -->
+      <ellipse cx="930" cy="616" rx="34" ry="12" fill="#2b2016"/><ellipse cx="930" cy="618" rx="30" ry="9" fill="#f4f1ea" opacity=".85"/><ellipse cx="930" cy="616" rx="26" ry="7" fill="#1a130c"/>
+      <path d="M948 612 V420" stroke="#fffdf7" stroke-width="7" stroke-linecap="round"/>
+      <path class="t-flag" d="M951 424 Q1000 432 1040 420 Q1018 446 1040 474 Q996 462 951 470 Z" fill="#ef7d6d"/>
+      <!-- confetti burst when the ball drops -->
+      <g class="t-confetti"><rect x="926" y="590" width="10" height="16" fill="#ffd66e"/><rect x="920" y="590" width="10" height="16" fill="#ef7d6d"/><rect x="934" y="590" width="10" height="16" fill="#6fc0df"/><rect x="928" y="590" width="10" height="16" fill="#74c465"/><rect x="922" y="590" width="10" height="16" fill="#b7a7e0"/><rect x="930" y="590" width="10" height="16" fill="#ffd66e"/></g>
+      <!-- the putter swings, the ball with a face rolls into the cup -->
+      <g class="t-putter"><path d="M250 330 L300 584" stroke="#c9ced6" stroke-width="9" stroke-linecap="round"/><path d="M246 312 L254 352" stroke="#4a3826" stroke-width="18" stroke-linecap="round"/><rect x="262" y="578" width="64" height="24" rx="8" fill="#9aa3ad" stroke="#6f7881" stroke-width="4"/></g>
+      <g class="t-ball"><ellipse class="t-shadow" cx="370" cy="626" rx="40" ry="10" fill="#1d3a1d" opacity=".3"/>
+        <g class="t-lines" stroke="#fffdf7" stroke-width="7" stroke-linecap="round" opacity=".8"><path d="M300 572 H262 M308 592 H250 M300 612 H266"/></g>
+        <g class="t-body"><circle cx="370" cy="586" r="40" fill="#fffdf7" stroke="#e6d2ab" stroke-width="5"/>
+          <g class="t-spin" fill="#e6d2ab"><circle cx="352" cy="566" r="3.5"/><circle cx="390" cy="604" r="3.5"/><circle cx="356" cy="606" r="3.5"/><circle cx="392" cy="566" r="3"/><circle cx="372" cy="552" r="3"/><circle cx="342" cy="586" r="3"/></g>
+          <g class="t-face"><ellipse cx="380" cy="580" rx="6.5" ry="9" fill="#2f241a"/><ellipse cx="398" cy="580" rx="6.5" ry="9" fill="#2f241a"/><circle cx="382" cy="576" r="2.4" fill="#fff"/><circle cx="400" cy="576" r="2.4" fill="#fff"/><path d="M380 596 Q390 604 400 596" stroke="#2f241a" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="372" cy="594" rx="6" ry="3.5" fill="#ffb3a8" opacity=".7"/><ellipse cx="406" cy="594" rx="5" ry="3.2" fill="#ffb3a8" opacity=".7"/></g>
+        </g>
+      </g>
+      <!-- hanging sign with the emblem: crossed putters, a ball, a flag -->
+      <g class="t-sign">
+        <path d="M470 0 V64 M730 0 V64" stroke="#5a4634" stroke-width="6"/>
+        <rect x="400" y="60" width="400" height="190" rx="26" fill="url(#tWood)" stroke="#7a4a20" stroke-width="8"/>
+        <rect x="420" y="80" width="360" height="150" rx="18" fill="#fff8ec"/>
+        <circle cx="420" cy="80" r="7" fill="#7a4a20"/><circle cx="780" cy="80" r="7" fill="#7a4a20"/><circle cx="420" cy="230" r="7" fill="#7a4a20"/><circle cx="780" cy="230" r="7" fill="#7a4a20"/>
+        <ellipse cx="600" cy="212" rx="150" ry="10" fill="#74c465"/>
+        <g stroke-linecap="round"><path d="M520 104 L640 206" stroke="#9aa3ad" stroke-width="10"/><path d="M680 104 L560 206" stroke="#9aa3ad" stroke-width="10"/><path d="M514 98 L530 112" stroke="#4a3826" stroke-width="18"/><path d="M686 98 L670 112" stroke="#4a3826" stroke-width="18"/></g>
+        <rect x="622" y="196" width="42" height="18" rx="6" fill="#ef7d6d" transform="rotate(40 643 205)"/><rect x="536" y="196" width="42" height="18" rx="6" fill="#6fc0df" transform="rotate(-40 557 205)"/>
+        <circle cx="600" cy="150" r="34" fill="#fffdf7" stroke="#e6d2ab" stroke-width="5"/><path d="M567 150 H633" stroke="#ffd66e" stroke-width="10"/><circle cx="588" cy="136" r="3" fill="#e6d2ab"/><circle cx="612" cy="166" r="3" fill="#e6d2ab"/><circle cx="610" cy="134" r="3" fill="#e6d2ab"/>
+        <path d="M720 204 V112" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M722 114 L760 126 L722 140 Z" fill="#ef7d6d"/><ellipse cx="720" cy="206" rx="16" ry="5" fill="#3a2c1e"/>
+        <g fill="#ffd66e" stroke="#dca63f" stroke-width="2"><path d="M468 120 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1z"/><path d="M748 168 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z"/></g>
+      </g>
+    </svg>
     <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     <button class="btn" id="dailyBtn" aria-label="daily hole"><svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="8" fill="#fffdf7" stroke="#a8804e" stroke-width="5"/><path d="M8 24 H56" stroke="#ef7d6d" stroke-width="10"/><path d="M20 6 V16 M44 6 V16" stroke="#a8804e" stroke-width="5" stroke-linecap="round"/></svg><span class="day" id="dailyDay">1</span><span class="tally" id="dailyStreak"></span></button>
     <div id="titleStrip"></div>

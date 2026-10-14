@@ -954,7 +954,8 @@ function renderFrame(dt) {
   if (hs.dataset.phase !== play.phase) hs.dataset.phase = play.phase;
   const intro = play.intro ? '1' : '';
   if (hs.dataset.intro !== intro) hs.dataset.intro = intro;
-  if (!play.hole || currentScene === 'map' || currentScene === 'shop') return;
+  /* the 2D scenes cover the whole stage: no point drawing a hole behind them */
+  if (!play.hole || ['map', 'shop', 'title', 'worlds', 'world'].includes(currentScene)) return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
   const lk = lookOf(holeWorld(play.hole)); if (lk.tick) lk.tick(holeGroup, dt, play.time);
@@ -1382,7 +1383,7 @@ function restInCup(h, from) {
 }
 function advance(dt) {
   if (!play.hole || play.phase === 'idle') return;
-  if (play.phase === 'title') { play.time += dt; if (currentScene === 'title') tickTitle(dt); return; }
+  if (play.phase === 'title') { play.time += dt; return; }
   if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
   if (play.phase === 'replay') { advanceReplay(dt); return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
@@ -1873,11 +1874,11 @@ const NODE_POS = Array.from({ length: HOLES_PER }, (_, i) => i < 9 ? [130 + i * 
 let mapWorld = 1;
 
 /* the title flies round each course's showpiece 18th in turn; the strip below picks a course */
-let titleCourse = 0, titleT = 0;
+const titleCourse = 0;
 function showTitle() {
   const list = playable(), w = list[titleCourse % list.length], hs = WORLDS[w].holes, key = hs[hs.length - 1].key;
   if (!play.hole || play.key !== key) startHole(key);
-  play.phase = 'title'; titleT = 0;
+  play.phase = 'title';
   showScene('title');
   renderTitleStrip(w); renderDaily();
 }
@@ -1892,10 +1893,6 @@ function renderTitleStrip(cur) {
     b.onclick = () => { if (open) { sfx('tap'); showWorld(w); } else sfx('boink'); };
     titleStrip.append(b);
   }
-}
-function tickTitle(dt) {
-  if ((titleT += dt) < 8 || reducedMotion()) return;
-  titleCourse++; wipe(); showTitle();
 }
 /* the ten worlds as big cards; each opens its world map */
 function showWorlds() {

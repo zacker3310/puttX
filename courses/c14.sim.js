@@ -51,7 +51,7 @@ registerWorld(14, { holes: [
     zones: [{ surf: 'water', poly: C14_POOL(0, 3.3, 0.6, 0.45) }, { surf: 'ice', poly: rect(-1.4, 2, 1.4, 4.6) }],
     tubes: [{ a: [-0.8, 5.0], b: [-0.8, 6.2], dir: 60 }], posts: [C14_MAN(-0.1, 6.9)] },
   /* 8. avalanche bowl: through the icy bowl, then the narrow ramp past the snowball or the wide one round the side */
-  { par: 3, sol: [[0,1,0.5]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8.2),
+  { par: 3, sol: [[0,1,1],[10,1,0]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8.2),
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.8), h: 0.3 }, { poly: rect(-1.4, 6.2, 1.4, 8.2), h: 0.2 }],
     ramps: [{ x0: -0.3, z0: 5.4, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.75, z0: 5.4, x1: 1.4, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: 0, z: 3.9, r: 1.0, h: -0.3 }], zones: [{ surf: 'fast', poly: C14_POOL(0, 3.9, 1.1, 1.1, 12) }],
@@ -100,7 +100,7 @@ registerWorld(14, { holes: [
     posts: [C14_MAN(-0.3, 2.8), C14_MAN(0.3, 3.8), C14_MAN(-0.2, 4.8), C14_MAN(0.85, 8.3)], movers: [C14_BALL(-0.4, 5.5, 0.4, 5.5, 2.6)],
     zones: [{ surf: 'water', poly: C14_POOL(-0.5, 7.4, 0.35, 0.3) }, { surf: 'ice', poly: rect(-1.2, 6.0, 1.2, 7.0) }] },
   /* 16. sinkholes: two icy bowls, each with a cave at the bottom; one comes out on the cup shelf, one back on the deck */
-  { par: 4, sol: [[5,0.583,0],[20,0.44,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.6, 0, 1.6, 8.2),
+  { par: 4, sol: [[305,0.583,0],[0,0.083,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.6, 0, 1.6, 8.2),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }, { poly: rect(-1.6, 6.2, 1.6, 8.2), h: 0.2 }],
     ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.7, z: 3.4, r: 0.75, h: -0.3 }, { x: 0.8, z: 4.4, r: 0.75, h: -0.3 }],

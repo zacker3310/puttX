@@ -97,7 +97,7 @@ registerWorld(24, { holes: [
     bumps: [{ x: -0.1, z: 5.2, r: 0.3, h: 0.1 }, { x: 0.8, z: 5.3, r: 0.3, h: 0.12 }, { x: 0.5, z: 8.2, r: 0.5, h: 0.06 }],
     movers: [C24_BALL(-0.8, 7.2, 0.8, 7.2, 2.8), C24_LIFT(0.75, 1.55, 1.0, 1.55, 0.2, 90, 2.2)] },
   /* 14. sinkholes: three icy sinkholes with a cave at the bottom of each; one to the cup shelf, two back up the hill */
-  { par: 4, sol: [[195,0.917,0],[0,0.12,0]], tee: [0, 0.5], cup: [0.6, 7.6], shape: rect(-1.6, 0, 1.6, 8.4),
+  { par: 4, sol: [[20,1,0]], tee: [0, 0.5], cup: [0.6, 7.6], shape: rect(-1.6, 0, 1.6, 8.4),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }, { poly: rect(-1.6, 6.4, 1.6, 8.4), h: 0.2 }],
     ramps: [{ x0: 0.9, z0: 5.8, x1: 1.6, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.8, z: 3.0, r: 0.6, h: -0.25 }, { x: 0.7, z: 3.4, r: 0.6, h: -0.25 }, { x: -0.3, z: 4.9, r: 0.6, h: -0.25 }],

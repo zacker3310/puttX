@@ -535,7 +535,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = 'f3c709bde465';
+const BUILD_ID = '3970d6134202';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1055,7 +1055,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
-  { crazy: true, par: 3, sol: [[26,1,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
+  { crazy: true, par: 3, sol: [[352,0.64,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],
     walls: [[[-0.7, 4.6], [-0.7, 0], [0.7, 0], [0.7, 6], [-2, 6]], [[-0.7, 4.6], [-3.6, 4.6], [-3.6, 6]],
             [[-3.6, 7], [-3.6, 10], [-0.8, 10], [-0.8, 7]]],
@@ -2740,7 +2740,7 @@ registerWorld(14, { holes: [
     zones: [{ surf: 'water', poly: C14_POOL(0, 3.3, 0.6, 0.45) }, { surf: 'ice', poly: rect(-1.4, 2, 1.4, 4.6) }],
     tubes: [{ a: [-0.8, 5.0], b: [-0.8, 6.2], dir: 60 }], posts: [C14_MAN(-0.1, 6.9)] },
   /* 8. avalanche bowl: through the icy bowl, then the narrow ramp past the snowball or the wide one round the side */
-  { par: 3, sol: [[0,1,0.5]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8.2),
+  { par: 3, sol: [[0,1,1],[10,1,0]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8.2),
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.8), h: 0.3 }, { poly: rect(-1.4, 6.2, 1.4, 8.2), h: 0.2 }],
     ramps: [{ x0: -0.3, z0: 5.4, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.75, z0: 5.4, x1: 1.4, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: 0, z: 3.9, r: 1.0, h: -0.3 }], zones: [{ surf: 'fast', poly: C14_POOL(0, 3.9, 1.1, 1.1, 12) }],
@@ -2789,7 +2789,7 @@ registerWorld(14, { holes: [
     posts: [C14_MAN(-0.3, 2.8), C14_MAN(0.3, 3.8), C14_MAN(-0.2, 4.8), C14_MAN(0.85, 8.3)], movers: [C14_BALL(-0.4, 5.5, 0.4, 5.5, 2.6)],
     zones: [{ surf: 'water', poly: C14_POOL(-0.5, 7.4, 0.35, 0.3) }, { surf: 'ice', poly: rect(-1.2, 6.0, 1.2, 7.0) }] },
   /* 16. sinkholes: two icy bowls, each with a cave at the bottom; one comes out on the cup shelf, one back on the deck */
-  { par: 4, sol: [[5,0.583,0],[20,0.44,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.6, 0, 1.6, 8.2),
+  { par: 4, sol: [[305,0.583,0],[0,0.083,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.6, 0, 1.6, 8.2),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }, { poly: rect(-1.6, 6.2, 1.6, 8.2), h: 0.2 }],
     ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.7, z: 3.4, r: 0.75, h: -0.3 }, { x: 0.8, z: 4.4, r: 0.75, h: -0.3 }],
@@ -4338,7 +4338,7 @@ registerWorld(24, { holes: [
     bumps: [{ x: -0.1, z: 5.2, r: 0.3, h: 0.1 }, { x: 0.8, z: 5.3, r: 0.3, h: 0.12 }, { x: 0.5, z: 8.2, r: 0.5, h: 0.06 }],
     movers: [C24_BALL(-0.8, 7.2, 0.8, 7.2, 2.8), C24_LIFT(0.75, 1.55, 1.0, 1.55, 0.2, 90, 2.2)] },
   /* 14. sinkholes: three icy sinkholes with a cave at the bottom of each; one to the cup shelf, two back up the hill */
-  { par: 4, sol: [[195,0.917,0],[0,0.12,0]], tee: [0, 0.5], cup: [0.6, 7.6], shape: rect(-1.6, 0, 1.6, 8.4),
+  { par: 4, sol: [[20,1,0]], tee: [0, 0.5], cup: [0.6, 7.6], shape: rect(-1.6, 0, 1.6, 8.4),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }, { poly: rect(-1.6, 6.4, 1.6, 8.4), h: 0.2 }],
     ramps: [{ x0: 0.9, z0: 5.8, x1: 1.6, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.8, z: 3.0, r: 0.6, h: -0.25 }, { x: 0.7, z: 3.4, r: 0.6, h: -0.25 }, { x: -0.3, z: 4.9, r: 0.6, h: -0.25 }],

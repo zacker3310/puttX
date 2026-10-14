@@ -135,7 +135,7 @@ registerWorld(2, { holes: [
     posts: [C2_CACTUS(-0.75, 5.4), C2_CACTUS(0.1, 7.0)] },
   /* 18. the three-mesa descent: off the high mesa, across the middle mesa past a tumbleweed,
      down a narrow gap to the dune green and round the rock spur to the cup */
-  { par: 4, crazy: true, sol: [[162,1,0],[36,0.875,0]], tee: [-0.3, 0.6], cup: [0.55, 9.35],
+  { par: 4, crazy: true, sol: [[32,1,0.5],[16,1,0]], tee: [-0.3, 0.6], cup: [0.55, 9.35],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [1.2, 3], [1.2, 6.5], [1.2, 10], [-1.8, 10], [-1.8, 6.5], [-1.8, 3], [-0.8, 3]],
     inner: [[[-0.8, 3], [0.2, 3]], [[-1.15, 6.5], [1.2, 6.5]], [[-0.45, 8.5], [1.2, 8.5]]],
     tiers: [{ poly: rect(-1.9, 2.9, 1.3, 6.5), h: 0.35 }, { poly: rect(-0.9, -0.1, 0.9, 3), h: 0.7 }, { poly: rect(-1.9, 6.5, 1.3, 10.1), h: 0.05, sx: 0.03 }],

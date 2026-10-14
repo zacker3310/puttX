@@ -19,7 +19,7 @@ check('soft putt stops on the felt', soft.end === 'stop' && soft.z > 0.55 && sof
 {
   const b = S.launch(S.newBall(straight, 0, 0.5), 0, 0.5), v0 = Math.hypot(b.vx, b.vz);
   let t = 0, n = 0; while (b.skid > 0 && n < 2000) { S.stepBall(straight, b, t); t += S.SIM_DT; n++; }
-  check('the struck ball skids, then rolls once it has shed ~12%', n > 5 && n < 200 && Math.abs(Math.hypot(b.vx, b.vz) / v0 - 0.88) < 0.02, JSON.stringify({ n, ratio: Math.hypot(b.vx, b.vz) / v0 }));
+  check('the struck ball skids, then rolls once it has shed ~8%', n > 5 && n < 200 && Math.abs(Math.hypot(b.vx, b.vz) / v0 - S.SKID_END) < 0.02, JSON.stringify({ n, ratio: Math.hypot(b.vx, b.vz) / v0 }));
 }
 
 /* 2. the cup: slow drops, centre catches faster balls than the edge, hot balls hop or lip out */
@@ -49,7 +49,7 @@ const roll = s => S.simulatePutt(lane(s), [0, 0.5], 0, 0.3).z;
 const zs = ['ice', 'fast', null, 'sand', 'mud'].map(roll);
 check('ice > fast > felt > sand > mud roll-out', zs.every((z, i) => i === 0 || z < zs[i - 1]), JSON.stringify(zs));
 const full = S.simulatePutt(lane(null), [0, 0.5], 0, 1).z - 0.5;
-check('full power rolls 13-16 m on felt', full > 13 && full < 16, full.toFixed(2));
+check('full power rolls 15.5-19 m on felt, for long lag putts', full > 15.5 && full < 19, full.toFixed(2));
 
 /* 6. a hill to the right breaks the ball left; slope force follows the exact incline */
 const hill = S.makeHole({ tee: [0, 0.5], cup: [0, 5.5], shape: S.rect(-1, 0, 1, 6), bumps: [{ x: 0.3, z: 2.5, r: 0.6, h: 0.12 }] });
@@ -161,5 +161,24 @@ const mound = S.makeHole({ par: 3, tee: [0, 0.5], cup: [0, 3.2], shape: S.rect(-
 const pin = S.simulatePutt(pinned, [0, 0.5], 4, 1, 1.2), lip = S.simulatePutt(mound, [0, 0.5], 2, 1, 0.6);
 check('a ball pinned against a wall by a slope settles', pin.end !== 'timeout', JSON.stringify([pin.end, pin.x, pin.z]));
 check('a ball held at the lip of a mound cup settles', lip.end !== 'timeout', JSON.stringify([lip.end, lip.x, lip.z]));
+
+/* drains: a coin funnel round the cup. Flat where the cup sits, steeper toward the middle, and a ball
+   fed in fast and sideways spirals down and drops */
+{
+  const dh = S.makeHole({ tee: [-1.6, 0.4], cup: [0, 2.5], shape: S.rect(-2, 0, 2, 4.5), drains: [{ x: 0, z: 2.5, r: 1.3, depth: 0.32 }] });
+  const flat = [0, 1, 2, 3].every(k => Math.abs(S.groundH(dh, k * 0.03, 2.5) + 0.32) < 1e-9);
+  const steeper = S.groundH(dh, 0.6, 2.5) - S.groundH(dh, 0.4, 2.5) > S.groundH(dh, 1.2, 2.5) - S.groundH(dh, 1.0, 2.5);
+  let laps = 0, best = null;
+  for (let p = 0.3; p <= 0.9 && !best; p += 0.02) {
+    const b = S.launch(S.newBall(dh, -1.2, 2.5), 0, p);
+    let th0 = Math.atan2(b.z - 2.5, b.x), turn = 0, t = 0, end = null;
+    for (let i = 0; i < 240 * 25 && !end; i++) { end = S.stepBall(dh, b, t); t += S.SIM_DT; const th = Math.atan2(b.z - 2.5, b.x); let d = th - th0; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; turn += d; th0 = th; }
+    if (end === 'sunk' && Math.abs(turn) / (2 * Math.PI) >= 1) { best = p; laps = Math.abs(turn) / (2 * Math.PI); }
+  }
+  check('a drain is flat under the cup and steepens toward it', flat && steeper);
+  check('a ball fed sideways into a drain spirals at least a lap and drops', !!best && laps >= 1, JSON.stringify({ best, laps: +laps.toFixed(2) }));
+  const m = S.mirrorDef({ tee: [0.5, 0.4], cup: [1, 2], shape: S.rect(-2, 0, 2, 4), drains: [{ x: 1, z: 2, r: 1, depth: 0.2 }] });
+  check('night remixes mirror drains', m.drains[0].x === -1);
+}
 
 done();

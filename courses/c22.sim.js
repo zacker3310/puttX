@@ -17,7 +17,7 @@ registerWorld(22, { holes: [
     tiers: [{ poly: rect(-1.1, 3.4, 1.1, 6.1), h: 0.25 }],
     posts: [C22_CACTUS(-0.45, 4.5), C22_ROCK(0.6, 1.5)] },
   /* 2. up onto the mesa, through the sliding gate, down to the leaning green */
-  { par: 3, sol: [[355.25,0.99,0]], tee: [0, 0.5], cup: [-0.6, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
+  { par: 3, sol: [[0,1,0]], tee: [0, 0.5], cup: [-0.6, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
     inner: [[[-1.5, 5], [-0.5, 5]], [[0.3, 5], [1.5, 5]]],
     ramps: [{ x0: -1.6, z0: 1.4, x1: 1.6, z1: 2.4, axis: 'z', h0: 0, h1: 0.35 }],
     tiers: [{ poly: rect(-1.6, 2.4, 1.6, 5), h: 0.35 }, { poly: rect(-1.6, 5, 1.6, 8.6), h: 0.05, sx: 0.03 }],
@@ -35,14 +35,14 @@ registerWorld(22, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.7, 6.4, -0.1, 7.4) }],
     posts: [C22_CACTUS(2.3, 5.2), C22_ROCK(2.9, 7.05, 0.12)] },
   /* 4. three terraces, a tumbleweed on each step down */
-  { par: 3, sol: [[5,0.64286,0]], tee: [0, 0.5], cup: [0.5, 7.2], shape: rect(-1.2, 0, 1.2, 8),
+  { par: 3, sol: [[2,0.8,0]], tee: [0, 0.5], cup: [0.5, 7.2], shape: rect(-1.2, 0, 1.2, 8),
     tiers: [{ poly: rect(-1.3, -0.1, 1.3, 2.5), h: 0.4 }, { poly: rect(-1.3, 2.5, 1.3, 5), h: 0.2 }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 7.2, -0.4, 8) }],
     movers: [C22_WEED(-0.8, 3.6, 0.8, 3.6, 2.2), C22_WEED(0.8, 5.9, -0.8, 5.9, 2.6, 1)],
     posts: [C22_CACTUS(0.05, 6.8), C22_CACTUS(0.95, 6.7), C22_ROCK(-0.6, 1.6)] },
   /* 5. three decks down: drop through the left gap, cross the middle deck past the tumbleweed, drop through
      the right gap; or dive into the shaft on the top deck */
-  { par: 3, sol: [[20,0.92857,1.5]], tee: [0, 0.5], cup: [0, 8.2], shape: rect(-1.5, 0, 1.5, 9),
+  { par: 3, sol: [[36,0.96,1.5]], tee: [0, 0.5], cup: [0, 8.2], shape: rect(-1.5, 0, 1.5, 9),
     inner: [[[-1.5, 3], [0.6, 3]], [[-0.6, 6], [1.5, 6]]],
     tiers: [{ poly: rect(-1.6, -0.1, 1.6, 3), h: 0.42 }, { poly: rect(-1.6, 3, 1.6, 6), h: 0.22 }, { poly: rect(-1.6, 6, 1.6, 9.1), h: 0.02 }],
     tubes: [{ a: [-0.9, 2.3], b: [0.9, 6.6], dir: 0, keep: 0.5, add: 0.3 }],

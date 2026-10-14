@@ -28,7 +28,7 @@ const CUP_R = 0.11;
 const CUP_SINK = 0.2;             /* how deep the cup is drawn: the drop is longer than the physics needs, for the plunk */
 const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
 const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
-const MIN_V = 0.3, MAX_V = 4.27; /* putt speed at power 0 and power 1: full power still rolls about 14.5 m of (slicker) felt */
+const MIN_V = 0.28, MAX_V = 4.27; /* putt speed at power 0 and power 1: full power rolls about 17 m of felt, for the long lag putts */
 const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step, well under a wall's reach (BALL_R + WALL_HALF) */
 const STOP_V = 0.03;
 const SETTLE_T = 0.4;            /* slower than STOP_V this long = at rest, even pressed on a wall or a lip */
@@ -36,13 +36,13 @@ const STATIC_MU = 0.1;           /* a stopped ball stays put on slopes gentler t
 const MAX_SIM_T = 25;
 const G = 9.8;
 const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slope */
-const SKID_MU = 0.22, SKID_END = 0.88;  /* the struck ball slides (sliding friction) until it has shed 12% and rolls */
+const SKID_MU = 0.22, SKID_END = 0.92;  /* the struck ball slides (sliding friction) until it has shed 12% and rolls */
 /* water is a hazard (the ball goes back where it was putted from, plus one); push zones are
    conveyors and fans: a constant acceleration [ax, az] while the ball rolls on them */
 /* GLIDE: every surface is slicker than a real green, so the ball coasts; ice is nearly frictionless */
-const GLIDE = 0.73, FELT_MU = 0.075;
+const GLIDE = 0.62, FELT_MU = 0.075;
 const SURF = { felt: { mu: FELT_MU * GLIDE }, ice: { mu: 0.006 }, sand: { mu: 0.4 * GLIDE }, mud: { mu: 0.75 * GLIDE }, fast: { mu: 0.04 * GLIDE }, water: { mu: FELT_MU * GLIDE } };
-const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.7, WALL_SLIP = 0.92;
+const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.78, WALL_SLIP = 0.94;
 const POST_E = 0.6, MOVER_E = 0.8;
 const STEP_MAX = 0.03;           /* ground rising more than this under the ball's leading edge is a cliff face */
 const CLIFF_E = 0.45;
@@ -65,7 +65,7 @@ const ring = pts => pts.concat([pts[0]]);
    `tubes` { a, b, dir, keep?, add? } swallow a ball at mouth a and spit it out at b heading
    `dir` degrees. `aim0` sets the tee's opening aim (degrees) when the cup is not the way to go. */
 function makeHole(def) {
-  const h = Object.assign({ par: 3, g: 1, feltMu: SURF.felt.mu, bumps: [], ramps: [], tiers: [], zones: [], posts: [], movers: [], inner: [], tubes: [] }, def);
+  const h = Object.assign({ par: 3, g: 1, feltMu: SURF.felt.mu, bumps: [], drains: [], ramps: [], tiers: [], zones: [], posts: [], movers: [], inner: [], tubes: [] }, def);
   h.open = !def.shape;
   if (!h.floors) h.floors = [h.shape];
   if (!h.walls) h.walls = [ring(h.shape)];
@@ -120,9 +120,20 @@ function baseAt(h, x, z) {
   }
   return [0, 0, 0];
 }
+/* a drain is a coin-funnel bowl: flat at the bottom (radius f, where the cup goes), then a curve
+   that steepens toward the middle, so a ball fed in sideways spirals round and round as it drops */
+const DRAIN_FLAT = CUP_R + 0.07;
+function drainY(d, dr) {
+  const f = dr.flat || DRAIN_FLAT;
+  if (d >= dr.r) return [0, 0];
+  if (d <= f) return [-dr.depth, 0];
+  const u = (dr.r - d) / (dr.r - f);
+  return [-dr.depth * u * u, 2 * dr.depth * u / (dr.r - f)];
+}
 function groundH(h, x, z) {
   let y = baseAt(h, x, z)[0];
   for (const b of h.bumps) { const dx = x - b.x, dz = z - b.z; y += b.h * Math.exp(-(dx * dx + dz * dz) / (b.r * b.r)); }
+  for (const dr of h.drains) y += drainY(Math.hypot(x - dr.x, z - dr.z), dr)[0];
   return y;
 }
 function groundGrad(h, x, z) {
@@ -131,6 +142,10 @@ function groundGrad(h, x, z) {
   for (const b of h.bumps) {
     const dx = x - b.x, dz = z - b.z, k = -2 * b.h * Math.exp(-(dx * dx + dz * dz) / (b.r * b.r)) / (b.r * b.r);
     gx += k * dx; gz += k * dz;
+  }
+  for (const dr of h.drains) {
+    const dx = x - dr.x, dz = z - dr.z, d = Math.hypot(dx, dz), s = d > 1e-9 ? drainY(d, dr)[1] / d : 0;
+    gx += s * dx; gz += s * dz;
   }
   return [gx, gz];
 }
@@ -438,6 +453,7 @@ function mirrorDef(d) {
     return r.axis === 'x' ? Object.assign(o, { h0: h1, h1: h0 }) : Object.assign(o, { h0, h1 });
   });
   if (d.bumps) m.bumps = d.bumps.map(b => Object.assign({}, b, { x: -b.x }));
+  if (d.drains) m.drains = d.drains.map(b => Object.assign({}, b, { x: -b.x }));
   if (d.zones) m.zones = d.zones.map(z => Object.assign({}, z, { poly: mpoly(z.poly) }, z.push ? { push: [-z.push[0], z.push[1]] } : {}));
   if (d.posts) m.posts = d.posts.map(q => Object.assign({}, q, { x: -q.x }));
   if (d.movers) m.movers = d.movers.map(v => v.kind === 'spin' ? Object.assign({}, v, { x: -v.x, w: -v.w, phase: -(v.phase || 0) })
@@ -722,6 +738,24 @@ function skirtGeometry(h, bottom) {
   g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
+/* a drain's look: three painted spiral arms winding down into it, so the funnel reads at a glance */
+function drainSpiral(h, dr) {
+  const g = new THREE.Group(), f = dr.flat || DRAIN_FLAT, cols = ['#fffdf7', '#ffd66e', '#fffdf7'];
+  for (let k = 0; k < 3; k++) {
+    const pos = [], idx = [], N = 140, w = 0.022;
+    for (let i = 0; i <= N; i++) {
+      const u = i / N, rr = dr.r - (dr.r - f) * u, th = k * 2.094 + u * Math.PI * 3.2, x = dr.x + Math.cos(th) * rr, z = dr.z + Math.sin(th) * rr;
+      const nx = Math.cos(th), nz = Math.sin(th);
+      for (const sgn of [-1, 1]) { const px = x + nx * w * sgn * (1 - u * 0.5), pz = z + nz * w * sgn * (1 - u * 0.5); pos.push(px, groundH(h, px, pz) + 0.004, pz); }
+      if (i < N) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx);
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: cols[k], transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 }));
+    m.renderOrder = 1; g.add(m);
+  }
+  g.name = 'drain';
+  return g;
+}
 /* the cup, cut clean: the green is drawn as a grid, which can only cut a ragged square round the
    hole, so the grid stops at COLLAR_R and a fine ring of the same felt (same world UVs, drawn just
    above with polygon offset) runs from there to the exact rim. Inside: a cut band of soil, a white
@@ -864,6 +898,7 @@ function buildHoleScene(h) {
     const gr = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), mat(look.ground, { roughness: 1, depthWrite: false }));
     gr.rotation.x = -Math.PI / 2; gr.position.y = -0.03; gr.receiveShadow = true; gr.renderOrder = -1; holeGroup.add(gr);
   }
+  for (const dr of h.drains) holeGroup.add(drainSpiral(h, dr));
   if (look.prop) scatterProps(holeGroup, h, look);
   if (look.decor) look.decor(holeGroup, h);
   scene.background = skyTexture(look.sky[0], look.sky[1]);
@@ -906,6 +941,11 @@ function cameraGoal() {
   }
   const over = () => { const hi = Math.max(B.x1 - B.x0, (B.z1 - B.z0) * 1.7) * 0.75 + 2; return { pos: new THREE.Vector3(B.cx, hi, B.cz - hi * 0.3), look: new THREE.Vector3(B.cx, 0, B.cz) }; };
   if (play.overview) return over();
+  /* the drop: swoop in low over the lip and look down into the cup */
+  if (play.phase === 'sunk' && !reducedMotion()) {
+    const [fx, fz] = play.fx.sinkFrom || h.tee, dx = h.cup[0] - fx, dz = h.cup[1] - fz, d = Math.hypot(dx, dz) || 1, cy = groundH(h, ...h.cup);
+    return { pos: new THREE.Vector3(h.cup[0] - dx / d * 0.42, cy + 0.36, h.cup[1] - dz / d * 0.42), look: new THREE.Vector3(h.cup[0], cy - 0.08, h.cup[1]) };
+  }
   if (play.phase === 'replay') {
     /* low, beside the ball's path, looking across it */
     const r = play.replay, b = r.b, v = Math.hypot(b.vx, b.vz), ux = v > 0.05 ? b.vx / v : 0, uz = v > 0.05 ? b.vz / v : 1;
@@ -1401,7 +1441,8 @@ function advance(dt) {
   if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
   if (play.phase === 'replay') { advanceReplay(dt); return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
-  const b0b = play.ball, near = (play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.35 && Math.hypot(b0b.vx, b0b.vz) < 1.2;
+  const b0b = play.ball, near = ((play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.35 && Math.hypot(b0b.vx, b0b.vz) < 1.2)
+    || (play.phase === 'sunk' && (play.fx.sunkT || 0) < 0.3);
   play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.7 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
   dt *= play.fx.slow;
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
@@ -1449,7 +1490,10 @@ function stepSink(dt) {
     if (k.y < floor) {
       k.y = floor;
       if (k.vy < -0.3) {
-        if (!k.floor) { k.floor = true; sfx('plunk'); sinkRing(); play.fx.shake = Math.max(play.fx.shake || 0, 0.18); }
+        if (!k.floor) {
+          k.floor = true; sfx('plunk'); sinkRing(); play.fx.shake = Math.max(play.fx.shake || 0, 0.18);
+          const h = play.hole; if (!reducedMotion()) burst(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup) + 0.04, h.cup[1]), 45);
+        }
         k.vy = -k.vy * 0.32;
       } else k.vy = 0;
       k.vx *= 1 - Math.min(1, 4 * d); k.vz *= 1 - Math.min(1, 4 * d);

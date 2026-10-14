@@ -16,7 +16,7 @@ Units are metres and seconds, and y is up. A hole lies in the x-z plane, and the
 - **Angles** are degrees, 0 is +z and 90 is +x. On screen, from behind the ball, +x is to the **left**.
 - **Ball** radius is 0.051 and **cup** radius is 0.11.
 - **Walls** are 0.1 thick (`WALL_HALF` 0.05) and stand 0.15 over the highest ground next to them.
-- **Full power** rolls about 14.5 m on felt. Keep holes inside about 14 x 14 m; most are 3-8 m long.
+- **Full power** rolls about 17 m on felt. Keep holes inside about 14 x 14 m; most are 3-8 m long.
 - **Lanes** need to be at least 0.6 m wide between wall centre lines, and choke points at least 0.4 m (the ball is 0.1 wide).
 
 ## A hole
@@ -29,6 +29,7 @@ registerWorld(N, { g: 1, feltMu: 0.075, holes: [
     tiers: [{ poly: rect(-0.6, 4, 2.4, 7), h: 0.25, sx: 0, sz: 0.02 }],          // raised (optionally tilted) plateau
     ramps: [{ x0: -0.6, z0: 3, x1: 0.6, z1: 4, axis: 'z', h0: 0, h1: 0.25 }],   // rises h0 -> h1 along +axis; beats tiers
     bumps: [{ x: 1.2, z: 5.5, r: 0.5, h: 0.12 }],                                 // gaussian hill (h > 0) or bowl (h < 0)
+    drains: [{ x: 1.8, z: 6.2, r: 1.2, depth: 0.3 }],                             // coin-funnel bowl: flat at the bottom (put the cup there), steepening inward
     zones: [{ surf: 'sand', poly: rect(...) }, { surf: 'water', poly: ... }, { push: [0, 1.2], poly: ... }],
     posts: [{ x, z, r, e?, top?, look? }],                                        // e > 1 is a bumper that adds speed
     movers: [{ kind: 'spin', x, z, len, w, phase, blades?: 2, look? },           // arm(s) through a hub; blades 2 = windmill cross
@@ -112,10 +113,29 @@ Look rules:
   still applies, a little above course w at most.
 - Each of the two has one or two `auto` holes and 3 to 6 `crazy` holes.
 
+## Long greens
+
+Every course has 3 or 4 **long greens**: open, real-golf-course putting surfaces 8 to 15 m long
+(full power rolls about 17 m), with broad tilted tiers, swales and ridges (wide, low bumps, r 1 to
+3 m, h 0.05 to 0.2) and a cup on a flat spot. No gimmicks: the challenge is reading the break and
+the pace. They must be makeable: par 2 or 3, and the solver's line should be a single smooth lag
+or a lag and a tap-in.
+
+## Auto holes: make them mental
+
+An auto hole is a Rube Goldberg ride: at least 4 stages, e.g. a chute, a banked turn, a tube that
+spits the ball at a fixed speed into a drain that spirals it round and round into the cup, or a
+drain whose drop leads into a second drain. It must still nearly play itself (the holes-check rule).
+
 ## Design brief: harder, for 12-year-olds
 
 - **Shape of a course:** holes 1-5 are a warm-up that teaches the course's signature mechanic, 6-12 combine it with others, 13-18 are hard, and hole 18 is the showpiece.
 - **Multi-part holes:** at least 5 holes per course are crazy 3-4 part holes. That means 3 or 4 distinct sections joined by ramps, drops, tubes or gaps: upper deck, then tube, then lower green, then a guarded cup.
+- **Drains** (`drains: [{ x, z, r, depth, flat? }]`): a coin-funnel bowl. Its bottom is flat out to
+  `flat` (default 0.18, so a cup at its centre sits on flat ground); outside that the floor rises,
+  gently at the rim and steeply near the middle. A ball fed in sideways at the right pace spirals
+  round one to three laps before it drops; too slow and it stops on the shallow rim. Feed one from a
+  tube with `keep: 0` and a fixed `add` for a deterministic spiral. Depth 0.2 to 0.35, r 0.9 to 1.6.
 - **Big hills** belong everywhere: bumps up to h 0.35, steep banks, crater cups, tilted greens that need reading.
 - **Not a gimme:** at most 4% of tee shots may ace (`holes-check` enforces this). Aces should take a precise bank or a deliberate tube.
 - **Difficulty target:** the noisy bot (`--bot`) mean minus par sits around `0.1 + 0.07 * (N - 1)` to `0.5 + 0.08 * (N - 1)` across the course. Course 1 is about par+0.1 to par+0.5; course 10 is about par+0.7 to par+1.2. Individual holes may sit outside the band.

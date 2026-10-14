@@ -67,17 +67,17 @@ registerWorld(4, { holes: [
       { surf: 'water', poly: C4_POOL(0.3, 5.9, 0.35) }, { surf: 'ice', poly: rect(-2, 2, 2, 6.4) }],
     posts: [C4_MAN(0.7, 7.0), C4_MAN(1.55, 6.6)], bumps: [{ x: 1.2, z: 7.2, r: 0.55, h: 0.1 }] },
   /* 15. mogul descent: down a steep slope of moguls into a ring of snowmen */
-  { par: 3, sol: [[18,0.88,1.5]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[22,0.72,1]], tee: [0, 0.5], cup: [-0.6, 7.8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 1.4), h: 0.4 }], ramps: [{ x0: -1.2, z0: 1.4, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.4, h1: 0 }],
     bumps: [{ x: 0.4, z: 2.4, r: 0.35, h: 0.14 }, { x: -0.5, z: 3.2, r: 0.4, h: 0.16 }, { x: 0.3, z: 4.2, r: 0.4, h: 0.15 }, { x: -0.2, z: 5.0, r: 0.35, h: 0.12 }],
     inner: [[[-1.2, 6.0], [0.5, 6.0]]], posts: [C4_MAN(-0.05, 7.5), C4_MAN(-0.6, 8.45)], movers: [C4_BALL(0.1, 5.6, 0.8, 5.6, 2.8)] },
   /* 16. twin bowls: off the deck, round two icy avalanche bowls, past a rolling snowball */
-  { par: 4, sol: [[26,0.68,0]], tee: [0, 0.5], cup: [0, 7.1], shape: rect(-1.6, 0, 1.6, 8),
+  { par: 4, sol: [[30,0.44,0]], tee: [0, 0.5], cup: [0, 7.1], shape: rect(-1.6, 0, 1.6, 8),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }],
     bumps: [{ x: -0.7, z: 3.2, r: 0.7, h: -0.3 }, { x: 0.7, z: 4.6, r: 0.7, h: -0.3 }, { x: 0, z: 7.1, r: 0.55, h: 0.1 }],
     zones: [{ surf: 'ice', poly: rect(-1.6, 1.6, 1.6, 5.6) }], movers: [C4_BALL(-0.9, 6.0, 0.9, 6.0, 3.0)] },
   /* 17. ski lift: ride the narrow lift ramp, beat the bar at the top, drop to the lake */
-  { par: 5, crazy: true, sol: [[4,0.96,1.5],[0,0.2,0]], tee: [0, 0.5], cup: [0.6, 8.9], shape: rect(-1.4, 0, 1.4, 10),
+  { par: 5, crazy: true, sol: [[4,1,0.5]], tee: [0, 0.5], cup: [0.6, 8.9], shape: rect(-1.4, 0, 1.4, 10),
     ramps: [{ x0: -0.45, z0: 2.4, x1: 0.45, z1: 4.4, axis: 'z', h0: 0, h1: 0.4 }], tiers: [{ poly: rect(-1.4, 4.4, 1.4, 6.4), h: 0.4 }],
     movers: [{ kind: 'gate', ax: -0.8, az: 4.8, bx: 0.8, bz: 4.8, len: 0.35, ang: 90, period: 3.4, phase: 0, look: 'lift' }],
     zones: [{ surf: 'water', poly: C4_POOL(-0.5, 8.2, 0.45, 0.4) }, { surf: 'ice', poly: rect(-1.4, 6.4, 1.4, 7.6) }],

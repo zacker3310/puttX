@@ -6,18 +6,19 @@ const C7_GATE = (ax, az, bx, bz, len, ang, period, phase) => ({ kind: 'gate', ax
 const C7_GHOST = (ax, az, bx, bz, period, phase) => ({ kind: 'slide', ax, az, bx, bz, r: 0.17, period, phase, look: 'ghost' });
 const C7_GARG = (x, z) => ({ x, z, r: 0.12, top: 0.3, look: 'gargoyle' });
 const C7_MOAT = poly => ({ surf: 'water', poly });
-/* the spectral vortex: a walled round bowl (radius 1.3) over a drain, fed by a straight lane on
-   its +x side; a ball spat up the lane from (cx + 0.95, cz - 2.8) heading 0 spirals round and down */
-const C7_VORTEX = (cx, cz) => {
+/* the spectral vortex: a walled round bowl (radius 1.3) over a drain, fed by a straight lane of
+   length L on its +x side; a ball spat up the lane from (cx + 0.95, cz - L + 0.4) heading 0
+   spirals round and down */
+const C7_VORTEX = (cx, cz, L = 3.2) => {
   const R = 1.3, p = [[cx + R, cz]];
   for (let i = 1; i < 24; i++) {
     const a = i / 24 * 2 * Math.PI, x = R * Math.cos(a), z = R * Math.sin(a);
     if (z < 0 && x > 0.6) break;
     p.push([cx + x, cz + z]);
   }
-  return p.concat([[cx + 0.6, cz - Math.sqrt(R * R - 0.36)], [cx + 0.6, cz - 3.2], [cx + 1.3, cz - 3.2], [cx + 1.3, cz]]);
+  return p.concat([[cx + 0.6, cz - Math.sqrt(R * R - 0.36)], [cx + 0.6, cz - L], [cx + 1.3, cz - L], [cx + 1.3, cz]]);
 };
-const C7_DRAIN = (x, z) => ({ x, z, r: 1.6, depth: 0.35 });
+const C7_DRAIN = (x, z) => ({ x, z, r: 1.3, depth: 0.35 });
 registerWorld(7, { holes: [
   /* 1: over the drawbridge; a gargoyle guards the cup */
   { par: 2, sol: [[34,0.72,0]], tee: [0, 0.5], cup: [0, 5.3], shape: rect(-0.9, 0, 0.9, 6),
@@ -71,12 +72,12 @@ registerWorld(7, { holes: [
     bumps: [{ x: 0.3, z: 5.5, r: 0.5, h: 0.2 }],
     movers: [C7_MILL(0.1, 6.2, 0.5, 1.5, 0)] },
   /* 11: down the dungeon and back through the portcullis, a ghost on patrol */
-  { par: 3, sol: [[332,0.9375,0],[12,1,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
+  { par: 3, sol: [[342,0.76,2],[4,0.6,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
     inner: [[[1.7, 3], [2.15, 3]], [[2.65, 3], [3.1, 3]]],
     bumps: [{ x: -0.1, z: 4.85, r: 0.5, h: 0.2 }],
     movers: [C7_GHOST(1.2, 4.45, 1.2, 5.15, 2.2, 0), C7_GATE(2.4, 3, 2.85, 3, 0.25, 90, 2.8, 0)] },
   /* 12: the ghost ballroom: two dancing ghosts on a polished floor, the cup up on the stage */
-  { par: 3, sol: [[180,0.9,0],[4,0.95,0]], tee: [0, 0.5], cup: [0.6, 7.05], shape: rect(-1.3, 0, 1.3, 7.6),
+  { par: 3, sol: [[26,0.8,0]], tee: [0, 0.5], cup: [0.6, 7.05], shape: rect(-1.3, 0, 1.3, 7.6),
     zones: [{ surf: 'fast', poly: rect(-1.3, 1.5, 1.3, 5.8) }],
     tiers: [{ poly: rect(-1.3, 6.4, 1.3, 7.6), h: 0.15 }],
     ramps: [{ x0: -0.25, z0: 5.8, x1: 0.25, z1: 6.4, axis: 'z', h0: 0, h1: 0.15 }],
@@ -84,7 +85,7 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(-0.65, 5.95), C7_GARG(0.65, 5.95), C7_GARG(0.25, 6.8)],
     movers: [C7_GHOST(-0.75, 3.0, 0.75, 3.0, 3.0, 0), C7_GHOST(0.75, 4.5, -0.75, 4.5, 2.4, 1.2)] },
   /* 13: windmill ramp to the rampart, down the narrow drawbridge (or jump the moat), then the tilted courtyard */
-  { par: 4, sol: [[322,0.92,0],[72,0.48,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
+  { par: 4, sol: [[46,1,1.5],[0,0.12,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
     ramps: [{ x0: -1.2, z0: 2.6, x1: 1.2, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.55, z0: 5.4, x1: 1.05, z1: 6.5, axis: 'z', h0: 0.3, h1: 0.07 }],
     tiers: [{ poly: rect(-1.2, 3.6, 1.2, 5.4), h: 0.3 }, { poly: rect(-1.2, 6.5, 1.2, 9.6), h: 0.2, sz: -0.02 }],
     zones: [C7_MOAT(rect(-1.2, 5.4, 0.55, 6.5)), C7_MOAT(rect(1.05, 5.4, 1.2, 6.5)), C7_MOAT(rect(-1.2, 9.25, 1.2, 9.6))],
@@ -115,7 +116,7 @@ registerWorld(7, { holes: [
     bumps: [{ x: -1.1, z: 4.1, r: 0.35, h: 0.1 }],
     movers: [C7_GATE(1.125, 2, 1.375, 2, 0.25, 90, 2.4, 0)] },
   /* 18: the showpiece: through the gate, up the tower stairs, into the right secret passage, down to the throne room */
-  { par: 4, crazy: true, sol: [[0,0.6,1.2],[20,1,1.2]], tee: [0, 0.5], cup: [3.4, 7.3], floors: [rect(-1.2, 0, 1.2, 7), rect(2.0, 3.0, 4.8, 8.0)],
+  { par: 4, crazy: true, sol: [[0,0.84,1.5],[12,0.84,0]], tee: [0, 0.5], cup: [3.4, 7.3], floors: [rect(-1.2, 0, 1.2, 7), rect(2.0, 3.0, 4.8, 8.0)],
     walls: [ring(rect(-1.2, 0, 1.2, 7)), ring(rect(2.0, 3.0, 4.8, 8.0)), [[-1.2, 2.2], [-0.3, 2.2]], [[0.3, 2.2], [1.2, 2.2]]],
     tiers: [{ poly: rect(-1.2, 3.8, 1.2, 7), h: 0.2 }, { poly: rect(-1.2, 5.4, 1.2, 7), h: 0.4 }, { poly: rect(2.6, 6.4, 4.2, 8.0), h: 0.1 }],
     ramps: [{ x0: -1.2, z0: 3.0, x1: 0, z1: 3.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0, z0: 4.6, x1: 1.2, z1: 5.4, axis: 'z', h0: 0.2, h1: 0.4 },

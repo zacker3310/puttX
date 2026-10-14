@@ -7,13 +7,13 @@ const C9_PRESS = (ax, az, bx, bz, len, ang, period, phase = 0) => ({ kind: 'gate
 const C9_BELT = (poly, ax, az) => ({ push: [ax, az], poly });
 const C9_PIPE = (a, b, dir, keep, add) => ({ a, b, dir, keep, add, color: '#ef7d6d' });
 registerWorld(9, { holes: [
-  /* 1: a sideways belt across the lane */
-  { par: 3, sol: [[0,0.6,0]], tee: [0, 0.5], cup: [-0.35, 5.6], shape: rect(-0.8, 0, 0.8, 6.4),
-    zones: [C9_BELT(rect(-0.8, 2.4, 0.8, 3.6), 1.8, 0)], posts: [C9_GUM(0.15, 4.5)] },
-  /* 2: dogleg left, a belt carries round the bend onto hard candy */
-  { par: 2, sol: [[0,0.4,0]], tee: [0, 0.5], cup: [4.0, 3.7], aim0: 10, shape: [[-0.7, 0], [0.7, 0], [0.7, 3], [4.6, 3], [4.6, 4.4], [-0.7, 4.4]],
-    zones: [C9_BELT(rect(-0.7, 3, 0.7, 4.4), 1.6, 0), { surf: 'fast', poly: rect(0.7, 3, 3.2, 4.4) }],
-    posts: [C9_GUM(-0.25, 3.9)] },
+  /* 1: a sideways belt across the lane, a taffy back stop */
+  { par: 3, sol: [[0,0.44,0]], tee: [0, 0.5], cup: [-0.35, 5.0], shape: rect(-0.8, 0, 0.8, 6.4),
+    zones: [C9_BELT(rect(-0.8, 2.4, 0.8, 3.6), 1.8, 0), { surf: 'mud', poly: rect(-0.8, 5.6, 0.8, 6.4) }], posts: [C9_GUM(0.15, 4.5)] },
+  /* 2: dogleg left, a slow belt nudges round the bend onto hard candy, a gumdrop and a taffy end guard the cup */
+  { par: 2, sol: [[22,0.92,0]], tee: [0, 0.5], cup: [3.7, 3.7], aim0: 10, shape: [[-0.7, 0], [0.7, 0], [0.7, 3], [4.6, 3], [4.6, 4.4], [-0.7, 4.4]],
+    zones: [C9_BELT(rect(-0.7, 3, 0.7, 4.4), 0.5, 0), { surf: 'fast', poly: rect(0.7, 3, 3.2, 4.4) }, { surf: 'mud', poly: rect(4.1, 3, 4.6, 4.4) }],
+    posts: [C9_GUM(-0.25, 3.9), C9_GUM(3.1, 3.75)] },
   /* 3: hard-candy slab through a gumdrop field */
   { par: 3, sol: [[8,0.92,0]], tee: [0, 0.5], cup: [0.6, 6.3], shape: rect(-1.2, 0, 1.2, 7), inner: [[[0, 5.6], [1.2, 5.6]]],
     zones: [{ surf: 'fast', poly: rect(-1.2, 1.4, 1.2, 7) }],

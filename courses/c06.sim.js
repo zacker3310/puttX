@@ -12,7 +12,7 @@ registerWorld(6, { holes: [
   { par: 2, sol: [[0,0.6,0]], tee: [0, 0.5], cup: [0.3, 5.4], shape: rect(-1, 0, 1, 6.4),
     bumps: [{ x: 0.1, z: 3, r: 0.65, h: 0.3 }, { x: 0.6, z: 4.4, r: 0.35, h: 0.15 }], zones: [V6_LAVA(rect(-1, 6.1, 1, 6.4))] },
   /* 2: long green: the ash apron, a 9 m lag over a side-slope, a ridge and a swale */
-  { par: 2, sol: [], tee: [0, 0.5], cup: [0.5, 8.4], shape: rect(-1.6, 0, 1.6, 9.4),
+  { par: 2, sol: [[12,0.92,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: rect(-1.6, 0, 1.6, 9.4),
     tiers: [{ poly: rect(-1.7, -0.1, 1.7, 9.5), h: 0.15, sx: 0.025 }],
     bumps: [{ x: 0.9, z: 4, r: 1.6, h: 0.12 }, { x: -0.8, z: 6.2, r: 1.3, h: -0.08 }] },
   /* 3: first crater cup, lava behind it */
@@ -24,7 +24,7 @@ registerWorld(6, { holes: [
     bumps: V6_CRATER(-0.6, 2.1, 0.8), tubes: [{ a: [-0.6, 2.1], b: [-0.1, 4.2], dir: 0 }],
     zones: [V6_LAVA(rect(0.3, 4.7, 1.4, 5.4)), V6_MUD(rect(-0.6, 4.9, 0.3, 5.5))] },
   /* 5: long green: two tiers joined by a broad bank, a cross-slope swale below and a crown above */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-0.7, 11.4], shape: rect(-1.8, 0, 1.8, 12.4),
+  { par: 3, sol: [[338,1,0]], tee: [0, 0.5], cup: [-0.7, 11.4], shape: rect(-1.8, 0, 1.8, 12.4),
     tiers: [{ poly: rect(-1.9, -0.1, 1.9, 5.5), h: 0.1, sz: 0.004 }, { poly: rect(-1.9, 7, 1.9, 12.5), h: 0.1925, sz: 0.015 }],
     ramps: [{ x0: -1.8, z0: 5.5, x1: 1.8, z1: 7, axis: 'z', h0: 0.122, h1: 0.2975 }],
     bumps: [{ x: 1.2, z: 3, r: 2, h: -0.1 }, { x: 0.8, z: 9.6, r: 1.4, h: 0.1 }] },
@@ -60,7 +60,7 @@ registerWorld(6, { holes: [
     bumps: V6_CRATER(1.5, 5.2, 0.7), tubes: [{ a: [1.5, 5.2], b: [-0.2, 8.4], dir: 75 }], posts: [V6_COL(1.4, 8.2), V6_COL(0.9, 7.7)],
     zones: [V6_LAVA(rect(-0.7, 6.5, 2.6, 6.9))] },
   /* 12: long green: the caldera floor, 12 m downhill-to-uphill over a ridge and two swales */
-  { par: 3, sol: [], tee: [0, 0.5], cup: [-1, 12.2], shape: rect(-2, 0, 2, 13.2),
+  { par: 3, sol: [[346.61,0.86,0]], tee: [0, 0.5], cup: [-1, 12.2], shape: rect(-2, 0, 2, 13.2),
     tiers: [{ poly: rect(-2.1, -0.1, 2.1, 13.3), h: 0.2, sx: -0.03, sz: 0.006 }],
     bumps: [{ x: 0.8, z: 5, r: 2.2, h: 0.15 }, { x: -1.1, z: 8, r: 1.6, h: -0.1 }, { x: 1.3, z: 10.4, r: 1.5, h: -0.08 }] },
   /* 13: lava jumps: two kickers over two lava rivers to a crater green (crazy, 3 parts) */
@@ -88,13 +88,13 @@ registerWorld(6, { holes: [
     posts: [V6_COL(2.6, 1.1)],
     zones: [V6_LAVA(rect(2.2, 2.4, 2.6, 3.15)), V6_LAVA(rect(3.2, 3.6, 3.6, 5))] },
   /* 17: crater moat: a narrow ramp over the lava moat to the island crater (crazy, 3 parts) */
-  { par: 4, crazy: true, sol: [[206,0.68,0],[330,0.4,0]], tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
+  { par: 4, crazy: true, sol: [[216,0.72,0],[326,0.44,0]], tee: [0, 0.5], cup: [-0.4, 6.5], shape: rect(-2, 0, 2, 9),
     ramps: [{ x0: 0.5, z0: 3.7, x1: 1.1, z1: 4.5, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.2, 4.5, 1.2, 7.5), h: 0.25 }],
     bumps: [...V6_CRATER(-0.4, 6.5, 0.85), ...V6_CRATER(-1.5, 2, 0.7)], tubes: [{ a: [-1.5, 2], b: [0.6, 5.1], dir: 340 }], posts: [V6_COL(0.1, 5.8)],
     zones: [V6_LAVA(rect(-2, 3.7, 0.5, 4.45)), V6_LAVA(rect(1.1, 3.7, 2, 4.45)), V6_LAVA(rect(-2, 4.45, -1.25, 9)), V6_LAVA(rect(1.25, 4.45, 2, 9)), V6_LAVA(rect(-1.25, 7.55, 1.25, 9))] },
   /* 18: the summit: boulder run, two ledges up the cone and the summit crater, or the tube (crazy, 4 parts) */
-  { par: 5, crazy: true, sol: [[350,0.96,0],[86,0.84,0]], tee: [0, 0.5], cup: [0.3, 9.3], aim0: 0,
+  { par: 5, crazy: true, sol: [[344,0.84,0],[88,0.72,0]], tee: [0, 0.5], cup: [0.3, 9.3], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [0.8, 5], [3, 5], [3, 5.1], [3, 6.5], [3, 6.6], [3, 7.6], [3, 10.6], [-0.8, 10.6], [-0.8, 7.6], [-0.8, 6.6], [-0.8, 6.5], [-0.8, 5.1], [-0.8, 5], [-0.8, 4]],
     inner: [[[-0.8, 6.6], [1.6, 6.6]], [[1.6, 5], [1.6, 6.05]]],
     ramps: [{ x0: -0.8, z0: 4, x1: 0.8, z1: 5, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.6, z0: 6.6, x1: 3, z1: 7.6, axis: 'z', h0: 0.3, h1: 0.6 }],

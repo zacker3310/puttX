@@ -815,7 +815,7 @@ function scatterProps(group, h, look) {
     const x = x0 + r() * (x1 - x0), z = z0 + r() * (z1 - z0);
     if (h.floors.some(f => inPoly(f, x, z)) || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < 0.5; })
       || h.floors.some(f => f.some((p, i) => { const q = f[(i + 1) % f.length], c = closestOnSeg(p[0], p[1], q[0], q[1], x, z); return Math.hypot(x - c[0], z - c[1]) < 0.5; }))) continue;
-    const o = look.prop(r); o.position.set(x, 0, z); o.rotation.y = r() * Math.PI * 2; group.add(o); n++;
+    const o = look.prop(r); o.position.set(x, 0, z); o.rotation.y = r() * Math.PI * 2; o.userData.prop = true; group.add(o); n++;
   }
 }
 function disposeGroup(g) {
@@ -1829,6 +1829,23 @@ function neonGrid() {
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(40, 40); return t;
 }
 let ballHalo = null;
+/* the cosmic-bowling groove: a four-on-the-floor kick, off-beat hats and a little bass line,
+   synthesized, scheduled a beat ahead, only while a neon hole is on screen (and the sound is on) */
+const BPM = 118, BASS = [55, 55, 65.4, 49, 55, 73.4, 65.4, 49];
+let beatAt = 0, beatN = 0;
+function neonBeat(on) {
+  if (!on || !actx || !progress.sound) { beatAt = 0; return; }
+  const now = actx.currentTime, step = 60 / BPM;
+  if (!beatAt || beatAt < now - 0.5) beatAt = now + 0.05;
+  while (beatAt < now + 0.2) {
+    const d = beatAt - now;
+    tone(110, 0.22, { vol: 0.22, slide: -70, delay: d });
+    noise(0.04, { vol: 0.05, freq: 8000, q: 0.8, type: 'highpass', delay: d + step / 2 });
+    tone(BASS[beatN % BASS.length], step * 0.45, { type: 'sawtooth', vol: 0.045, delay: d + step / 2 });
+    if (beatN % 4 === 3) noise(0.12, { vol: 0.07, freq: 1800, q: 0.7, delay: d });
+    beatAt += step; beatN++;
+  }
+}
 function nightDecor(group, h) {
   const B = holeBounds(h), pos = [], r = rng32(7);
   /* the carpet: the floor's felt becomes black-light paint */
@@ -1873,6 +1890,31 @@ function nightDecor(group, h) {
     drift.add(o);
   }
   group.add(drift);
+  /* the scenery turns into black-light silhouettes, each glowing its own neon */
+  let pi = 0;
+  for (const c of group.children) if (c.userData.prop) {
+    const col = NEON[pi++ % NEON.length];
+    c.traverse(o => { if (o.isMesh && o.material && o.material.emissive) { o.material = o.material.clone(); o.material.color.set('#160c33'); o.material.emissive.set(col); o.material.emissiveIntensity = 0.55; } });
+  }
+  /* lasers sweeping from two towers of light over the course */
+  const lasers = new THREE.Group(); lasers.name = 'lasers';
+  for (let i = 0; i < 8; i++) {
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 7.5, 5, 1, true), new THREE.MeshBasicMaterial({ color: NEON[i % NEON.length], transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    beam.geometry.translate(0, -3.75, 0);
+    const pivot = new THREE.Group(); pivot.position.set(B.cx + (i < 4 ? -1 : 1) * Math.max(0.6, (B.x1 - B.x0) * 0.3), 5.5, B.z0 + ((i % 4) + 0.5) / 4 * (B.z1 - B.z0));
+    pivot.userData.phase = i * 0.8; pivot.userData.side = i < 4 ? 1 : -1; pivot.add(beam); lasers.add(pivot);
+  }
+  group.add(lasers);
+  /* a disco ball high over the green, throwing spots of light that wheel across the carpet */
+  const disco = new THREE.Mesh(new THREE.IcosahedronGeometry(0.32, 1), new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 1, roughness: 0.15, flatShading: true, emissive: '#5a4a90', emissiveIntensity: 0.5 }));
+  disco.position.set(B.cx, 3.4, B.cz); disco.name = 'disco'; group.add(disco);
+  const spots = new THREE.Group(); spots.name = 'spots'; spots.position.set(B.cx, 0, B.cz);
+  const spotGeo = new THREE.CircleGeometry(0.045, 14);
+  for (let i = 0; i < 46; i++) {
+    const m = new THREE.Mesh(spotGeo, new THREE.MeshBasicMaterial({ color: NEON[i % NEON.length], transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    m.rotation.x = -Math.PI / 2; m.userData.r = 0.4 + r() * B.ext; m.userData.a = r() * Math.PI * 2; spots.add(m);
+  }
+  group.add(spots);
 }
 /* per frame at night: the ball glows, the cup ring and wall halos breathe, the shapes turn */
 function tickNight(dt, t) {
@@ -1883,9 +1925,24 @@ function tickNight(dt, t) {
   }
   ballHalo.visible = on;
   ballMesh.material.emissive.set(on ? 0x9a9ab0 : 0x000000);
+  neonBeat(on && currentScene === 'hole');
   if (!on || reducedMotion()) return;
-  const k = 0.5 + 0.5 * Math.sin(t * 2.2);
-  const glow = holeGroup.getObjectByName('cupGlow'); if (glow) glow.material.opacity = 0.7 + 0.3 * k;
+  /* everything breathes on the beat */
+  const beat = (t * BPM / 60) % 1, k = Math.exp(-beat * 5);
+  const glow = holeGroup.getObjectByName('cupGlow'); if (glow) glow.material.opacity = 0.6 + 0.4 * k;
+  const walls = holeGroup.getObjectByName('walls');
+  if (walls) for (const c of walls.children) if (c.name === 'halo') c.material.opacity = 0.1 + 0.22 * k;
+  const h = play.hole;
+  for (const p of holeGroup.getObjectByName('lasers').children) {
+    const u = t * 0.6 + p.userData.phase;
+    p.rotation.set(Math.sin(u) * 0.45, 0, -p.userData.side * (0.45 + Math.sin(u * 0.7) * 0.3));
+  }
+  const disco = holeGroup.getObjectByName('disco'); disco.rotation.y += dt * 0.8;
+  for (const m of holeGroup.getObjectByName('spots').children) {
+    const a = m.userData.a + t * 0.35, x = disco.position.x + Math.cos(a) * m.userData.r, z = disco.position.z + Math.sin(a) * m.userData.r;
+    m.position.set(Math.cos(a) * m.userData.r, groundH(h, x, z) + 0.006, Math.sin(a) * m.userData.r);
+    m.visible = onFloor(h, x, z);
+  }
   for (const o of holeGroup.getObjectByName('neonDrift').children) { o.rotation.x += dt * o.userData.spin; o.rotation.y += dt * o.userData.spin * 0.7; }
 }
 
@@ -2088,10 +2145,10 @@ function showCard(w) {
 /* ============ 8. FX ============ */
 const FX_COLORS = [0xef7d6d, 0xffd66e, 0x74c465, 0x6fc0df, 0xfff8ec];
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-let trailDots = [], confetti = [], trailClock = 0, trailNext = 0;
+let trailDots = [], confetti = [], trailClock = 0, trailNext = 0, trailN = 0;
 function initFx() {
   const dotGeo = new THREE.SphereGeometry(BALL_R * 0.55, 10, 8);
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 30; i++) {
     const m = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0xfffdf7, transparent: true, opacity: 0, depthWrite: false }));
     m.visible = false; m.userData.life = 0; scene.add(m); trailDots.push(m);
   }
@@ -2129,12 +2186,13 @@ function updateFx(dt) {
   if (!calm && rolling && !b.tube && trailClock >= trailNext && Math.hypot(b.vx, b.vz) > 0.3) {
     trailNext = trailClock + 0.03;
     const m = trailDots.find(d => !d.visible) || trailDots[0];
-    m.position.set(b.x, b.y + BALL_R * 0.6, b.z); m.visible = true; m.userData.life = 0.4;
+    m.position.set(b.x, b.y + BALL_R * 0.6, b.z); m.visible = true; m.userData.life = progress.neon ? 0.8 : 0.4;
+    m.material.color.set(progress.neon ? NEON[(trailN++) % NEON.length] : '#fffdf7'); m.material.blending = progress.neon ? THREE.AdditiveBlending : THREE.NormalBlending;
   }
   for (const m of trailDots) if (m.visible) {
     m.userData.life -= dt;
     if (m.userData.life <= 0 || calm) { m.visible = false; continue; }
-    m.material.opacity = m.userData.life / 0.4 * 0.55; m.scale.setScalar(0.4 + m.userData.life / 0.4 * 0.6);
+    const L = progress.neon ? 0.8 : 0.4; m.material.opacity = m.userData.life / L * (progress.neon ? 0.9 : 0.55); m.scale.setScalar((0.4 + m.userData.life / L * 0.6) * (progress.neon ? 1.6 : 1));
   }
   /* squash on hard hits */
   const s = calm ? 0 : (play.fx.squash || 0);

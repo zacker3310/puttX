@@ -40,7 +40,8 @@ const visibleLetters = page => page.evaluate(() => {
   const out = [], w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   for (let n; (n = w.nextNode());) {
     const el = n.parentElement;
-    if (!el || el.closest('script,style,title') || !el.getClientRects().length) continue;
+    /* the game's name on the title sign is the one word allowed: it is the logo */
+    if (!el || el.closest('script,style,title,[data-logo]') || !el.getClientRects().length) continue;
     if (getComputedStyle(el).visibility === 'hidden') continue;
     if (/\p{L}/u.test(n.nodeValue)) out.push(n.nodeValue.trim().slice(0, 24));
   }

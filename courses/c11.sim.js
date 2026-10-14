@@ -114,7 +114,7 @@ registerWorld(11, { holes: [
     zones: [{ push: [-1.1, 0], poly: rect(-1.4, 7.9, 1.4, 8.3) }, { surf: 'sand', poly: rect(-1.4, 9, -0.4, 9.6) }],
     bumps: [{ x: 0.2, z: 7.4, r: 0.4, h: 0.16 }] },
   /* 14: pipe relay (4 parts). The pipe or the gap into the crane yard, the second pipe or the top gap, then down the belt lane */
-  { par: 4, crazy: true, sol: [[352,1,0],[104,0.79,0]], tee: [-1, 0.5], cup: [1, 1.4], aim0: 0, shape: rect(-2, 0, 2, 9),
+  { par: 4, crazy: true, sol: [[352,0.96,0],[106,0.92,0]], tee: [-1, 0.5], cup: [1, 1.4], aim0: 0, shape: rect(-2, 0, 2, 9),
     inner: [[[0, 0], [0, 8.2]], [[-1.4, 4], [0, 4]]],
     movers: [{ kind: 'spin', x: -1, z: 6, len: 0.6, w: 1.3, phase: 0, look: 'crane' }],
     tubes: [{ a: [-0.4, 3.4], b: [-1.2, 8.3], dir: 90 }, { a: [-1.6, 4.6], b: [1, 6.6], dir: 180 }],

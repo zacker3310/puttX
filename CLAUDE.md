@@ -15,7 +15,8 @@ Never hand-edit or Read `index.html` (the three.js line is ~690 KB). Edit the so
 
 ## Rules the suites enforce
 
-- Zero words on screen: numerals and symbols only. `aria-label`s are fine.
+- Zero words on screen: numerals and symbols only. `aria-label`s are fine. The one exception is the
+  logo on the title sign (`data-logo`).
 - No fail states: every hole finishes (the stroke cap, double par, auto-sinks); stars and bests only go up.
 - Tap targets at least 64 px rendered at 1024x768 (88 stage px buttons).
 - Toybox look: the `--v-*` tokens from vroom, flat shadows, big radii.

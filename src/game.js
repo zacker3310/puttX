@@ -995,7 +995,7 @@ const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeL
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
 const PUTTER_SCALE = 0.83;   /* the club shrank with the ball; it is built full size and scaled */
-const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
+const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.8, AIM_POWER = 0.5;
 let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimLine = null, aimRing = null, putter = null;
 
 /* pure: a pad gesture's samples [{t, x, y}] (first = the touch) -> the stroke, or null (no contact) */
@@ -1030,46 +1030,57 @@ function computeStroke(samples) {
 function initAim() {
   aimGroup = new THREE.Group(); aimGroup.visible = false;
   /* the aim line is a ribbon draped over the ground, so it never cuts through a hill or a wall */
-  const n = 48, geo = new THREE.BufferGeometry();
+  const n = 110, geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((n * 2 + 3) * 3), 3));
   const idx = [];
   for (let i = 0; i < n - 1; i++) idx.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2);
   idx.push(n * 2, n * 2 + 1, n * 2 + 2);
   geo.setIndex(idx);
   aimLine = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xfffdf7, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
-    polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
   aimLine.frustumCulled = false; aimLine.renderOrder = 2; aimLine.userData.n = n;
   aimRing = new THREE.Mesh(new THREE.RingGeometry(BALL_R * 1.6, BALL_R * 2.3, 48, 1, 0, 0.01), new THREE.MeshBasicMaterial({ color: 0xffd66e, side: THREE.DoubleSide, transparent: true, opacity: 0.95, depthWrite: false, toneMapped: false }));
   aimRing.rotation.x = -Math.PI / 2; aimRing.renderOrder = 2;
   aimGroup.add(aimLine, aimRing);
   scene.add(aimGroup);
 }
-/* where the aim line runs: from just past the ball along the aim, stopping at a wall, a post, water or the floor's edge */
+/* where the aim line runs: the ball's own path for its first AIM_LEN metres, struck at a middling
+   pace through the real physics, so it bends with the slopes, bounces off walls and posts (bank
+   shots read), and stops at water, a tube mouth, the cup or the floor's edge. Painted just above
+   whatever it crosses. Cached until the aim, the ball or the movers change. */
+const aimCache = { key: '', pts: [] };
 function aimPath(h, b, angDeg, len = AIM_LEN) {
-  const a = angDeg * Math.PI / 180, ux = Math.sin(a), uz = Math.cos(a), pts = [];
-  const blocked = (x, z) => !onFloor(h, x, z) || (zoneAt(h, x, z) || {}).surf === 'water'
-    || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < WALL_HALF + 0.012; })
-    || h.posts.some(p => Math.hypot(x - p.x, z - p.z) < p.r + 0.01);
-  for (let d = BALL_R * 3; d <= len + 1e-9; d += len / 40) {
-    const x = b.x + ux * d, z = b.z + uz * d;
-    if (blocked(x, z)) break;
-    pts.push([x, groundH(h, x, z) + 0.008, z]);
+  const t0 = play.hole === h ? play.time : 0, moving = h.movers.length > 0;
+  const key = [h.key, b.x.toFixed(4), b.z.toFixed(4), angDeg.toFixed(3), len, moving ? Math.floor(t0 * 8) : 0].join();
+  if (aimCache.key === key) return aimCache.pts;
+  const s = launch(newBall(h, b.x, b.z), angDeg, AIM_POWER), pts = [], STEP = 0.02;
+  let t = t0, went = 0, next = BALL_R * 3, px = s.x, pz = s.z;
+  for (let i = 0; i < 2400; i++) {
+    const end = stepBall(h, s, t); t += SIM_DT;
+    if (s.tube) break;
+    went += Math.hypot(s.x - px, s.z - pz); px = s.x; pz = s.z;
+    if (went >= next) { pts.push([s.x, (s.air ? s.y : groundH(h, s.x, s.z)) + 0.012, s.z]); next += STEP; }
+    /* stop where the ball would nearly die: a line rolling back down a hill only confuses */
+    if (end || went >= len || (!s.air && Math.hypot(s.vx, s.vz) < 0.3)) break;
   }
+  s.hits.length = 0;
+  aimCache.key = key; aimCache.pts = pts;
   return pts;
 }
 function updateAimLine() {
   const show = play.phase === 'aim' && !play.overview && !b0();
   aimGroup.visible = show;
   if (!show) return;
-  const b = play.ball, pts = aimPath(play.hole, b, play.aim), geo = aimLine.geometry, pos = geo.attributes.position, n = aimLine.userData.n;
-  const a = play.aim * Math.PI / 180, px = Math.cos(a), pz = -Math.sin(a), w = 0.012;
+  const b = play.ball, pts = aimPath(play.hole, b, play.aim), geo = aimLine.geometry, pos = geo.attributes.position, n = aimLine.userData.n, w = 0.012;
   const m = Math.min(pts.length, n);
-  for (let i = 0; i < m; i++) { const [x, y, z] = pts[i]; pos.setXYZ(i * 2, x + px * w, y, z + pz * w); pos.setXYZ(i * 2 + 1, x - px * w, y, z - pz * w); }
+  /* the ribbon's width follows the path's own heading, so it turns with every bounce */
+  const side = i => { const a = pts[Math.max(0, i - 1)], c = pts[Math.min(m - 1, i + 1)], dx = c[0] - a[0], dz = c[2] - a[2], d = Math.hypot(dx, dz) || 1; return [dz / d, -dx / d]; };
+  for (let i = 0; i < m; i++) { const [x, y, z] = pts[i], [sx, sz] = side(i); pos.setXYZ(i * 2, x + sx * w, y, z + sz * w); pos.setXYZ(i * 2 + 1, x - sx * w, y, z - sz * w); }
   if (m >= 2) {
-    /* arrowhead at the far end */
-    const [x, y, z] = pts[m - 1], ux = Math.sin(a), uz = Math.cos(a);
-    pos.setXYZ(n * 2, x + px * w * 3.5, y, z + pz * w * 3.5); pos.setXYZ(n * 2 + 1, x - px * w * 3.5, y, z - pz * w * 3.5); pos.setXYZ(n * 2 + 2, x + ux * 0.06, groundH(play.hole, x + ux * 0.06, z + uz * 0.06) + 0.008, z + uz * 0.06);
-    geo.index.array.fill(0, (m - 1) * 6, (n - 1) * 6); geo.index.needsUpdate = true;
+    /* arrowhead at the far end, along the last heading */
+    const [x, y, z] = pts[m - 1], [sx, sz] = side(m - 1), ux = -sz, uz = sx;
+    pos.setXYZ(n * 2, x + sx * w * 3.5, y, z + sz * w * 3.5); pos.setXYZ(n * 2 + 1, x - sx * w * 3.5, y, z - sz * w * 3.5); pos.setXYZ(n * 2 + 2, x + ux * 0.06, y, z + uz * 0.06);
+    geo.index.array.fill(0, (m - 1) * 6, (n - 1) * 6);
     for (let i = 0; i < m - 1; i++) geo.index.array.set([i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2], i * 6);
     geo.index.needsUpdate = true;
   }

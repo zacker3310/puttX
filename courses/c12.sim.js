@@ -164,7 +164,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(1.1, 1.4), C12_CACTUS(-1.0, 5.0), C12_CACTUS(-1.3, 9.6)] },
   /* 18. the grand descent: high deck, gate at the ramp foot, the mid mesa with two tumbleweeds, the shaft or the
      gated drop to the dunes, then up to the summit green */
-  { par: 5, crazy: true, sol: [[5,0.8125,1.5],[10,0.4375,0]], tee: [0, 0.5], cup: [-0.6, 11.3],
+  { par: 5, crazy: true, sol: [[0,1,0.5],[10,0.36,0]], tee: [0, 0.5], cup: [-0.6, 11.3],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.5], [2, 3.5], [2, 12], [-2, 12], [-2, 3.5], [-0.8, 3.5]],
     inner: [[[-2, 6.3], [0.1, 6.3]], [[0.9, 6.3], [2, 6.3]]],
     ramps: [{ x0: -0.9, z0: 2.5, x1: 0.9, z1: 3.5, axis: 'z', h0: 0.44, h1: 0.27 }, { x0: -2.1, z0: 9.2, x1: 0.2, z1: 10, axis: 'z', h0: 0.05, h1: 0.3 }],

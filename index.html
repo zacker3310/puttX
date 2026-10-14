@@ -508,11 +508,14 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 @keyframes pop { 0%, 57% { opacity: 0; translate: 0 0; rotate: 0deg; } 60% { opacity: 1; } 80% { opacity: 1; translate: var(--dx) var(--dy); rotate: 280deg; } 90%, 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 60px); rotate: 400deg; } }
 @media (prefers-reduced-motion: reduce) { #titleArt *, #titleGo { animation: none !important; } }
 /* ---------- 19. DONE CARD: one tidy column ---------- */
-#holeDone { height: 446px; }
+#holeDone { height: 470px; }
 #holeDone .score { left: 0; right: 0; justify-content: center; }
-#doneMap { left: 30px; bottom: 34px; } #doneRetry { left: 134px; bottom: 34px; }
-#doneCoins { left: 238px; bottom: 44px; width: 132px; }
-#doneNext { right: 30px; bottom: 34px; width: 104px; }
+#doneMap { left: 96px; bottom: 34px; } #doneRetry { left: 208px; bottom: 34px; }
+#doneNext { left: 320px; right: auto; bottom: 34px; width: 104px; }
+/* the coins won: a gold sticker slapped on the card's corner */
+#doneCoins { left: auto; right: -22px; top: -26px; bottom: auto; width: auto; height: 64px; padding: 0 16px 0 8px; gap: 4px; font-size: 32px; rotate: 8deg;
+  background: linear-gradient(#ffe9a3, #ffd66e); border: 4px solid var(--v-yellow-line); box-shadow: 0 5px 0 var(--v-yellow-down); }
+#doneCoins svg.coin { width: 44px; height: 44px; }
 /* ---------- 20. HOLE OF THE DAY: a gold ticket in the corner ---------- */
 #dailyBtn { position: absolute; left: auto; top: auto; right: 26px; bottom: 24px; width: 236px; height: 112px; padding: 0 16px 0 10px; z-index: 2; cursor: pointer;
   display: flex; align-items: center; gap: 8px; border-radius: 22px; background: linear-gradient(#ffe9a3, #ffd66e); border: 5px solid var(--v-yellow-line);
@@ -729,7 +732,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '6fb596027d4c';
+const BUILD_ID = 'b090b66a5741';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1393,7 +1396,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.6, 3.4, -0.75, 4.3) }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
-  { par: 5, crazy: true, sol: [[36,1,0],[120,1,3],[0,0.5625,0]], tee: [0, 0.5], cup: [3.1, 9.2],
+  { par: 5, crazy: true, sol: [[340,1,0],[125.75,0.84,2]], tee: [0, 0.5], cup: [3.1, 9.2],
     shape: [[-0.5, 0], [0.5, 0], [0.5, 4.2], [3.6, 4.2], [3.6, 10], [2.7, 10], [2.7, 5.0], [-0.5, 5.0]],
     ramps: [{ x0: 3.0, z0: 6.6, x1: 3.6, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.6, -0.1, 0.6, 2.6), h: 0.35 }, { poly: rect(2.6, 7.6, 3.7, 10.1), h: 0.3 }],
@@ -1564,7 +1567,7 @@ registerWorld(4, { holes: [
     zones: [{ surf: 'water', poly: C4_POOL(0.05, 3.0, 0.55, 0.5) }, { surf: 'water', poly: C4_POOL(-0.4, 6.0, 0.55, 0.22) }, { surf: 'water', poly: C4_POOL(0.85, 4.5, 0.3, 0.35, 8) },
       { surf: 'ice', poly: rect(-1.4, 1.6, 1.4, 6.4) }], bumps: [{ x: -0.3, z: 5.1, r: 0.6, h: 0.1 }] },
   /* 7. terraces: drop off the tee deck onto an ice shelf, then drop again and come back to the cup */
-  { par: 3, sol: [[326,0.96,0],[0,1,0]], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
+  { par: 3, sol: [[323,0.98,0]], tee: [0, 0.5], cup: [2.4, 1.1], aim0: 20, shape: [[-0.6, 0], [0.6, 0], [0.6, 3], [1.8, 3], [1.8, 0.4], [3, 0.4], [3, 4.6], [-0.6, 4.6]],
     tiers: [{ poly: rect(-0.6, 0, 0.6, 3), h: 0.4 }, { poly: rect(-0.6, 3, 3, 4.6), h: 0.2 }],
     zones: [{ surf: 'ice', poly: rect(-0.6, 3, 3, 4.6) }], bumps: [{ x: 1.2, z: 3.8, r: 0.3, h: 0.1 }, { x: 2.4, z: 1.1, r: 0.55, h: 0.08 }] },
   /* 8. ski lift: a lift bar sweeps across the gap, then a climb to the summit deck */
@@ -1572,7 +1575,7 @@ registerWorld(4, { holes: [
     movers: [{ kind: 'gate', ax: -0.44, az: 3.1, bx: 0.44, bz: 3.1, len: 0.35, ang: 90, period: 3.2, phase: 0, look: 'lift' }],
     ramps: [{ x0: -1, z0: 3.8, x1: 1, z1: 4.8, axis: 'z', h0: 0, h1: 0.25 }], tiers: [{ poly: rect(-1, 4.8, 1, 7), h: 0.25 }], posts: [C4_MAN(-0.3, 5.6)] },
   /* 9. avalanche bowl: off the tee deck into an icy bowl, up a narrow ramp to the cup shelf */
-  { par: 4, crazy: true, sol: [[12,0.84,0]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.3, 0, 1.3, 8.2),
+  { par: 4, crazy: true, sol: [[22,0.96,0]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.3, 0, 1.3, 8.2),
     tiers: [{ poly: rect(-1.3, 0, 1.3, 2), h: 0.3 }, { poly: rect(-1.3, 6.4, 1.3, 8.2), h: 0.2 }], ramps: [{ x0: -0.4, z0: 5.6, x1: 0.4, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: 0, z: 4.1, r: 1.0, h: -0.35 }], zones: [{ surf: 'ice', poly: C4_POOL(0, 4.1, 1.1, 1.1, 12) }], posts: [C4_MAN(0.05, 7.3)] },
   /* 10. slalom: down the ski slope between snowmen, open water past the cup */
@@ -1581,7 +1584,7 @@ registerWorld(4, { holes: [
     posts: [C4_MAN(0.4, 2.4), C4_MAN(-0.4, 3.4), C4_MAN(0.35, 4.4)], bumps: [{ x: 0.3, z: 5.9, r: 0.3, h: 0.08 }],
     zones: [{ surf: 'water', poly: rect(-1, 7.1, 1, 7.6) }] },
   /* 11. ski jump: fly the gap off the kicker, or creep over the narrow ice bridge */
-  { par: 4, crazy: true, sol: [[344,1,0]], tee: [0, 0.5], cup: [-0.4, 7.3], aim0: 0,
+  { par: 4, crazy: true, sol: [[12,1,0]], tee: [0, 0.5], cup: [-0.4, 7.3], aim0: 0,
     floors: [rect(-0.7, 0, 1.7, 3.6), rect(1.1, 3.6, 1.5, 4.4), rect(-1.2, 4.4, 1.8, 8.2)],
     walls: [[[-0.7, 3.6], [-0.7, 0], [1.7, 0], [1.7, 3.6], [1.5, 3.6]], [[1.1, 3.6], [0.7, 3.6], [0.7, 1.6]],
       [[1.5, 4.4], [1.8, 4.4], [1.8, 8.2], [-1.2, 8.2], [-1.2, 4.4], [-0.8, 4.4]], [[0.8, 4.4], [1.1, 4.4]]],
@@ -2727,7 +2730,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(1.1, 1.4), C12_CACTUS(-1.0, 5.0), C12_CACTUS(-1.3, 9.6)] },
   /* 18. the grand descent: high deck, gate at the ramp foot, the mid mesa with two tumbleweeds, the shaft or the
      gated drop to the dunes, then up to the summit green */
-  { par: 5, crazy: true, sol: [[5,0.8125,1.5],[10,0.4375,0]], tee: [0, 0.5], cup: [-0.6, 11.3],
+  { par: 5, crazy: true, sol: [[0,1,0.5],[10,0.36,0]], tee: [0, 0.5], cup: [-0.6, 11.3],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.5], [2, 3.5], [2, 12], [-2, 12], [-2, 3.5], [-0.8, 3.5]],
     inner: [[[-2, 6.3], [0.1, 6.3]], [[0.9, 6.3], [2, 6.3]]],
     ramps: [{ x0: -0.9, z0: 2.5, x1: 0.9, z1: 3.5, axis: 'z', h0: 0.44, h1: 0.27 }, { x0: -2.1, z0: 9.2, x1: 0.2, z1: 10, axis: 'z', h0: 0.05, h1: 0.3 }],
@@ -7778,7 +7781,7 @@ const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeL
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
 const PUTTER_SCALE = 0.83;   /* the club shrank with the ball; it is built full size and scaled */
-const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
+const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.8, AIM_POWER = 0.5;
 let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimLine = null, aimRing = null, putter = null;
 
 /* pure: a pad gesture's samples [{t, x, y}] (first = the touch) -> the stroke, or null (no contact) */
@@ -7813,46 +7816,57 @@ function computeStroke(samples) {
 function initAim() {
   aimGroup = new THREE.Group(); aimGroup.visible = false;
   /* the aim line is a ribbon draped over the ground, so it never cuts through a hill or a wall */
-  const n = 48, geo = new THREE.BufferGeometry();
+  const n = 110, geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((n * 2 + 3) * 3), 3));
   const idx = [];
   for (let i = 0; i < n - 1; i++) idx.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2);
   idx.push(n * 2, n * 2 + 1, n * 2 + 2);
   geo.setIndex(idx);
   aimLine = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xfffdf7, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
-    polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
   aimLine.frustumCulled = false; aimLine.renderOrder = 2; aimLine.userData.n = n;
   aimRing = new THREE.Mesh(new THREE.RingGeometry(BALL_R * 1.6, BALL_R * 2.3, 48, 1, 0, 0.01), new THREE.MeshBasicMaterial({ color: 0xffd66e, side: THREE.DoubleSide, transparent: true, opacity: 0.95, depthWrite: false, toneMapped: false }));
   aimRing.rotation.x = -Math.PI / 2; aimRing.renderOrder = 2;
   aimGroup.add(aimLine, aimRing);
   scene.add(aimGroup);
 }
-/* where the aim line runs: from just past the ball along the aim, stopping at a wall, a post, water or the floor's edge */
+/* where the aim line runs: the ball's own path for its first AIM_LEN metres, struck at a middling
+   pace through the real physics, so it bends with the slopes, bounces off walls and posts (bank
+   shots read), and stops at water, a tube mouth, the cup or the floor's edge. Painted just above
+   whatever it crosses. Cached until the aim, the ball or the movers change. */
+const aimCache = { key: '', pts: [] };
 function aimPath(h, b, angDeg, len = AIM_LEN) {
-  const a = angDeg * Math.PI / 180, ux = Math.sin(a), uz = Math.cos(a), pts = [];
-  const blocked = (x, z) => !onFloor(h, x, z) || (zoneAt(h, x, z) || {}).surf === 'water'
-    || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < WALL_HALF + 0.012; })
-    || h.posts.some(p => Math.hypot(x - p.x, z - p.z) < p.r + 0.01);
-  for (let d = BALL_R * 3; d <= len + 1e-9; d += len / 40) {
-    const x = b.x + ux * d, z = b.z + uz * d;
-    if (blocked(x, z)) break;
-    pts.push([x, groundH(h, x, z) + 0.008, z]);
+  const t0 = play.hole === h ? play.time : 0, moving = h.movers.length > 0;
+  const key = [h.key, b.x.toFixed(4), b.z.toFixed(4), angDeg.toFixed(3), len, moving ? Math.floor(t0 * 8) : 0].join();
+  if (aimCache.key === key) return aimCache.pts;
+  const s = launch(newBall(h, b.x, b.z), angDeg, AIM_POWER), pts = [], STEP = 0.02;
+  let t = t0, went = 0, next = BALL_R * 3, px = s.x, pz = s.z;
+  for (let i = 0; i < 2400; i++) {
+    const end = stepBall(h, s, t); t += SIM_DT;
+    if (s.tube) break;
+    went += Math.hypot(s.x - px, s.z - pz); px = s.x; pz = s.z;
+    if (went >= next) { pts.push([s.x, (s.air ? s.y : groundH(h, s.x, s.z)) + 0.012, s.z]); next += STEP; }
+    /* stop where the ball would nearly die: a line rolling back down a hill only confuses */
+    if (end || went >= len || (!s.air && Math.hypot(s.vx, s.vz) < 0.3)) break;
   }
+  s.hits.length = 0;
+  aimCache.key = key; aimCache.pts = pts;
   return pts;
 }
 function updateAimLine() {
   const show = play.phase === 'aim' && !play.overview && !b0();
   aimGroup.visible = show;
   if (!show) return;
-  const b = play.ball, pts = aimPath(play.hole, b, play.aim), geo = aimLine.geometry, pos = geo.attributes.position, n = aimLine.userData.n;
-  const a = play.aim * Math.PI / 180, px = Math.cos(a), pz = -Math.sin(a), w = 0.012;
+  const b = play.ball, pts = aimPath(play.hole, b, play.aim), geo = aimLine.geometry, pos = geo.attributes.position, n = aimLine.userData.n, w = 0.012;
   const m = Math.min(pts.length, n);
-  for (let i = 0; i < m; i++) { const [x, y, z] = pts[i]; pos.setXYZ(i * 2, x + px * w, y, z + pz * w); pos.setXYZ(i * 2 + 1, x - px * w, y, z - pz * w); }
+  /* the ribbon's width follows the path's own heading, so it turns with every bounce */
+  const side = i => { const a = pts[Math.max(0, i - 1)], c = pts[Math.min(m - 1, i + 1)], dx = c[0] - a[0], dz = c[2] - a[2], d = Math.hypot(dx, dz) || 1; return [dz / d, -dx / d]; };
+  for (let i = 0; i < m; i++) { const [x, y, z] = pts[i], [sx, sz] = side(i); pos.setXYZ(i * 2, x + sx * w, y, z + sz * w); pos.setXYZ(i * 2 + 1, x - sx * w, y, z - sz * w); }
   if (m >= 2) {
-    /* arrowhead at the far end */
-    const [x, y, z] = pts[m - 1], ux = Math.sin(a), uz = Math.cos(a);
-    pos.setXYZ(n * 2, x + px * w * 3.5, y, z + pz * w * 3.5); pos.setXYZ(n * 2 + 1, x - px * w * 3.5, y, z - pz * w * 3.5); pos.setXYZ(n * 2 + 2, x + ux * 0.06, groundH(play.hole, x + ux * 0.06, z + uz * 0.06) + 0.008, z + uz * 0.06);
-    geo.index.array.fill(0, (m - 1) * 6, (n - 1) * 6); geo.index.needsUpdate = true;
+    /* arrowhead at the far end, along the last heading */
+    const [x, y, z] = pts[m - 1], [sx, sz] = side(m - 1), ux = -sz, uz = sx;
+    pos.setXYZ(n * 2, x + sx * w * 3.5, y, z + sz * w * 3.5); pos.setXYZ(n * 2 + 1, x - sx * w * 3.5, y, z - sz * w * 3.5); pos.setXYZ(n * 2 + 2, x + ux * 0.06, y, z + uz * 0.06);
+    geo.index.array.fill(0, (m - 1) * 6, (n - 1) * 6);
     for (let i = 0; i < m - 1; i++) geo.index.array.set([i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2], i * 6);
     geo.index.needsUpdate = true;
   }

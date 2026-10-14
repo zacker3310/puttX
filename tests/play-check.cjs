@@ -126,14 +126,17 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
     /* tee 0.12 from the back wall: no room, so no putter, and the aim line still runs forward */
     startHole('97-3'); loopPaused = true; play.aim = 0; renderFrame(0.016);
     out.noRoom = putter.visible;
-    play.aim = 180; out.wallStop = aimPath(play.hole, play.ball, 180).length;
+    /* aimed straight at the back wall: the line bounces off it and comes back, never through it */
+    const back = aimPath(play.hole, play.ball, 180), h3 = play.hole;
+    out.bounce = back.length > 3 && back[back.length - 1][2] > play.ball.z;
+    out.inside = back.every(p => onFloor(h3, p[0], p[2]));
     return out;
   });
   check('the putter head never touches the ball (gap >= ball radius)', clip.ballGap >= 0.0255 - 1e-6, JSON.stringify(clip));
   check('the putter head never sinks into a hill', clip.under === 0, JSON.stringify(clip));
   check('the aim line drapes over hills, never under them', clip.pts > 50 && clip.below === 0, JSON.stringify(clip));
   check('no room behind the ball: the putter hides instead of clipping the wall', clip.noRoom === false, JSON.stringify(clip));
-  check('the aim line stops at a wall', clip.wallStop === 0, JSON.stringify(clip));
+  check('the aim line traces the ball: it bounces off a wall and never goes through it', clip.bounce && clip.inside, JSON.stringify(clip));
 
   /* 7. live loop == pure simulation, with ragged frames and a long background gap */
   const same = await page.evaluate(() => {

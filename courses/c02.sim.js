@@ -117,7 +117,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.6, 3.4, -0.75, 4.3) }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
   /* 16. the slot canyon: drop off the tee mesa, a tumbleweed in each leg, then up to the green */
-  { par: 5, crazy: true, sol: [[36,1,0],[120,1,3],[0,0.5625,0]], tee: [0, 0.5], cup: [3.1, 9.2],
+  { par: 5, crazy: true, sol: [[340,1,0],[125.75,0.84,2]], tee: [0, 0.5], cup: [3.1, 9.2],
     shape: [[-0.5, 0], [0.5, 0], [0.5, 4.2], [3.6, 4.2], [3.6, 10], [2.7, 10], [2.7, 5.0], [-0.5, 5.0]],
     ramps: [{ x0: 3.0, z0: 6.6, x1: 3.6, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.6, -0.1, 0.6, 2.6), h: 0.35 }, { poly: rect(2.6, 7.6, 3.7, 10.1), h: 0.3 }],

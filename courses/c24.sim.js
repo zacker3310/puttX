@@ -14,7 +14,7 @@ registerWorld(24, { holes: [
   { par: 3, sol: [[4,1,0]], tee: [0, 0.5], cup: [0.4, 6.7], shape: rect(-1, 0, 1, 7.6),
     tiers: [{ poly: rect(-1, 0, 1, 1.6), h: 0.3 }, { poly: rect(-1, 5.0, 1, 7.6), h: 0.22 }],
     ramps: [{ x0: -1, z0: 4.2, x1: 1, z1: 5.0, axis: 'z', h0: 0, h1: 0.22 }],
-    zones: [{ surf: 'ice', poly: rect(-1, 1.6, 1, 4.2) }], movers: [C24_BALL(-0.55, 3.0, 0.55, 3.0, 2.8)], posts: [C24_MAN(-0.3, 6.3)] },
+    zones: [{ surf: 'fast', poly: rect(-1, 1.6, 1, 4.2) }], movers: [C24_BALL(-0.55, 3.0, 0.55, 3.0, 2.8)], posts: [C24_MAN(-0.3, 6.3)] },
   /* 2. switchback stair: up the first ramp through the fence, across, up the second ramp to the top terrace */
   { par: 3, sol: [[44,0.64,0],[310,1,0]], tee: [-0.6, 0.5], cup: [0.6, 5.8], aim0: 20, shape: rect(-1.4, 0, 1.4, 6.6),
     inner: [[[-1.4, 2.2], [0.6, 2.2]], [[-0.6, 4.4], [1.4, 4.4]]],
@@ -102,7 +102,7 @@ registerWorld(24, { holes: [
     ramps: [{ x0: 0.9, z0: 5.8, x1: 1.6, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.8, z: 3.0, r: 0.6, h: -0.25 }, { x: 0.7, z: 3.4, r: 0.6, h: -0.25 }, { x: -0.3, z: 4.9, r: 0.6, h: -0.25 }],
     tubes: [{ a: [-0.3, 4.9], b: [-1.0, 7.0], dir: 90 }, { a: [-0.8, 3.0], b: [-1.2, 1.0], dir: 90 }, { a: [0.7, 3.4], b: [1.2, 1.0], dir: 270 }],
-    zones: [{ surf: 'ice', poly: rect(-1.6, 1.6, 1.6, 5.8) }], posts: [C24_MAN(1.1, 8.0)] },
+    zones: [{ surf: 'fast', poly: rect(-1.6, 1.6, 1.6, 5.8) }], posts: [C24_MAN(1.1, 8.0)] },
   /* 15. lift chain: three decks up the mountain, a lift bar at the top of every ramp, then off the summit deck to the lake */
   { par: 5, crazy: true, sol: [[10,0.833,2],[220,0.917,1],[46,0.48,0]], tee: [0, 0.5], cup: [0.5, 11.0], shape: rect(-1.4, 0, 1.4, 11.8),
     ramps: [{ x0: -0.45, z0: 1.4, x1: 0.45, z1: 2.6, axis: 'z', h0: 0, h1: 0.14 }, { x0: 0.5, z0: 4.4, x1: 1.4, z1: 5.4, axis: 'z', h0: 0.14, h1: 0.28 },

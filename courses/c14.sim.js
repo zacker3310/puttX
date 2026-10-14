@@ -54,7 +54,7 @@ registerWorld(14, { holes: [
   { par: 3, sol: [[0,1,0.5]], tee: [0, 0.5], cup: [-0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8.2),
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.8), h: 0.3 }, { poly: rect(-1.4, 6.2, 1.4, 8.2), h: 0.2 }],
     ramps: [{ x0: -0.3, z0: 5.4, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.75, z0: 5.4, x1: 1.4, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
-    bumps: [{ x: 0, z: 3.9, r: 1.0, h: -0.3 }], zones: [{ surf: 'ice', poly: C14_POOL(0, 3.9, 1.1, 1.1, 12) }],
+    bumps: [{ x: 0, z: 3.9, r: 1.0, h: -0.3 }], zones: [{ surf: 'fast', poly: C14_POOL(0, 3.9, 1.1, 1.1, 12) }],
     movers: [C14_BALL(-0.7, 6.7, 0.7, 6.7, 2.6)], posts: [C14_MAN(0.6, 7.5)] },
   /* 9. lift tower: up the lift ramp and past the bar, or thread the snow cave straight onto the deck; then down to the lake */
   { par: 4, sol: [[4,0.96,0.5]], tee: [0, 0.5], cup: [0.6, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
@@ -105,7 +105,7 @@ registerWorld(14, { holes: [
     ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.7, z: 3.4, r: 0.75, h: -0.3 }, { x: 0.8, z: 4.4, r: 0.75, h: -0.3 }],
     tubes: [{ a: [-0.7, 3.4], b: [-0.9, 6.8], dir: 90 }, { a: [0.8, 4.4], b: [1.2, 1.0], dir: 270 }],
-    zones: [{ surf: 'ice', poly: rect(-1.6, 1.6, 1.6, 5.6) }], posts: [C14_MAN(1.0, 7.8)] },
+    zones: [{ surf: 'fast', poly: rect(-1.6, 1.6, 1.6, 5.6) }], posts: [C14_MAN(1.0, 7.8)] },
   /* 17. lift chain: up the lift ramp past the first bar, up the side ramp past the second, off the top deck to the lake */
   { par: 5, crazy: true, sol: [[350,1,0],[0,0.25,0]], tee: [0, 0.5], cup: [-0.5, 9.6], shape: rect(-1.4, 0, 1.4, 10.4),
     ramps: [{ x0: -0.45, z0: 1.6, x1: 0.45, z1: 3.0, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.4, z0: 5.2, x1: -0.5, z1: 6.4, axis: 'z', h0: 0.2, h1: 0.42 }],

@@ -48,7 +48,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.4, 7.3, 0.6, 7.8) }],
     posts: [C2_CACTUS(0.5, 3.4), C2_CACTUS(-0.75, 4.2), C2_CACTUS(0.25, 5.2), C2_ROCK(-1.05, 5.5, 0.12), C2_CACTUS(-0.55, 8.4)] },
   /* 7. switchback: up the canyon, round the ramp at the top, back down a leaning mesa past a tumbleweed */
-  { par: 4, sol: [[3,0.6875,0],[31.5,1,3]], tee: [0, 0.5], cup: [2.9, 1.7], aim0: 0,
+  { par: 4, sol: [[32,0.76,0],[36,1,0],[0,0.48,0]], tee: [0, 0.5], cup: [2.9, 1.7], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 6], [1.8, 6], [1.8, 1], [3.4, 1], [3.4, 7.6], [-0.8, 7.6]],
     ramps: [{ x0: 0.8, z0: 6, x1: 1.8, z1: 7.6, axis: 'x', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(1.8, 0.9, 3.5, 7.7), h: 0.246, sx: 0.03 }],

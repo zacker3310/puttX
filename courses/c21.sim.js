@@ -114,7 +114,7 @@ registerWorld(21, { holes: [
     tubes: [{ a: [-0.9, 6.3], b: [-0.9, 8], dir: 0 }],
     bumps: [{ x: 0, z: 2.4, r: 0.75, h: 0.3 }, { x: 0.6, z: 9.2, r: 0.4, h: -0.06 }] },
   /* 14: deck relay (4 parts). Ramp to the deck, the side boom, the guarded chute or the pipe, then the belt pocket */
-  { par: 4, sol: [[0,0.93,0],[16,1,0]], tee: [0.8, 0.5], cup: [0.9, 9.6], aim0: 0, shape: rect(-1.6, 0, 1.6, 10.4),
+  { par: 4, sol: [[0,0.92,0],[278,0.84,0]], tee: [0.8, 0.5], cup: [0.9, 9.6], aim0: 0, shape: rect(-1.6, 0, 1.6, 10.4),
     tiers: [{ poly: rect(-1.6, 3.2, 1.6, 6.2), h: 0.35 }],
     ramps: [{ x0: 0.4, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.35 }],
     inner: [[[1.6, 3.2], [1.2, 3.2]], [[0.4, 3.2], [-1.6, 3.2]], [[0, 3.2], [0, 4.5]], [[0, 5.1], [0, 6.2]],

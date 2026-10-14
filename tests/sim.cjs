@@ -7,7 +7,7 @@
 const vm = require('vm');
 const { simSource, parseOnly } = require('../scripts/build.cjs');
 
-const NAMES = ['SIM_DT', 'BALL_R', 'CUP_R', 'CUP_DEPTH', 'CAP_V0', 'MIN_V', 'MAX_V', 'V_CAP', 'WALL_HALF', 'WALL_TOP', 'G', 'SURF', 'TUBE_R',
+const NAMES = ['SIM_DT', 'BALL_R', 'CUP_R', 'CAP_V0', 'MIN_V', 'MAX_V', 'V_CAP', 'WALL_HALF', 'WALL_TOP', 'G', 'SURF', 'TUBE_R',
   'STEP_MAX', 'rect', 'ring', 'makeHole', 'inPoly', 'onFloor', 'zoneAt', 'baseAt', 'groundH', 'groundGrad', 'closestOnSeg', 'moverState',
   'moverTouch', 'newBall', 'launch', 'stepBall', 'simulatePutt', 'newRound', 'capOf', 'starsFor', 'resolvePutt',
   'resolveDrift', 'WORLD_ORDER', 'HOLES_PER', 'WORLDS', 'registerWorld', 'holeAt', 'nextKey', 'playable', 'allCourses', 'coursesOf', 'worldOf', 'COURSE_STEP', 'GLIDE', 'FELT_MU', 'freshProgress', 'recordHole',

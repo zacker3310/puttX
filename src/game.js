@@ -24,7 +24,8 @@ function showScene(id) {
 /* ---- 2a. constants ---- */
 const SIM_DT = 1 / 240;          /* fixed physics step */
 const BALL_R = 0.0255;           /* a small, quick ball: about 1.2x a real one (0.021) */
-const CUP_R = 0.11, CUP_DEPTH = 0.12;
+const CUP_R = 0.11;
+const CUP_SINK = 0.2;             /* how deep the cup is drawn: the drop is longer than the physics needs, for the plunk */
 const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
 const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
 const MIN_V = 0.3, MAX_V = 4.27; /* putt speed at power 0 and power 1: full power still rolls about 14.5 m of (slicker) felt */
@@ -515,7 +516,9 @@ const SFX = {
   putt: (p, clean = 1) => { noise(0.03, { vol: 0.25 + p * 0.3, freq: 2200 + 1500 * clean, q: 2 }); tone(500 + p * 400 + clean * 300, 0.06, { type: 'triangle', vol: 0.2 + p * 0.2, slide: -300 }); },
   clonk: v => tone(170 + Math.min(v, 4) * 30, 0.09, { type: 'triangle', vol: Math.min(0.45, 0.12 + v * 0.1) }),
   boing: v => tone(320, 0.2, { vol: Math.min(0.3, 0.1 + v * 0.08), slide: 260 }),
-  cup: () => { [0, 0.06, 0.11].forEach((d, i) => tone(1400 - i * 200, 0.05, { type: 'square', vol: 0.08, delay: d })); tone(110, 0.18, { vol: 0.4, delay: 0.16, slide: -40 }); },
+  cup: () => tone(1500, 0.04, { type: 'triangle', vol: 0.12, slide: -300 }),
+  rattle: (v = 0.5) => { tone(1900 - v * 500, 0.035, { type: 'square', vol: 0.05 + v * 0.07 }); noise(0.04, { vol: 0.08 + v * 0.1, freq: 3200, q: 4 }); },
+  plunk: () => { tone(150, 0.32, { vol: 0.55, slide: -70 }); tone(300, 0.12, { type: 'triangle', vol: 0.18, slide: -120 }); noise(0.09, { vol: 0.3, freq: 420, q: 1.2, type: 'lowpass' }); },
   lip: () => tone(900, 0.07, { type: 'square', vol: 0.08, slide: 300 }),
   land: v => noise(0.08, { vol: Math.min(0.4, 0.12 + v * 0.08), freq: 400 }),
   boink: () => tone(420, 0.25, { vol: 0.3, slide: -220 }),
@@ -738,10 +741,10 @@ function cupGroup(h, look) {
   g.name = 'cup'; g.position.set(h.cup[0], y, h.cup[1]);
   const SEG = 64, CUT = 0.018;
   const soil = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUT, SEG, 1, true), mat('#4a3626', { roughness: 1, side: THREE.BackSide })); soil.position.y = -CUT / 2 + 0.001;
-  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R - 0.002, CUP_R - 0.002, CUP_DEPTH - CUT, SEG, 1, true), mat('#f4f1ea', { roughness: 0.55, side: THREE.BackSide })); liner.position.y = -CUT - (CUP_DEPTH - CUT) / 2;
+  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R - 0.002, CUP_R - 0.002, CUP_SINK - CUT, SEG, 1, true), mat('#f4f1ea', { roughness: 0.55, side: THREE.BackSide })); liner.position.y = -CUT - (CUP_SINK - CUT) / 2;
   const lip = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.006, CUP_R - 0.001, SEG), mat('#ffffff', { roughness: 0.4 })); lip.rotation.x = -Math.PI / 2; lip.position.y = -CUT;
-  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, SEG), mat('#2b2620', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_DEPTH;
-  const drain = new THREE.Mesh(new THREE.CircleGeometry(0.03, 24), mat('#14110e', { roughness: 1 })); drain.rotation.x = -Math.PI / 2; drain.position.y = -CUP_DEPTH + 0.001;
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, SEG), mat('#2b2620', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_SINK;
+  const drain = new THREE.Mesh(new THREE.CircleGeometry(0.03, 24), mat('#14110e', { roughness: 1 })); drain.rotation.x = -Math.PI / 2; drain.position.y = -CUP_SINK + 0.001;
   /* the funnel's shadow: a soft dark ring on the green, strongest at the edge */
   const shade = new THREE.Mesh(new THREE.RingGeometry(CUP_R, LIP_PULL_R, SEG), new THREE.MeshBasicMaterial({ map: cupShadeTexture(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   shade.rotation.x = -Math.PI / 2; shade.position.y = 0.0025; shade.renderOrder = 1;
@@ -959,7 +962,7 @@ function renderFrame(dt) {
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
   const lk = lookOf(holeWorld(play.hole)); if (lk.tick) lk.tick(holeGroup, dt, play.time);
-  syncLost(dt); tickNight(dt, play.time);
+  syncLost(dt); tickNight(dt, play.time); updateSinkRing(dt);
   syncBall(dt);
   syncGhost();
   updatePuffs(dt);
@@ -1327,7 +1330,7 @@ function endRoll(end) {
   play.lastOutcome = out;
   setRoll(0);
   if (out === 'sunk') {
-    play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [r.x, r.z]; sfx('cup');
+    play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [r.x, r.z]; startSink(play.ball.vx, play.ball.vz); sfx('cup');
     if (play.round.score === 1) { burst(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup) + 0.1, h.cup[1])); sfx('fanfare'); if (!reducedMotion() && play.log.length === 1) play.fx.wantReplay = true; }
   }
   else if (out === 'auto') { play.phase = 'auto'; play.fx.autoT = 0; play.fx.autoFrom = end === 'oob' ? play.from.slice() : [r.x, r.z]; }
@@ -1400,15 +1403,64 @@ function advance(dt) {
     const t = (play.fx.autoT += dt) / 0.9, k = Math.min(1, t), e = k * k * (3 - 2 * k), [fx, fz] = play.fx.autoFrom;
     b.x = fx + (h.cup[0] - fx) * e; b.z = fz + (h.cup[1] - fz) * e; b.tube = null;
     b.y = groundH(h, b.x, b.z) + Math.sin(k * Math.PI) * 0.12;
-    if (k >= 1) { play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [fx, fz]; sfx('cup'); }
+    if (k >= 1) { play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [fx, fz]; const d = Math.hypot(h.cup[0] - fx, h.cup[1] - fz) || 1; startSink((h.cup[0] - fx) / d * 0.5, (h.cup[1] - fz) / d * 0.5); sfx('cup'); }
   } else if (play.phase === 'sunk') {
-    /* drop over the lip, then a small rattle settling on the cup floor */
-    const t = (play.fx.sunkT += dt), [rx, rz] = restInCup(h, play.fx.sinkFrom || h.tee), k = Math.min(1, t / 0.22);
-    const wob = t < 0.6 ? Math.sin(t * 40) * 0.006 * (1 - t / 0.6) : 0;
-    b.x = h.cup[0] + (rx - h.cup[0]) * k + wob; b.z = h.cup[1] + (rz - h.cup[1]) * k;
-    b.y = cy - (CUP_DEPTH - 0.004) * k * k;
-    if (t > 1.3) { if (play.fx.wantReplay) startReplay(); else finishHole(); }
+    const t = (play.fx.sunkT += dt);
+    if (!play.fx.sink) startSink(0, 0);
+    stepSink(dt);
+    const k = play.fx.sink;
+    b.x = h.cup[0] + k.x; b.z = h.cup[1] + k.z; b.y = cy + k.y; b.vx = k.vx; b.vz = k.vz;
+    if (t > 1.45) { play.fx.sink = null; if (play.fx.wantReplay) startReplay(); else finishHole(); }
   }
+}
+/* the drop, drawn (the result was settled when the cup caught the ball): the ball carries its
+   pace over the lip, falls, clacks off the white liner, rattles round it and plunks onto the floor
+   of a cup drawn deeper than the physics needs. A ring of light pops on the green and the camera
+   gives a little nod. Visual only: positions relative to the cup centre. */
+function startSink(vx, vz) {
+  const b = play.ball, h = play.hole, s = Math.hypot(vx, vz), cap = 1.4, k = s > cap ? cap / s : 1;
+  play.fx.sink = { x: clamp(b.x - h.cup[0], -0.05, 0.05), z: clamp(b.z - h.cup[1], -0.05, 0.05), y: 0, vx: vx * k, vz: vz * k, vy: 0, walls: 0, floor: false };
+}
+function stepSink(dt) {
+  const k = play.fx.sink, lim = CUP_R - BALL_R - 0.003, floor = -(CUP_SINK - 0.004);
+  for (let n = Math.max(1, Math.round(dt / SIM_DT)); n > 0; n--) {
+    const d = dt / Math.max(1, Math.round(dt / SIM_DT));
+    k.vy -= G * d; k.x += k.vx * d; k.z += k.vz * d; k.y += k.vy * d;
+    const r = Math.hypot(k.x, k.z);
+    if (r > lim) {
+      const nx = k.x / r, nz = k.z / r, vn = k.vx * nx + k.vz * nz;
+      if (vn > 0) {
+        k.vx -= 1.5 * vn * nx; k.vz -= 1.5 * vn * nz; k.vx *= 0.9; k.vz *= 0.9;
+        if (vn > 0.15 && k.walls < 3) { k.walls++; sfx('rattle', Math.min(1, vn)); }
+      }
+      k.x = nx * lim; k.z = nz * lim;
+    }
+    if (k.y < floor) {
+      k.y = floor;
+      if (k.vy < -0.3) {
+        if (!k.floor) { k.floor = true; sfx('plunk'); sinkRing(); play.fx.shake = Math.max(play.fx.shake || 0, 0.18); }
+        k.vy = -k.vy * 0.32;
+      } else k.vy = 0;
+      k.vx *= 1 - Math.min(1, 4 * d); k.vz *= 1 - Math.min(1, 4 * d);
+    }
+  }
+}
+let sinkRingMesh = null;
+function sinkRing() {
+  if (reducedMotion()) return;
+  if (!sinkRingMesh) {
+    sinkRingMesh = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 48), new THREE.MeshBasicMaterial({ color: 0xfff3c4, transparent: true, depthWrite: false, toneMapped: false }));
+    sinkRingMesh.rotation.x = -Math.PI / 2; scene.add(sinkRingMesh);
+  }
+  const h = play.hole; sinkRingMesh.position.set(h.cup[0], groundH(h, ...h.cup) + 0.006, h.cup[1]);
+  sinkRingMesh.userData.t = 0; sinkRingMesh.visible = true;
+}
+function updateSinkRing(dt) {
+  const m = sinkRingMesh;
+  if (!m || !m.visible) return;
+  const t = (m.userData.t += dt), k = Math.min(1, t / 0.55);
+  m.scale.setScalar(CUP_R * (1.1 + k * 3.2)); m.material.opacity = 0.9 * (1 - k);
+  if (k >= 1) m.visible = false;
 }
 /* the ace replay: the same putt again, from a low cinematic angle beside the line, at 70% speed. Any tap skips. */
 function startReplay() {
@@ -1430,7 +1482,7 @@ function advanceReplay(dt) {
   if (r.done) {
     r.end += dt;
     const k = Math.min(1, r.end / 0.22), [rx, rz] = restInCup(h, [r.b.x, r.b.z]);
-    r.b.x += (rx - r.b.x) * k; r.b.z += (rz - r.b.z) * k; r.b.y = groundH(h, ...h.cup) - (CUP_DEPTH - 0.004) * k * k;
+    r.b.x += (rx - r.b.x) * k; r.b.z += (rz - r.b.z) * k; r.b.y = groundH(h, ...h.cup) - (CUP_SINK - 0.004) * k * k;
     if (r.end > 0.9) endReplay();
   }
 }

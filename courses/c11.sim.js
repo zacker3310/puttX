@@ -94,7 +94,7 @@ registerWorld(11, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.6, 3, -1.1, 4.2) }],
     bumps: [{ x: -0.95, z: 4.9, r: 0.3, h: 0.08 }] },
   /* 12: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the jib green */
-  { par: 3, sol: [[332,1,0],[0,0.29,0]], tee: [0, 0.5], cup: [2.5, 9.2], aim0: 0,
+  { par: 3, sol: [[332,0.92,0],[0,0.24,0]], tee: [0, 0.5], cup: [2.5, 9.2], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(0.65, 4.6, 3.6, 6), rect(0.8, 7, 3.6, 10)],
     walls: [[[0.7, 4.6], [0.7, 0], [-0.7, 0], [-0.7, 6], [2, 6]], [[0.7, 4.6], [3.6, 4.6], [3.6, 6]],
             [[3.6, 7], [3.6, 10], [0.8, 10], [0.8, 7]]],
@@ -104,7 +104,7 @@ registerWorld(11, { holes: [
     movers: [{ kind: 'spin', x: 1.6, z: 8.3, len: 0.45, w: -1.4, phase: 0, look: 'crane' }],
     bumps: [{ x: 2.5, z: 9.2, r: 0.45, h: -0.08 }, { x: 2.3, z: 7.9, r: 0.3, h: 0.1 }] },
   /* 13: double boom (3 parts). Ramp to the deck, beat the barrier, then the chute or the pipe, across the belt */
-  { par: 3, sol: [[0,1,1],[48,0.64,0]], tee: [0, 0.5], cup: [0.6, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
+  { par: 3, sol: [[2,1,1.5]], tee: [0, 0.5], cup: [0.6, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
     tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.4), h: 0.35 }],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.6, axis: 'z', h0: 0, h1: 0.35 }],
     inner: [[[-1.4, 3.6], [-0.35, 3.6]], [[0.35, 3.6], [1.4, 3.6]], [[-1.4, 4.6], [-0.3, 4.6]], [[0.3, 4.6], [1.4, 4.6]],

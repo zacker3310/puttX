@@ -115,7 +115,7 @@ registerWorld(1, { holes: [
     movers: [{ kind: 'spin', x: -1.6, z: 8.2, len: 0.45, w: 1.4, phase: 0, look: 'crane' }],
     bumps: [{ x: -2.2, z: 9, r: 0.45, h: -0.08 }] },
   /* 18: topping out (4 parts, open). The belt ramp, the boom gate on the deck, the chute or the pipe, the crane green */
-  { crazy: true, par: 5, sol: [[34,0.96,2],[24,1,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
+  { crazy: true, par: 5, sol: [[34,0.96,2],[26,0.92,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 0,
     floors: [rect(-1, 0, 1, 3.05), rect(-0.45, 3, 0.45, 4.45), rect(-1.2, 4.4, 3.4, 6), rect(-0.2, 5.99, 3.6, 10.2)],
     walls: [[[-0.45, 3.05], [-1, 3.05], [-1, 0], [1, 0], [1, 3.05], [0.45, 3.05]],
             [[-0.45, 4.4], [-1.2, 4.4], [-1.2, 6], [2, 6]], [[0.45, 4.4], [3.4, 4.4], [3.4, 6], [3.6, 6], [3.6, 10.2], [-0.2, 10.2], [-0.2, 6]],

@@ -1465,8 +1465,6 @@ function finishHole() {
   saveProgress();
   updateMulligan();
   holeDone.classList.toggle('practice', play.practice);
-  doneShare.classList.remove('ok');
-  doneShare.style.display = !round.auto && play.log.length >= 1 ? '' : 'none';
   const stars = starsFor(round.score, hole.par);
   holeDone.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < stars));
   doneStrokes.textContent = round.score; donePar.textContent = hole.par;
@@ -1727,13 +1725,6 @@ function friendScore(h, log) {
   }
   return null;
 }
-const shotUrl = () => location.origin + location.pathname + '?shot=' + encodeShot(play.key, play.log);
-function shareShot() {
-  const url = shotUrl(), ok = () => { doneShare.classList.add('ok'); sfx('star', 2); };
-  sfx('tap');
-  if (navigator.share) navigator.share({ url }).then(ok, () => {});
-  else if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, () => {});
-}
 
 /* night: cosmic bowling. Neon tube walls with a soft additive halo, a black-light carpet whose
    paint splatters glow, a neon grid to the horizon, a glowing ball, a cyan lamp in the cup,
@@ -1859,7 +1850,6 @@ function openTracker() {
 function initExtras() {
   practiceBtn.addEventListener('click', () => { sfx('tap'); practiceMode = !practiceMode; renderMap(); });
   dailyBtn.addEventListener('click', () => { const ds = dayStr(); goHole(dailyKey(ds), { daily: ds }); });
-  doneShare.addEventListener('click', shareShot);
   trophyBtn.addEventListener('click', openTracker);
   trackClose.addEventListener('click', () => { sfx('tap'); tracker.classList.remove('show'); });
 }

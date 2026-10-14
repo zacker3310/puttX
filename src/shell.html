@@ -360,8 +360,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #doneObj .obj svg { width: 40px; height: 40px; }
 #doneObj .obj.on { opacity: 1; background: var(--v-accent-yellow); border-color: var(--v-yellow-line); color: var(--v-ink-strong); }
 #doneObj .obj.new { animation: popIn .4s .5s cubic-bezier(.3, 1.6, .5, 1) both; }
-#doneShare { right: 24px; top: 146px; }
-#doneShare.ok { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); }
 #holeDone.practice #doneCoins, #holeDone.practice #doneObj { visibility: hidden; }
 #nightBtn { left: 24px; top: 124px; }
 #practiceBtn { left: 124px; top: 124px; }
@@ -516,6 +514,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #titleArt .t-confetti rect:nth-child(5) { --dx: -120px; --dy: -90px; } #titleArt .t-confetti rect:nth-child(6) { --dx: 20px; --dy: -150px; }
 @keyframes pop { 0%, 57% { opacity: 0; translate: 0 0; rotate: 0deg; } 60% { opacity: 1; } 80% { opacity: 1; translate: var(--dx) var(--dy); rotate: 280deg; } 90%, 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 60px); rotate: 400deg; } }
 @media (prefers-reduced-motion: reduce) { #titleArt *, #titleGo { animation: none !important; } }
+/* ---------- 19. DONE CARD: one tidy column ---------- */
+#holeDone { height: 446px; }
+#holeDone .score { left: 0; right: 0; justify-content: center; }
+#doneMap { left: 30px; bottom: 34px; } #doneRetry { left: 134px; bottom: 34px; }
+#doneCoins { left: 238px; bottom: 44px; width: 132px; }
+#doneNext { right: 30px; bottom: 34px; width: 104px; }
 </style>
 </head>
 <body>
@@ -628,7 +632,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <div class="score"><span id="doneStrokes">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
       <div id="doneBadge" aria-label="under par"></div>
       <div id="doneObj" aria-label="goals"><i class="obj" data-k="0" aria-label="under par"><svg viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="20" ry="14" fill="currentColor"/><circle cx="44" cy="22" r="11" fill="currentColor"/><path d="M53 20 L62 24 L53 27 Z" fill="#ef7d6d"/><circle cx="46" cy="20" r="2.6" fill="#fffdf7"/><path d="M14 34 Q26 26 34 36 Q24 44 14 34 Z" fill="#fffdf7" opacity=".55"/><path d="M10 38 L2 32 L4 42 Z" fill="currentColor"/></svg></i><i class="obj" data-k="1" aria-label="no walls"><svg viewBox="0 0 64 64"><rect x="8" y="14" width="20" height="12" rx="2" fill="currentColor"/><rect x="32" y="14" width="24" height="12" rx="2" fill="currentColor"/><rect x="8" y="30" width="28" height="12" rx="2" fill="currentColor"/><rect x="40" y="30" width="16" height="12" rx="2" fill="currentColor"/><path d="M8 56 L56 6" stroke="#fffdf7" stroke-width="10" stroke-linecap="round"/><path d="M8 56 L56 6" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></i><i class="obj" data-k="2" aria-label="lost ball"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg></i></div>
-      <button class="btn" id="doneShare" aria-label="share this putt"><svg viewBox="0 0 64 64"><path d="M32 40 V8 M20 20 L32 8 L44 20" fill="none" stroke="#a8804e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 30 V54 H50 V30" fill="none" stroke="#a8804e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="btn" id="doneMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
       <button class="btn" id="doneRetry" aria-label="play this hole again"><svg viewBox="0 0 64 64"><path d="M50 32 A18 18 0 1 1 40 16" fill="none" stroke="#a8804e" stroke-width="8" stroke-linecap="round"/><path d="M33 7 L43 16 L33 26" fill="none" stroke="#a8804e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>

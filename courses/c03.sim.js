@@ -44,7 +44,7 @@ registerWorld(3, { holes: [
     zones: [J3_WATER(rect(-0.9, 2.0, -0.2, 4.2)), J3_WATER(rect(0.3, 2.0, 0.9, 4.2))],
     bumps: [{ x: 0, z: 4.6, r: 0.45, h: 0.18 }], posts: [J3_IDOL(-1.0, 4.7)] },
   /* 9: the boulder run: downhill, over the bridge, past two rolling boulders */
-  { par: 3, sol: [[24,0.56,0]], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
+  { par: 3, sol: [[16,0.44,0]], tee: [0, 0.5], cup: [0.4, 8.4], shape: rect(-0.9, 0, 0.9, 9),
     tiers: [{ poly: rect(-0.9, 0, 0.9, 9), h: 0.4, sz: -0.04 }],
     zones: [J3_WATER(rect(-0.9, 5, 0.25, 5.5)), J3_WATER(rect(0.65, 5, 0.9, 5.5)), J3_MUD(rect(-0.9, 2.4, 0.3, 2.9))],
     movers: [J3_ROCK(-0.55, 3.7, 0.55, 3.7, 2.2), J3_ROCK(0.55, 6.6, -0.55, 6.6, 3.0)], bumps: [{ x: -0.3, z: 7.6, r: 0.4, h: 0.12 }] },
@@ -83,7 +83,7 @@ registerWorld(3, { holes: [
     tubes: [{ a: [0.6, 4.05], b: [-0.6, 5.6], dir: 0, keep: 0.4 }], posts: [J3_IDOL(0.6, 3.6), J3_IDOL(0.25, 3.95), J3_IDOL(-0.1, 6.9)],
     bumps: [{ x: 0.5, z: 6.9, r: 0.5, h: 0.2 }] },
   /* 16: the lost city: over the hill, across the stream, up to the plaza, through the gate tunnel */
-  { par: 5, crazy: true, sol: [[346,0.84,0],[128,0.86,0],[180,0.45,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[322,0.84,0],[38,0.96,0],[0,0.32,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [0.8, 6.0], [1.8, 6.0], [1.8, 0], [3.4, 0], [3.4, 2.4], [3.4, 7.8], [-0.8, 7.8], [-0.8, 3.6]],
     bumps: [{ x: 0, z: 2.0, r: 0.6, h: 0.35 }],
     ramps: [{ x0: 0.8, z0: 6.0, x1: 1.8, z1: 7.8, axis: 'x', h0: 0, h1: 0.3 }],

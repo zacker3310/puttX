@@ -24,7 +24,7 @@ function showScene(id) {
 /* ---- 2a. constants ---- */
 const SIM_DT = 1 / 240;          /* fixed physics step */
 const BALL_R = 0.0255;           /* a small, quick ball: about 1.2x a real one (0.021) */
-const CUP_R = 0.11;
+const CUP_R = 0.099;
 const CUP_SINK = 0.2;             /* how deep the cup is drawn: the drop is longer than the physics needs, for the plunk */
 const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
 const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
@@ -1412,7 +1412,7 @@ function advance(dt) {
   if (play.phase === 'replay') { advanceReplay(dt); return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
   const b0b = play.ball, near = ((play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.35 && Math.hypot(b0b.vx, b0b.vz) < 1.2)
-    || (play.phase === 'sunk' && (play.fx.sunkT || 0) < 0.3);
+    || (play.phase === 'sunk' && (play.fx.sunkT || 0) < 0.18);
   play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.7 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
   dt *= play.fx.slow;
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
@@ -1441,21 +1441,35 @@ function advance(dt) {
    gives a little nod. Visual only: positions relative to the cup centre. */
 function startSink(vx, vz) {
   const b = play.ball, h = play.hole, s = Math.hypot(vx, vz), cap = 1.4, k = s > cap ? cap / s : 1;
-  play.fx.sink = { x: clamp(b.x - h.cup[0], -0.05, 0.05), z: clamp(b.z - h.cup[1], -0.05, 0.05), y: 0, vx: vx * k, vz: vz * k, vy: 0, walls: 0, floor: false };
+  /* from exactly where the cup caught it: no jump inward */
+  play.fx.sink = { x: b.x - h.cup[0], z: b.z - h.cup[1], y: 0, vx: vx * k, vz: vz * k, vy: 0, walls: 0, floor: false };
 }
 function stepSink(dt) {
   const k = play.fx.sink, lim = CUP_R - BALL_R - 0.003, floor = -(CUP_SINK - 0.004);
   for (let n = Math.max(1, Math.round(dt / SIM_DT)); n > 0; n--) {
     const d = dt / Math.max(1, Math.round(dt / SIM_DT));
     k.vy -= G * d; k.x += k.vx * d; k.z += k.vz * d; k.y += k.vy * d;
-    const r = Math.hypot(k.x, k.z);
-    if (r > lim) {
+    let r = Math.hypot(k.x, k.z);
+    /* over the lip: until the whole ball is inside the rim it rests on the rim's edge, so it tips
+       over it (sinking as it goes, and pulled inward by the tilt) instead of dropping like a stone */
+    const e = CUP_R - r;
+    if (e < BALL_R && r > 1e-6) {
+      const lipY = -(BALL_R - Math.sqrt(Math.max(0, BALL_R * BALL_R - Math.max(0, e) ** 2)));
+      if (k.y < lipY) { k.y = lipY; k.vy = Math.max(k.vy, 0) * 0.5 + (lipY - k.y); }
+      const pull = G * 0.6 * Math.min(1, Math.max(0, e) / BALL_R + 0.25);
+      k.vx -= k.x / r * pull * d; k.vz -= k.z / r * pull * d;
+      if (k.y <= lipY + 1e-6) k.vy = Math.min(k.vy, -0.05);
+    }
+    r = Math.hypot(k.x, k.z);
+    /* below the rim the liner holds it; up at the rim it can ride to the far lip but never back out */
+    const wall = k.y < -BALL_R * 0.9 ? lim : CUP_R - 0.004;
+    if (r > wall) {
       const nx = k.x / r, nz = k.z / r, vn = k.vx * nx + k.vz * nz;
       if (vn > 0) {
         k.vx -= 1.5 * vn * nx; k.vz -= 1.5 * vn * nz; k.vx *= 0.9; k.vz *= 0.9;
         if (vn > 0.15 && k.walls < 3) { k.walls++; sfx('rattle', Math.min(1, vn)); }
       }
-      k.x = nx * lim; k.z = nz * lim;
+      k.x = nx * wall; k.z = nz * wall;
     }
     if (k.y < floor) {
       k.y = floor;

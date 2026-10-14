@@ -52,7 +52,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(-1.0, 4.5, 1.0, 4.5, 2.4)],
     posts: [C22_CACTUS(0.5, 7.6), C22_CACTUS(-0.4, 7.4), C22_ROCK(0.9, 1.4)] },
   /* 6. the staircase down: three lanes, each a step below the last */
-  { par: 4, sol: [[12,0.95,0],[200,1,0]], tee: [2.0, 0.5], cup: [0, 6.4], aim0: 0,
+  { par: 4, sol: [[14,0.72,0.5],[0,0.36,0]], tee: [2.0, 0.5], cup: [0, 6.4], aim0: 0,
     shape: rect(-0.5, 0, 2.5, 7.2),
     inner: [[[1.5, 0], [1.5, 6]], [[0.5, 1.2], [0.5, 7.2]]],
     ramps: [{ x0: 1.5, z0: 4.8, x1: 2.6, z1: 6, axis: 'z', h0: 0.6, h1: 0.4 }, { x0: 0.5, z0: 2.4, x1: 1.5, z1: 3.6, axis: 'z', h0: 0.2, h1: 0.4 },

@@ -64,7 +64,7 @@ registerWorld(24, { holes: [
     drains: [{ x: 4.7, z: 5.3, r: 0.8, depth: 0.22, flat: 0.12 }, { x: 2.1, z: 2.2, r: 1.15, depth: 0.3, flat: 0.12 }, { x: 4.6, z: 2.0, r: 1.0, depth: 0.25 }],
     tubes: [{ a: [4.7, 5.3], b: [0.85, 2.2], dir: 40, keep: 0, add: 1.2 }, { a: [2.1, 2.2], b: [4.6, 0.85], dir: 40, keep: 0, add: 1.0 }] },
   /* 10. gate terraces: four terraces, each snow fence open at one gap; lift bars slide across the top two */
-  { par: 4, sol: [[5,0.833,2],[218,0.96,0]], tee: [0, 0.5], cup: [0.4, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
+  { par: 4, sol: [[218,1,0],[14,0.88,0]], tee: [0, 0.5], cup: [0.4, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
     inner: [[[-1.4, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1.4, 2.6]], [[-1.4, 5.2], [0.5, 5.2]], [[1.1, 5.2], [1.4, 5.2]], [[-1.4, 7.6], [-1.1, 7.6]], [[-0.5, 7.6], [1.4, 7.6]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 2.6), h: 0.42 }, { poly: rect(-1.4, 2.6, 1.4, 5.2), h: 0.28 }, { poly: rect(-1.4, 5.2, 1.4, 7.6), h: 0.14 }],
     movers: [C24_LIFT(-0.5, 2.35, 0.5, 2.35, 0.3, 90, 2.8), C24_LIFT(0.2, 4.95, 0.8, 4.95, 0.3, 90, 2.4, 1)],
@@ -76,7 +76,7 @@ registerWorld(24, { holes: [
     tiers: [{ poly: rect(-2.2, 0, 2.2, 10.6), h: 0.04, sx: -0.01, sz: 0.004 }],
     bumps: [{ x: 0, z: 3.4, r: 1.1, h: 0.16 }, { x: -0.1, z: 5.4, r: 1.2, h: 0.18 }, { x: 0.1, z: 7.4, r: 1.0, h: 0.14 }, { x: -1.2, z: 7.6, r: 1.0, h: -0.07 }] },
   /* 12. twin chutes: the icy chute past the open water or the mogul chute, onto the terrace, then through the gated fence to the cup */
-  { par: 4, sol: [[18,0.8,0]], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
+  { par: 4, sol: [[4,0.8,0]], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
     inner: [[[0, 1.6], [0, 5.6]], [[-1.4, 7.0], [-0.3, 7.0]], [[0.3, 7.0], [1.4, 7.0]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.4), h: 0.42 }, { poly: rect(-1.4, 5.6, 1.4, 7.0), h: 0.14 }],
     ramps: [{ x0: -1.4, z0: 1.4, x1: 1.4, z1: 5.6, axis: 'z', h0: 0.42, h1: 0.14 }],

@@ -12,7 +12,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(0.1, 4.7, 0.8, 5.9) }],
     posts: [C2_CACTUS(-0.27, 4.5)] },
   /* 2. ride off the mesa: a canyon drop onto a green that tilts to the right, the cup tucked behind a rock spur */
-  { par: 3, sol: [[38,0.92,0],[6,0.92,0]], tee: [0, 0.6], cup: [1.2, 6.8],
+  { par: 3, sol: [[38,0.88,0],[6,0.92,0]], tee: [0, 0.6], cup: [1.2, 6.8],
     shape: [[-0.7, 0], [0.7, 0], [0.7, 2.6], [1.8, 2.6], [1.8, 7.6], [-1.8, 7.6], [-1.8, 2.6], [-0.7, 2.6]],
     inner: [[[1.8, 5.2], [-0.3, 5.2]]],
     tiers: [{ poly: rect(-0.75, -0.1, 0.75, 2.6), h: 0.42 }, { poly: rect(-1.9, 2.6, 1.9, 7.7), h: 0.08, sx: 0.042 }],

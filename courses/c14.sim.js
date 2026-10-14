@@ -16,7 +16,7 @@ registerWorld(14, { holes: [
     zones: [{ surf: 'ice', poly: rect(-0.7, 2.4, 0.7, 4.4) }], bumps: [{ x: 0, z: 5.7, r: 0.6, h: 0.1 }], posts: [C14_MAN(0.32, 3.4)] },
   /* 2. the back bowl green: a long open green in two broad tiers that lean opposite ways, joined by a
      gentle bank; a low ridge on the front tier and a swale short of the cup */
-  { par: 3, sol: [[0,0.84,0]], tee: [0.6, 0.5], cup: [-0.9, 9.4], shape: rect(-2, 0, 2, 10.5),
+  { par: 3, sol: [[0,0.76,0]], tee: [0.6, 0.5], cup: [-0.9, 9.4], shape: rect(-2, 0, 2, 10.5),
     tiers: [{ poly: rect(-2, 0, 2, 4.2), h: 0, sx: -0.012 }, { poly: rect(-2, 5.4, 2, 10.5), h: 0.13, sx: 0.012 }],
     ramps: [{ x0: -2, z0: 4.2, x1: 2, z1: 5.4, axis: 'z', h0: 0, h1: 0.13 }],
     bumps: [{ x: 0.9, z: 2.6, r: 1.3, h: 0.12 }, { x: -0.4, z: 7.6, r: 1.2, h: -0.09 }, { x: 1.2, z: 8.8, r: 1.0, h: 0.07 }] },

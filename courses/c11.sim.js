@@ -67,7 +67,7 @@ registerWorld(11, { holes: [
             { surf: 'sand', poly: rect(-1.6, 4.4, -1, 5.4) }],
     bumps: [{ x: -0.5, z: 0.6, r: 0.3, h: 0.08 }] },
   /* 9: tower drop (3 parts). Off the scaffold, through twin cranes, then up the ramp past the boom */
-  { par: 3, crazy: true, sol: [[-1,0.98,1],[140,0.7,0]], tee: [0, 0.5], cup: [0.6, 9.1], shape: rect(-1.3, 0, 1.3, 10),
+  { par: 3, crazy: true, sol: [[0,0.92,1]], tee: [0, 0.5], cup: [0.6, 9.1], shape: rect(-1.3, 0, 1.3, 10),
     tiers: [{ poly: rect(-1.3, 0, 1.3, 3), h: 0.4 }, { poly: rect(-1.3, 7.6, 1.3, 10), h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 6.4, x1: 0.4, z1: 7.6, axis: 'z', h0: 0, h1: 0.3 }],
     inner: [[[-1.3, 7.6], [-0.4, 7.6]], [[0.4, 7.6], [1.3, 7.6]]],

@@ -153,7 +153,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(2.2, 4.2), C12_CACTUS(1.75, 5.2)] },
   /* 17. the twin floods: over the plank or the kicker, onto the island, then the shaft or the second kicker over
      the far river to the green behind the wall */
-  { par: 4, crazy: true, sol: [[0,0.8125,0],[40,0.8125,0]], tee: [0, 0.5], cup: [-0.8, 9.0], shape: rect(-1.6, 0, 1.6, 10),
+  { par: 4, crazy: true, sol: [[0,1,0]], tee: [0, 0.5], cup: [-0.8, 9.0], shape: rect(-1.6, 0, 1.6, 10),
     inner: [[[-1.6, 8.1], [-0.2, 8.1]]],
     ramps: [{ x0: -0.4, z0: 1.8, x1: 0.4, z1: 2.7, axis: 'z', h0: 0, h1: 0.22 }, { x0: -0.3, z0: 5.2, x1: 0.3, z1: 6.1, axis: 'z', h0: 0, h1: 0.22 }],
     tubes: [{ a: [0.9, 5.6], b: [0.9, 7.4], dir: 0, keep: 0.5, add: 0.3 }],

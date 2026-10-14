@@ -141,7 +141,7 @@ registerWorld(12, { holes: [
     movers: [C12_WEED(-1.5, 3.2, -1.5, 5.6, 2.6, 0, 0.15)],
     posts: [C12_CACTUS(0, 1.6), C12_CACTUS(1.5, 6.6), C12_CACTUS(-0.5, 4.6), C12_ROCK(1.6, 4.4)] },
   /* 16. the switchback climb: three lanes, two ramps, each shelf higher than the last */
-  { par: 4, crazy: true, sol: [[345,0.85714,0],[155,1,0],[0,0.92857,0]], tee: [0, 0.5], cup: [2.0, 6.4], aim0: 0,
+  { par: 4, crazy: true, sol: [[348,1,0],[160,0.92,1],[0,0.6,0]], tee: [0, 0.5], cup: [2.0, 6.4], aim0: 0,
     shape: rect(-0.5, 0, 2.5, 7.2),
     inner: [[[0.5, 0], [0.5, 6]], [[1.5, 1.2], [1.5, 7.2]]],
     ramps: [{ x0: -0.6, z0: 4.8, x1: 0.5, z1: 6, axis: 'z', h0: 0, h1: 0.14 }, { x0: 0.5, z0: 2.4, x1: 1.5, z1: 3.6, axis: 'z', h0: 0.28, h1: 0.14 },

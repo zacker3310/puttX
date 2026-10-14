@@ -1750,10 +1750,12 @@ function finishDaily(score) {
 }
 function renderDaily() {
   const ds = dayStr(), d = progress.daily, y = new Date(); y.setDate(y.getDate() - 1);
-  dailyDay.textContent = new Date().getDate();
+  const key = dailyKey(ds), [c, n] = key.split('-').map(Number), w = worldOf(c);
+  dailyWorld.innerHTML = lookOf(w).icon || ''; dailyHole.textContent = n;
+  dailyPips.innerHTML = '<i></i>'.repeat(coursesOf(w).indexOf(c) + 1);
   dailyBtn.classList.toggle('done', !!d && d.d === ds);
   const live = d && (d.d === ds || d.d === dayStr(y));
-  dailyStreak.textContent = live ? d.streak : '';
+  dailyStreakN.textContent = live ? d.streak : '';
   dailyStreak.classList.toggle('show', !!live);
 }
 

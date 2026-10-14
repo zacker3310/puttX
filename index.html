@@ -371,12 +371,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #worldTabs .btn.night { background: #3b4a86; border-color: #26305e; box-shadow: 0 6px 0 #1b2246; }
 #worldTabs .btn.night.on { background: var(--v-accent-yellow); border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
 #map.practice #holePath .node:not(.locked) { border-color: var(--v-red-line); }
-#dailyBtn { left: 712px; top: 336px; }
-#dailyBtn .day { position: absolute; left: 0; right: 0; top: 40px; text-align: center; font: 800 26px var(--v-font); color: var(--v-ink-strong); pointer-events: none; }
-#dailyBtn .tally { position: absolute; right: -10px; top: -10px; min-width: 34px; height: 32px; padding: 0 6px; border-radius: 16px; background: var(--v-accent-red);
-  border: 3px solid var(--v-red-line); font: 800 18px/26px var(--v-font); color: #fff; display: none; }
-#dailyBtn .tally.show { display: block; }
-#dailyBtn.done { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); }
 @media (prefers-reduced-motion: reduce) { #lostPop.show, #doneObj .obj.new { animation: none; } }
 /* ---------- 16. COURSES, TRACKER, BADGES ---------- */
 #courseTabs { position: absolute; left: 416px; top: 124px; display: flex; gap: 8px; }
@@ -471,7 +465,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #titleStrip { display: none; }
 #titleGo { left: 440px; top: 396px; width: 320px; height: 144px; border-radius: 72px; animation: popIn .5s .3s cubic-bezier(.3, 1.6, .5, 1) both, pulse 1.8s 1.2s ease-in-out infinite; }
 #titleGo svg { width: 76px; height: 76px; }
-#dailyBtn { left: 712px; top: 372px; z-index: 2; }
 #titleArt .t-sign { transform-box: view-box; transform-origin: 600px 0; animation: sway 4s ease-in-out infinite, signDrop .8s cubic-bezier(.3, 1.5, .5, 1) both; }
 @keyframes sway { 50% { rotate: 1.6deg; } }
 @keyframes signDrop { from { translate: 0 -260px; } }
@@ -500,12 +493,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #titleArt .t-ball { animation: putt 6s infinite; }
 @keyframes putt {
   0%, 16% { translate: 0 0; opacity: 1; animation-timing-function: cubic-bezier(.2, .7, .4, 1); }
-  52% { translate: 560px 30px; opacity: 1; }
-  56% { translate: 560px 50px; opacity: 1; scale: 1; }
-  60%, 92% { translate: 560px 60px; opacity: 0; }
+  52% { translate: 430px 30px; opacity: 1; }
+  56% { translate: 430px 50px; opacity: 1; scale: 1; }
+  60%, 92% { translate: 430px 60px; opacity: 0; }
   96% { translate: 0 0; opacity: 0; } 100% { translate: 0 0; opacity: 1; } }
 #titleArt .t-spin { transform-box: view-box; transform-origin: 370px 586px; animation: rollspin 6s infinite; }
-@keyframes rollspin { 0%, 16% { rotate: 0deg; animation-timing-function: cubic-bezier(.2, .7, .4, 1); } 52%, 100% { rotate: 900deg; } }
+@keyframes rollspin { 0%, 16% { rotate: 0deg; animation-timing-function: cubic-bezier(.2, .7, .4, 1); } 52%, 100% { rotate: 700deg; } }
 #titleArt .t-lines { animation: lines 6s infinite; }
 @keyframes lines { 0%, 16% { opacity: 0; } 22% { opacity: .9; } 44%, 100% { opacity: 0; } }
 #titleArt .t-confetti rect { transform-box: fill-box; transform-origin: center; opacity: 0; animation: pop 6s infinite; }
@@ -520,6 +513,27 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #doneMap { left: 30px; bottom: 34px; } #doneRetry { left: 134px; bottom: 34px; }
 #doneCoins { left: 238px; bottom: 44px; width: 132px; }
 #doneNext { right: 30px; bottom: 34px; width: 104px; }
+/* ---------- 20. HOLE OF THE DAY: a gold ticket in the corner ---------- */
+#dailyBtn { position: absolute; left: auto; top: auto; right: 26px; bottom: 24px; width: 236px; height: 112px; padding: 0 16px 0 10px; z-index: 2; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; border-radius: 22px; background: linear-gradient(#ffe9a3, #ffd66e); border: 5px solid var(--v-yellow-line);
+  box-shadow: 0 7px 0 var(--v-yellow-down), 0 12px 24px rgba(47, 36, 26, .25); font: 900 40px var(--v-font); color: var(--v-ink-strong);
+  animation: popIn .5s .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+#dailyBtn::before, #dailyBtn::after { content: ''; position: absolute; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; background: #7bc463; }
+#dailyBtn::before { left: -13px; } #dailyBtn::after { right: -13px; background: #3f6a5a; }
+#dailyBtn:active { transform: translateY(4px); box-shadow: 0 3px 0 var(--v-yellow-down); }
+#dailyBtn .sun { position: absolute; left: -26px; top: -30px; width: 64px; height: 64px; animation: spin 14s linear infinite; }
+#dailyBtn .sun svg, #dailyBtn .world svg { width: 100%; height: 100%; display: block; }
+#dailyBtn .world { width: 70px; height: 70px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #fffdf7; border: 4px solid var(--v-yellow-line); padding: 8px; }
+#dailyBtn .hole { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+#dailyBtn .pips { display: flex; gap: 4px; margin-top: 6px; }
+#dailyBtn .pips i { width: 9px; height: 9px; border-radius: 50%; background: var(--v-ink-soft); }
+#dailyBtn .streak { margin-left: auto; display: none; align-items: center; gap: 2px; font-size: 28px; }
+#dailyBtn .streak.show { display: flex; }
+#dailyBtn .streak svg { width: 34px; height: 34px; }
+#dailyBtn .stamp { position: absolute; right: -14px; top: -16px; width: 50px; height: 50px; border-radius: 50%; background: var(--v-accent-green); border: 4px solid var(--v-green-line); display: none; rotate: 12deg; }
+#dailyBtn .stamp svg { width: 100%; height: 100%; }
+#dailyBtn.done .stamp { display: block; }
+@media (prefers-reduced-motion: reduce) { #dailyBtn, #dailyBtn .sun { animation: none; } }
 </style>
 </head>
 <body>
@@ -575,11 +589,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <path d="M78 676 Q62 568 176 552 L1034 534 Q1146 538 1140 650 L1132 688 Z" fill="url(#tGreen)"/>
       <path d="M78 676 Q62 568 176 552 L1034 534 Q1146 538 1140 650 L1132 688 Z" fill="url(#tStripes)"/>
       <!-- cup and waving flag -->
-      <ellipse cx="930" cy="616" rx="34" ry="12" fill="#2b2016"/><ellipse cx="930" cy="618" rx="30" ry="9" fill="#f4f1ea" opacity=".85"/><ellipse cx="930" cy="616" rx="26" ry="7" fill="#1a130c"/>
-      <path d="M948 612 V420" stroke="#fffdf7" stroke-width="7" stroke-linecap="round"/>
-      <path class="t-flag" d="M951 424 Q1000 432 1040 420 Q1018 446 1040 474 Q996 462 951 470 Z" fill="#ef7d6d"/>
+      <ellipse cx="800" cy="616" rx="34" ry="12" fill="#2b2016"/><ellipse cx="800" cy="618" rx="30" ry="9" fill="#f4f1ea" opacity=".85"/><ellipse cx="800" cy="616" rx="26" ry="7" fill="#1a130c"/>
+      <path d="M818 612 V420" stroke="#fffdf7" stroke-width="7" stroke-linecap="round"/>
+      <path class="t-flag" d="M821 424 Q870 432 910 420 Q888 446 910 474 Q866 462 821 470 Z" fill="#ef7d6d"/>
       <!-- confetti burst when the ball drops -->
-      <g class="t-confetti"><rect x="926" y="590" width="10" height="16" fill="#ffd66e"/><rect x="920" y="590" width="10" height="16" fill="#ef7d6d"/><rect x="934" y="590" width="10" height="16" fill="#6fc0df"/><rect x="928" y="590" width="10" height="16" fill="#74c465"/><rect x="922" y="590" width="10" height="16" fill="#b7a7e0"/><rect x="930" y="590" width="10" height="16" fill="#ffd66e"/></g>
+      <g class="t-confetti"><rect x="796" y="590" width="10" height="16" fill="#ffd66e"/><rect x="790" y="590" width="10" height="16" fill="#ef7d6d"/><rect x="804" y="590" width="10" height="16" fill="#6fc0df"/><rect x="798" y="590" width="10" height="16" fill="#74c465"/><rect x="792" y="590" width="10" height="16" fill="#b7a7e0"/><rect x="800" y="590" width="10" height="16" fill="#ffd66e"/></g>
       <!-- the putter swings, the ball with a face rolls into the cup -->
       <g class="t-putter"><path d="M250 330 L300 584" stroke="#c9ced6" stroke-width="9" stroke-linecap="round"/><path d="M246 312 L254 352" stroke="#4a3826" stroke-width="18" stroke-linecap="round"/><rect x="262" y="578" width="64" height="24" rx="8" fill="#9aa3ad" stroke="#6f7881" stroke-width="4"/></g>
       <g class="t-ball"><ellipse class="t-shadow" cx="370" cy="626" rx="40" ry="10" fill="#1d3a1d" opacity=".3"/>
@@ -603,7 +617,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       </g>
     </svg>
     <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
-    <button class="btn" id="dailyBtn" aria-label="daily hole"><svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="8" fill="#fffdf7" stroke="#a8804e" stroke-width="5"/><path d="M8 24 H56" stroke="#ef7d6d" stroke-width="10"/><path d="M20 6 V16 M44 6 V16" stroke="#a8804e" stroke-width="5" stroke-linecap="round"/></svg><span class="day" id="dailyDay">1</span><span class="tally" id="dailyStreak"></span></button>
+    <button id="dailyBtn" aria-label="hole of the day"><span class="sun" aria-hidden="true"><svg viewBox="0 0 64 64"><g stroke="#dca63f" stroke-width="5" stroke-linecap="round"><path d="M32 3 V10 M32 54 V61 M3 32 H10 M54 32 H61 M11 11 L16 16 M48 48 L53 53 M11 53 L16 48 M48 16 L53 11"/></g><circle cx="32" cy="32" r="17" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/></svg></span><span class="world" id="dailyWorld"></span><span class="hole"><span id="dailyHole">1</span><span class="pips" id="dailyPips"></span></span><span class="streak" id="dailyStreak"><svg viewBox="0 0 64 64"><path d="M34 4 C38 18 52 24 50 42 A18 18 0 0 1 14 42 C13 32 20 26 22 18 C26 26 30 26 30 26 C28 18 30 10 34 4 Z" fill="#ff8a3d"/><path d="M33 30 C36 38 42 40 40 48 A8 8 0 0 1 24 48 C24 42 30 40 33 30 Z" fill="#ffd66e"/></svg><span id="dailyStreakN"></span></span><span class="stamp" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 33 L27 46 L51 19" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
     <div id="titleStrip"></div>
   </section>
   <section class="scene" id="hole">
@@ -715,7 +729,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '70ef4af7f9d1';
+const BUILD_ID = '079ce609b8f3';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1343,7 +1357,7 @@ registerWorld(2, { holes: [
       C2_CACTUS(-0.55, 4.3), C2_CACTUS(0.5, 4.8), C2_ROCK(-1.15, 5.4, 0.15), C2_CACTUS(1.0, 5.15), C2_CACTUS(0.35, 6.0)],
     zones: [{ surf: 'sand', poly: rect(-1.6, 6.2, -0.4, 6.8) }, { surf: 'sand', poly: [[1.5, 6.0], [1.5, 6.25], [1.1, 6.8], [0.9, 6.8]] }] },
   /* 11. mesa hop: up a ramp, across the mesa past a tumbleweed, off the far left edge to the green */
-  { par: 3, sol: [[324,0.9375,3],[9,0.5,0]], tee: [0, 0.5], cup: [-0.3, 7.8],
+  { par: 3, sol: [[327.25,0.96,0]], tee: [0, 0.5], cup: [-0.3, 7.8],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3], [2.4, 3], [2.4, 8.6], [-0.8, 8.6]],
     inner: [[[-0.8, 5.5], [1.0, 5.5]]],
     ramps: [{ x0: -0.8, z0: 2, x1: 0.8, z1: 3, axis: 'z', h0: 0, h1: 0.4 }],
@@ -1353,28 +1367,28 @@ registerWorld(2, { holes: [
     movers: [C2_WEED(1.7, 3.55, 1.7, 4.95, 2.2)],
     posts: [C2_CACTUS(0.2, 4.4), C2_CACTUS(-0.4, 3.6), C2_CACTUS(1.9, 7.9)] },
   /* 12. bank off the canyon wall round a rock spur; a tumbleweed patrols the green */
-  { par: 3, sol: [[312,1,0]], tee: [0, 0.5], cup: [-0.6, 6.6], aim0: 12,
+  { par: 3, sol: [[164,0.88,0]], tee: [0, 0.5], cup: [-0.6, 6.6], aim0: 12,
     shape: [[-1.2, 0], [1.2, 0], [1.2, 4.5], [2.0, 5.5], [2.0, 7.5], [-1.2, 7.5]],
     inner: [[[-1.2, 4.2], [0.6, 4.2]]],
     tiers: [{ poly: rect(-1.3, -0.1, 2.1, 7.6), h: 0.16, sz: -0.02 }],
     movers: [C2_WEED(-0.8, 5.5, 0.9, 5.5, 3.0)],
     posts: [C2_CACTUS(-0.9, 2.6), C2_ROCK(1.55, 7.1, 0.13)] },
   /* 13. ridge walk: a narrow humped ridge over the canyon to a walled green */
-  { par: 4, sol: [[26,1,0],[0,0.64,0]], tee: [0, 0.5], cup: [2.5, 6.8], aim0: 0,
+  { par: 4, sol: [[334,0.96,0],[60,0.84,0]], tee: [0, 0.5], cup: [2.5, 6.8], aim0: 0,
     floors: [[[-0.7, 0], [0.7, 0], [0.7, 2.2], [0.4, 2.2], [0.4, 4.3], [1.4, 4.3], [1.4, 3.8], [3.2, 3.8], [3.2, 7.6], [1.4, 7.6], [1.4, 5.1], [-0.4, 5.1], [-0.4, 2.2], [-0.7, 2.2]]],
     walls: [[[-0.7, 2.2], [-0.7, 0], [0.7, 0], [0.7, 2.2]], [[-0.4, 4.3], [-0.4, 5.1], [0.4, 5.1]], [[1.4, 5.1], [1.4, 7.6], [3.2, 7.6], [3.2, 3.8], [1.4, 3.8], [1.4, 4.3]]],
     bumps: [{ x: 0.0, z: 3.2, r: 0.35, h: 0.08 }],
     zones: [{ surf: 'sand', poly: rect(1.4, 5.6, 2.2, 6.2) }],
     posts: [C2_CACTUS(2.9, 5.8), C2_CACTUS(1.8, 7.0)] },
   /* 14. flash flood: jump the river off the kicker, or take the plank bridge round the side */
-  { par: 4, crazy: true, sol: [[31,0.96,0]], tee: [0, 0.5], cup: [-1.0, 7.9], shape: rect(-1.6, 0, 1.6, 9),
+  { par: 4, crazy: true, sol: [[326,1,0]], tee: [0, 0.5], cup: [-1.0, 7.9], shape: rect(-1.6, 0, 1.6, 9),
     ramps: [{ x0: -0.45, z0: 2.4, x1: 0.45, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 }],
     zones: [{ surf: 'fast', poly: rect(0.85, 3.3, 1.35, 4.5) }, { surf: 'fast', poly: rect(-0.45, 2.4, 0.45, 3.4) }, { surf: 'water', poly: rect(-1.6, 3.5, 1.6, 4.3) }],
     inner: [[[-1.6, 6.9], [-0.3, 6.9]]],
     bumps: [{ x: 0.1, z: 5.9, r: 0.5, h: 0.24 }, { x: 0.9, z: 7.4, r: 0.45, h: 0.2 }],
     posts: [C2_CACTUS(-1.1, 2.0), C2_CACTUS(-0.2, 8.3), C2_ROCK(0.6, 8.6)] },
   /* 15. the summit cup: the hole sits on top of a giant dune */
-  { par: 3, sol: [[0,0.72,0]], tee: [0, 0.5], cup: [0, 5.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [1.6, 7.2], [-1.6, 7.2], [-1.6, 3.0]],
+  { par: 3, sol: [[0,0.76,0]], tee: [0, 0.5], cup: [0, 5.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [1.6, 7.2], [-1.6, 7.2], [-1.6, 3.0]],
     bumps: [{ x: 0, z: 5.2, r: 0.85, h: 0.35 }, { x: 0.8, z: 2.3, r: 0.4, h: 0.15 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 3.4, -0.75, 4.3) }, { surf: 'sand', poly: rect(-1.6, 6.6, 1.6, 7.2) }],
     posts: [C2_CACTUS(-0.7, 1.8), C2_CACTUS(1.3, 6.4)] },
@@ -2690,7 +2704,7 @@ registerWorld(12, { holes: [
     movers: [C12_WEED(-1.5, 3.2, -1.5, 5.6, 2.6, 0, 0.15)],
     posts: [C12_CACTUS(0, 1.6), C12_CACTUS(1.5, 6.6), C12_CACTUS(-0.5, 4.6), C12_ROCK(1.6, 4.4)] },
   /* 16. the switchback climb: three lanes, two ramps, each shelf higher than the last */
-  { par: 4, crazy: true, sol: [[345,0.85714,0],[155,1,0],[0,0.92857,0]], tee: [0, 0.5], cup: [2.0, 6.4], aim0: 0,
+  { par: 4, crazy: true, sol: [[348,1,0],[160,0.92,1],[0,0.6,0]], tee: [0, 0.5], cup: [2.0, 6.4], aim0: 0,
     shape: rect(-0.5, 0, 2.5, 7.2),
     inner: [[[0.5, 0], [0.5, 6]], [[1.5, 1.2], [1.5, 7.2]]],
     ramps: [{ x0: -0.6, z0: 4.8, x1: 0.5, z1: 6, axis: 'z', h0: 0, h1: 0.14 }, { x0: 0.5, z0: 2.4, x1: 1.5, z1: 3.6, axis: 'z', h0: 0.28, h1: 0.14 },
@@ -8519,10 +8533,12 @@ function finishDaily(score) {
 }
 function renderDaily() {
   const ds = dayStr(), d = progress.daily, y = new Date(); y.setDate(y.getDate() - 1);
-  dailyDay.textContent = new Date().getDate();
+  const key = dailyKey(ds), [c, n] = key.split('-').map(Number), w = worldOf(c);
+  dailyWorld.innerHTML = lookOf(w).icon || ''; dailyHole.textContent = n;
+  dailyPips.innerHTML = '<i></i>'.repeat(coursesOf(w).indexOf(c) + 1);
   dailyBtn.classList.toggle('done', !!d && d.d === ds);
   const live = d && (d.d === ds || d.d === dayStr(y));
-  dailyStreak.textContent = live ? d.streak : '';
+  dailyStreakN.textContent = live ? d.streak : '';
   dailyStreak.classList.toggle('show', !!live);
 }
 

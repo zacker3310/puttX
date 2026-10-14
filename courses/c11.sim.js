@@ -34,7 +34,7 @@ registerWorld(11, { holes: [
     tubes: [{ a: [0.35, 2.4], b: [-2.6, 3.75], dir: 0 }],
     bumps: [{ x: 0, z: 4.3, r: 0.45, h: 0.15 }] },
   /* 5: double deck (3 parts). Two plank ramps on opposite sides, then a jib on the top deck */
-  { par: 3, sol: [[28,0.86,0],[324,1,1]], tee: [0, 0.5], cup: [0.6, 8.3], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[30,0.88,0],[0,0.96,0]], tee: [0, 0.5], cup: [0.6, 8.3], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 3.2, 1.2, 6), h: 0.2 }, { poly: rect(-1.2, 6, 1.2, 9), h: 0.4 }],
     ramps: [{ x0: 0.5, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 },
             { x0: -1.2, z0: 4.8, x1: -0.5, z1: 6, axis: 'z', h0: 0.2, h1: 0.4 }],
@@ -52,7 +52,7 @@ registerWorld(11, { holes: [
             { push: [0, 0.8], poly: rect(-3.2, 1.2, -1, 6.5) }],
     bumps: [{ x: -2.3, z: 7.4, r: 0.75, h: -0.25 }] },
   /* 7: trench jump (3 parts, open). Launch off the plank over the trench or creep round the side plank, then the jib */
-  { par: 3, sol: [[4,0.98,0]], tee: [0, 0.5], cup: [0.25, 8.3],
+  { par: 3, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [0.25, 8.3],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 9)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 9], [0.8, 9], [0.8, 5.3]]],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.5, axis: 'z', h0: 0, h1: 0.22 }],

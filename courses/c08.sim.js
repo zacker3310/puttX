@@ -81,7 +81,7 @@
       bumps: [{ x: 0, z: 5, r: 0.5, h: -0.2 }],
       posts: [ALIEN(1.6, 5.3), ALIEN(2.25, 4.55), ALIEN(1.5, 4.4)] },
     /* 10. tube relay: tee deck, tube, asteroid deck, jump, cup deck */
-    { par: 3, sol: [[350,0.88,0],[68,0.64,0]], tee: [0, 0.5], cup: [1.6, 6.4],
+    { par: 3, sol: [[46,0.8,0],[358,0.96,0]], tee: [0, 0.5], cup: [1.6, 6.4],
       floors: [rect(-0.8, 0, 0.8, 2.4), rect(2, 0, 3.6, 4), rect(1, 4.8, 3.8, 7)],
       walls: [...box(-0.8, 0, 0.8, 2.4), ...box(2, 0, 3.6, 4, 'n'), ...box(1, 4.8, 3.8, 7, 'w')],
       ramps: [{ x0: 2, z0: 3.2, x1: 3.6, z1: 4, axis: 'z', h0: 0, h1: 0.2 }],
@@ -90,14 +90,14 @@
       tubes: [{ a: [-0.45, 2.0], b: [2.8, 0.5], dir: 0 }],
       movers: [ROCK(2.4, 2.2, 3.2, 2.2, 2.2, 0, 0.16)] },
     /* 11. the abyss: jump the void through a narrow launch, or ride the long way round */
-    { par: 3, crazy: true, sol: [[40,0.96,0],[32,1,0]], tee: [0, 0.5], cup: [-0.55, 6],
+    { par: 3, crazy: true, sol: [[138,1,0],[30,1,0]], tee: [0, 0.5], cup: [-0.55, 6],
       floors: [[[-0.7, 0], [2.6, 0], [2.6, 6.6], [-1.2, 6.6], [-1.2, 4.4], [1.6, 4.4], [1.6, 1.2], [0.7, 1.2], [0.7, 3], [-0.7, 3]]],
       walls: [[[-0.7, 3], [-0.7, 0], [2.6, 0], [2.6, 6.6], [1, 6.6]], [[-1.2, 6.6], [-1.2, 4.4]], [[0.7, 3], [0.7, 1.2], [1.6, 1.2], [1.6, 4.4], [-1.2, 4.4]]],
       inner: [[[-0.7, 2.3], [-0.3, 2.3], [-0.3, 3]], [[0.7, 2.3], [0.3, 2.3], [0.3, 3]]],
       ramps: [{ x0: -0.7, z0: 2.3, x1: 0.7, z1: 3, axis: 'z', h0: 0, h1: 0.24 }],
       bumps: [{ x: 2.1, z: 3, r: 0.5, h: -0.18 }] },
     /* 12. moon dome: the cup sits on top of a hill ringed by aliens; short rolls back, long runs off */
-    { par: 2, sol: [[40,0.68,0]], tee: [0, 0.5], cup: [0, 4.6], shape: rect(-1.6, 0, 1.6, 6.6),
+    { par: 2, sol: [[10,0.72,0]], tee: [0, 0.5], cup: [0, 4.6], shape: rect(-1.6, 0, 1.6, 6.6),
       bumps: [{ x: 0, z: 4.6, r: 0.95, h: 0.3 }],
       posts: [ALIEN(0, 3.55), ALIEN(-0.85, 3.95), ALIEN(0.85, 3.95), ALIEN(-1.05, 4.95), ALIEN(1.05, 4.95), ALIEN(-0.5, 5.75), ALIEN(0.5, 5.75)] },
     /* 13. double jump: launch, slip the airlock, then turn and launch off the side ramp */

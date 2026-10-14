@@ -596,7 +596,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '0c85345362b6';
+const BUILD_ID = '3535c0f13930';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -638,7 +638,7 @@ const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.7, WALL_SLIP = 0.92;
 const POST_E = 0.6, MOVER_E = 0.8;
 const STEP_MAX = 0.03;           /* ground rising more than this under the ball's leading edge is a cliff face */
 const CLIFF_E = 0.45;
-const BOUNCE_VY = 1.1, BOUNCE_E = 0.35;  /* a landing faster than BOUNCE_VY hops back up */
+const BOUNCE_VY = 0.75, BOUNCE_E = 0.5;  /* a landing faster than BOUNCE_VY hops back up: a lively golf ball, not a marble */
 const OOB_Y = -1;
 /* the cup sits in a slight funnel: inside LIP_PULL_R of the rim a slow ball is drawn in, harder the closer it gets */
 const LIP_TURN = 0.5, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 2.6, LIP_PULL_R = 0.25;
@@ -868,8 +868,8 @@ function stepBall(h, b, t) {
       } else if (b.y <= gh) {
         const imp = -b.vy;
         b.y = gh;
-        if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.9; b.vz *= 0.9; }
-        else { b.vy = 0; b.air = false; const k = 1 - 0.15 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k; }
+        if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.95; b.vz *= 0.95; }
+        else { b.vy = 0; b.air = false; const k = 1 - 0.08 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k; }
         if (imp > 0.4) b.hits.push(['land', imp]);
       }
     } else if (b.y < OOB_Y) return 'oob';
@@ -1042,7 +1042,7 @@ registerWorld(1, { holes: [
     zones: [{ push: [0, -1.2], poly: rect(-1, 4.4, 1, 5.2) }],
     bumps: [{ x: -0.4, z: 5.9, r: 0.35, h: 0.12 }] },
   /* 6: pipe run (3 parts). Scaffold deck, then a drop or the pipe, then a girder and a crane on the yard */
-  { par: 3, sol: [[22,0.88,0]], tee: [0, 0.5], cup: [-0.6, 8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[22,0.8,0]], tee: [0, 0.5], cup: [-0.6, 8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 3.6), h: 0.4 }],
     tubes: [{ a: [0.8, 3], b: [-0.85, 5.75], dir: 90 }],
     inner: [[[-1.2, 5.2], [0.3, 5.2]]],
@@ -1154,7 +1154,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(0.1, 4.7, 0.8, 5.9) }],
     posts: [C2_CACTUS(-0.27, 4.5)] },
   /* 2. ride off the mesa: a canyon drop onto a green that tilts to the right, the cup tucked behind a rock spur */
-  { par: 3, sol: [[348,0.68,0],[22,0.76,0]], tee: [0, 0.6], cup: [1.2, 6.8],
+  { par: 3, sol: [[42,0.92,0],[22,0.88,0]], tee: [0, 0.6], cup: [1.2, 6.8],
     shape: [[-0.7, 0], [0.7, 0], [0.7, 2.6], [1.8, 2.6], [1.8, 7.6], [-1.8, 7.6], [-1.8, 2.6], [-0.7, 2.6]],
     inner: [[[1.8, 5.2], [-0.3, 5.2]]],
     tiers: [{ poly: rect(-0.75, -0.1, 0.75, 2.6), h: 0.42 }, { poly: rect(-1.9, 2.6, 1.9, 7.7), h: 0.08, sx: 0.042 }],
@@ -1918,7 +1918,7 @@ registerWorld(7, { holes: [
       bumps: [{ x: 0, z: 5, r: 0.5, h: -0.2 }],
       posts: [ALIEN(1.6, 5.3), ALIEN(2.25, 4.55), ALIEN(1.5, 4.4)] },
     /* 10. tube relay: tee deck, tube, asteroid deck, jump, cup deck */
-    { par: 3, sol: [[350,0.88,0],[68,0.64,0]], tee: [0, 0.5], cup: [1.6, 6.4],
+    { par: 3, sol: [[46,0.8,0],[358,0.96,0]], tee: [0, 0.5], cup: [1.6, 6.4],
       floors: [rect(-0.8, 0, 0.8, 2.4), rect(2, 0, 3.6, 4), rect(1, 4.8, 3.8, 7)],
       walls: [...box(-0.8, 0, 0.8, 2.4), ...box(2, 0, 3.6, 4, 'n'), ...box(1, 4.8, 3.8, 7, 'w')],
       ramps: [{ x0: 2, z0: 3.2, x1: 3.6, z1: 4, axis: 'z', h0: 0, h1: 0.2 }],
@@ -1927,14 +1927,14 @@ registerWorld(7, { holes: [
       tubes: [{ a: [-0.45, 2.0], b: [2.8, 0.5], dir: 0 }],
       movers: [ROCK(2.4, 2.2, 3.2, 2.2, 2.2, 0, 0.16)] },
     /* 11. the abyss: jump the void through a narrow launch, or ride the long way round */
-    { par: 3, crazy: true, sol: [[40,0.96,0],[32,1,0]], tee: [0, 0.5], cup: [-0.55, 6],
+    { par: 3, crazy: true, sol: [[138,1,0],[30,1,0]], tee: [0, 0.5], cup: [-0.55, 6],
       floors: [[[-0.7, 0], [2.6, 0], [2.6, 6.6], [-1.2, 6.6], [-1.2, 4.4], [1.6, 4.4], [1.6, 1.2], [0.7, 1.2], [0.7, 3], [-0.7, 3]]],
       walls: [[[-0.7, 3], [-0.7, 0], [2.6, 0], [2.6, 6.6], [1, 6.6]], [[-1.2, 6.6], [-1.2, 4.4]], [[0.7, 3], [0.7, 1.2], [1.6, 1.2], [1.6, 4.4], [-1.2, 4.4]]],
       inner: [[[-0.7, 2.3], [-0.3, 2.3], [-0.3, 3]], [[0.7, 2.3], [0.3, 2.3], [0.3, 3]]],
       ramps: [{ x0: -0.7, z0: 2.3, x1: 0.7, z1: 3, axis: 'z', h0: 0, h1: 0.24 }],
       bumps: [{ x: 2.1, z: 3, r: 0.5, h: -0.18 }] },
     /* 12. moon dome: the cup sits on top of a hill ringed by aliens; short rolls back, long runs off */
-    { par: 2, sol: [[40,0.68,0]], tee: [0, 0.5], cup: [0, 4.6], shape: rect(-1.6, 0, 1.6, 6.6),
+    { par: 2, sol: [[10,0.72,0]], tee: [0, 0.5], cup: [0, 4.6], shape: rect(-1.6, 0, 1.6, 6.6),
       bumps: [{ x: 0, z: 4.6, r: 0.95, h: 0.3 }],
       posts: [ALIEN(0, 3.55), ALIEN(-0.85, 3.95), ALIEN(0.85, 3.95), ALIEN(-1.05, 4.95), ALIEN(1.05, 4.95), ALIEN(-0.5, 5.75), ALIEN(0.5, 5.75)] },
     /* 13. double jump: launch, slip the airlock, then turn and launch off the side ramp */
@@ -2303,7 +2303,7 @@ registerWorld(11, { holes: [
     tubes: [{ a: [0.35, 2.4], b: [-2.6, 3.75], dir: 0 }],
     bumps: [{ x: 0, z: 4.3, r: 0.45, h: 0.15 }] },
   /* 5: double deck (3 parts). Two plank ramps on opposite sides, then a jib on the top deck */
-  { par: 3, sol: [[28,0.86,0],[324,1,1]], tee: [0, 0.5], cup: [0.6, 8.3], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[30,0.88,0],[0,0.96,0]], tee: [0, 0.5], cup: [0.6, 8.3], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 3.2, 1.2, 6), h: 0.2 }, { poly: rect(-1.2, 6, 1.2, 9), h: 0.4 }],
     ramps: [{ x0: 0.5, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 },
             { x0: -1.2, z0: 4.8, x1: -0.5, z1: 6, axis: 'z', h0: 0.2, h1: 0.4 }],
@@ -2321,7 +2321,7 @@ registerWorld(11, { holes: [
             { push: [0, 0.8], poly: rect(-3.2, 1.2, -1, 6.5) }],
     bumps: [{ x: -2.3, z: 7.4, r: 0.75, h: -0.25 }] },
   /* 7: trench jump (3 parts, open). Launch off the plank over the trench or creep round the side plank, then the jib */
-  { par: 3, sol: [[4,0.98,0]], tee: [0, 0.5], cup: [0.25, 8.3],
+  { par: 3, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [0.25, 8.3],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 9)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 9], [0.8, 9], [0.8, 5.3]]],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.5, axis: 'z', h0: 0, h1: 0.22 }],
@@ -2436,13 +2436,13 @@ const C12_WEED = (ax, az, bx, bz, period, phase = 0, r = 0.17) => ({ kind: 'slid
 const C12_GATE = (ax, az, bx, bz, len, ang, period, phase = 0) => ({ kind: 'gate', ax, az, bx, bz, len, ang, period, phase });
 registerWorld(12, { holes: [
   /* 1. two ramps up the mesa: the wide one on the right, the narrow one on the left */
-  { par: 2, sol: [[21,0.8,0]], tee: [0, 0.5], cup: [-0.3, 5.6], shape: rect(-1, 0, 1, 6.5),
+  { par: 2, sol: [[20,1,0]], tee: [0, 0.5], cup: [-0.3, 5.6], shape: rect(-1, 0, 1, 6.5),
     ramps: [{ x0: 0.45, z0: 2.5, x1: 1, z1: 3.5, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1, z0: 2.5, x1: -0.45, z1: 3.5, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.1, 3.5, 1.1, 6.6), h: 0.3 }],
     zones: [{ surf: 'sand', poly: rect(0.2, 4.9, 1, 6.0) }],
     posts: [C12_CACTUS(-0.3, 4.6), C12_ROCK(0, 1.6)] },
   /* 2. up onto the mesa past a tumbleweed, then off the left gap onto a leaning green */
-  { par: 3, sol: [[26.75,0.98,1.5]], tee: [0, 0.5], cup: [-0.5, 7.2], shape: rect(-1, 0, 1, 8),
+  { par: 3, sol: [[14,0.96,0]], tee: [0, 0.5], cup: [-0.5, 7.2], shape: rect(-1, 0, 1, 8),
     inner: [[[-1, 5.5], [0.35, 5.5]]],
     ramps: [{ x0: -1, z0: 1.5, x1: 1, z1: 2.5, axis: 'z', h0: 0, h1: 0.35 }],
     tiers: [{ poly: rect(-1.1, 2.5, 1.1, 5.5), h: 0.35 }, { poly: rect(-1.1, 5.5, 1.1, 8.1), h: 0.05, sx: 0.02 }],
@@ -2485,7 +2485,7 @@ registerWorld(12, { holes: [
     movers: [C12_WEED(-2.2, 3.6, -3.0, 3.6, 2.4)],
     posts: [C12_CACTUS(0.45, 5.6), C12_CACTUS(-3.0, 6.0)] },
   /* 7. flash flood: fly the kicker over the river or cross the plank on the left, then up to the mesa green */
-  { par: 3, sol: [[0,1,0],[24,0.5,0]], tee: [0, 0.5], cup: [0.7, 8.7], shape: rect(-1.6, 0, 1.6, 9.5),
+  { par: 3, sol: [[0,0.96,0],[40,0.48,0]], tee: [0, 0.5], cup: [0.7, 8.7], shape: rect(-1.6, 0, 1.6, 9.5),
     ramps: [{ x0: -0.45, z0: 2.4, x1: 0.45, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1.6, z0: 6.6, x1: 0, z1: 7.4, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.7, 7.4, 1.7, 9.6), h: 0.25 }],
     zones: [{ surf: 'fast', poly: rect(-0.45, 2.4, 0.45, 3.4) }, { surf: 'water', poly: rect(-1.6, 3.5, 0.85, 4.3) }, { surf: 'water', poly: rect(1.35, 3.5, 1.6, 4.3) },
@@ -2493,7 +2493,7 @@ registerWorld(12, { holes: [
     bumps: [{ x: 0.1, z: 5.6, r: 0.45, h: 0.2 }],
     posts: [C12_CACTUS(-1.1, 2.0), C12_CACTUS(0.1, 8.9)] },
   /* 8. the sluice gate: across the mesa, through the gap while the gate is open, drop to the green behind the spur */
-  { par: 3, sol: [[40,0.929,0],[0,0.286,0]], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.5, 0, 1.5, 8),
+  { par: 3, sol: [[44,0.92,0]], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.5, 0, 1.5, 8),
     inner: [[[-1.5, 4], [-0.2, 4]], [[0.6, 4], [1.5, 4]], [[1.5, 6.2], [-0.2, 6.2]]],
     tiers: [{ poly: rect(-1.6, -0.1, 1.6, 4), h: 0.45 }, { poly: rect(-1.6, 4, 1.6, 8.1), h: 0.05, sx: -0.025 }],
     bumps: [{ x: -0.7, z: 5.3, r: 0.4, h: 0.15 }],
@@ -5752,21 +5752,47 @@ function skirtGeometry(h, bottom) {
   g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
+/* the cup, cut clean: the green is drawn as a grid, which can only cut a ragged square round the
+   hole, so the grid stops at COLLAR_R and a fine ring of the same felt (same world UVs, drawn just
+   above with polygon offset) runs from there to the exact rim. Inside: a cut band of soil, a white
+   plastic liner set just below the surface, a dark floor with a drain, and a soft shadow on the
+   green that shows the slight funnel the ball feels. */
+const COLLAR_R = 0.26;
+function collarGeometry(h) {
+  const [cx, cz] = h.cup, N = 96, rings = [CUP_R, CUP_R + 0.02, 0.06 + CUP_R, 0.17, COLLAR_R + 0.07], pos = [], uv = [], idx = [];
+  rings.forEach(r => { for (let i = 0; i <= N; i++) { const a = i / N * Math.PI * 2, x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r; pos.push(x, groundH(h, x, z) + 0.0015, z); uv.push(x * 1.5, z * 1.5); } });
+  for (let k = 0; k + 1 < rings.length; k++) for (let i = 0; i < N; i++) { const a = k * (N + 1) + i, b = a + 1, c = a + N + 1, d = c + 1; idx.push(a, b, c, b, d, c); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals(); return g;
+}
 function cupGroup(h, look) {
   const g = new THREE.Group(), y = groundH(h, h.cup[0], h.cup[1]);
   g.name = 'cup'; g.position.set(h.cup[0], y, h.cup[1]);
-  const dark = mat('#3a2c1e', { roughness: 1, side: THREE.BackSide });
-  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUP_DEPTH, 32, 1, true), dark); liner.position.y = -CUP_DEPTH / 2;
-  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, 32), mat('#2a1f15', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_DEPTH;
-  const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.004, CUP_R + 0.04, 48), mat('#ffffff', { roughness: 0.5 })); rim.rotation.x = -Math.PI / 2; rim.position.y = 0.004;
+  const SEG = 64, CUT = 0.018;
+  const soil = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUT, SEG, 1, true), mat('#4a3626', { roughness: 1, side: THREE.BackSide })); soil.position.y = -CUT / 2 + 0.001;
+  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R - 0.002, CUP_R - 0.002, CUP_DEPTH - CUT, SEG, 1, true), mat('#f4f1ea', { roughness: 0.55, side: THREE.BackSide })); liner.position.y = -CUT - (CUP_DEPTH - CUT) / 2;
+  const lip = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.006, CUP_R - 0.001, SEG), mat('#ffffff', { roughness: 0.4 })); lip.rotation.x = -Math.PI / 2; lip.position.y = -CUT;
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, SEG), mat('#2b2620', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_DEPTH;
+  const drain = new THREE.Mesh(new THREE.CircleGeometry(0.03, 24), mat('#14110e', { roughness: 1 })); drain.rotation.x = -Math.PI / 2; drain.position.y = -CUP_DEPTH + 0.001;
+  /* the funnel's shadow: a soft dark ring on the green, strongest at the edge */
+  const shade = new THREE.Mesh(new THREE.RingGeometry(CUP_R, LIP_PULL_R, SEG), new THREE.MeshBasicMaterial({ map: cupShadeTexture(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+  shade.rotation.x = -Math.PI / 2; shade.position.y = 0.0025; shade.renderOrder = 1;
   /* the flagstick stands in the cup until a ball comes near, then it is pulled out and held aside */
   flagGroup = new THREE.Group(); flagGroup.name = 'flag';
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.8, 8), mat('#fffdf7', { roughness: 0.4 })); pole.position.y = 0.3; pole.castShadow = true;
-  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(0.22, -0.07); shape.lineTo(0, -0.14);
-  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape), mat(look.flag, { side: THREE.DoubleSide, roughness: 0.7 })); flag.position.set(0.008, 0.69, 0); flag.castShadow = true;
-  flagGroup.add(pole, flag);
-  g.add(liner, bottom, rim, flagGroup);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.8, 12), mat('#fffdf7', { roughness: 0.35 })); pole.position.y = 0.3; pole.castShadow = true;
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.05, 12), mat(look.flag, { roughness: 0.4 })); band.position.y = 0.5;
+  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.quadraticCurveTo(0.12, -0.03, 0.22, -0.06); shape.lineTo(0.2, -0.1); shape.quadraticCurveTo(0.1, -0.12, 0, -0.14);
+  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape, 8), mat(look.flag, { side: THREE.DoubleSide, roughness: 0.7 })); flag.position.set(0.007, 0.69, 0); flag.castShadow = true;
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), mat('#fffdf7', { roughness: 0.35 })); ball.position.y = 0.705;
+  flagGroup.add(pole, band, flag, ball);
+  g.add(soil, liner, lip, bottom, drain, shade, flagGroup);
   return g;
+}
+function cupShadeTexture() {
+  /* the ring's UVs are planar, so the fade is a radial gradient: dark at the rim, gone at LIP_PULL_R */
+  const k = CUP_R / LIP_PULL_R;
+  return canvasTex(256, 256, x => { const gr = x.createRadialGradient(128, 128, 0, 128, 128, 128); gr.addColorStop(0, 'rgba(20,14,8,0.45)'); gr.addColorStop(k, 'rgba(20,14,8,0.45)'); gr.addColorStop(k + (1 - k) * 0.22, 'rgba(20,14,8,0.14)'); gr.addColorStop(1, 'rgba(20,14,8,0)'); x.fillStyle = gr; x.fillRect(0, 0, 256, 256); });
 }
 /* tube mouths and exits: a pair shares a colour; the exit has an arrow showing where the ball comes out */
 const TUBE_COLORS = ['#ef7d6d', '#6fc0df', '#ffd66e', '#74c465', '#b7a7e0'];
@@ -5849,10 +5875,11 @@ function buildHoleScene(h) {
   if (holeGroup) { scene.remove(holeGroup); disposeGroup(holeGroup); }
   if (scene.background && scene.background.dispose) scene.background.dispose();
   flowTex = [];
-  const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= CUP_R && h.tubes.every(t => Math.hypot(x - t.a[0], z - t.a[1]) >= TUBE_R * 0.9);
+  const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= COLLAR_R && h.tubes.every(t => Math.hypot(x - t.a[0], z - t.a[1]) >= TUBE_R * 0.9);
   holeGroup = new THREE.Group(); moverMeshes = [];
   const floor = new THREE.Mesh(gridGeometry(h, (x, z) => onFloor(h, x, z) && off(x, z)), mat('#ffffff', { map: feltTexture(look.felt), roughness: 0.95 }));
   floor.name = 'floor'; floor.receiveShadow = true; holeGroup.add(floor);
+  const collar = new THREE.Mesh(collarGeometry(h), floor.material); collar.name = 'collar'; collar.receiveShadow = true; holeGroup.add(collar);
   for (const zn of h.zones) {
     const z = new THREE.Mesh(gridGeometry(h, (x, zz) => zoneAt(h, x, zz) === zn && onFloor(h, x, zz) && off(x, zz), zn.surf === 'water' ? 0.002 : 0.004), zoneMaterial(zn, look));
     z.receiveShadow = true; holeGroup.add(z);
@@ -7613,7 +7640,7 @@ const SWING_FULL = 240, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeLoss: 0.15, twist: 4 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
-const PUTTER_SCALE = 0.72;   /* the club shrank with the ball; it is built full size and scaled */
+const PUTTER_SCALE = 0.83;   /* the club shrank with the ball; it is built full size and scaled */
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
 let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimLine = null, aimRing = null, putter = null;
 
@@ -7669,7 +7696,7 @@ function aimPath(h, b, angDeg, len = AIM_LEN) {
   const blocked = (x, z) => !onFloor(h, x, z) || (zoneAt(h, x, z) || {}).surf === 'water'
     || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < WALL_HALF + 0.012; })
     || h.posts.some(p => Math.hypot(x - p.x, z - p.z) < p.r + 0.01);
-  for (let d = BALL_R * 1.5; d <= len + 1e-9; d += len / 40) {
+  for (let d = BALL_R * 3; d <= len + 1e-9; d += len / 40) {
     const x = b.x + ux * d, z = b.z + uz * d;
     if (blocked(x, z)) break;
     pts.push([x, groundH(h, x, z) + 0.008, z]);
@@ -8009,8 +8036,8 @@ function advance(dt) {
   if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
   if (play.phase === 'replay') { advanceReplay(dt); return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
-  const b0b = play.ball, near = (play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.55 && Math.hypot(b0b.vx, b0b.vz) < 1.6;
-  play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.45 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
+  const b0b = play.ball, near = (play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.35 && Math.hypot(b0b.vx, b0b.vz) < 1.2;
+  play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.7 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
   dt *= play.fx.slow;
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
   while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }

@@ -7,13 +7,13 @@ const C12_WEED = (ax, az, bx, bz, period, phase = 0, r = 0.17) => ({ kind: 'slid
 const C12_GATE = (ax, az, bx, bz, len, ang, period, phase = 0) => ({ kind: 'gate', ax, az, bx, bz, len, ang, period, phase });
 registerWorld(12, { holes: [
   /* 1. two ramps up the mesa: the wide one on the right, the narrow one on the left */
-  { par: 2, sol: [[21,0.8,0]], tee: [0, 0.5], cup: [-0.3, 5.6], shape: rect(-1, 0, 1, 6.5),
+  { par: 2, sol: [[20,1,0]], tee: [0, 0.5], cup: [-0.3, 5.6], shape: rect(-1, 0, 1, 6.5),
     ramps: [{ x0: 0.45, z0: 2.5, x1: 1, z1: 3.5, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1, z0: 2.5, x1: -0.45, z1: 3.5, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.1, 3.5, 1.1, 6.6), h: 0.3 }],
     zones: [{ surf: 'sand', poly: rect(0.2, 4.9, 1, 6.0) }],
     posts: [C12_CACTUS(-0.3, 4.6), C12_ROCK(0, 1.6)] },
   /* 2. up onto the mesa past a tumbleweed, then off the left gap onto a leaning green */
-  { par: 3, sol: [[26.75,0.98,1.5]], tee: [0, 0.5], cup: [-0.5, 7.2], shape: rect(-1, 0, 1, 8),
+  { par: 3, sol: [[14,0.96,0]], tee: [0, 0.5], cup: [-0.5, 7.2], shape: rect(-1, 0, 1, 8),
     inner: [[[-1, 5.5], [0.35, 5.5]]],
     ramps: [{ x0: -1, z0: 1.5, x1: 1, z1: 2.5, axis: 'z', h0: 0, h1: 0.35 }],
     tiers: [{ poly: rect(-1.1, 2.5, 1.1, 5.5), h: 0.35 }, { poly: rect(-1.1, 5.5, 1.1, 8.1), h: 0.05, sx: 0.02 }],
@@ -56,7 +56,7 @@ registerWorld(12, { holes: [
     movers: [C12_WEED(-2.2, 3.6, -3.0, 3.6, 2.4)],
     posts: [C12_CACTUS(0.45, 5.6), C12_CACTUS(-3.0, 6.0)] },
   /* 7. flash flood: fly the kicker over the river or cross the plank on the left, then up to the mesa green */
-  { par: 3, sol: [[0,1,0],[24,0.5,0]], tee: [0, 0.5], cup: [0.7, 8.7], shape: rect(-1.6, 0, 1.6, 9.5),
+  { par: 3, sol: [[0,0.96,0],[40,0.48,0]], tee: [0, 0.5], cup: [0.7, 8.7], shape: rect(-1.6, 0, 1.6, 9.5),
     ramps: [{ x0: -0.45, z0: 2.4, x1: 0.45, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1.6, z0: 6.6, x1: 0, z1: 7.4, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.7, 7.4, 1.7, 9.6), h: 0.25 }],
     zones: [{ surf: 'fast', poly: rect(-0.45, 2.4, 0.45, 3.4) }, { surf: 'water', poly: rect(-1.6, 3.5, 0.85, 4.3) }, { surf: 'water', poly: rect(1.35, 3.5, 1.6, 4.3) },
@@ -64,7 +64,7 @@ registerWorld(12, { holes: [
     bumps: [{ x: 0.1, z: 5.6, r: 0.45, h: 0.2 }],
     posts: [C12_CACTUS(-1.1, 2.0), C12_CACTUS(0.1, 8.9)] },
   /* 8. the sluice gate: across the mesa, through the gap while the gate is open, drop to the green behind the spur */
-  { par: 3, sol: [[40,0.929,0],[0,0.286,0]], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.5, 0, 1.5, 8),
+  { par: 3, sol: [[44,0.92,0]], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.5, 0, 1.5, 8),
     inner: [[[-1.5, 4], [-0.2, 4]], [[0.6, 4], [1.5, 4]], [[1.5, 6.2], [-0.2, 6.2]]],
     tiers: [{ poly: rect(-1.6, -0.1, 1.6, 4), h: 0.45 }, { poly: rect(-1.6, 4, 1.6, 8.1), h: 0.05, sx: -0.025 }],
     bumps: [{ x: -0.7, z: 5.3, r: 0.4, h: 0.15 }],
@@ -105,7 +105,7 @@ registerWorld(12, { holes: [
     posts: [C12_CACTUS(0.9, 6.5), C12_CACTUS(-0.4, 7.0), C12_ROCK(0, 1.5)] },
   /* 12. the canyon descent: down off the high deck, across the mid mesa past the tumbleweed, through the
      gate onto the low green and round the spur */
-  { par: 4, crazy: true, sol: [[355,1,1.5],[270,0.75,0]], tee: [0, 0.5], cup: [0.55, 9.35],
+  { par: 4, crazy: true, sol: [[20,1,1.5],[10,0.96,0]], tee: [0, 0.5], cup: [0.55, 9.35],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [1.2, 4], [1.2, 10], [-1.8, 10], [-1.8, 4], [-0.8, 4]],
     inner: [[[-1.8, 6.5], [-0.6, 6.5]], [[0, 6.5], [1.2, 6.5]], [[-0.45, 8.5], [1.2, 8.5]]],
     ramps: [{ x0: -0.8, z0: 3, x1: 0.8, z1: 4, axis: 'z', h0: 0.44, h1: 0.25 }],

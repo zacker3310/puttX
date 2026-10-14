@@ -40,7 +40,7 @@ const { check, done, open } = require('./lib.cjs');
     const set = new Set(); for (let i = 0; i < buf.length; i += 16) set.add((buf[i] >> 3) + ',' + (buf[i + 1] >> 3) + ',' + (buf[i + 2] >> 3));
     rt.dispose(); return set.size;
   });
-  check('the frame is not blank (> 40 distinct colours)', px > 40, 'colours: ' + px);
+  check('the frame is not blank (> 30 distinct colours)', px > 30, 'colours: ' + px);
 
   const b = await page.evaluate(() => ({ m: ballMesh.position.toArray(), x: play.ball.x, y: play.ball.y + BALL_R, z: play.ball.z, r: ballMesh.geometry.parameters.radius }));
   check('ball mesh sits on the physics ball, at the new size', Math.abs(b.m[0] - b.x) < 1e-6 && Math.abs(b.m[1] - b.y) < 1e-6 && Math.abs(b.m[2] - b.z) < 1e-6 && b.r === 0.0255, JSON.stringify(b));

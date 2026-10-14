@@ -45,7 +45,7 @@ const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.7, WALL_SLIP = 0.92;
 const POST_E = 0.6, MOVER_E = 0.8;
 const STEP_MAX = 0.03;           /* ground rising more than this under the ball's leading edge is a cliff face */
 const CLIFF_E = 0.45;
-const BOUNCE_VY = 1.1, BOUNCE_E = 0.35;  /* a landing faster than BOUNCE_VY hops back up */
+const BOUNCE_VY = 0.75, BOUNCE_E = 0.5;  /* a landing faster than BOUNCE_VY hops back up: a lively golf ball, not a marble */
 const OOB_Y = -1;
 /* the cup sits in a slight funnel: inside LIP_PULL_R of the rim a slow ball is drawn in, harder the closer it gets */
 const LIP_TURN = 0.5, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 2.6, LIP_PULL_R = 0.25;
@@ -275,8 +275,8 @@ function stepBall(h, b, t) {
       } else if (b.y <= gh) {
         const imp = -b.vy;
         b.y = gh;
-        if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.9; b.vz *= 0.9; }
-        else { b.vy = 0; b.air = false; const k = 1 - 0.15 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k; }
+        if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.95; b.vz *= 0.95; }
+        else { b.vy = 0; b.air = false; const k = 1 - 0.08 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k; }
         if (imp > 0.4) b.hits.push(['land', imp]);
       }
     } else if (b.y < OOB_Y) return 'oob';
@@ -719,21 +719,47 @@ function skirtGeometry(h, bottom) {
   g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
+/* the cup, cut clean: the green is drawn as a grid, which can only cut a ragged square round the
+   hole, so the grid stops at COLLAR_R and a fine ring of the same felt (same world UVs, drawn just
+   above with polygon offset) runs from there to the exact rim. Inside: a cut band of soil, a white
+   plastic liner set just below the surface, a dark floor with a drain, and a soft shadow on the
+   green that shows the slight funnel the ball feels. */
+const COLLAR_R = 0.26;
+function collarGeometry(h) {
+  const [cx, cz] = h.cup, N = 96, rings = [CUP_R, CUP_R + 0.02, 0.06 + CUP_R, 0.17, COLLAR_R + 0.07], pos = [], uv = [], idx = [];
+  rings.forEach(r => { for (let i = 0; i <= N; i++) { const a = i / N * Math.PI * 2, x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r; pos.push(x, groundH(h, x, z) + 0.0015, z); uv.push(x * 1.5, z * 1.5); } });
+  for (let k = 0; k + 1 < rings.length; k++) for (let i = 0; i < N; i++) { const a = k * (N + 1) + i, b = a + 1, c = a + N + 1, d = c + 1; idx.push(a, b, c, b, d, c); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals(); return g;
+}
 function cupGroup(h, look) {
   const g = new THREE.Group(), y = groundH(h, h.cup[0], h.cup[1]);
   g.name = 'cup'; g.position.set(h.cup[0], y, h.cup[1]);
-  const dark = mat('#3a2c1e', { roughness: 1, side: THREE.BackSide });
-  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUP_DEPTH, 32, 1, true), dark); liner.position.y = -CUP_DEPTH / 2;
-  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, 32), mat('#2a1f15', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_DEPTH;
-  const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.004, CUP_R + 0.04, 48), mat('#ffffff', { roughness: 0.5 })); rim.rotation.x = -Math.PI / 2; rim.position.y = 0.004;
+  const SEG = 64, CUT = 0.018;
+  const soil = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUT, SEG, 1, true), mat('#4a3626', { roughness: 1, side: THREE.BackSide })); soil.position.y = -CUT / 2 + 0.001;
+  const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R - 0.002, CUP_R - 0.002, CUP_DEPTH - CUT, SEG, 1, true), mat('#f4f1ea', { roughness: 0.55, side: THREE.BackSide })); liner.position.y = -CUT - (CUP_DEPTH - CUT) / 2;
+  const lip = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.006, CUP_R - 0.001, SEG), mat('#ffffff', { roughness: 0.4 })); lip.rotation.x = -Math.PI / 2; lip.position.y = -CUT;
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, SEG), mat('#2b2620', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_DEPTH;
+  const drain = new THREE.Mesh(new THREE.CircleGeometry(0.03, 24), mat('#14110e', { roughness: 1 })); drain.rotation.x = -Math.PI / 2; drain.position.y = -CUP_DEPTH + 0.001;
+  /* the funnel's shadow: a soft dark ring on the green, strongest at the edge */
+  const shade = new THREE.Mesh(new THREE.RingGeometry(CUP_R, LIP_PULL_R, SEG), new THREE.MeshBasicMaterial({ map: cupShadeTexture(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+  shade.rotation.x = -Math.PI / 2; shade.position.y = 0.0025; shade.renderOrder = 1;
   /* the flagstick stands in the cup until a ball comes near, then it is pulled out and held aside */
   flagGroup = new THREE.Group(); flagGroup.name = 'flag';
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.8, 8), mat('#fffdf7', { roughness: 0.4 })); pole.position.y = 0.3; pole.castShadow = true;
-  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(0.22, -0.07); shape.lineTo(0, -0.14);
-  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape), mat(look.flag, { side: THREE.DoubleSide, roughness: 0.7 })); flag.position.set(0.008, 0.69, 0); flag.castShadow = true;
-  flagGroup.add(pole, flag);
-  g.add(liner, bottom, rim, flagGroup);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.8, 12), mat('#fffdf7', { roughness: 0.35 })); pole.position.y = 0.3; pole.castShadow = true;
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.05, 12), mat(look.flag, { roughness: 0.4 })); band.position.y = 0.5;
+  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.quadraticCurveTo(0.12, -0.03, 0.22, -0.06); shape.lineTo(0.2, -0.1); shape.quadraticCurveTo(0.1, -0.12, 0, -0.14);
+  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape, 8), mat(look.flag, { side: THREE.DoubleSide, roughness: 0.7 })); flag.position.set(0.007, 0.69, 0); flag.castShadow = true;
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), mat('#fffdf7', { roughness: 0.35 })); ball.position.y = 0.705;
+  flagGroup.add(pole, band, flag, ball);
+  g.add(soil, liner, lip, bottom, drain, shade, flagGroup);
   return g;
+}
+function cupShadeTexture() {
+  /* the ring's UVs are planar, so the fade is a radial gradient: dark at the rim, gone at LIP_PULL_R */
+  const k = CUP_R / LIP_PULL_R;
+  return canvasTex(256, 256, x => { const gr = x.createRadialGradient(128, 128, 0, 128, 128, 128); gr.addColorStop(0, 'rgba(20,14,8,0.45)'); gr.addColorStop(k, 'rgba(20,14,8,0.45)'); gr.addColorStop(k + (1 - k) * 0.22, 'rgba(20,14,8,0.14)'); gr.addColorStop(1, 'rgba(20,14,8,0)'); x.fillStyle = gr; x.fillRect(0, 0, 256, 256); });
 }
 /* tube mouths and exits: a pair shares a colour; the exit has an arrow showing where the ball comes out */
 const TUBE_COLORS = ['#ef7d6d', '#6fc0df', '#ffd66e', '#74c465', '#b7a7e0'];
@@ -816,10 +842,11 @@ function buildHoleScene(h) {
   if (holeGroup) { scene.remove(holeGroup); disposeGroup(holeGroup); }
   if (scene.background && scene.background.dispose) scene.background.dispose();
   flowTex = [];
-  const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= CUP_R && h.tubes.every(t => Math.hypot(x - t.a[0], z - t.a[1]) >= TUBE_R * 0.9);
+  const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= COLLAR_R && h.tubes.every(t => Math.hypot(x - t.a[0], z - t.a[1]) >= TUBE_R * 0.9);
   holeGroup = new THREE.Group(); moverMeshes = [];
   const floor = new THREE.Mesh(gridGeometry(h, (x, z) => onFloor(h, x, z) && off(x, z)), mat('#ffffff', { map: feltTexture(look.felt), roughness: 0.95 }));
   floor.name = 'floor'; floor.receiveShadow = true; holeGroup.add(floor);
+  const collar = new THREE.Mesh(collarGeometry(h), floor.material); collar.name = 'collar'; collar.receiveShadow = true; holeGroup.add(collar);
   for (const zn of h.zones) {
     const z = new THREE.Mesh(gridGeometry(h, (x, zz) => zoneAt(h, x, zz) === zn && onFloor(h, x, zz) && off(x, zz), zn.surf === 'water' ? 0.002 : 0.004), zoneMaterial(zn, look));
     z.receiveShadow = true; holeGroup.add(z);
@@ -963,7 +990,7 @@ const SWING_FULL = 240, SWING_DEAD = 16, TEMPO_T = 0.2, FACE_HALF = 40;
 const FEEL_BASE = { sweet: 0.18, tempoDead: 0.22, tempoK: 0.18, pathK: 0.5, toeLoss: 0.15, twist: 4 };
 const FEEL = Object.assign({}, FEEL_BASE);
 const AIM_DEG_PX = 0.12, NUDGE_DEG = 0.25;
-const PUTTER_SCALE = 0.72;   /* the club shrank with the ball; it is built full size and scaled */
+const PUTTER_SCALE = 0.83;   /* the club shrank with the ball; it is built full size and scaled */
 const PUTTER_BACK_M = 0.36, PUTTER_GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042, AIM_LEN = 1.1;
 let loopPaused = false, lastNow = 0, simAcc = 0, aimGroup = null, aimLine = null, aimRing = null, putter = null;
 
@@ -1019,7 +1046,7 @@ function aimPath(h, b, angDeg, len = AIM_LEN) {
   const blocked = (x, z) => !onFloor(h, x, z) || (zoneAt(h, x, z) || {}).surf === 'water'
     || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < WALL_HALF + 0.012; })
     || h.posts.some(p => Math.hypot(x - p.x, z - p.z) < p.r + 0.01);
-  for (let d = BALL_R * 1.5; d <= len + 1e-9; d += len / 40) {
+  for (let d = BALL_R * 3; d <= len + 1e-9; d += len / 40) {
     const x = b.x + ux * d, z = b.z + uz * d;
     if (blocked(x, z)) break;
     pts.push([x, groundH(h, x, z) + 0.008, z]);
@@ -1359,8 +1386,8 @@ function advance(dt) {
   if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
   if (play.phase === 'replay') { advanceReplay(dt); return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
-  const b0b = play.ball, near = (play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.55 && Math.hypot(b0b.vx, b0b.vz) < 1.6;
-  play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.45 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
+  const b0b = play.ball, near = (play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.35 && Math.hypot(b0b.vx, b0b.vz) < 1.2;
+  play.fx.slow = (play.fx.slow || 1) + ((near && !reducedMotion() ? 0.7 : 1) - (play.fx.slow || 1)) * Math.min(1, dt * 8);
   dt *= play.fx.slow;
   simAcc = Math.min(simAcc + dt, 0.1 + SIM_DT);
   while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }

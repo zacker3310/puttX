@@ -31,7 +31,7 @@ registerWorld(1, { holes: [
     zones: [{ push: [0, -1.2], poly: rect(-1, 4.4, 1, 5.2) }],
     bumps: [{ x: -0.4, z: 5.9, r: 0.35, h: 0.12 }] },
   /* 6: pipe run (3 parts). Scaffold deck, then a drop or the pipe, then a girder and a crane on the yard */
-  { par: 3, sol: [[22,0.88,0]], tee: [0, 0.5], cup: [-0.6, 8], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[22,0.8,0]], tee: [0, 0.5], cup: [-0.6, 8], shape: rect(-1.2, 0, 1.2, 9),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 3.6), h: 0.4 }],
     tubes: [{ a: [0.8, 3], b: [-0.85, 5.75], dir: 90 }],
     inner: [[[-1.2, 5.2], [0.3, 5.2]]],
@@ -53,7 +53,7 @@ registerWorld(1, { holes: [
              { kind: 'spin', x: -0.1, z: 5.5, len: 0.7, w: -1.4, phase: 0.5, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 6.6, -0.3, 8) }] },
   /* 10: scaffold climb (3 parts). Ramp to the first lift, cross the belt that wants you off the edge, ramp to the top deck */
-  { par: 4, sol: [[322,1,0],[34,1,0],[2,0.56,0]], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
+  { par: 4, sol: [[320,1,0],[30,1,0],[12,0.8,0]], tee: [0.6, 0.5], cup: [0.6, 8.3], aim0: -20,
     shape: [[-1.4, 0], [1.4, 0], [1.4, 3.4], [1.4, 6.2], [1.4, 9], [-1.4, 9], [-1.4, 6.2], [-1.4, 3.4]],
     tiers: [{ poly: rect(-1.4, 3.4, 1.4, 6.2), h: 0.22 }, { poly: rect(-1.4, 6.2, 1.4, 9), h: 0.41 }],
     ramps: [{ x0: -1.4, z0: 2.2, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.22 },
@@ -69,7 +69,7 @@ registerWorld(1, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.5, 5.2, -1, 7.2) }],
     bumps: [{ x: 0.3, z: 6.1, r: 0.35, h: 0.1 }] },
   /* 12: gap jump (3 parts, open). Launch off the plank ramp over the trench, or creep round the side plank */
-  { crazy: true, par: 3, sol: [[357.25,0.97,0]], tee: [0, 0.5], cup: [0, 7.2],
+  { crazy: true, par: 3, sol: [[358,0.96,0]], tee: [0, 0.5], cup: [0, 7.2],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 8)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 8], [0.8, 8], [0.8, 5.3]]],
     ramps: [{ x0: -0.35, z0: 2.4, x1: 0.35, z1: 3.5, axis: 'z', h0: 0, h1: 0.22 }],
@@ -99,7 +99,7 @@ registerWorld(1, { holes: [
     bumps: [{ x: -0.2, z: 7.8, r: 0.45, h: 0.18 }],
     zones: [{ surf: 'sand', poly: rect(-1.4, 8.9, -0.3, 9.6) }] },
   /* 16: dirt mounds. Thread big mounds on a leaning slab, past the dirt, into the girder pocket */
-  { par: 3, sol: [[321.5,0.91,0]], tee: [0, 0.5], cup: [1, 7.3], shape: rect(-1.6, 0, 1.6, 8),
+  { par: 3, sol: [[351,0.94,0]], tee: [0, 0.5], cup: [1, 7.3], shape: rect(-1.6, 0, 1.6, 8),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 8), h: 0.08, sx: -0.035 }],
     inner: [[[1.6, 6.5], [0.45, 6.5]]],
     bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],

@@ -535,7 +535,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '3970d6134202';
+const BUILD_ID = 'ecbdd20b4a1c';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1234,7 +1234,7 @@ const J3_WATER = poly => ({ surf: 'water', poly });
 const J3_MUD = poly => ({ surf: 'mud', poly });
 registerWorld(3, { holes: [
   /* 1: the stream. A stone bridge off to the left, the cup back on the right behind a mound */
-  { par: 2, sol: [[2,0.8,0]], tee: [0, 0.5], cup: [-0.25, 5.3], aim0: 4, shape: rect(-0.8, 0, 0.8, 6),
+  { par: 2, sol: [[2,0.84,0]], tee: [0, 0.5], cup: [-0.25, 5.3], aim0: 4, shape: rect(-0.8, 0, 0.8, 6),
     zones: [J3_WATER(rect(-0.8, 2.6, 0, 3.2)), J3_WATER(rect(0.45, 2.6, 0.8, 3.2))],
     bumps: [{ x: 0.1, z: 4.4, r: 0.45, h: 0.12 }], posts: [J3_IDOL(0.45, 4.9, 0.12)] },
   /* 2: temple steps: a narrow ramp to the first terrace, a side ramp to the second */

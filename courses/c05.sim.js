@@ -11,9 +11,11 @@ registerWorld(5, (() => {
   const sand = poly => ({ surf: 'sand', poly });
   const lagoon = poly => ({ surf: 'water', poly });
   return { holes: [
-    /* 1 beach lane: up the sand, round the corner to the cup */
-    { par: 2, sol: [[30,0.88,0]], tee: [0, 0.5], cup: [-1.7, 5.6], shape: [[-0.8, 0], [0.8, 0], [0.8, 6.4], [-2.4, 6.4], [-2.4, 4.8], [-0.8, 4.8]],
-      zones: [sand(rect(-0.8, 1.8, 0.3, 2.6))], bumps: [{ x: -1.0, z: 5.6, r: 0.4, h: 0.12 }] },
+    /* 1 the long beach green: a 10 m lag across a green that leans toward the lagoon, over a broad dune ridge and a swale */
+    { par: 3, sol: [], tee: [0, 0.5], cup: [0.9, 9.6], shape: rect(-2, 0, 2, 10.6),
+      tiers: [{ poly: rect(-2.1, -0.1, 2.1, 10.7), h: 0, sx: 0.025 }],
+      bumps: [{ x: -0.6, z: 4.5, r: 1.6, h: 0.14 }, { x: 1.1, z: 6.9, r: 1.2, h: -0.1 }, { x: -1.0, z: 8.7, r: 1.0, h: 0.08 }],
+      zones: [sand(rect(1.3, 2.6, 2, 3.8)), lagoon(rect(-2, 9.4, -1.5, 10.6))] },
     /* 2 drawbridge over the lagoon */
     { par: 3, sol: [[326,0.88,1]], tee: [0.6, 0.5], cup: [0.7, 5.5], shape: rect(-1.2, 0, 1.2, 6.2),
       zones: [lagoon(rect(-0.5, 2.6, 1.2, 3.6))],
@@ -42,10 +44,12 @@ registerWorld(5, (() => {
       inner: [[[-1.4, 3.4], [0.7, 3.4]], [[-1.4, 6], [-0.2, 6]]],
       movers: [CANNON(-0.9, 4.7, 0.9, 4.7, 2.6)], zones: [lagoon(rect(0.2, 7.3, 1.4, 9.2))],
       posts: [BARREL(-0.2, 7.9)], bumps: [{ x: -0.6, z: 7.0, r: 0.35, h: 0.12 }] },
-    /* 8 dune sea: a pot bunker and big dunes */
-    { par: 3, sol: [[0,0.92,0]], tee: [0, 0.5], cup: [-0.9, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
-      bumps: [{ x: -0.6, z: 3.0, r: 0.45, h: -0.15 }, { x: 0.6, z: 2.4, r: 0.6, h: 0.3 }, { x: -0.3, z: 4.6, r: 0.7, h: 0.32 }, { x: 0.9, z: 5.3, r: 0.5, h: 0.25 }],
-      zones: [sand(rect(-1.05, 2.55, -0.15, 3.45)), lagoon(rect(-1.5, 6.85, 0.3, 7.2))], posts: [BARREL(-0.75, 5.75)] },
+    /* 8 the dune sea green: 12 m, up a broad swell onto a back-to-front top tier, round a pot bunker */
+    { par: 3, sol: [], tee: [0, 0.5], cup: [-1.0, 11.2], shape: rect(-2, 0, 2, 12.4),
+      tiers: [{ poly: rect(-2.1, -0.1, 2.1, 6.0), h: 0 }, { poly: rect(-2.1, 7.2, 2.1, 12.5), h: 0.0636, sz: 0.012 }],
+      ramps: [{ x0: -2, z0: 6.0, x1: 2, z1: 7.2, axis: 'z', h0: 0, h1: 0.15 }],
+      bumps: [{ x: 0.8, z: 3.4, r: 1.5, h: 0.16 }, { x: -1.2, z: 9.0, r: 1.2, h: -0.09 }, { x: 0.9, z: 10.4, r: 1.0, h: 0.1 }],
+      zones: [sand(rect(-0.5, 8.2, 0.3, 9.0)), lagoon(rect(1.5, 0.6, 2, 2.2))] },
     /* 9 the fort: two drawbridges over the moat, then the gangplank up to the fort */
     { par: 3, sol: [[38,0.64,0],[344,0.92,0]], tee: [0, 0.5], cup: [0.9, 8.2], shape: [[-1.6, 0], [1.6, 0], [1.6, 6], [1.6, 9], [-1.6, 9], [-1.6, 6]],
       zones: [lagoon(rect(-1.6, 3, -1.2, 3.8)), lagoon(rect(-0.6, 3, 0.6, 3.8)), lagoon(rect(1.2, 3, 1.6, 3.8))],
@@ -98,12 +102,11 @@ registerWorld(5, (() => {
       posts: [BARREL(0.2, 4.5), BARREL(-0.6, 5.3), BARREL(0.9, 5.9), BARREL(-1.3, 6.3)],
       tubes: [{ a: [-1.2, 4.2], b: [-1.2, 8.0], dir: 0 }],
       zones: [lagoon(rect(-0.4, 8.6, 0.4, 10)), sand(rect(-1.8, 1.2, -0.6, 2.2))], bumps: [{ x: 0.3, z: 7.9, r: 0.4, h: 0.14 }] },
-    /* 17 skull rock: over the dunes or through the skull's cave to the tilted green */
-    { par: 3, sol: [[30,0.9,0]], tee: [0, 0.5], cup: [0.6, 8.2], shape: rect(-1.8, 0, 1.8, 9),
-      tiers: [{ poly: rect(-1.9, 6.5, 1.9, 9.1), h: -0.325, sz: 0.05 }],
-      bumps: [{ x: -0.9, z: 3.6, r: 0.6, h: 0.35 }, { x: 0.9, z: 3.6, r: 0.6, h: 0.35 }, { x: 0, z: 2.6, r: 0.35, h: 0.15 }, { x: 0, z: 5.0, r: 0.5, h: 0.2 }],
-      tubes: [{ a: [1.4, 1.6], b: [-1.2, 6.0], dir: 30 }],
-      zones: [sand(rect(-1.8, 5.2, -0.6, 6.2)), lagoon(rect(-1.8, 7.4, -0.8, 9))], posts: [ANCHOR(1.3, 7.6)] },
+    /* 17 skull rock green: 13 m from the skull to the flag, a long diagonal ridge, a hollow and a green leaning to the sea */
+    { par: 3, sol: [], tee: [0, 0.5], cup: [-0.7, 12.2], shape: rect(-2.2, 0, 2.2, 13.2),
+      tiers: [{ poly: rect(-2.3, -0.1, 2.3, 13.3), h: 0, sx: -0.022 }],
+      bumps: [{ x: 0.9, z: 4.2, r: 2.0, h: 0.18 }, { x: -1.3, z: 7.8, r: 1.6, h: 0.12 }, { x: 0.7, z: 9.8, r: 1.3, h: -0.1 }, { x: 1.4, z: 12.2, r: 0.9, h: 0.08 }],
+      zones: [sand(rect(-2.2, 4.6, -1.4, 5.6)), lagoon(rect(1.7, 7.0, 2.2, 9.0))], posts: [ANCHOR(-1.8, 1.2)] },
     /* 18 board the ship: gangplank up, past the wheel, down the hatch (or walk the plank and jump) to treasure island */
     { par: 4, crazy: true, sol: [[327,0.95,0],[325.5,0.91,0]], tee: [0, 0.5], cup: [-0.8, 12.0], aim0: -20,
       shape: [[-2, 0], [2, 0], [2, 4], [2, 8.4], [2, 13], [-2, 13], [-2, 8.4], [-2, 4]],

@@ -30,14 +30,14 @@ registerWorld(12, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1, 5.6, 0.2, 6.2) }],
     movers: [C12_WEED(2.2, 5.4, 0.9, 5.4, 2.6)],
     posts: [C12_CACTUS(1.0, 6.5), C12_CACTUS(2.2, 6.3), C12_ROCK(0.45, 2.4)] },
-  /* 4. a sea of dunes, then two ramps up to the plateau: the near right one or the far left bay */
-  { par: 3, sol: [[348,0.813,0],[8,0.563,0]], tee: [0, 0.5], cup: [0.8, 7.2], aim0: 0,
-    shape: [[-1.2, 0], [1.2, 0], [1.2, 5], [2.6, 5], [2.6, 8], [-1.2, 8]],
-    ramps: [{ x0: -1.2, z0: 5, x1: -0.2, z1: 6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.7, z0: 5, x1: 2.6, z1: 6, axis: 'z', h0: 0, h1: 0.3 }],
-    tiers: [{ poly: rect(-1.3, 6, 2.7, 8.1), h: 0.3 }],
-    bumps: [{ x: -0.5, z: 2.2, r: 0.55, h: 0.28 }, { x: 0.6, z: 3.4, r: 0.55, h: 0.3 }, { x: -0.4, z: 4.4, r: 0.45, h: 0.2 }],
-    zones: [{ surf: 'sand', poly: rect(0.4, 4.3, 1.2, 5) }],
-    posts: [C12_CACTUS(0.2, 6.8), C12_ROCK(2.2, 7.5)] },
+  /* 4. long green: the dry wash, a twelve metre green that bends left round a long low ridge. The whole wash
+     leans left and climbs gently; a swale guards the front of the cup shelf */
+  { par: 3, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [2.6, 10.4], aim0: 10,
+    shape: [[-1.3, 0], [1.3, 0], [1.6, 6], [3.8, 8.5], [3.8, 11.5], [0.2, 11.5], [-1.6, 7]],
+    tiers: [{ poly: rect(-1.7, -0.1, 3.9, 11.6), h: 0.08, sz: 0.012, sx: -0.015 }],
+    bumps: [{ x: 0.3, z: 5.8, r: 1.6, h: 0.15 }, { x: 2.3, z: 8.5, r: 1.1, h: -0.08 }, { x: -0.6, z: 2.6, r: 1.2, h: 0.07 }],
+    zones: [{ surf: 'sand', poly: [[0.2, 11.5], [-1.0, 8.6], [-0.2, 9.2], [0.9, 11.5]] }],
+    posts: [C12_CACTUS(-1.1, 6.2), C12_ROCK(3.4, 11.1, 0.12)] },
   /* 5. slickrock slide: off the tee mesa down a fast chute, across the canyon floor past a tumbleweed, up to the green */
   { par: 3, sol: [[-0.75,1,0]], tee: [0, 0.5], cup: [0.45, 8.2], shape: rect(-0.9, 0, 0.9, 9),
     ramps: [{ x0: -0.9, z0: 2, x1: 0.9, z1: 3.5, axis: 'z', h0: 0.4, h1: 0 }, { x0: -0.9, z0: 6, x1: 0.2, z1: 6.8, axis: 'z', h0: 0, h1: 0.2 }],
@@ -71,9 +71,10 @@ registerWorld(12, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.5, 7.3, -0.5, 8) }],
     movers: [C12_GATE(-0.35, 4, 0.75, 4, 0.3, 90, 3)],
     posts: [C12_CACTUS(-0.7, 2.4), C12_CACTUS(0.8, 2.0)] },
-  /* 9. the mine railway: off the top deck, banked off two corner boards, down the rail, into the shaft
-     and out into the sinkhole. A firm straight putt rides it all the way in. */
-  { par: 3, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [0.3, 6.3], aim0: 0,
+  /* 9. the mine railway: off the top deck down the fast chute, banked off two corner boards, down the rail,
+     into the shaft, and spat out sideways at a fixed pace into the big coin-funnel drain that spirals it
+     round and round into the cup. A firm straight putt rides it all the way in. */
+  { par: 3, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [0.6, 6.35], aim0: 0,
     shape: [[-0.4, 0], [0.4, 0], [0.4, 3.5], [3.4, 3.5], [3.4, 8.4], [-1.4, 8.4], [-1.4, 4.3], [-0.4, 4.3], [-0.4, 3.5], [-0.4, 3.0]],
     inner: [[[-0.4, 3.5], [0.4, 4.3]], [[2.6, 3.5], [3.4, 4.3]], [[-0.4, 4.3], [2.6, 4.3], [2.6, 8.4]],
       [[2.6, 7.4], [2.8, 7.85]], [[3.4, 7.4], [3.2, 7.85]]],
@@ -81,8 +82,8 @@ registerWorld(12, { holes: [
       { x0: 2.5, z0: 4.4, x1: 3.5, z1: 7.75, axis: 'z', h0: 0.39, h1: 0.06 }],
     tiers: [{ poly: rect(-1.5, 4.1, 2.6, 8.5), h: 0.3 }, { poly: rect(-0.5, -0.1, 0.5, 2), h: 0.9 }, { poly: rect(-0.5, 3.3, 0.5, 4.4), h: 0.68, sx: -0.1 },
       { poly: rect(2.5, 3.4, 3.5, 4.4), h: 0.654, sz: -0.06 }, { poly: rect(2.5, 7.75, 3.5, 8.5), h: 0.06 }],
-    bumps: [{ x: 0.3, z: 6.3, r: 1.0, h: -0.3 }],
-    tubes: [{ a: [3.0, 8.0], b: [2.1, 6.3], dir: 270, keep: 0.3, add: 0.9 }],
+    drains: [{ x: 0.6, z: 6.35, r: 1.5, depth: 0.3 }],
+    tubes: [{ a: [3.0, 8.0], b: [2.05, 5.6], dir: 340, keep: 0, add: 1.4 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 2, 0.4, 3.3) }],
     posts: [C12_CACTUS(-0.9, 4.9), C12_ROCK(1.7, 7.9, 0.13)] },
   /* 10. the staircase: up the first lane to the crossover, back down lane two and up its ramp to the high shelf */
@@ -94,15 +95,15 @@ registerWorld(12, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.6, 6.9, 0.3, 7.6) }],
     movers: [C12_WEED(-0.25, 3.0, 0.25, 3.0, 1.9, 0, 0.13)],
     posts: [C12_CACTUS(1.0, 2.6), C12_ROCK(2.0, 3.4, 0.13)] },
-  /* 11. tube chain: two mine shafts climb two mesa faces, or the side ramps the long way */
-  { par: 3, sol: [[15,0.9375,0],[5,0.375,0]], tee: [0, 0.5], cup: [0.3, 7.2], aim0: 15,
-    shape: rect(-1.2, 0, 1.2, 8),
-    ramps: [{ x0: -1.3, z0: 2, x1: -0.7, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: 0.7, z0: 4.5, x1: 1.3, z1: 5.5, axis: 'z', h0: 0.22, h1: 0.42 }],
-    tiers: [{ poly: rect(-1.3, 3, 1.3, 5.5), h: 0.22 }, { poly: rect(-1.3, 5.5, 1.3, 8.1), h: 0.42 }],
-    tubes: [{ a: [0.6, 2.4], b: [-0.6, 3.6], dir: 0, keep: 0.5, add: 0.4 }, { a: [-0.6, 5.0], b: [-0.6, 6.0], dir: 20, keep: 0.5, add: 0.35 }],
-    zones: [{ surf: 'sand', poly: rect(-1.2, 7.4, -0.3, 8) }],
-    movers: [C12_WEED(-0.2, 4.2, 0.6, 4.2, 2.0, 0, 0.14)],
-    posts: [C12_CACTUS(0.9, 6.5), C12_CACTUS(-0.4, 7.0), C12_ROCK(0, 1.5)] },
+  /* 11. long green: the punch bowl. A long rising front tier with a ridge on the left, a broad step up, and the
+     cup in a wide shallow bowl on the back tier: too soft stays on the rim, too firm climbs the far side */
+  { par: 3, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [-0.7, 10.8],
+    shape: [[-1.2, 0], [1.2, 0], [1.9, 3], [1.9, 12.4], [-1.9, 12.4], [-1.9, 3]],
+    ramps: [{ x0: -2, z0: 6.5, x1: 2, z1: 7.5, axis: 'z', h0: 0.0975, h1: 0.25 }],
+    tiers: [{ poly: rect(-2, -0.1, 2, 6.5), h: 0, sz: 0.015 }, { poly: rect(-2, 7.5, 2, 12.5), h: 0.25 }],
+    bumps: [{ x: 1.0, z: 4.0, r: 1.4, h: 0.12 }, { x: -0.7, z: 10.8, r: 1.6, h: -0.12 }, { x: -1.0, z: 2.0, r: 1.0, h: -0.06 }],
+    zones: [{ surf: 'sand', poly: rect(1.0, 11.6, 1.9, 12.4) }],
+    posts: [C12_CACTUS(1.5, 8.2), C12_ROCK(-1.5, 5.6, 0.12)] },
   /* 12. the canyon descent: down off the high deck, across the mid mesa past the tumbleweed, through the
      gate onto the low green and round the spur */
   { par: 4, crazy: true, sol: [[20,1,1.5],[10,0.96,0]], tee: [0, 0.5], cup: [0.55, 9.35],
@@ -132,14 +133,14 @@ registerWorld(12, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.2, 9.2, -0.3, 9.8) }],
     movers: [C12_WEED(-0.7, 4.6, 0.9, 4.6, 2.4, 0, 0.15)],
     posts: [C12_CACTUS(-0.2, 8.6), C12_CACTUS(1.1, 8.2)] },
-  /* 15. the butte: the cup sits on a mesa in the middle; round either side, up the back ramp, or the shaft from the left */
-  { par: 4, sol: [[155,1,0],[230,0.143,0]], tee: [0, 0.5], cup: [0, 3.8], aim0: 30, shape: rect(-2, 0, 2, 8),
-    ramps: [{ x0: -1, z0: 6, x1: 1, z1: 7, axis: 'z', h0: 0.45, h1: 0 }],
-    tiers: [{ poly: rect(-1, 3, 1, 6), h: 0.45 }],
-    tubes: [{ a: [1.5, 2.2], b: [0.5, 5.4], dir: 180, keep: 0.4, add: 0.3 }],
-    zones: [{ surf: 'sand', poly: rect(-2, 6.8, -1.2, 8) }],
-    movers: [C12_WEED(-1.5, 3.2, -1.5, 5.6, 2.6, 0, 0.15)],
-    posts: [C12_CACTUS(0, 1.6), C12_CACTUS(1.5, 6.6), C12_CACTUS(-0.5, 4.6), C12_ROCK(1.6, 4.4)] },
+  /* 15. long green: the saddle. A wide fan of felt falling gently away, a swale in the middle, and the cup
+     on the saddle between two big low dunes at the back */
+  { par: 3, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [0, 9.6],
+    shape: [[-1.2, 0], [1.2, 0], [2.6, 4], [2.6, 12], [-2.6, 12], [-2.6, 4]],
+    tiers: [{ poly: rect(-2.7, -0.1, 2.7, 12.1), h: 0.12, sz: -0.008 }],
+    bumps: [{ x: -1.4, z: 9.5, r: 1.3, h: 0.18 }, { x: 1.4, z: 9.5, r: 1.3, h: 0.18 }, { x: 0.5, z: 5.0, r: 1.8, h: -0.1 }],
+    zones: [{ surf: 'sand', poly: rect(-2.6, 11.3, -1.4, 12) }],
+    posts: [C12_CACTUS(-2.1, 4.6), C12_CACTUS(2.2, 11.5)] },
   /* 16. the switchback climb: three lanes, two ramps, each shelf higher than the last */
   { par: 4, crazy: true, sol: [[348,1,0],[160,0.92,1],[0,0.6,0]], tee: [0, 0.5], cup: [2.0, 6.4], aim0: 0,
     shape: rect(-0.5, 0, 2.5, 7.2),

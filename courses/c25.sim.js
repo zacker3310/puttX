@@ -9,6 +9,8 @@ registerWorld(25, (() => {
   const WHEEL = (x, z, len, w, phase = 0) => ({ kind: 'spin', x, z, len, w, phase, blades: 2, look: 'wheel' });
   const sand = poly => ({ surf: 'sand', poly });
   const lagoon = poly => ({ surf: 'water', poly });
+  /* points on a circle, from angle a0 to a1 in degrees (0 is +z, 90 is +x), for round whirlpool walls */
+  const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + Math.sin(a) * r, cz + Math.cos(a) * r]; });
   return { holes: [
     /* 1 dock steps: up the gangplank to the moonlit dock */
     { par: 2, sol: [[332.5,0.82,0]], tee: [0.3, 0.5], cup: [0.5, 5.4], aim0: 340, shape: rect(-1, 0, 1, 6.4),
@@ -33,14 +35,17 @@ registerWorld(25, (() => {
       inner: [[[-1.6, 2.8], [0.9, 2.8]], [[-0.9, 5.6], [1.6, 5.6]]],
       movers: [CANNON(-0.6, 4.0, 0.9, 4.0, 2.4)], posts: [BARREL(0.2, 7.4), BARREL(1.2, 7.0), ANCHOR(-1.2, 7.8)],
       zones: [sand(rect(-1.6, 1.2, -0.4, 2.0))] },
-    /* 5 the rum barrel run: up the chute, the cave to the top deck, down the long plank, the second cave, over the dune into the bowl */
-    { par: 3, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [-1.65, 7.4], aim0: 0, shape: rect(-2.2, 0, 0.2, 9),
-      inner: [[[-0.2, 0], [-0.2, 4.8], [0.2, 4.8]], [[-1.1, 0], [-1.1, 9]], [[-0.4, 9], [-0.4, 0.8], [-1.1, 0.8]]],
-      ramps: [{ x0: -0.2, z0: 1.6, x1: 0.2, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1.1, z0: 4.2, x1: -0.4, z1: 7.0, axis: 'z', h0: 0, h1: 0.35 }],
-      tiers: [{ poly: rect(-0.2, 3.0, 0.2, 4.8), h: 0.3 }, { poly: rect(-1.1, 7.0, -0.4, 9.0), h: 0.35 }],
-      tubes: [{ a: [0, 4.3], b: [-0.75, 8.4], dir: 180, keep: 0, add: 1.8 }, { a: [-0.75, 3.4], b: [-1.65, 1.2], dir: 0, keep: 0, add: 2.6 }],
-      zones: [lagoon(rect(-0.38, 0.1, -0.22, 8.9)), lagoon(rect(-0.18, 4.9, 0.18, 8.9)), lagoon(rect(-1.08, 0.1, -0.42, 0.7))],
-      bumps: [{ x: -1.65, z: 7.4, r: 0.5, h: -0.1 }, { x: -1.65, z: 4.2, r: 0.4, h: 0.08 }] },
+    /* 5 the rum barrel run: up the gangplank, round the hairpin on the deck, down the long plank into the
+       first whirlpool, down the cave at its eye into the second, down its eye into the third, round and round into the cup */
+    { par: 3, auto: true, sol: [[0, 0.92, 0]], tee: [0, 0.5], cup: [-4.55, 6.7], aim0: 0,
+      floors: [rect(-0.35, 0, 0.35, 7.9), rect(-2.2, 7.0, 0.35, 7.9), rect(-2.2, 2.6, -1.5, 7.9), arc(-1.85, 2.0, 0.95, 0, 360, 24), rect(-6, 0, -3.1, 9)],
+      walls: [[[-0.35, 0], [0.35, 0], [0.35, 7.1], [-0.45, 7.9], [-1.4, 7.9], [-2.2, 7.1], [-2.2, 2.88], ...arc(-1.85, 2.0, 0.947, -21.7, -338.3, 18),
+        [-1.5, 2.88], [-1.5, 7.0], [-0.35, 7.0], [-0.35, 0]], ring(rect(-6, 0, -3.1, 9)), [[-6, 4.4], [-3.1, 4.4]]],
+      ramps: [{ x0: -0.35, z0: 1.4, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }],
+      tiers: [{ poly: rect(-0.4, 3.0, 0.4, 7.95), h: 0.3 }, { poly: rect(-2.25, 6.95, 0.4, 7.95), h: 0.3 }, { poly: rect(-2.25, 3.0, -1.45, 7.95), h: 0.3 }],
+      zones: [{ push: [-0.8, 0], poly: rect(-1.5, 7.0, -0.35, 7.9) }, { push: [0, -1.2], poly: rect(-2.2, 3.0, -1.5, 7.0) }],
+      drains: [{ x: -1.85, z: 2.0, r: 1.1, depth: 0.35, flat: 0.13 }, { x: -4.55, z: 2.2, r: 1.25, depth: 0.3, flat: 0.13 }, { x: -4.55, z: 6.7, r: 1.3, depth: 0.35 }],
+      tubes: [{ a: [-1.85, 2.0], b: [-4.55, 0.85], dir: 36, keep: 0, add: 1.2 }, { a: [-4.55, 2.2], b: [-4.55, 5.3], dir: 42, keep: 0, add: 1.6 }] },
     /* 6 gun deck: through the drawbridge off the deck, past the cannon on the green */
     { par: 3, sol: [[318,1,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8),
       tiers: [{ poly: rect(-1.5, -0.1, 1.5, 3.4), h: 0.35 }],

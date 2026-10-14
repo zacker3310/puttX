@@ -29,11 +29,11 @@
       floors: [rect(-0.7, 0, 0.7, 3), [[-1.2, 4], [1.2, 4], [1.2, 5], [3.4, 5], [3.4, 6], [-1.2, 6]]],
       walls: [...box(-0.7, 0, 0.7, 3, 'n'), [[3.4, 5], [1.2, 5], [1.2, 4], [-1.2, 4], [-1.2, 6], [3.4, 6]]],
       ramps: [{ x0: -0.7, z0: 2.2, x1: 0.7, z1: 3, axis: 'z', h0: 0, h1: 0.22 }] },
-    /* 2. crater deck: bowls swallow a lazy putt, and the open edges drop into space */
-    { par: 3, sol: [[316,0.88,0]], tee: [0, 0.5], cup: [3.05, 4.3], floors: [[[-1, 0], [1, 0], [1, 3.6], [3.7, 3.6], [3.7, 5], [-1, 5]]],
-      walls: [[[1, 3.6], [1, 0], [-1, 0], [-1, 5], [3.7, 5]]],
-      bumps: [{ x: 0.05, z: 2.3, r: 0.55, h: -0.24 }, { x: 0.15, z: 4.2, r: 0.5, h: -0.25 }, { x: 2.05, z: 4.3, r: 0.42, h: -0.24 }],
-      posts: [ALIEN(-0.55, 3.4)] },
+    /* 2. lunar fairway: a long green over a broad ridge and a swale, the whole deck leaning left */
+    { par: 2, sol: [[0,0.88,0]], tee: [0, 0.5], cup: [-0.6, 9.4],
+      shape: [[-1.4, 0], [1.4, 0], [2.2, 1.6], [2.6, 4.5], [2.4, 8], [1.6, 10.4], [0, 11.2], [-1.8, 10.6], [-2.6, 8.2], [-2.4, 4], [-2, 1.4]],
+      tiers: [{ poly: rect(-3, -1, 3, 12), h: 0, sx: 0.03, sz: 0 }],
+      bumps: [{ x: 0.6, z: 4.6, r: 1.6, h: 0.15 }, { x: -1.2, z: 7.2, r: 1.3, h: -0.12 }, { x: -0.6, z: 9.6, r: 2, h: 0.06 }] },
     /* 3. stepping down: drop deck to deck; turn on the middle deck or fall off its open edge */
     { par: 2, sol: [[12,0.92,0]], tee: [0, 0.5], cup: [2.75, 2.7],
       floors: [rect(-0.6, 0, 0.6, 2.4), rect(-1.2, 2.4, 1.4, 4.6), rect(1.4, 2, 3.4, 6.6)],
@@ -74,12 +74,11 @@
       ramps: [{ x0: -0.6, z0: 2.2, x1: 0.6, z1: 3, axis: 'z', h0: 0, h1: 0.4 }, { x0: 0.3, z0: 3.6, x1: 1, z1: 6, axis: 'x', h0: 0.2, h1: 0.42 }],
       bumps: [{ x: 2.4, z: 5.2, r: 0.4, h: -0.16 }],
       posts: [ALIEN(2.45, 6.25), ALIEN(3.3, 5.45)] },
-    /* 9. tilted greenhouse: the whole deck leans, aliens kick */
-    { par: 2, sol: [[8,0.81,0]], tee: [0, 0.5], cup: [3, 5.05],
-      shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [3.6, 4], [3.6, 6], [-0.8, 6]],
-      tiers: [{ poly: rect(-1, -1, 4, 7), h: 0, sx: -0.06, sz: 0 }],
-      bumps: [{ x: 0, z: 5, r: 0.5, h: -0.2 }],
-      posts: [ALIEN(1.6, 5.3), ALIEN(2.25, 4.55), ALIEN(1.5, 4.4)] },
+    /* 9. greenhouse dogleg: a long green bending right round a broad shoulder, rising to the back */
+    { par: 2, sol: [[10,0.92,0]], tee: [0, 0.5], cup: [4.8, 9.8], aim0: 20,
+      shape: [[-1.4, 0], [1.4, 0], [1.6, 5], [3, 7.4], [6, 8.2], [6.6, 10], [5, 11.4], [1.6, 11], [-0.6, 9.6], [-1.6, 6.4]],
+      tiers: [{ poly: rect(-2, -1, 7, 12), h: 0, sx: -0.025, sz: 0.015 }],
+      bumps: [{ x: 0.8, z: 6.8, r: 1.8, h: 0.16 }, { x: 3.2, z: 9.6, r: 1.1, h: -0.1 }, { x: -0.3, z: 3.4, r: 1.4, h: 0.1 }] },
     /* 10. tube relay: tee deck, tube, asteroid deck, jump, cup deck */
     { par: 3, sol: [[46,0.8,0],[358,0.96,0]], tee: [0, 0.5], cup: [1.6, 6.4],
       floors: [rect(-0.8, 0, 0.8, 2.4), rect(2, 0, 3.6, 4), rect(1, 4.8, 3.8, 7)],
@@ -121,14 +120,12 @@
       bumps: [{ x: -0.6, z: 4.3, r: 0.5, h: -0.2 }, { x: 0.7, z: 3.9, r: 0.45, h: -0.2 }],
       tubes: [{ a: [-1.15, 5.15], b: [2.6, 6.85], dir: 0, keep: 0.5, add: 0.2 }],
       movers: [ROCK(0.25, 7.1, 2.05, 7.1, 2.6)] },
-    /* 16. solar wind: a rail-less slab, a crosswind toward the void, rocks drifting through it */
-    { par: 2, sol: [[336,0.68,0]], tee: [0, 0.5], cup: [0.35, 7.1],
-      floors: [rect(-1.2, 0, 1.2, 7.9)],
-      walls: [],
-      bumps: [{ x: -0.35, z: 6.1, r: 0.4, h: -0.2 }],
-      posts: [ALIEN(0.08, 6.55), ALIEN(0.7, 6.6)],
-      zones: [{ push: [1.1, 0], poly: rect(-1.2, 1.5, 1.2, 5.6) }],
-      movers: [ROCK(-0.9, 2.6, 0.9, 2.6, 2.8, 0, 0.2), ROCK(0.9, 4.4, -0.9, 4.4, 2.2, 0, 0.2)] },
+    /* 16. the upper deck: a long two-tier green, a broad ramp up to the back tier, a hump and a hollow to read */
+    { par: 2, sol: [[30,0.88,0]], tee: [0, 0.5], cup: [-0.2, 10.2],
+      shape: [[-1.6, 0], [1.6, 0], [2.2, 2], [2.4, 6], [2.6, 9], [2.2, 12], [0.8, 13], [-1, 12.9], [-2.2, 11.6], [-2.6, 8], [-2.4, 4], [-2.1, 1.6]],
+      tiers: [{ poly: rect(-3, 7.6, 3, 13.5), h: 0.18 }],
+      ramps: [{ x0: -2.7, z0: 6.4, x1: 2.7, z1: 7.6, axis: 'z', h0: 0, h1: 0.18 }],
+      bumps: [{ x: -1, z: 3.5, r: 1.8, h: 0.14 }, { x: 1.2, z: 10.5, r: 1.6, h: -0.1 }, { x: -0.8, z: 11.6, r: 1.2, h: 0.1 }] },
     /* 17. airlock maze: two doors to time, or thread the rock to the tube */
     { par: 3, sol: [[296,0.88,0],[0,0.24,0]], tee: [0, 0.5], cup: [1.1, 6.3], shape: rect(-1.8, 0, 1.8, 7),
       inner: [[[-1.8, 2.2], [0.9, 2.2]], [[-0.9, 4.4], [1.8, 4.4]]],

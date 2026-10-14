@@ -26,12 +26,11 @@ registerWorld(24, { holes: [
     tubes: [{ a: [0.9, 1.9], b: [-0.9, 3.0], dir: 90 }, { a: [0.9, 3.0], b: [-0.9, 5.4], dir: 45 }],
     movers: [C24_LIFT(0, 3.0, 0, 4.0, 0.3, 0, 2.8)], zones: [{ surf: 'ice', poly: rect(-1.6, 4.8, 1.6, 7.2) }],
     bumps: [{ x: 0.4, z: 6.3, r: 0.5, h: 0.08 }], posts: [C24_MAN(-0.2, 6.6), C24_MAN(-0.3, 1.4)] },
-  /* 4. drop gates: the deck's snow fence has two gaps and a lift bar sliding across them; drop to the lake */
-  { par: 3, sol: [[154,1,0.5]], tee: [0, 0.5], cup: [-0.5, 5.8], shape: rect(-1.4, 0, 1.4, 6.8),
-    inner: [[[-1.4, 3.0], [-0.9, 3.0]], [[-0.3, 3.0], [0.3, 3.0]], [[0.9, 3.0], [1.4, 3.0]]],
-    tiers: [{ poly: rect(-1.4, 0, 1.4, 3.0), h: 0.35 }], movers: [C24_LIFT(-0.6, 2.75, 0.6, 2.75, 0.3, 90, 3.0)],
-    zones: [{ surf: 'water', poly: C24_POOL(0.5, 5.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 3.0, 1.4, 4.4) }],
-    bumps: [{ x: -0.5, z: 5.8, r: 0.5, h: 0.08 }], posts: [C24_MAN(0.3, 6.2)] },
+  /* 4. the summit green: a fourteen metre green that leans left all the way, a broad ridge across
+     the middle and a swale behind it; lag over the ridge and let the tilt bring it home */
+  { par: 3, sol: [], tee: [1.0, 0.5], cup: [-1.0, 12.8], shape: rect(-2, 0, 2, 14),
+    tiers: [{ poly: rect(-2, 0, 2, 14), h: 0.03, sx: 0.012, sz: 0.004 }],
+    bumps: [{ x: 0.2, z: 6.0, r: 1.6, h: 0.16 }, { x: -1.6, z: 6.4, r: 1.2, h: 0.1 }, { x: -0.2, z: 9.4, r: 1.5, h: -0.12 }, { x: 1.2, z: 11.6, r: 1.0, h: 0.08 }] },
   /* 5. sinkhole lift: roll into the sinkhole and its cave lifts you to the high shelf; drop off the shelf to the cup */
   { par: 3, sol: [[335,1,0],[100,1,0]], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }], ramps: [{ x0: -1.4, z0: 3.8, x1: -0.4, z1: 4.6, axis: 'z', h0: 0, h1: 0.3 }],
@@ -55,16 +54,15 @@ registerWorld(24, { holes: [
     tiers: [{ poly: rect(-1.2, 6.2, 1.2, 7.8), h: 0.2 }], ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],
     zones: [{ surf: 'ice', poly: rect(-0.8, 3.0, -0.4, 4.2) }, { surf: 'ice', poly: rect(0.4, 3.0, 0.8, 4.2) }],
     bumps: [{ x: 0.6, z: 5.0, r: 0.3, h: 0.1 }], posts: [C24_MAN(-0.5, 7.2)] },
-  /* 9. the grand bobsled: four runs and three caves, down, back, up and out into the funnel bowl. A good putt rides it all. */
-  { par: 4, auto: true, sol: [[0, 0.85, 0]], tee: [0, 0.5], cup: [4.2, 4.2], aim0: 0, shape: rect(-0.5, 0, 5.6, 6.0),
-    inner: [[[0.5, 0], [0.5, 6.0]], [[1.5, 0], [1.5, 6.0]], [[2.5, 0], [2.5, 6.0]]],
-    tiers: [{ poly: rect(-0.5, 0, 0.5, 1.2), h: 0.42 }, { poly: rect(-0.5, 4.2, 0.5, 6.0), h: 0.22 }, { poly: rect(0.5, 4.4, 1.5, 6.0), h: 0.22 }, { poly: rect(1.5, 4.4, 2.5, 6.0), h: 0.2 }],
-    ramps: [{ x0: -0.5, z0: 1.2, x1: 0.5, z1: 4.2, axis: 'z', h0: 0.42, h1: 0.22 }, { x0: 0.5, z0: 1.8, x1: 1.5, z1: 4.4, axis: 'z', h0: 0, h1: 0.22 },
-      { x0: 1.5, z0: 1.4, x1: 2.5, z1: 4.4, axis: 'z', h0: 0, h1: 0.2 }],
-    zones: [{ surf: 'ice', poly: rect(-0.5, 4.2, 0.5, 6.0) }, { surf: 'ice', poly: rect(0.5, 0, 1.5, 1.8) }],
-    tubes: [{ a: [0, 4.5], b: [1.0, 5.3], dir: 180, keep: 0, add: 1.6 }, { a: [1.0, 1.2], b: [2.0, 0.6], dir: 0, keep: 0, add: 3.4 },
-      { a: [2.0, 5.2], b: [4.2, 0.6], dir: 0, keep: 0, add: 2.3 }],
-    bumps: [{ x: 4.2, z: 4.2, r: 0.8, h: -0.2 }], posts: [C24_MAN(3.2, 2.4), C24_MAN(5.2, 2.4)] },
+  /* 9. the grand bobsled: the push-start booster, the banked turn at the top, up the kicker onto the
+     race deck and off its lip into the collector drain; its cave fires you sideways into the big
+     spiral drain, whose cave feeds the cup drain. Seven stages, one putt. */
+  { par: 4, auto: true, sol: [[0, 0.7, 0]], tee: [0, 0.5], cup: [4.6, 2.0], aim0: 0, shape: rect(-0.5, 0, 5.6, 6.0),
+    inner: [[[0.5, 0], [0.5, 4.6], [5.6, 4.6]], [[-0.5, 5.3], [0.2, 6.0]]],
+    tiers: [{ poly: rect(2.4, 4.6, 3.4, 6.0), h: 0.2 }], ramps: [{ x0: 1.4, z0: 4.6, x1: 2.4, z1: 6.0, axis: 'x', h0: 0, h1: 0.2 }],
+    zones: [{ surf: 'fast', push: [0, 1.2], poly: rect(-0.5, 1.0, 0.5, 4.0) }],
+    drains: [{ x: 4.7, z: 5.3, r: 0.8, depth: 0.22, flat: 0.12 }, { x: 2.1, z: 2.2, r: 1.15, depth: 0.3, flat: 0.12 }, { x: 4.6, z: 2.0, r: 1.0, depth: 0.25 }],
+    tubes: [{ a: [4.7, 5.3], b: [0.85, 2.2], dir: 40, keep: 0, add: 1.2 }, { a: [2.1, 2.2], b: [4.6, 0.85], dir: 40, keep: 0, add: 1.0 }] },
   /* 10. gate terraces: four terraces, each snow fence open at one gap; lift bars slide across the top two */
   { par: 4, sol: [[5,0.833,2],[218,0.96,0]], tee: [0, 0.5], cup: [0.4, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
     inner: [[[-1.4, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1.4, 2.6]], [[-1.4, 5.2], [0.5, 5.2]], [[1.1, 5.2], [1.4, 5.2]], [[-1.4, 7.6], [-1.1, 7.6]], [[-0.5, 7.6], [1.4, 7.6]]],
@@ -72,14 +70,11 @@ registerWorld(24, { holes: [
     movers: [C24_LIFT(-0.5, 2.35, 0.5, 2.35, 0.3, 90, 2.8), C24_LIFT(0.2, 4.95, 0.8, 4.95, 0.3, 90, 2.4, 1)],
     zones: [{ surf: 'ice', poly: rect(-1.4, 2.6, 1.4, 5.2) }, { surf: 'water', poly: C24_POOL(-0.3, 6.4, 0.35, 0.3) }],
     bumps: [{ x: 0.6, z: 6.6, r: 0.3, h: 0.1 }, { x: 0.4, z: 8.8, r: 0.5, h: 0.06 }], posts: [C24_MAN(-0.4, 8.9)] },
-  /* 11. ski jump: fly the gap off the kicker or creep over the ice bridge, dodge the snowball, climb to the cup shelf */
-  { par: 4, sol: [[355,1,0]], tee: [0, 0.5], cup: [-0.5, 7.7], aim0: 0,
-    floors: [rect(-0.7, 0, 1.7, 3.6), rect(1.1, 3.6, 1.5, 4.4), rect(-1.2, 4.4, 1.8, 8.4)],
-    walls: [[[-0.7, 3.6], [-0.7, 0], [1.7, 0], [1.7, 3.6], [1.5, 3.6]], [[1.1, 3.6], [0.7, 3.6], [0.7, 1.6]],
-      [[1.5, 4.4], [1.8, 4.4], [1.8, 8.4], [-1.2, 8.4], [-1.2, 4.4], [-0.8, 4.4]], [[0.8, 4.4], [1.1, 4.4]]],
-    ramps: [{ x0: -0.7, z0: 2.6, x1: 0.7, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }, { x0: -1.2, z0: 6.2, x1: 1.8, z1: 6.9, axis: 'z', h0: 0, h1: 0.2 }],
-    tiers: [{ poly: rect(-1.2, 6.9, 1.8, 8.4), h: 0.2 }], zones: [{ surf: 'ice', poly: rect(1.1, 3.6, 1.5, 4.4) }],
-    movers: [C24_BALL(-0.6, 5.6, 1.2, 5.6, 3.0)], bumps: [{ x: 0.3, z: 4.9, r: 0.25, h: 0.08 }], posts: [C24_MAN(0.4, 7.7)] },
+  /* 11. the cornice: a long green with a snow spine down the middle; tee off the right of it, and
+     the cup sits on the left behind it, so the lag has to ride the spine or swing round its end */
+  { par: 3, sol: [], tee: [1.4, 0.5], cup: [-1.1, 9.6], shape: rect(-2.2, 0, 2.2, 10.6),
+    tiers: [{ poly: rect(-2.2, 0, 2.2, 10.6), h: 0.04, sx: -0.01, sz: 0.004 }],
+    bumps: [{ x: 0, z: 3.4, r: 1.1, h: 0.16 }, { x: -0.1, z: 5.4, r: 1.2, h: 0.18 }, { x: 0.1, z: 7.4, r: 1.0, h: 0.14 }, { x: -1.2, z: 7.6, r: 1.0, h: -0.07 }] },
   /* 12. twin chutes: the icy chute past the open water or the mogul chute, onto the terrace, then through the gated fence to the cup */
   { par: 4, sol: [[295,0.667,2],[12,0.8,1]], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
     inner: [[[0, 1.6], [0, 5.6]], [[-1.4, 7.0], [-0.3, 7.0]], [[0.3, 7.0], [1.4, 7.0]]],
@@ -111,12 +106,12 @@ registerWorld(24, { holes: [
     movers: [C24_LIFT(-0.8, 3.0, 0.8, 3.0, 0.35, 90, 3.0), C24_LIFT(-0.8, 5.8, 0.8, 5.8, 0.35, 90, 2.6, 1), C24_LIFT(-0.8, 8.4, 0.8, 8.4, 0.35, 90, 2.8, 2)],
     zones: [{ surf: 'ice', poly: rect(-1.4, 8.0, 1.4, 9.4) }, { surf: 'water', poly: C24_POOL(-0.5, 10.6, 0.35, 0.3) }],
     bumps: [{ x: 0.5, z: 11.0, r: 0.4, h: 0.05 }], posts: [C24_MAN(-0.6, 4.0), C24_MAN(0.6, 7.0)] },
-  /* 16. snowball gauntlet: up the ramp between two snowballs, along the ice deck, drop past the third to the cup */
-  { par: 4, sol: [[0,1,1]], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.2, 0, 1.2, 9.4),
-    ramps: [{ x0: -1.2, z0: 1.6, x1: 1.2, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }], tiers: [{ poly: rect(-1.2, 3.0, 1.2, 6.4), h: 0.3 }],
-    inner: [[[-1.2, 6.4], [-0.4, 6.4]], [[0.3, 6.4], [1.2, 6.4]]],
-    movers: [C24_BALL(-0.8, 2.2, 0.8, 2.2, 2.6), C24_BALL(0.8, 4.2, -0.8, 4.2, 3.0, 1), C24_BALL(-0.7, 7.6, 0.7, 7.6, 2.4, 2)],
-    zones: [{ surf: 'ice', poly: rect(-1.2, 3.0, 1.2, 6.4) }], posts: [C24_MAN(0.6, 5.4), C24_MAN(-0.5, 8.8)] },
+  /* 16. the long run-out: a twelve metre green falling away from the tee, three tilted tiers on
+     wide banks, a swale and a crown; the pace is everything */
+  { par: 3, sol: [], tee: [-0.8, 0.5], cup: [0.8, 11.4], shape: rect(-1.8, 0, 1.8, 12.4),
+    tiers: [{ poly: rect(-1.8, 0, 1.8, 4.0), h: 0.24, sx: -0.01, sz: -0.006 }, { poly: rect(-1.8, 5.2, 1.8, 8.4), h: 0.12, sx: 0.012 }, { poly: rect(-1.8, 9.4, 1.8, 12.4), h: 0.02, sx: -0.008 }],
+    ramps: [{ x0: -1.8, z0: 4.0, x1: 1.8, z1: 5.2, axis: 'z', h0: 0.216, h1: 0.12 }, { x0: -1.8, z0: 8.4, x1: 1.8, z1: 9.4, axis: 'z', h0: 0.12, h1: 0.02 }],
+    bumps: [{ x: 0.5, z: 2.2, r: 1.2, h: -0.08 }, { x: -0.6, z: 6.8, r: 1.3, h: 0.12 }, { x: 0.2, z: 10.4, r: 0.9, h: -0.06 }] },
   /* 17. cave maze: four chambers; walk the gaps round or chain the caves through the middle */
   { par: 4, crazy: true, sol: [[45,1,0],[40,0.833,0]], tee: [0, 0.5], cup: [-0.9, 8.0], aim0: 0, shape: rect(-1.6, 0, 1.6, 9.0),
     inner: [[[-1.6, 2.4], [1.0, 2.4]], [[-1.0, 4.6], [1.6, 4.6]], [[-1.6, 6.8], [1.0, 6.8]]],

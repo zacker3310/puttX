@@ -4,7 +4,7 @@
 const C20_PAD = (x0, z0, x1, z1) => rect(x0 - 0.1, z0 - 0.1, x1 + 0.1, z1 + 0.1);
 registerWorld(20, { holes: [
   /* 1. twin bridges: a slick narrow rainbow on the left or the wide bridge on the right, up to a crater on a hill */
-  { par: 2, sol: [[350,0.96,0],[28,0.6,0]], tee: [-0.15, 0.5], cup: [0.45, 5.5],
+  { par: 2, sol: [[349.25,0.89,0]], tee: [-0.15, 0.5], cup: [0.45, 5.5],
     floors: [rect(-0.9, 0, 0.9, 2.2), rect(0.35, 2.2, 0.75, 3.8), rect(-0.9, 2.2, -0.3, 3.8), rect(-1.3, 3.8, 1.3, 6.6)],
     walls: [[[-0.9, 2.2], [-0.9, 2.2], [-0.9, 0], [0.9, 0], [0.9, 2.2], [0.75, 2.2]], [[-0.3, 2.2], [0.35, 2.2]], [[-1.3, 5.6], [-1.3, 6.6], [1.3, 6.6], [1.3, 5.6]]],
     ramps: [{ x0: 0.35, z0: 2.2, x1: 0.75, z1: 3.8, axis: 'z', h0: 0, h1: 0.3 }, { x0: -0.9, z0: 2.2, x1: -0.3, z1: 3.8, axis: 'z', h0: 0, h1: 0.3 }],
@@ -77,19 +77,24 @@ registerWorld(20, { holes: [
     bumps: [{ x: 0.5, z: 8.6, r: 0.3, h: -0.05 }],
     movers: [{ kind: 'gate', ax: -0.95, az: 4.2, bx: 0.95, bz: 4.2, len: 0.45, ang: 90, period: 3, look: 'gate' },
       { kind: 'gate', ax: 0.95, az: 5.4, bx: -0.95, bz: 5.4, len: 0.45, ang: 90, period: 2.4, phase: 1, look: 'gate' }] },
-  /* 9. (auto) rainbow coaster: three chained tubes and a rainbow jump into a funnel bowl */
-  { par: 4, auto: true, sol: [[0,0.6,0]], tee: [0, 0.5], cup: [0, 10.4], aim0: 0,
-    floors: [rect(-0.3, 0, 0.3, 2.4), rect(1.0, 0.3, 1.5, 5.6), rect(-1.6, 6.0, 1.6, 6.5), rect(-0.3, 6.9, 0.3, 8.6), rect(-1.0, 9.4, 1.0, 11.4)],
-    walls: [ring(rect(-0.3, 0, 0.3, 2.4)), ring(rect(1.0, 0.3, 1.5, 5.6)), ring(rect(-1.6, 6.0, 1.6, 6.5)), [[0.3, 8.6], [0.3, 6.9], [-0.3, 6.9], [-0.3, 8.6]],
-      [[-1.0, 9.4], [-1.0, 11.4], [1.0, 11.4], [1.0, 9.4]]],
-    tiers: [{ poly: C20_PAD(1.0, 0.3, 1.5, 1.5), h: 0.6 }, { poly: C20_PAD(1.0, 3.0, 1.5, 5.6), h: 0.2 }, { poly: C20_PAD(-1.6, 6.0, 1.6, 6.5), h: 0.2 },
-      { poly: C20_PAD(-0.3, 6.9, 0.3, 8.6), h: 0.6 }, { poly: C20_PAD(-1.0, 9.4, 1.0, 11.4), h: 0.1 }],
-    ramps: [{ x0: 0.9, z0: 1.5, x1: 1.6, z1: 3.0, axis: 'z', h0: 0.6, h1: 0.2 }, { x0: -0.3, z0: 8.2, x1: 0.3, z1: 8.6, axis: 'z', h0: 0.6, h1: 0.7 }],
-    zones: [{ surf: 'fast', poly: rect(1.0, 0.3, 1.5, 5.6) }, { surf: 'fast', poly: rect(-1.6, 6.0, 1.6, 6.5) }],
-    bumps: [{ x: 0, z: 10.4, r: 0.7, h: -0.2 }],
-    tubes: [{ a: [0, 2.0], b: [1.25, 0.65], dir: 0, keep: 0, add: 2.4, color: '#ffd66e' },
-      { a: [1.25, 5.2], b: [1.3, 6.25], dir: 270, keep: 0, add: 2.6, color: '#6fc0df' },
-      { a: [-1.3, 6.25], b: [0, 7.3], dir: 0, keep: 0, add: 4, color: '#ef7d6d' }] },
+  /* 9. (auto) twin whirlwinds: up the rainbow into the gold tube, which fires the ball round the
+     banked rail bend into the blue tube, out into the first sky whirlwind; its eye swallows the ball
+     into the red tube, which flings it round and round the second whirlwind and down into the cup */
+  { par: 4, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [-0.6, 8.6], aim0: 0,
+    floors: [rect(-0.35, 0, 0.35, 5.0), rect(1.15, 0.8, 1.85, 4.4), C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), rect(3.15, 0.8, 3.85, 4.4),
+      C10_PEN(2.5, 7.6, 1.36), C10_PEN(-0.6, 8.6, 1.36)],
+    walls: [ring(rect(-0.35, 0, 0.35, 5.0)), [[1.85, 0.8], [1.15, 0.8], ...C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), [3.85, 0.8], [3.15, 0.8]],
+      [[1.85, 0.8], ...C10_ARC(2.5, 4.4, 0.65, 270, 450, 8), [3.15, 0.8]],
+      ring(C10_PEN(2.5, 7.6, 1.36)), ring(C10_PEN(-0.6, 8.6, 1.36))],
+    tiers: [{ poly: C20_PAD(-0.35, 0, 0.35, 2.0), h: 0.15 }, { poly: C20_PAD(-0.35, 4.4, 0.35, 5.0), h: 0.45 },
+      { poly: [[1.05, 0.7], ...C10_ARC(2.5, 4.4, 1.45, 270, 450, 12), [3.95, 0.7]], h: 0.6 },
+      { poly: C10_PEN(2.5, 7.6, 1.46), h: 0.3 }, { poly: C10_PEN(-0.6, 8.6, 1.46), h: 0.1 }],
+    ramps: [{ x0: -0.35, z0: 2.0, x1: 0.35, z1: 4.4, axis: 'z', h0: 0.15, h1: 0.45 }],
+    zones: [{ surf: 'fast', poly: rect(-0.35, 2.0, 0.35, 4.4) }, { surf: 'fast', poly: [[1.15, 0.8], ...C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), [3.85, 0.8]] }],
+    drains: [{ x: 2.5, z: 7.6, r: 1.2, depth: 0.3, flat: 0.14 }, { x: -0.6, z: 8.6, r: 1.2, depth: 0.3 }],
+    tubes: [{ a: [0, 4.7], b: [1.5, 1.1], dir: 0, keep: 0, add: 3.6, color: '#ffd66e' },
+      { a: [3.5, 1.1], b: [1.37, 7.6], dir: 30, keep: 0, add: 1.8, color: '#6fc0df' },
+      { a: [2.5, 7.6], b: [0.53, 8.6], dir: 240, keep: 0, add: 2.4, color: '#ef7d6d' }] },
   /* 10. switchback: up the rainbow rail, swing round the high deck, up the second rail the other way, then along the railed ridge to the crown green */
   { par: 5, crazy: true, sol: [[2,0.75,0],[90,0.3,0],[180,0.7,0],[107,0.2,0],[356,0.64,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
     floors: [rect(-1.5, 0, -0.5, 1.5), rect(-1.3, 1.5, -0.7, 4), rect(-1.5, 4, 0.9, 5.3), rect(0.3, 1.6, 0.9, 4), rect(0.1, 0.2, 2.3, 1.6), rect(1.5, 1.6, 2.1, 3.6), rect(1.2, 3.6, 2.6, 6)],

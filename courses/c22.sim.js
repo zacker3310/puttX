@@ -34,12 +34,14 @@ registerWorld(22, { holes: [
     bumps: [{ x: -0.2, z: 2.0, r: 0.5, h: 0.25 }, { x: 0.3, z: 3.4, r: 0.45, h: 0.22 }, { x: -0.1, z: 5.2, r: 0.4, h: 0.18 }],
     zones: [{ surf: 'sand', poly: rect(-0.7, 6.4, -0.1, 7.4) }],
     posts: [C22_CACTUS(2.3, 5.2), C22_ROCK(2.9, 7.05, 0.12)] },
-  /* 4. three terraces, a tumbleweed on each step down */
-  { par: 3, sol: [[2,0.8,0]], tee: [0, 0.5], cup: [0.5, 7.2], shape: rect(-1.2, 0, 1.2, 8),
-    tiers: [{ poly: rect(-1.3, -0.1, 1.3, 2.5), h: 0.4 }, { poly: rect(-1.3, 2.5, 1.3, 5), h: 0.2 }],
-    zones: [{ surf: 'sand', poly: rect(-1.2, 7.2, -0.4, 8) }],
-    movers: [C22_WEED(-0.8, 3.6, 0.8, 3.6, 2.2), C22_WEED(0.8, 5.9, -0.8, 5.9, 2.6, 1)],
-    posts: [C22_CACTUS(0.05, 6.8), C22_CACTUS(0.95, 6.7), C22_ROCK(-0.6, 1.6)] },
+  /* 4. long green: the snake. Thirteen metres of canyon floor that kinks left then right, leaning left all the
+     way, a ridge on the inside of the first bend and a swale short of the cup */
+  { par: 3, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [-0.6, 11.8], aim0: 10,
+    shape: [[-1.2, 0], [1.2, 0], [1.2, 4], [2.8, 6.5], [2.8, 9], [0.6, 13], [-1.8, 13], [-1.8, 10], [-0.2, 7.5], [-1.2, 4]],
+    tiers: [{ poly: rect(-1.9, -0.1, 2.9, 13.1), h: 0.1, sz: 0.01, sx: -0.012 }],
+    bumps: [{ x: 1.6, z: 8.0, r: 1.4, h: 0.14 }, { x: -0.5, z: 3.0, r: 1.2, h: -0.07 }, { x: -0.3, z: 10.3, r: 1.0, h: -0.06 }],
+    zones: [{ surf: 'sand', poly: rect(0.0, 12.4, 0.9, 13) }],
+    posts: [C22_CACTUS(1.0, 1.4), C22_ROCK(-1.4, 12.5, 0.12)] },
   /* 5. three decks down: drop through the left gap, cross the middle deck past the tumbleweed, drop through
      the right gap; or dive into the shaft on the top deck */
   { par: 3, sol: [[36,0.96,1.5]], tee: [0, 0.5], cup: [0, 8.2], shape: rect(-1.5, 0, 1.5, 9),
@@ -83,13 +85,15 @@ registerWorld(22, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.6, 10.3, -0.6, 11) }],
     movers: [C22_GATE(0.375, 3.5, 0.625, 3.5, 0.25, 90, 2.4), C22_GATE(-0.625, 7, -0.375, 7, 0.25, 90, 2.8, 0.9), C22_WEED(-1.0, 5.2, 1.0, 5.2, 2.6)],
     posts: [C22_CACTUS(-0.8, 2.2), C22_CACTUS(-0.2, 10.4)] },
-  /* 10. the ziggurat: round the butte, up the back ramp to the first terrace, round to the side ramp and the summit */
-  { par: 4, sol: [[210,0.9375,0],[180,0.9375,0],[160,0.5625,0],[0,0.0625,0]], tee: [0, 0.5], cup: [0, 4.3], aim0: 25, shape: rect(-2, 0, 2, 8),
-    ramps: [{ x0: 0.2, z0: 6.4, x1: 1.4, z1: 7.2, axis: 'z', h0: 0.2, h1: 0 }, { x0: -1.4, z0: 3.6, x1: -0.7, z1: 4.8, axis: 'x', h0: 0.2, h1: 0.4 }],
-    tiers: [{ poly: rect(-1.4, 2.2, 1.4, 6.4), h: 0.2 }, { poly: rect(-0.7, 3.2, 0.7, 5.4), h: 0.4 }],
-    zones: [{ surf: 'sand', poly: rect(-2, 6.8, -1.2, 8) }],
-    movers: [C22_WEED(-1.7, 2.0, -1.7, 6.0, 2.8, 0, 0.12)],
-    posts: [C22_CACTUS(1.0, 3.0), C22_ROCK(1.6, 1.4), C22_CACTUS(-0.4, 7.4)] },
+  /* 10. long green: the three shelves. Up a broad step to a middle shelf with a big low dune, then a step back
+     down to the cup shelf: the putt has to climb, crest and die */
+  { par: 3, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [1.3, 10.8],
+    shape: [[-1.4, 0], [1.4, 0], [2.4, 3], [2.4, 12], [-2.4, 12], [-2.4, 3]],
+    ramps: [{ x0: -2.5, z0: 4, x1: 2.5, z1: 5, axis: 'z', h0: 0.06, h1: 0.2 }, { x0: -2.5, z0: 8, x1: 2.5, z1: 9, axis: 'z', h0: 0.2, h1: 0.1 }],
+    tiers: [{ poly: rect(-2.5, -0.1, 2.5, 4), h: 0, sz: 0.015 }, { poly: rect(-2.5, 5, 2.5, 8), h: 0.2 }, { poly: rect(-2.5, 9, 2.5, 12.1), h: 0.1, sx: -0.008 }],
+    bumps: [{ x: -1.0, z: 6.5, r: 1.5, h: 0.15 }, { x: 1.2, z: 2.5, r: 1.3, h: -0.08 }],
+    zones: [{ surf: 'sand', poly: rect(-2.4, 11.2, -1.2, 12) }],
+    posts: [C22_CACTUS(2.0, 6.4), C22_ROCK(-2.0, 3.2, 0.12)] },
   /* 11. three rivers: the plank, the island shaft or kicker, the far plank, then the green */
   { par: 4, sol: [[10,0.8125,0],[40,0.625,0]], tee: [0, 0.5], cup: [-0.6, 10.2], shape: rect(-1.6, 0, 1.6, 11),
     ramps: [{ x0: -0.35, z0: 1.7, x1: 0.35, z1: 2.5, axis: 'z', h0: 0, h1: 0.2 }, { x0: -0.3, z0: 4.7, x1: 0.3, z1: 5.5, axis: 'z', h0: 0, h1: 0.2 }],
@@ -136,17 +140,14 @@ registerWorld(22, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.4, 9.3, -0.6, 10) }],
     movers: [C22_WEED(-1.0, 3.8, 1.0, 3.8, 2.4), C22_GATE(0.35, 5, 0.95, 5, 0.25, 90, 2.2), C22_WEED(1.0, 6.3, -1.0, 6.3, 2.6, 1.1)],
     posts: [C22_CACTUS(0.5, 1.6), C22_CACTUS(-0.9, 8.6), C22_CACTUS(-0.1, 9.6)] },
-  /* 16. the four-lane switchback climb: every lane a step above the last */
-  { par: 4, sol: [[350,1,0],[155,1,0],[350,0.9375,0],[165,0.75,0]], tee: [0, 0.5], cup: [2.7, 0.9], aim0: 0,
-    shape: rect(-0.45, 0, 3.15, 7.2),
-    inner: [[[0.45, 0], [0.45, 6]], [[1.35, 1.2], [1.35, 7.2]], [[2.25, 0], [2.25, 6]]],
-    ramps: [{ x0: -0.55, z0: 4.8, x1: 0.45, z1: 6, axis: 'z', h0: 0, h1: 0.14 }, { x0: 0.45, z0: 2.4, x1: 1.35, z1: 3.6, axis: 'z', h0: 0.28, h1: 0.14 },
-      { x0: 1.35, z0: 4.8, x1: 2.25, z1: 6, axis: 'z', h0: 0.28, h1: 0.42 }],
-    tiers: [{ poly: rect(-0.55, 6, 1.35, 7.3), h: 0.14 }, { poly: rect(0.45, 3.6, 1.35, 6), h: 0.14 }, { poly: rect(0.45, -0.1, 2.25, 2.4), h: 0.28 },
-      { poly: rect(1.35, 1.2, 2.25, 4.8), h: 0.28 }, { poly: rect(1.35, 6, 3.25, 7.3), h: 0.42 }, { poly: rect(2.25, -0.1, 3.25, 6), h: 0.42 }],
-    zones: [{ surf: 'sand', poly: rect(2.25, 3.0, 3.15, 3.5) }],
-    movers: [C22_WEED(0, 2.6, 0, 3.6, 1.8, 0, 0.12), C22_WEED(1.8, 2.6, 1.8, 3.8, 2.2, 0.8, 0.12)],
-    posts: [C22_CACTUS(2.9, 4.6), C22_CACTUS(2.5, 2.0)] },
+  /* 16. long green: the dogleg. Up the long lane and round the corner to the left, a ridge on the corner and the
+     whole green leaning back toward the tee; the lag has to turn the corner off the far wall or die at it */
+  { par: 3, sol: [[0,0.8,0]], tee: [0.2, 0.5], cup: [4.9, 9.0], aim0: 0,
+    shape: [[-1.0, 0], [1.4, 0], [1.4, 7.5], [6.0, 7.5], [6.0, 10.5], [-1.0, 10.5]],
+    tiers: [{ poly: rect(-1.1, -0.1, 6.1, 10.6), h: 0.1, sz: 0.01, sx: 0.006 }],
+    bumps: [{ x: 0.2, z: 9.0, r: 1.2, h: 0.12 }, { x: 0.2, z: 4.0, r: 1.3, h: -0.07 }, { x: 3.2, z: 9.6, r: 1.0, h: 0.07 }],
+    zones: [{ surf: 'sand', poly: rect(5.2, 9.8, 6.0, 10.5) }],
+    posts: [C22_CACTUS(-0.6, 6.0), C22_CACTUS(2.4, 7.9)] },
   /* 17. the grand chain: high deck, the shaft or the ramp to the mid mesa, the second shaft or the gated drop
      to the dunes, the plank over the flood, up to the summit green */
   { par: 5, crazy: true, sol: [[335,1,1.5],[320,0.4375,0],[270,0.625,0],[0,0.5625,0]], tee: [0, 0.5], cup: [-0.6, 12.3],
@@ -160,9 +161,11 @@ registerWorld(22, { holes: [
     zones: [{ surf: 'water', poly: rect(-2, 8.6, 1.2, 9.3) }, { surf: 'fast', poly: rect(1.2, 8.5, 2, 9.4) }, { surf: 'sand', poly: rect(0.8, 11, 2, 11.6) }],
     movers: [C22_WEED(-1.0, 4.9, 1.4, 4.9, 2.8), C22_GATE(0.35, 6.3, 1.25, 6.3, 0.3, 90, 2.8)],
     posts: [C22_CACTUS(0.2, 12.0), C22_CACTUS(1.3, 12.5), C22_ROCK(-0.9, 7.9, 0.13)] },
-  /* 18. the canyon express: off the summit deck, two corner boards, down the rail into the first shaft, along
-     the high flume into the second shaft and out into the sinkhole. A firm straight putt rides it all the way. */
-  { par: 4, auto: true, crazy: true, sol: [[0, 0.85, 0]], tee: [0, 0.5], cup: [0, 6.3], aim0: 0,
+  /* 18. the canyon express: off the summit deck down the fast chute, two corner boards, down the rail into the
+     first shaft, along the ice flume into the second shaft, spat into the first coin-funnel drain that spins
+     it down into a third shaft at its heart, which fires it into the second drain to spiral round into the cup.
+     A firm straight putt rides it all the way. */
+  { par: 4, auto: true, crazy: true, sol: [[0, 0.85, 0]], tee: [0, 0.5], cup: [1.3, 6.35], aim0: 0,
     shape: [[0.4, 0], [-0.4, 0], [-0.4, 3.5], [-3.4, 3.5], [-3.4, 9.4], [2.6, 9.4], [2.6, 4.3], [0.4, 4.3], [0.4, 3.5], [0.4, 3.0]],
     inner: [[[0.4, 3.5], [-0.4, 4.3]], [[-2.6, 3.5], [-3.4, 4.3]], [[0.4, 4.3], [-2.6, 4.3], [-2.6, 8.4]], [[-3.4, 8.4], [2.6, 8.4]],
       [[-2.6, 7.4], [-2.8, 7.85]], [[-3.4, 7.4], [-3.2, 7.85]], [[1.7, 8.4], [2.15, 8.7]], [[1.7, 9.4], [2.15, 9.1]]],
@@ -171,8 +174,9 @@ registerWorld(22, { holes: [
     tiers: [{ poly: rect(-2.6, 4.1, 2.7, 8.4), h: 0.35 }, { poly: rect(-0.5, -0.1, 0.5, 2), h: 1.0 }, { poly: rect(-0.5, 3.3, 0.5, 4.4), h: 0.76, sx: 0.05 },
       { poly: rect(-3.5, 3.4, -2.5, 4.4), h: 0.654, sz: -0.06 }, { poly: rect(-3.5, 7.75, -2.5, 8.4), h: 0.06 },
       { poly: rect(-3.5, 8.4, 2.7, 9.5), h: 0.3 }],
-    bumps: [{ x: 0, z: 6.3, r: 1.0, h: -0.3 }],
-    tubes: [{ a: [-3.0, 8.0], b: [-2.9, 8.9], dir: 90, keep: 0.3, add: 1.4 }, { a: [2.3, 8.9], b: [1.6, 7.4], dir: 231, keep: 0.3, add: 1.0 }],
+    drains: [{ x: -1.25, z: 6.35, r: 1.1, depth: 0.28, flat: 0.16 }, { x: 1.3, z: 6.35, r: 1.1, depth: 0.28 }],
+    tubes: [{ a: [-3.0, 8.0], b: [-2.9, 8.9], dir: 90, keep: 0.3, add: 1.4 }, { a: [2.3, 8.9], b: [-0.7, 7.4], dir: 250, keep: 0, add: 0.7 },
+      { a: [-1.25, 6.35], b: [0.75, 5.3], dir: 70, keep: 0, add: 1.0 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 2, 0.4, 3.3) }, { surf: 'ice', poly: rect(-3.4, 8.4, 2.6, 9.4) }],
-    posts: [C22_CACTUS(-1.6, 5.0), C22_ROCK(1.9, 5.0, 0.13)] },
+    posts: [C22_CACTUS(-2.25, 4.65), C22_ROCK(2.2, 8.0, 0.13)] },
 ] });

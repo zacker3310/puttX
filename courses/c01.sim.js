@@ -37,11 +37,12 @@ registerWorld(1, { holes: [
     inner: [[[-1.2, 5.2], [0.3, 5.2]]],
     movers: [{ kind: 'spin', x: 0.15, z: 7, len: 0.6, w: 1.5, phase: 1, look: 'crane' }],
     zones: [{ surf: 'sand', poly: rect(-1.2, 8.5, 1.2, 9) }] },
-  /* 7: the big dirt mound. Over the top or round the dry side, then down into the crater cup */
-  { par: 2, sol: [[2,0.76,0]], tee: [0, 0.5], cup: [0.5, 6.6], shape: rect(-1.3, 0, 1.3, 8),
-    bumps: [{ x: 0, z: 3.6, r: 0.9, h: 0.35 }, { x: 0.5, z: 6.6, r: 0.5, h: -0.06 }],
-    inner: [[[0, 5.6], [0.95, 5.6]]],
-    zones: [{ surf: 'sand', poly: rect(0.65, 2.8, 1.3, 4.4) }] },
+  /* 7: the haul road (long green). A broad lower apron, a gentle bank up to the top tier, a dirt ridge
+     that leans the lag right and a swale short of the cup */
+  { par: 3, sol: [[4,0.96,0]], tee: [0, 0.5], cup: [-0.7, 11.8], shape: rect(-1.8, 0, 1.8, 13),
+    tiers: [{ poly: rect(-1.8, 0, 1.8, 6), h: 0, sx: -0.01 }, { poly: rect(-1.8, 7.4, 1.8, 13), h: 0.16, sx: 0.01 }],
+    ramps: [{ x0: -1.8, z0: 6, x1: 1.8, z1: 7.4, axis: 'z', h0: 0, h1: 0.16 }],
+    bumps: [{ x: 1.6, z: 3.5, r: 1.6, h: 0.14 }, { x: -0.6, z: 9.2, r: 1.1, h: -0.07 }, { x: 1.2, z: 11, r: 1.4, h: 0.1 }] },
   /* 8: switchback. Up the left lane, round the top, then down against the belt to the cup */
   { par: 3, sol: [[28,0.76,0],[140,0.92,0]], tee: [0.8, 0.5], cup: [-0.8, 1], aim0: 0, shape: rect(-1.6, 0, 1.6, 6.4),
     inner: [[[0, 0], [0, 5]]],
@@ -61,13 +62,11 @@ registerWorld(1, { holes: [
     inner: [[[0.6, 5], [0.6, 6.2]], [[1.4, 7.1], [-0.5, 7.1]], [[-0.6, 3.4], [1.4, 3.4]], [[-1.4, 6.2], [0.6, 6.2]]],
     zones: [{ push: [0, -0.9], poly: rect(-0.6, 3.4, 0.5, 6.2) }],
     bumps: [{ x: -0.95, z: 8.3, r: 0.35, h: 0.12 }] },
-  /* 11: the tilted slab. A poured slab leans to the right; read the break through the girder posts */
-  { par: 2, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [-0.5, 6.4], shape: rect(-1.5, 0, 1.5, 7.2),
-    tiers: [{ poly: rect(-1.5, 0, 1.5, 7.2), h: 0.1, sx: 0.045 }],
-    posts: [{ x: -0.35, z: 3.2, r: 0.09, look: 'girder' }, { x: 0.45, z: 3.6, r: 0.09, look: 'girder' }, { x: -0.9, z: 4.4, r: 0.09, look: 'girder' },
-            { x: 0.05, z: 4.8, r: 0.09, look: 'girder' }],
-    zones: [{ surf: 'sand', poly: rect(-1.5, 5.2, -1, 7.2) }],
-    bumps: [{ x: 0.3, z: 6.1, r: 0.35, h: 0.1 }] },
+  /* 11: the poured slab (long green). One long slab leaning to the right, a low hump to read round and a
+     soft dip by the cup */
+  { par: 2, sol: [[0,0.68,0]], tee: [0, 0.5], cup: [0.5, 8.8], shape: rect(-1.6, 0, 1.6, 10),
+    tiers: [{ poly: rect(-1.6, 0, 1.6, 10), h: 0.05, sx: 0.02 }],
+    bumps: [{ x: -0.6, z: 4.5, r: 1.8, h: 0.12 }, { x: 1.1, z: 7.4, r: 1.2, h: -0.06 }] },
   /* 12: gap jump (3 parts, open). Launch off the plank ramp over the trench, or creep round the side plank */
   { crazy: true, par: 3, sol: [[358,0.96,0]], tee: [0, 0.5], cup: [0, 7.2],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 8)],
@@ -98,12 +97,12 @@ registerWorld(1, { holes: [
     tubes: [{ a: [1, 5.6], b: [1, 7.4], dir: 0 }],
     bumps: [{ x: -0.2, z: 7.8, r: 0.45, h: 0.18 }],
     zones: [{ surf: 'sand', poly: rect(-1.4, 8.9, -0.3, 9.6) }] },
-  /* 16: dirt mounds. Thread big mounds on a leaning slab, past the dirt, into the girder pocket */
-  { par: 3, sol: [[351,0.94,0]], tee: [0, 0.5], cup: [1, 7.3], shape: rect(-1.6, 0, 1.6, 8),
-    tiers: [{ poly: rect(-1.6, 0, 1.6, 8), h: 0.08, sx: -0.035 }],
-    inner: [[[1.6, 6.5], [0.45, 6.5]]],
-    bumps: [{ x: 0.7, z: 2.6, r: 0.55, h: 0.3 }, { x: -0.7, z: 3.9, r: 0.6, h: 0.35 }, { x: 0.45, z: 5.2, r: 0.55, h: 0.32 }, { x: -0.55, z: 6.7, r: 0.45, h: 0.25 }],
-    zones: [{ surf: 'sand', poly: rect(-1.6, 4.8, -0.5, 5.8) }, { surf: 'sand', poly: rect(1.05, 3.4, 1.6, 4.6) }, { surf: 'sand', poly: rect(-0.2, 7.5, 1.6, 8) }] },
+  /* 16: the long pour (long green). An uphill slab over two low dirt ridges, a wide swale, a bunker
+     on the right and a crown that kicks a short lag away from the cup */
+  { par: 3, sol: [[2,0.88,0]], tee: [0, 0.5], cup: [0.6, 12.4], shape: rect(-1.7, 0, 1.7, 14),
+    tiers: [{ poly: rect(-1.7, 0, 1.7, 14), h: 0, sz: 0.012 }],
+    bumps: [{ x: -1, z: 5, r: 1.5, h: 0.15 }, { x: 1.2, z: 6.5, r: 1.5, h: 0.12 }, { x: 0, z: 9.5, r: 1.6, h: -0.08 }, { x: -1.2, z: 12, r: 1.2, h: 0.1 }],
+    zones: [{ surf: 'sand', poly: rect(-1.7, 8.6, -1.1, 10.4) }] },
   /* 17: the long haul (4 parts, open). Off the deck, along the belt, down the pipe over the trench, to the crane green */
   { crazy: true, par: 3, sol: [[26,0.68,0],[0,0.16,0]], tee: [0, 0.5], cup: [-2.2, 9], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 6), rect(-3.6, 4.6, -0.65, 6), rect(-3.6, 7, -0.8, 10)],

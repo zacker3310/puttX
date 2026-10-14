@@ -13,7 +13,7 @@ registerWorld(30, { holes: [
     tiers: [{ poly: C30_PAD(-1.1, 3, 1.1, 4.8), h: 0.2 }, { poly: C30_PAD(-1.1, 6, 1.1, 8.2), h: 0.4 }],
     bumps: [{ x: 0.2, z: 3.9, r: 0.35, h: 0.08 }, { x: -0.4, z: 7.4, r: 0.3, h: -0.05 }] },
   /* 2. tube hop: a bare rainbow or the tube to the windmill isle, then drop off its lip onto the green */
-  { par: 3, sol: [[0,0.6875,0]], tee: [0, 0.6], cup: [0.5, 7.6],
+  { par: 3, sol: [[2,0.76,0]], tee: [0, 0.6], cup: [0.5, 7.6],
     floors: [rect(-0.8, 0, 0.8, 2), rect(-0.25, 2, 0.25, 4.2), rect(-1.2, 4.2, 1.2, 6), rect(-1.4, 6, 1.4, 8.4)],
     walls: [[[-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2]], [[-1.2, 4.2], [-1.2, 6], [-1.4, 6], [-1.4, 8.4], [1.4, 8.4], [1.4, 6], [1.2, 6], [1.2, 4.2]]],
     tiers: [{ poly: C30_PAD(-0.8, 0, 0.8, 2), h: 0.3 }, { poly: rect(-0.25, 2, 0.25, 4.2), h: 0.3 }, { poly: rect(-1.3, 4.1, 1.3, 6), h: 0.3 }],
@@ -47,20 +47,19 @@ registerWorld(30, { holes: [
     zones: [{ push: [1.1, 0], poly: rect(-1, 2.5, 1, 3.8) }, { push: [-1.1, 0], poly: rect(-1, 4.3, 1, 4.8) }],
     bumps: [{ x: -0.5, z: 8.0, r: 0.3, h: -0.05 }],
     movers: [{ kind: 'spin', x: 0, z: 5.3, len: 0.3, w: 1.8, phase: 0, blades: 2, look: 'windmill' }] },
-  /* 6. (auto) aurora coaster: the gold tube to the high rail, down the drop, the blue tube back along the low rail,
-     then the red tube onto the slide that pours you into the funnel bowl */
-  { par: 4, auto: true, sol: [[0, 0.6, 0]], tee: [0, 0.5], cup: [0, 7.7], aim0: 0,
-    floors: [rect(-0.3, 0, 0.3, 2.2), rect(-1.55, 0.3, -1.05, 4.4), rect(1.05, 0.3, 1.55, 4.4), rect(-0.4, 4.8, 0.4, 6.6), rect(-1.1, 6.6, 1.1, 8.8)],
-    walls: [ring(rect(-0.3, 0, 0.3, 2.2)), ring(rect(-1.55, 0.3, -1.05, 4.4)), ring(rect(1.05, 0.3, 1.55, 4.4)), [[-0.4, 6.6], [-0.4, 6.1], [-0.4, 5.6], [-0.4, 4.8], [0.4, 4.8], [0.4, 5.6], [0.4, 6.1], [0.4, 6.6]],
-      [[-0.4, 6.6], [-1.1, 6.6], [-1.1, 8.8], [1.1, 8.8], [1.1, 6.6], [0.4, 6.6]]],
-    tiers: [{ poly: C30_PAD(-1.55, 0.3, -1.05, 4.4), h: 0.5 }, { poly: C30_PAD(1.05, 0.3, 1.55, 4.4), h: 0.35 },
-      { poly: C30_PAD(-0.4, 4.8, 0.4, 5.6), h: 0.6 }, { poly: rect(-1.2, 6.6, 1.2, 8.9), h: 0.1 }],
-    ramps: [{ x0: -0.5, z0: 5.6, x1: 0.5, z1: 6.6, axis: 'z', h0: 0.6, h1: 0.1 }],
-    zones: [{ surf: 'fast', poly: rect(-1.55, 0.3, -1.05, 4.4) }, { surf: 'fast', poly: rect(1.05, 0.3, 1.55, 4.4) }],
-    bumps: [{ x: 1.3, z: 2.4, r: 0.3, h: 0.06 }, { x: 0, z: 7.7, r: 0.7, h: -0.2 }],
-    tubes: [{ a: [0, 1.9], b: [-1.3, 0.65], dir: 0, keep: 0, add: 2.2, color: '#ffd66e' },
-      { a: [-1.3, 4.0], b: [1.3, 4.0], dir: 180, keep: 0, add: 2.0, color: '#6fc0df' },
-      { a: [1.3, 0.75], b: [0, 5.15], dir: 0, keep: 0, add: 1.0, color: '#ef7d6d' }] },
+  /* 6. (auto) aurora drop: up the rainbow into the gold tube, shot along the high sky rail and off
+     its end, down into the first whirlwind; its eye swallows the ball into the blue tube, which
+     slings it round and round the big aurora whirlwind and down into the cup */
+  { par: 4, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [3.0, 6.0], aim0: 0,
+    floors: [rect(-0.3, 0, 0.3, 4.0), rect(1.2, 0.7, 4.2, 1.3), C10_PEN(5.6, 1.2, 1.15), C10_PEN(3.0, 6.0, 1.64)],
+    walls: [ring(rect(-0.3, 0, 0.3, 4.0)), [[4.2, 0.7], [1.2, 0.7], [1.2, 1.3], [4.2, 1.3]], ring(C10_PEN(5.6, 1.2, 1.15)), ring(C10_PEN(3.0, 6.0, 1.64))],
+    tiers: [{ poly: C30_PAD(-0.3, 3.4, 0.3, 4.0), h: 0.3 }, { poly: [[1.1, 0.6], [4.2, 0.6], [4.2, 1.4], [1.1, 1.4]], h: 0.9 }, { poly: C10_PEN(5.6, 1.2, 1.25), h: 0.2 },
+      { poly: C10_PEN(3.0, 6.0, 1.74), h: 0.1 }],
+    ramps: [{ x0: -0.3, z0: 1.4, x1: 0.3, z1: 3.4, axis: 'z', h0: 0, h1: 0.3 }],
+    zones: [{ surf: 'fast', poly: rect(-0.3, 1.4, 0.3, 3.4) }, { surf: 'fast', poly: rect(1.2, 0.7, 4.2, 1.3) }],
+    drains: [{ x: 5.6, z: 1.2, r: 1.1, depth: 0.3, flat: 0.14 }, { x: 3.0, z: 6.0, r: 1.5, depth: 0.35 }],
+    tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 2.2, color: '#ffd66e' },
+      { a: [5.6, 1.2], b: [4.43, 6.0], dir: 240, keep: 0, add: 2.4, color: '#6fc0df' }] },
   /* 7. switchback: up the rainbow rail, round the windmill deck, up the second rail the other way, along the walled ridge to the crown */
   { par: 5, crazy: true, sol: [[358,0.75,0],[265,0.7,1],[170,0.95,0],[270,0.3,0],[355,0.7,0]], tee: [1.0, 0.6], cup: [-1.8, 5.2], aim0: 0,
     floors: [rect(0.5, 0, 1.5, 1.5), rect(0.7, 1.5, 1.3, 4), rect(-0.9, 4, 1.5, 5.3), rect(-0.9, 1.6, -0.3, 4), rect(-2.3, 0.2, -0.1, 1.6), rect(-2.1, 1.6, -1.5, 3.6), rect(-2.6, 3.6, -1.2, 6)],
@@ -166,17 +165,19 @@ registerWorld(30, { holes: [
       { kind: 'gate', ax: 0.62, az: 3.4, bx: -0.62, bz: 3.4, len: 0.3, ang: 90, period: 2.2, look: 'gate' },
       { kind: 'spin', x: 0.6, z: 4.9, len: 0.3, w: 1.8, phase: 0, blades: 2, look: 'windmill' },
       { kind: 'slide', ax: -0.8, az: 8.0, bx: 0.8, bz: 8.0, r: 0.13, period: 2.4, look: 'cloud' }] },
-  /* 17. (auto) loop the sky: the gold tube to the high rail, down the drop and off the kicker into the walled catch,
-     whose blue tube pours you into the funnel bowl */
-  { par: 4, auto: true, sol: [[0, 0.6, 0]], tee: [0, 0.5], cup: [-1.1, 5.0], aim0: 0,
-    floors: [rect(-0.3, 0, 0.3, 2), rect(1.15, 0.2, 1.65, 3.6), rect(1.0, 4.4, 1.8, 7.0), rect(-2.2, 3.6, 0, 7.2)],
-    walls: [ring(rect(-0.3, 0, 0.3, 2)), [[1.15, 3.6], [1.15, 0.2], [1.65, 0.2], [1.65, 3.6]], [[1.0, 4.4], [1.0, 7.0], [1.8, 7.0], [1.8, 4.4]], ring(rect(-2.2, 3.6, 0, 7.2))],
-    tiers: [{ poly: C30_PAD(1.15, 0.2, 1.65, 3.2), h: 0.5 }, { poly: C30_PAD(-2.2, 3.6, 0, 7.2), h: 0.1 }],
-    ramps: [{ x0: 1.05, z0: 3.2, x1: 1.75, z1: 3.7, axis: 'z', h0: 0.5, h1: 0.625 }],
-    zones: [{ surf: 'fast', poly: rect(1.15, 0.2, 1.65, 3.6) }],
-    bumps: [{ x: -1.1, z: 5.0, r: 0.6, h: -0.2 }],
-    tubes: [{ a: [0, 1.7], b: [1.4, 0.5], dir: 0, keep: 0, add: 3.2, color: '#ffd66e' },
-      { a: [1.4, 6.5], b: [-1.1, 6.6], dir: 180, keep: 0, add: 1.2, color: '#6fc0df' }] },
+  /* 17. (auto) sky cascade: up the rainbow into the gold tube, out along the top step of the sky
+     stair, over two waterfalls of cloud down to the blue tube, which slings the ball round and
+     round the aurora whirlwind and down into the cup */
+  { par: 4, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [3.2, 5.6], aim0: 0,
+    floors: [rect(-0.3, 0, 0.3, 4.0), rect(1.2, 0.7, 5.4, 1.3), C10_PEN(3.2, 5.6, 1.64)],
+    walls: [ring(rect(-0.3, 0, 0.3, 4.0)), ring(rect(1.2, 0.7, 5.4, 1.3)), ring(C10_PEN(3.2, 5.6, 1.64))],
+    tiers: [{ poly: C30_PAD(-0.3, 3.4, 0.3, 4.0), h: 0.3 }, { poly: [[1.1, 0.6], [2.6, 0.6], [2.6, 1.4], [1.1, 1.4]], h: 1.0 }, { poly: rect(2.6, 0.6, 4.0, 1.4), h: 0.65 },
+      { poly: [[4.0, 0.6], [5.5, 0.6], [5.5, 1.4], [4.0, 1.4]], h: 0.3 }, { poly: C10_PEN(3.2, 5.6, 1.74), h: 0.1 }],
+    ramps: [{ x0: -0.3, z0: 1.4, x1: 0.3, z1: 3.4, axis: 'z', h0: 0, h1: 0.3 }],
+    zones: [{ surf: 'fast', poly: rect(-0.3, 1.4, 0.3, 3.4) }, { surf: 'fast', poly: rect(1.2, 0.7, 5.4, 1.3) }],
+    drains: [{ x: 3.2, z: 5.6, r: 1.5, depth: 0.35 }],
+    tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 2.5, color: '#ffd66e' },
+      { a: [5.1, 1.0], b: [4.63, 5.6], dir: 240, keep: 0, add: 2.4, color: '#6fc0df' }] },
   /* 18. the sky throne: the gold tube chains through the perch to the windmill isle (or ride the windy rainbow), take the
      gated kicker over the gap onto the slick court past two gates, then up the royal ramp to the throne */
   { par: 5, crazy: true, sol: [[24,0.4,0],[0,0.6,0],[7,0.76,0]], tee: [0, 0.6], cup: [0.3, 11.9],

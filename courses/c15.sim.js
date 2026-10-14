@@ -10,6 +10,8 @@ registerWorld(15, (() => {
   const WHEEL = (x, z, len, w, phase = 0) => ({ kind: 'spin', x, z, len, w, phase, blades: 2, look: 'wheel' });
   const sand = poly => ({ surf: 'sand', poly });
   const lagoon = poly => ({ surf: 'water', poly });
+  /* points on a circle, from angle a0 to a1 in degrees (0 is +z, 90 is +x), for round whirlpool walls */
+  const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + Math.sin(a) * r, cz + Math.cos(a) * r]; });
   return { holes: [
     /* 1 shore lane: round the corner, or the cave in the far corner */
     { par: 2, sol: [[10,1,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
@@ -51,14 +53,16 @@ registerWorld(15, (() => {
       inner: [[[-1.6, 3], [0.9, 3]], [[-0.9, 5.6], [1.6, 5.6]]],
       tubes: [{ a: [1.15, 4.9], b: [-1.15, 6.4], dir: 90 }],
       posts: [BARREL(-0.2, 4.2), BARREL(0.2, 7.0)], zones: [sand(rect(-1.6, 1.4, -0.6, 2.2))], bumps: [{ x: 0.6, z: 1.2, r: 0.4, h: 0.15 }] },
-    /* 8 the gangplank express: up the chute, through the treasure cave, down the long plank, into the bowl */
-    { par: 3, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [-1.25, 2.4], aim0: 0, shape: rect(-1.6, 0, 0.4, 8),
-      inner: [[[-0.2, 0], [-0.2, 4.8], [0.2, 4.8], [0.2, 0]], [[-0.9, 0], [-0.9, 7.0]]],
-      ramps: [{ x0: -0.2, z0: 1.6, x1: 0.2, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1.6, z0: 3.6, x1: -0.9, z1: 6.4, axis: 'z', h0: 0, h1: 0.35 }],
-      tiers: [{ poly: rect(-0.2, 3.0, 0.2, 4.8), h: 0.3 }, { poly: rect(-1.6, 6.4, 0.4, 8.0), h: 0.35 }],
-      tubes: [{ a: [0, 4.3], b: [-1.25, 7.3], dir: 180, keep: 0, add: 1.8 }],
-      zones: [lagoon(rect(-0.8, 0.1, -0.3, 6.3))],
-      bumps: [{ x: -1.25, z: 2.4, r: 0.5, h: -0.1 }] },
+    /* 8 the gangplank express: up the gangplank, round the banked corner on the deck, off the edge into the
+       little whirlpool, down the cave at its eye, and out into the big whirlpool that spins it round into the cup */
+    { par: 3, auto: true, sol: [[0, 0.92, 0]], tee: [0, 0.5], cup: [-1.85, 2.6], aim0: 0,
+      floors: [rect(-0.35, 0, 0.35, 6.8), rect(-1.55, 6.2, -0.35, 6.8), arc(-2.4, 6.5, 0.95, 0, 360, 24), rect(-3.3, 0, -0.35, 5.3)],
+      walls: [[[-0.35, 0], [0.35, 0], [0.35, 6.1], [-0.35, 6.8], [-1.5, 6.8], ...arc(-2.4, 6.5, 0.949, 72, -252, 16), [-1.5, 6.2], [-0.35, 6.2], [-0.35, 0],
+        [-3.3, 0], [-3.3, 5.3], [-0.35, 5.3]]],
+      ramps: [{ x0: -0.35, z0: 1.4, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }],
+      tiers: [{ poly: rect(-0.4, 3.0, 0.4, 6.85), h: 0.3 }, { poly: rect(-1.5, 6.15, -0.3, 6.85), h: 0.3 }],
+      drains: [{ x: -2.4, z: 6.5, r: 1.1, depth: 0.3 }, { x: -1.85, z: 2.6, r: 1.3, depth: 0.35 }],
+      tubes: [{ a: [-2.4, 6.5], b: [-1.85, 1.2], dir: 46, keep: 0, add: 1.4 }] },
     /* 9 twin wheels: past the beach wheel, up the plank, past the deck wheel */
     { par: 3, sol: [[26.5,0.96,0]], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.4, 0, 1.4, 8),
       movers: [WHEEL(0, 2.0, 0.5, 1.4), WHEEL(-0.5, 5.6, 0.45, -1.7)],

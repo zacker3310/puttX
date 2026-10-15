@@ -51,7 +51,7 @@
       posts: [ALIEN(1.4, 6.3), ALIEN(2.55, 5.5)],
       tubes: [{ a: [0.55, 2.15], b: [2.55, 4.2], dir: 270 }] },
     /* 4. asteroid bridge: cross the drifting rocks, then the tube is the only way into the crater pocket */
-    { par: 3, sol: [[184,1,0],[0,0.6,0]], tee: [0, 0.5], cup: [2.15, 5.55],
+    { par: 3, sol: [[184,1,0],[2,0.92,0]], tee: [0, 0.5], cup: [2.15, 5.55],
       floors: [rect(-0.9, 0, 0.9, 1.6), rect(-0.5, 1.6, 0.5, 4.6), rect(-1.2, 4.6, 1.2, 6.4), rect(1.7, 3, 3.5, 6.6)],
       walls: [[[-0.5, 1.6], [-0.9, 1.6], [-0.9, 0], [0.9, 0], [0.9, 1.6], [0.5, 1.6]], [[-0.5, 4.6], [-1.2, 4.6], [-1.2, 6.4], [1.2, 6.4], [1.2, 4.6], [0.5, 4.6]],
         ring(rect(1.7, 3, 3.5, 6.6))],
@@ -111,7 +111,7 @@
       tubes: [{ a: [-0.45, 2.0], b: [2.8, 0.5], dir: 0 }],
       movers: [ROCK(2.4, 2.2, 3.2, 2.2, 2.2, 0, 0.16), SAT(3.05, 6.05, 0.5, 1.1)] },
     /* 11. tilted greenhouse: the whole module leans, the planter sand waits by the bend, aliens kick */
-    { par: 3, sol: [[9,0.89,0]], tee: [0, 0.5], cup: [3, 5.05],
+    { par: 3, sol: [[38,1,0]], tee: [0, 0.5], cup: [3, 5.05],
       shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [3.6, 4], [3.6, 6], [-0.8, 6]],
       inner: [[[1.6, 6], [1.6, 5.2]]],
       tiers: [{ poly: rect(-1, -1, 4, 7), h: 0, sx: -0.06, sz: 0 }],
@@ -119,7 +119,7 @@
       zones: [{ surf: 'sand', poly: rect(0.8, 4, 1.5, 4.7) }],
       posts: [ALIEN(2.25, 4.55), ALIEN(-0.3, 2.6), ALIEN(2.4, 5.6)] },
     /* 12. the orchard green: a broad ramp up to the back tier, a planter bunker guarding the cup, a hump and a hollow */
-    { par: 2, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [0.4, 10.2],
+    { par: 2, sol: [[6,0.96,0]], tee: [0, 0.5], cup: [0.4, 10.2],
       shape: [[-1.5, 0], [1.5, 0], [2.6, 3], [2.8, 8], [2.2, 11.4], [0, 12.4], [-2.2, 11.4], [-2.8, 8], [-2.6, 3]],
       tiers: [{ poly: rect(-3.2, 6.4, 3.2, 13), h: 0.16 }],
       ramps: [{ x0: -3, z0: 5.2, x1: 3, z1: 6.4, axis: 'z', h0: 0, h1: 0.16 }],
@@ -142,7 +142,7 @@
       zones: [{ push: [0, -0.7], poly: rect(1.6, 1.3, 2.5, 3.7) }, { push: [0, 0.7], poly: rect(-2.5, 1.3, -1.6, 3.7) }],
       movers: [SAT(0, 2.6, 2.28, 0.8, 0, 2)] },
     /* 15. the descent: high deck, crater deck past the airlock, then tube or drop to the rock garden */
-    { par: 4, crazy: true, sol: [[6,0.92,0]], tee: [0, 0.5], cup: [0.5, 8],
+    { par: 4, crazy: true, sol: [[10,0.92,0]], tee: [0, 0.5], cup: [0.5, 8],
       floors: [rect(-0.6, 0, 0.6, 2.4), rect(-1.6, 2.8, 1.6, 5.6), rect(-0.2, 6.4, 3, 8.6)],
       walls: [...box(-0.6, 0, 0.6, 2.4, 'n'), [[0.2, 5.6], [-1.6, 5.6], [-1.6, 2.8], [1.6, 2.8], [1.6, 5.6]], ...box(-0.2, 6.4, 3, 8.6)],
       tiers: [DECK(-0.6, 0, 0.6, 2.4, 0.7), DECK(-1.6, 2.8, 1.6, 5.6, 0.3)],

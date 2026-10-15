@@ -744,7 +744,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '0b95588a75e1';
+const BUILD_ID = '80c3ef43189e';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1974,7 +1974,7 @@ registerWorld(7, { holes: [
     bumps: [{ x: 0.3, z: 5.5, r: 0.5, h: 0.2 }],
     movers: [C7_MILL(0.1, 6.2, 0.5, 1.5, 0)] },
   /* 11: down the dungeon and back through the portcullis, a ghost on patrol */
-  { par: 3, sol: [[342,0.76,2],[4,0.6,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
+  { par: 3, sol: [[342,0.76,2],[4,0.96,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
     inner: [[[1.7, 3], [2.15, 3]], [[2.65, 3], [3.1, 3]]],
     bumps: [{ x: -0.1, z: 4.85, r: 0.5, h: 0.2 }],
     movers: [C7_GHOST(1.2, 4.45, 1.2, 5.15, 2.2, 0), C7_GATE(2.4, 3, 2.85, 3, 0.25, 90, 2.8, 0)] },
@@ -1987,7 +1987,7 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(-0.65, 5.95), C7_GARG(0.65, 5.95), C7_GARG(0.25, 6.8)],
     movers: [C7_GHOST(-0.75, 3.0, 0.75, 3.0, 3.0, 0), C7_GHOST(0.75, 4.5, -0.75, 4.5, 2.4, 1.2)] },
   /* 13: windmill ramp to the rampart, down the narrow drawbridge (or jump the moat), then the tilted courtyard */
-  { par: 4, sol: [[46,1,1.5],[0,0.12,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
+  { par: 4, sol: [[332,0.88,0.5],[80,0.4,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
     ramps: [{ x0: -1.2, z0: 2.6, x1: 1.2, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.55, z0: 5.4, x1: 1.05, z1: 6.5, axis: 'z', h0: 0.3, h1: 0.07 }],
     tiers: [{ poly: rect(-1.2, 3.6, 1.2, 5.4), h: 0.3 }, { poly: rect(-1.2, 6.5, 1.2, 9.6), h: 0.2, sz: -0.02 }],
     zones: [C7_MOAT(rect(-1.2, 5.4, 0.55, 6.5)), C7_MOAT(rect(1.05, 5.4, 1.2, 6.5)), C7_MOAT(rect(-1.2, 9.25, 1.2, 9.6))],
@@ -2077,14 +2077,14 @@ registerWorld(7, { holes: [
       posts: [ALIEN(0.05, 5.85)],
       movers: [ROCK(-0.85, 2.7, 0.85, 2.7, 2.8, 0, 0.16), ROCK(0.85, 3.9, -0.85, 3.9, 3.4, 0, 0.16)] },
     /* 5. teleporter: jump the gap the long way, or drop into the tube */
-    { par: 2, sol: [[200,1,0]], tee: [0.3, 0.5], cup: [0.95, 6.05], aim0: -15,
+    { par: 2, sol: [[334,0.84,0]], tee: [0.3, 0.5], cup: [0.95, 6.05], aim0: -15,
       floors: [rect(-1, 0, 1, 2.6), rect(-1.4, 3.6, 1.4, 6.8)],
       walls: [[[-1, 2.6], [-1, 0], [1, 0], [1, 2.6], [0, 2.6], [0, 1.8]], [[-1.4, 3.6], [-1.4, 6.8], [1.4, 6.8], [1.4, 3.6], [-1.4, 3.6]]],
       inner: [[[0.25, 5.2], [1.4, 5.2]]],
       ramps: [{ x0: -1, z0: 1.8, x1: 0, z1: 2.6, axis: 'z', h0: 0, h1: 0.24 }],
       tubes: [{ a: [0.6, 2.1], b: [-0.95, 4.1], dir: 0 }] },
     /* 6. airlocks: time the doors, jump to the crater deck */
-    { par: 4, sol: [[336,0.96,0]], tee: [0, 0.5], cup: [-0.9, 7.6],
+    { par: 4, sol: [[354,0.84,0.5]], tee: [0, 0.5], cup: [-0.9, 7.6],
       floors: [rect(-0.6, 0, 0.6, 4.6), rect(-1.6, 5.6, 1, 8.4)],
       walls: [...box(-0.6, 0, 0.6, 4.6, 'n'), ...box(-1.6, 5.6, 1, 8.4, 'w')],
       ramps: [{ x0: -0.6, z0: 3.8, x1: 0.6, z1: 4.6, axis: 'z', h0: 0, h1: 0.22 }],
@@ -2105,7 +2105,7 @@ registerWorld(7, { holes: [
       bumps: [{ x: 2.4, z: 5.2, r: 0.4, h: -0.16 }],
       posts: [ALIEN(2.45, 6.25), ALIEN(3.3, 5.45)] },
     /* 9. greenhouse dogleg: a long green bending right round a broad shoulder, rising to the back */
-    { par: 2, sol: [[10,0.92,0]], tee: [0, 0.5], cup: [4.8, 9.8], aim0: 20,
+    { par: 2, sol: [[4,0.92,0]], tee: [0, 0.5], cup: [4.8, 9.8], aim0: 20,
       shape: [[-1.4, 0], [1.4, 0], [1.6, 5], [3, 7.4], [6, 8.2], [6.6, 10], [5, 11.4], [1.6, 11], [-0.6, 9.6], [-1.6, 6.4]],
       tiers: [{ poly: rect(-2, -1, 7, 12), h: 0, sx: -0.025, sz: 0.015 }],
       bumps: [{ x: 0.8, z: 6.8, r: 1.8, h: 0.16 }, { x: 3.2, z: 9.6, r: 1.1, h: -0.1 }, { x: -0.3, z: 3.4, r: 1.4, h: 0.1 }] },
@@ -2130,7 +2130,7 @@ registerWorld(7, { holes: [
       bumps: [{ x: 0, z: 4.6, r: 0.95, h: 0.3 }],
       posts: [ALIEN(0, 3.55), ALIEN(-0.85, 3.95), ALIEN(0.85, 3.95), ALIEN(-1.05, 4.95), ALIEN(1.05, 4.95), ALIEN(-0.5, 5.75), ALIEN(0.5, 5.75)] },
     /* 13. double jump: launch, slip the airlock, then turn and launch off the side ramp */
-    { par: 4, crazy: true, sol: [[6,0.96,1]], tee: [0, 0.5], cup: [-2.8, 7.3],
+    { par: 4, crazy: true, sol: [[5,0.93,1]], tee: [0, 0.5], cup: [-2.8, 7.3],
       floors: [rect(-0.6, 0, 0.6, 3), rect(-1, 3.8, 1, 7.2), rect(-3.6, 5.4, -1.6, 8.2)],
       walls: [...box(-0.6, 0, 0.6, 3, 'n'), [[-1, 5.9], [-1, 3.8], [1, 3.8], [1, 7.2], [-1, 7.2]], [[-1.6, 8.2], [-1.6, 5.4], [-3.6, 5.4], [-3.6, 8.2]]],
       ramps: [{ x0: -0.6, z0: 2.2, x1: 0.6, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1, z0: 5.9, x1: -0.3, z1: 7.2, axis: 'x', h0: 0.22, h1: 0 }],
@@ -2330,7 +2330,7 @@ registerWorld(10, { holes: [
       { kind: 'gate', ax: -0.7, az: 5.0, bx: 0.7, bz: 5.0, len: 0.35, ang: 90, period: 3.2, look: 'gate' }] },
   /* 6. tube isles: the safe tube to the high island and down its ramp, or the bare rainbow straight
      across; the tilted cup green drains toward an open edge */
-  { par: 2, sol: [[10,1,0]], tee: [0, 0.6], cup: [1.5, 7.4],
+  { par: 2, sol: [[10,0.56,0]], tee: [0, 0.6], cup: [1.5, 7.4],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.2, 2.2, 0.2, 5.4), rect(1.8, 2.4, 3.4, 5.4), rect(-1.2, 5.4, 3.4, 8)],
     walls: [[[-0.2, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.2, 2.2]],
       [[1.8, 4.8], [1.8, 2.4], [3.4, 2.4], [3.4, 4.8]], [[-1.2, 7.4], [-1.2, 8], [3.4, 8], [3.4, 5.4]]],
@@ -2339,7 +2339,7 @@ registerWorld(10, { holes: [
     zones: [{ surf: 'fast', poly: rect(-0.2, 2.2, 0.2, 5.4) }],
     tubes: [{ a: [0.45, 1.7], b: [2.6, 2.9], dir: 0 }] },
   /* 7. gale steps: two ramp bridges up two islands while a fan blows across the middle one */
-  { par: 3, sol: [[178,0.8,0],[24,1,0]], tee: [-0.2, 0.6], cup: [0.6, 7.6],
+  { par: 3, sol: [[178,0.8,0],[26,0.84,0]], tee: [-0.2, 0.6], cup: [0.6, 7.6],
     floors: [rect(-0.8, 0, 0.8, 2), rect(-0.6, 2, 0, 3), rect(-1.4, 3, 1.4, 5), rect(0.6, 5, 1.2, 6), rect(-1, 6, 1.4, 8.4)],
     walls: [[[-0.6, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0, 2]], [[-1, 6.6], [-1, 8.4], [1.4, 8.4], [1.4, 6.8]]],
     ramps: [{ x0: -0.6, z0: 2, x1: 0, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: 0.6, z0: 5, x1: 1.2, z1: 6, axis: 'z', h0: 0.25, h1: 0.5 }],
@@ -2390,7 +2390,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 3.1, r: 0.35, h: 0.08 }, { x: 0.65, z: 8.05, r: 0.3, h: -0.05 }] },
   /* 13. thunder run: up a railed diagonal rainbow into a headwind, past a windmill on the high island,
      then off the kicker down onto a tilted crater green */
-  { crazy: true, par: 4, sol: [[5,1,1],[46,0.8,0],[265,0.28,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
+  { crazy: true, par: 4, sol: [[312,1,0],[52,0.92,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 6.6, 2.8, 9.4)],
     walls: [[[1.35, 4.4], [-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2], [1.85, 4.4]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 6.6]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
@@ -2415,7 +2415,7 @@ registerWorld(10, { holes: [
     tiers: [{ poly: rect(-3, -1, 4, 15), h: 0, sx: -0.02, sz: 0.008 }],
     bumps: [{ x: 0.2, z: 6.5, r: 2.2, h: 0.15 }, { x: 1.8, z: 9.5, r: 1.5, h: -0.1 }, { x: 1.2, z: 12.2, r: 1.2, h: 0.06 }, { x: -0.6, z: 3, r: 1.4, h: -0.06 }] },
   /* 16. rainbow relay: three bare rainbows between three tiny islands, each with its own crosswind */
-  { par: 4, sol: [[354,0.5,0],[81,0.31,0],[353,0.76,0]], tee: [0, 0.6], cup: [3.3, 8.2],
+  { par: 4, sol: [[354,0.6,0],[62,0.44,0],[4,0.84,0]], tee: [0, 0.6], cup: [3.3, 8.2],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(0.6, 3.85, 2.6, 4.35), rect(2.6, 3.4, 3.6, 5.2),
       rect(2.85, 5.2, 3.35, 7.2), rect(2.0, 7.2, 4.4, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[0.6, 4.6], [-0.6, 4.6], [-0.6, 3.6]],
@@ -3144,7 +3144,7 @@ registerWorld(15, (() => {
       tubes: [{ a: [-1.0, 5.6], b: [-0.8, 9.0], dir: 90 }],
       bumps: [{ x: 0.2, z: 5.6, r: 0.45, h: 0.15 }], zones: [sand(rect(-1.2, 9.6, -0.2, 10.4))], posts: [BARREL(-0.6, 1.4)] },
     /* 13 the hold: the long gangplank or the cave up to the top deck, then past the drawbridge and down */
-    { par: 4, crazy: true, sol: [[9,0.95,0],[57,0.8,0]], tee: [0.4, 0.5], cup: [0.3, 8.3], aim0: 0, shape: rect(-1.8, 0, 1.8, 9.2),
+    { par: 4, crazy: true, sol: [[10,0.76,0],[84,0.56,0]], tee: [0.4, 0.5], cup: [0.3, 8.3], aim0: 0, shape: rect(-1.8, 0, 1.8, 9.2),
       ramps: [{ x0: -1.8, z0: 1.4, x1: -1.2, z1: 5.0, axis: 'z', h0: 0, h1: 0.4 }],
       tiers: [{ poly: rect(-1.2, 3.4, 1.9, 7.0), h: 0.4 }, { poly: rect(-1.9, 5.0, -1.2, 7.0), h: 0.4 }],
       inner: [[[-1.2, 1.4], [-1.2, 3.4], [1.8, 3.4]], [[-1.8, 7.0], [-0.2, 7.0]], [[0.8, 7.0], [1.8, 7.0]]],
@@ -3285,13 +3285,13 @@ registerWorld(16, { holes: [
     tiers: [{ poly: rect(-2.3, -0.1, 2.3, 13.5), h: 0.2, sx: 0.025, sz: -0.004 }],
     bumps: [{ x: -1, z: 4.5, r: 2, h: -0.12 }, { x: 1.2, z: 7.5, r: 2.2, h: 0.16 }, { x: -0.8, z: 10.2, r: 1.4, h: 0.08 }] },
   /* 13: lava jumps: two kickers over two rivers to the crater green (crazy, 3 parts) */
-  { par: 4, crazy: true, sol: [[18,0.96,0],[358.2,0.8,0]], tee: [0, 0.5], cup: [-0.3, 9], shape: rect(-1.1, 0, 1.1, 10),
+  { par: 4, crazy: true, sol: [[4,1,0],[42,0.6,0]], tee: [0, 0.5], cup: [-0.3, 9], shape: rect(-1.1, 0, 1.1, 10),
     ramps: [{ x0: -1.1, z0: 2.2, x1: 1.1, z1: 3.2, axis: 'z', h0: 0, h1: 0.22 }, { x0: -0.2, z0: 5.6, x1: 0.6, z1: 6.6, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [...V16_CRATER(-0.3, 9, 0.9)],
     movers: [V16_ROCK(-0.74, 4.9, 0.74, 4.9, 2.4)],
     zones: [V16_LAVA(rect(-1.1, 3.2, 1.1, 4.2)), V16_LAVA(rect(-1.1, 6.6, 1.1, 7.4)), V16_MUD(rect(-1.1, 5.4, -0.4, 6))] },
   /* 14: the spinning basalt arm on the tilted green, then a ramp to the cup shelf (3 parts) */
-  { par: 3, sol: [[19.8,0.92,0]], tee: [0, 0.5], cup: [0.4, 7.4], shape: rect(-1.4, 0, 1.4, 8.4),
+  { par: 3, sol: [[22,0.92,0]], tee: [0, 0.5], cup: [0.4, 7.4], shape: rect(-1.4, 0, 1.4, 8.4),
     tiers: [{ poly: rect(-1.5, -0.1, 1.5, 5.4), h: 0, sx: 0.04 }, { poly: rect(-1.5, 6.2, 1.5, 8.5), h: 0.25 }],
     ramps: [{ x0: -0.4, z0: 5.4, x1: 1.4, z1: 6.2, axis: 'z', h0: 0, h1: 0.25 }],
     inner: [[[-1.4, 6.2], [-0.4, 6.2]]],
@@ -3299,14 +3299,14 @@ registerWorld(16, { holes: [
     bumps: [...V16_CRATER(0.4, 7.4, 0.85)],
     zones: [V16_LAVA(rect(-1.4, 4.4, -0.6, 4.9)), V16_LAVA(rect(-1.4, 8.1, 1.4, 8.4))] },
   /* 15: the gated drop: a sliding basalt gate guards the gap off the deck (crazy, 3 parts) */
-  { par: 4, crazy: true, sol: [[356,0.84,0]], tee: [0, 0.5], cup: [0.8, 8], shape: rect(-1.4, 0, 1.4, 9),
+  { par: 4, crazy: true, sol: [[0,0.72,0]], tee: [0, 0.5], cup: [0.8, 8], shape: rect(-1.4, 0, 1.4, 9),
     tiers: [{ poly: rect(-1.5, -0.1, 1.5, 4), h: 0.4 }],
     inner: [[[-1.4, 4], [-0.45, 4]], [[0.45, 4], [1.4, 4]]],
     movers: [{ kind: 'gate', ax: -0.84, az: 3.6, bx: 0.84, bz: 3.6, len: 0.3, ang: 90, period: 3.4, look: 'basalt' }],
     bumps: [{ x: -0.5, z: 5.8, r: 0.5, h: 0.25 }, ...V16_CRATER(0.8, 8, 0.85)],
     zones: [V16_LAVA(rect(-1.4, 6.6, -0.2, 7.1)), V16_MUD(rect(0.6, 5, 1.4, 5.6)), V16_LAVA(rect(-1.4, 8.7, 0, 9))] },
   /* 16: chained tubes: crater to the upper deck, crater to the cup green, or the long way down the ramps (crazy, 4 parts) */
-  { par: 4, crazy: true, sol: [[299.4,0.84,0],[80.2,0.4,0],[192,0.44,0]], tee: [0, 0.5], cup: [2.6, 1.2], aim0: 0,
+  { par: 4, crazy: true, sol: [[332,0.96,0],[26,0.96,0]], tee: [0, 0.5], cup: [2.6, 1.2], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 4.4], [1.8, 4.4], [1.8, 0], [3.4, 0], [3.4, 7], [-0.8, 7]],
     tiers: [{ poly: rect(-0.9, 4.4, 3.5, 7.1), h: 0.35 }],
     ramps: [{ x0: -0.8, z0: 3.2, x1: 0.8, z1: 4.4, axis: 'z', h0: 0, h1: 0.35 }, { x0: 1.8, z0: 3.4, x1: 3.4, z1: 4.4, axis: 'z', h0: 0, h1: 0.35 }],
@@ -3315,7 +3315,7 @@ registerWorld(16, { holes: [
     posts: [V16_COL(2.2, 2.4)],
     zones: [V16_LAVA(rect(1.8, 4.4, 2.2, 5)), V16_LAVA(rect(3, 6.2, 3.4, 7)), V16_MUD(rect(-0.8, 6.6, 0.4, 7))] },
   /* 17: long green: off the high tee shelf, down the broad bank and over a knoll to a flat cup */
-  { par: 3, sol: [[21,1,0],[51,0.7,0]], tee: [0, 0.5], cup: [-0.7, 9.4], shape: rect(-1.7, 0, 1.7, 10.4),
+  { par: 3, sol: [[0,0.64,0]], tee: [0, 0.5], cup: [-0.7, 9.4], shape: rect(-1.7, 0, 1.7, 10.4),
     tiers: [{ poly: rect(-1.8, -0.1, 1.8, 3.5), h: 0.25 }, { poly: rect(-1.8, 4.7, 1.8, 10.5), h: 0.12 }],
     ramps: [{ x0: -1.7, z0: 3.5, x1: 1.7, z1: 4.7, axis: 'z', h0: 0.25, h1: 0.12 }],
     bumps: [{ x: 0.9, z: 7.4, r: 1.4, h: 0.1 }, { x: -1, z: 2, r: 1.2, h: -0.06 }, { x: -1.3, z: 6.2, r: 1.2, h: 0.07 }] },
@@ -3525,7 +3525,7 @@ registerWorld(17, { holes: [
       posts: [ALIEN(1.4, 6.3), ALIEN(2.55, 5.5)],
       tubes: [{ a: [0.55, 2.15], b: [2.55, 4.2], dir: 270 }] },
     /* 4. asteroid bridge: cross the drifting rocks, then the tube is the only way into the crater pocket */
-    { par: 3, sol: [[184,1,0],[0,0.6,0]], tee: [0, 0.5], cup: [2.15, 5.55],
+    { par: 3, sol: [[184,1,0],[2,0.92,0]], tee: [0, 0.5], cup: [2.15, 5.55],
       floors: [rect(-0.9, 0, 0.9, 1.6), rect(-0.5, 1.6, 0.5, 4.6), rect(-1.2, 4.6, 1.2, 6.4), rect(1.7, 3, 3.5, 6.6)],
       walls: [[[-0.5, 1.6], [-0.9, 1.6], [-0.9, 0], [0.9, 0], [0.9, 1.6], [0.5, 1.6]], [[-0.5, 4.6], [-1.2, 4.6], [-1.2, 6.4], [1.2, 6.4], [1.2, 4.6], [0.5, 4.6]],
         ring(rect(1.7, 3, 3.5, 6.6))],
@@ -3585,7 +3585,7 @@ registerWorld(17, { holes: [
       tubes: [{ a: [-0.45, 2.0], b: [2.8, 0.5], dir: 0 }],
       movers: [ROCK(2.4, 2.2, 3.2, 2.2, 2.2, 0, 0.16), SAT(3.05, 6.05, 0.5, 1.1)] },
     /* 11. tilted greenhouse: the whole module leans, the planter sand waits by the bend, aliens kick */
-    { par: 3, sol: [[9,0.89,0]], tee: [0, 0.5], cup: [3, 5.05],
+    { par: 3, sol: [[38,1,0]], tee: [0, 0.5], cup: [3, 5.05],
       shape: [[-0.8, 0], [0.8, 0], [0.8, 4], [3.6, 4], [3.6, 6], [-0.8, 6]],
       inner: [[[1.6, 6], [1.6, 5.2]]],
       tiers: [{ poly: rect(-1, -1, 4, 7), h: 0, sx: -0.06, sz: 0 }],
@@ -3593,7 +3593,7 @@ registerWorld(17, { holes: [
       zones: [{ surf: 'sand', poly: rect(0.8, 4, 1.5, 4.7) }],
       posts: [ALIEN(2.25, 4.55), ALIEN(-0.3, 2.6), ALIEN(2.4, 5.6)] },
     /* 12. the orchard green: a broad ramp up to the back tier, a planter bunker guarding the cup, a hump and a hollow */
-    { par: 2, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [0.4, 10.2],
+    { par: 2, sol: [[6,0.96,0]], tee: [0, 0.5], cup: [0.4, 10.2],
       shape: [[-1.5, 0], [1.5, 0], [2.6, 3], [2.8, 8], [2.2, 11.4], [0, 12.4], [-2.2, 11.4], [-2.8, 8], [-2.6, 3]],
       tiers: [{ poly: rect(-3.2, 6.4, 3.2, 13), h: 0.16 }],
       ramps: [{ x0: -3, z0: 5.2, x1: 3, z1: 6.4, axis: 'z', h0: 0, h1: 0.16 }],
@@ -3616,7 +3616,7 @@ registerWorld(17, { holes: [
       zones: [{ push: [0, -0.7], poly: rect(1.6, 1.3, 2.5, 3.7) }, { push: [0, 0.7], poly: rect(-2.5, 1.3, -1.6, 3.7) }],
       movers: [SAT(0, 2.6, 2.28, 0.8, 0, 2)] },
     /* 15. the descent: high deck, crater deck past the airlock, then tube or drop to the rock garden */
-    { par: 4, crazy: true, sol: [[6,0.92,0]], tee: [0, 0.5], cup: [0.5, 8],
+    { par: 4, crazy: true, sol: [[10,0.92,0]], tee: [0, 0.5], cup: [0.5, 8],
       floors: [rect(-0.6, 0, 0.6, 2.4), rect(-1.6, 2.8, 1.6, 5.6), rect(-0.2, 6.4, 3, 8.6)],
       walls: [...box(-0.6, 0, 0.6, 2.4, 'n'), [[0.2, 5.6], [-1.6, 5.6], [-1.6, 2.8], [1.6, 2.8], [1.6, 5.6]], ...box(-0.2, 6.4, 3, 8.6)],
       tiers: [DECK(-0.6, 0, 0.6, 2.4, 0.7), DECK(-1.6, 2.8, 1.6, 5.6, 0.3)],
@@ -3799,7 +3799,7 @@ registerWorld(20, { holes: [
     zones: [{ surf: 'fast', poly: rect(0.35, 2.2, 0.75, 3.8) }],
     bumps: [{ x: 0.45, z: 5.5, r: 0.6, h: 0.15 }, { x: 0.45, z: 5.5, r: 0.25, h: -0.06 }] },
   /* 2. gale rails: a windy rainbow to the windmill isle, then a ramp bridge up to the green */
-  { par: 3, sol: [[358,0.9,0],[21,0.77,0],[244,0.16,0]], tee: [0, 0.6], cup: [-0.4, 8.6],
+  { par: 3, sol: [[356,0.84,0.5],[0,0.56,0]], tee: [0, 0.6], cup: [-0.4, 8.6],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.25, 2, 0.25, 4.4), rect(-1.1, 4.4, 1.1, 6.2), rect(-0.3, 6.2, 0.3, 7.2), rect(-1.2, 7.2, 1.2, 9.4)],
     walls: [[[-0.25, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.25, 2]],
       [[-0.3, 6.2], [-1.1, 6.2], [-1.1, 4.4], [-0.25, 4.4]], [[0.3, 6.2], [1.1, 6.2], [1.1, 4.4], [0.25, 4.4]], [[-1.2, 8.4], [-1.2, 9.4], [1.2, 9.4], [1.2, 8.4]]],
@@ -3833,7 +3833,7 @@ registerWorld(20, { holes: [
     movers: [{ kind: 'spin', x: 0, z: 2.8, len: 0.3, w: 1.7, phase: 0, blades: 1, look: 'windmill' },
       { kind: 'spin', x: 0, z: 6.9, len: 0.3, w: -1.9, phase: 0.6, blades: 1, look: 'windmill' }] },
   /* 6. cloud steps: four islands stepping down over gaps under a crosswind, or the tube from the second straight to the green */
-  { par: 3, sol: [[353,0.82,0]], tee: [0, 0.6], cup: [0.65, 8.05],
+  { par: 3, sol: [[10,0.8,0]], tee: [0, 0.6], cup: [0.65, 8.05],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.9, 2.3, 0.9, 4), rect(-0.9, 4.3, 0.9, 6), rect(-1.2, 6.3, 1.2, 8.6)],
     walls: [[[-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2]], [[-1.2, 7.6], [-1.2, 8.6], [1.2, 8.6], [1.2, 7.3], [0, 7.3]]],
     tiers: [{ poly: C20_PAD(-0.7, 0, 0.7, 2), h: 0.6 }, { poly: rect(-0.9, 2.3, 0.9, 4), h: 0.4 }, { poly: rect(-0.9, 4.3, 0.9, 6), h: 0.2 }],
@@ -3880,7 +3880,7 @@ registerWorld(20, { holes: [
       { a: [3.5, 1.1], b: [1.37, 7.6], dir: 30, keep: 0, add: 1.8, color: '#6fc0df' },
       { a: [2.5, 7.6], b: [0.53, 8.6], dir: 240, keep: 0, add: 2.4, color: '#ef7d6d' }] },
   /* 10. switchback: up the rainbow rail, swing round the high deck, up the second rail the other way, then along the railed ridge to the crown green */
-  { par: 5, crazy: true, sol: [[2,0.75,0],[90,0.3,0],[180,0.7,0],[107,0.2,0],[3,0.97,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
+  { par: 5, crazy: true, sol: [[350,0.84,0],[18,1,0],[165,1,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
     floors: [rect(-1.5, 0, -0.5, 1.5), rect(-1.3, 1.5, -0.7, 4), rect(-1.5, 4, 0.9, 5.3), rect(0.3, 1.6, 0.9, 4), rect(0.1, 0.2, 2.3, 1.6), rect(1.5, 1.6, 2.1, 3.6), rect(1.2, 3.6, 2.6, 6)],
     walls: [[[-0.7, 1.5], [-0.5, 1.5], [-0.5, 0], [-1.5, 0], [-1.5, 1.5], [-1.3, 1.5]], [[-1.3, 1.5], [-1.3, 4]], [[-0.7, 1.5], [-0.7, 4]],
       [[-1.3, 4], [-1.5, 4], [-1.5, 5.3], [0.9, 5.3], [0.9, 4]], [[0.3, 4], [0.3, 1.6]], [[0.9, 4], [0.9, 1.6]],
@@ -3914,7 +3914,7 @@ registerWorld(20, { holes: [
       { x: 1.0, z: 6.5, r: 0.14, e: 1.15, look: 'cloud' }, { x: -1.0, z: 6.9, r: 0.14, e: 1.15, look: 'cloud' }],
     movers: [{ kind: 'gate', ax: -0.65, az: 9.1, bx: 0.65, bz: 9.1, len: 0.25, ang: 90, period: 2.6, look: 'gate' }] },
   /* 14. thunder kicker: up a windy railed diagonal rainbow, past the windmill (or its tube), off the kicker onto the green and up to the crown */
-  { par: 4, crazy: true, sol: [[27,0.95,0],[256,0.48,0]], tee: [-0.66, 0.95], cup: [0.1, 9.0], aim0: 34,
+  { par: 4, crazy: true, sol: [[26,0.88,0],[80,0.8,0]], tee: [-0.66, 0.95], cup: [0.1, 9.0], aim0: 34,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 7, 2.8, 9.4)],
     walls: [[[1.35, 4.4], [-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2], [1.85, 4.4]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 8.4]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 },
@@ -3930,7 +3930,7 @@ registerWorld(20, { holes: [
     tiers: [{ poly: rect(-3, -1, 4, 13), h: 0, sx: 0.015 }],
     bumps: [{ x: 0.4, z: 8.6, r: 1.8, h: -0.12 }, { x: 0, z: 4.5, r: 1.6, h: 0.15 }, { x: -1.4, z: 9.4, r: 1.2, h: 0.08 }] },
   /* 16. rainbow relay: three bare rainbows between tiny islands, each with its own crosswind, onto a gated green */
-  { par: 4, crazy: true, sol: [[3,0.58,0],[278,0.34,0],[358,0.7,0]], tee: [0, 0.6], cup: [-3.3, 8.4],
+  { par: 4, crazy: true, sol: [[2,0.56,0],[278,0.32,0],[0,0.64,0]], tee: [0, 0.6], cup: [-3.3, 8.4],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(-2.6, 3.85, -0.6, 4.35), rect(-3.6, 3.4, -2.6, 5.2),
       rect(-3.35, 5.2, -2.85, 7.2), rect(-4.4, 7.2, -2.0, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[-0.6, 4.6], [0.6, 4.6], [0.6, 3.6]],
@@ -4673,14 +4673,14 @@ registerWorld(25, (() => {
       bumps: [{ x: -0.7, z: 1.9, r: 1.2, h: 0.1 }, { x: 0.8, z: 6.0, r: 1.0, h: -0.07 }, { x: -1.1, z: 10.6, r: 1.0, h: 0.1 }],
       zones: [lagoon(rect(-2, 8.0, -1.5, 9.4)), sand(rect(1.3, 5.0, 2, 6.0))] },
     /* 10 smugglers' relay: four chambers, three caves, every gap guarded */
-    { par: 4, crazy: true, sol: [[48,1,0],[213,0.85,0],[0,0.15,0]], tee: [0, 0.5], cup: [0.9, 8.8], aim0: 30, shape: rect(-1.8, 0, 1.8, 9.6),
+    { par: 4, crazy: true, sol: [[32,0.84,2],[2,0.52,0]], tee: [0, 0.5], cup: [0.9, 8.8], aim0: 30, shape: rect(-1.8, 0, 1.8, 9.6),
       inner: [[[-1.8, 2.4], [1.1, 2.4]], [[-1.1, 4.8], [1.8, 4.8]], [[-1.8, 7.2], [1.1, 7.2]]],
       tubes: [{ a: [-1.2, 1.7], b: [-1.2, 3.2], dir: 90 }, { a: [1.2, 4.1], b: [1.2, 5.6], dir: 270 }, { a: [-1.2, 6.5], b: [-1.2, 8.0], dir: 90 }],
       movers: [CANNON(1.45, 2.0, 1.45, 3.0, 2.4), CANNON(-1.45, 4.4, -1.45, 5.3, 2.8, 1)],
       bumps: [{ x: 0.2, z: 1.4, r: 0.5, h: 0.18 }, { x: 0, z: 3.6, r: 0.5, h: 0.2 }, { x: 0.2, z: 6.0, r: 0.5, h: 0.2 }],
       zones: [lagoon(rect(1.1, 6.6, 1.8, 7.8)), sand(rect(-1.8, 8.6, -0.8, 9.6))], posts: [BARREL(0.0, 8.6)] },
     /* 11 zig-zag rigging: three gangplanks up three decks to the crow's nest */
-    { par: 4, sol: [[36,0.9,0],[333,0.85,0],[186.75,0.92,0]], tee: [0, 0.5], cup: [0.8, 9.8], aim0: 25, shape: rect(-1.6, 0, 1.6, 10.6),
+    { par: 4, sol: [[38,0.92,1.5],[28,0.96,0]], tee: [0, 0.5], cup: [0.8, 9.8], aim0: 25, shape: rect(-1.6, 0, 1.6, 10.6),
       ramps: [{ x0: 0.9, z0: 1.6, x1: 1.6, z1: 2.8, axis: 'z', h0: 0, h1: 0.14 }, { x0: -1.6, z0: 4.2, x1: -0.9, z1: 5.4, axis: 'z', h0: 0.14, h1: 0.28 },
         { x0: 0.9, z0: 6.8, x1: 1.6, z1: 8.0, axis: 'z', h0: 0.28, h1: 0.42 }],
       tiers: [{ poly: rect(-1.7, 2.8, 1.7, 10.7), h: 0.14 }, { poly: rect(-1.7, 5.4, 1.7, 10.7), h: 0.28 }, { poly: rect(-1.7, 8.0, 1.7, 10.7), h: 0.42 }],
@@ -4711,7 +4711,7 @@ registerWorld(25, (() => {
       bumps: [{ x: -0.2, z: 4.0, r: 2.4, h: 0.16 }, { x: 1.2, z: 7.6, r: 1.6, h: -0.12 }, { x: -1.2, z: 9.6, r: 1.8, h: 0.14 }, { x: 0.2, z: 12.0, r: 1.0, h: -0.06 }],
       zones: [sand(rect(-2.4, 6.6, -1.6, 7.8)), lagoon(rect(1.8, 10.0, 2.4, 11.8))], posts: [ANCHOR(2.0, 2.0), BARREL(-2.0, 12.6)] },
     /* 15 the rigging: floating decks joined by rail-less planks; the cave skips the middle */
-    { par: 4, crazy: true, sol: [[12,0.4,0],[5,0.4,0]], tee: [0, 0.5], cup: [1.0, 9.6], aim0: 0,
+    { par: 4, crazy: true, sol: [[12,0.4,0],[6,0.4,0]], tee: [0, 0.5], cup: [1.0, 9.6], aim0: 0,
       floors: [rect(-1.0, 0, 1.0, 2.4), rect(-0.95, 2.3, -0.45, 4.1), rect(-1.6, 4.0, 0.4, 5.8), rect(0.3, 5.0, 1.6, 5.6), rect(1.0, 5.5, 1.6, 7.6), rect(-0.4, 7.5, 1.8, 10.4)],
       walls: [[[-0.45, 2.4], [1.0, 2.4], [1.0, 0], [-1.0, 0], [-1.0, 2.4], [-0.95, 2.4]],
         [[-0.95, 4.0], [-1.6, 4.0], [-1.6, 5.8], [0.4, 5.8], [0.4, 5.6]], [[0.4, 5.0], [0.4, 4.0], [-0.45, 4.0]],
@@ -4867,7 +4867,7 @@ registerWorld(26, { holes: [
     bumps: [{ x: 0, z: 1.4, r: 0.45, h: 0.22 }, { x: 0, z: 4, r: 0.5, h: 0.24 }],
     zones: [V26_LAVA(rect(1.2, 0, 1.8, 1.2)), V26_LAVA(rect(-1.8, 3.2, -1.3, 3.9)), V26_MUD(rect(0.2, 2.75, 0.6, 5.35)), V26_LAVA(rect(-1.8, 7.85, -0.4, 8.2))] },
   /* 15: the stacked decks: ramp up, ramp up again, then a gated drop to the crater (crazy, 4 stages) */
-  { par: 4, crazy: true, sol: [[11.7,0.92,0],[100.5,0.8,0],[192,0.68,0]], tee: [0, 0.5], cup: [1.6, 2], aim0: 0,
+  { par: 4, crazy: true, sol: [[6,1,0],[122,1,0]], tee: [0, 0.5], cup: [1.6, 2], aim0: 0,
     shape: [[-0.9, 0], [0.9, 0], [0.9, 6.4], [1.2, 6.4], [1.2, 0.6], [2.6, 0.6], [2.6, 8], [-0.9, 8]],
     inner: [[[-0.9, 5.6], [0, 5.6]]],
     ramps: [{ x0: -0.9, z0: 2, x1: 0.9, z1: 3.2, axis: 'z', h0: 0, h1: 0.18 }, { x0: 0, z0: 4.8, x1: 0.9, z1: 5.8, axis: 'z', h0: 0.18, h1: 0.36 }],
@@ -4876,7 +4876,7 @@ registerWorld(26, { holes: [
     bumps: [{ x: -0.3, z: 4.2, r: 0.4, h: 0.18 }, ...V26_CRATER(1.9, 1.7, 0.75)],
     zones: [V26_LAVA(rect(-0.9, 7.5, 0.3, 8)), V26_LAVA(rect(2.1, 6.6, 2.6, 7.4)), V26_MUD(rect(-0.9, 1, -0.3, 1.6))] },
   /* 16: the tube maze: ramp to the deck, the crater tube or the drop, the boulder ledge and the cup plateau (crazy, 4 stages) */
-  { par: 5, crazy: true, sol: [[37.1,1,0],[95.2,0.48,0],[183,0.64,0]], tee: [0, 0.5], cup: [3, 0.8], aim0: 0,
+  { par: 5, crazy: true, sol: [[328,0.92,0],[2,0.88,0]], tee: [0, 0.5], cup: [3, 0.8], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 2], [0.8, 3.4], [2.2, 3.4], [2.2, 0], [3.8, 0], [3.8, 5.4], [-0.8, 5.4]],
     ramps: [{ x0: -0.8, z0: 2, x1: 0.8, z1: 3.4, axis: 'z', h0: 0, h1: 0.34 }, { x0: 2.2, z0: 1.6, x1: 3.8, z1: 2.6, axis: 'z', h0: 0.16, h1: 0 }],
     tiers: [{ poly: rect(-0.9, 3.4, 3.9, 5.5), h: 0.34 }, { poly: rect(2.1, -0.1, 3.9, 1.6), h: 0.16 }],
@@ -4890,7 +4890,7 @@ registerWorld(26, { holes: [
     tiers: [{ poly: rect(-1.7, -0.1, 1.7, 9.7), h: 0.15, sx: -0.035 }],
     bumps: [{ x: 0, z: 5, r: 1.2, h: 0.12 }, { x: 1, z: 7.5, r: 1, h: -0.05 }] },
   /* 18: the summit: boulder run, switchback up two decks, the gated vent, the summit crater, or the tube (crazy, 4 stages) */
-  { par: 5, crazy: true, sol: [[4.7,1,0],[60.5,0.56,0],[313.6,0.48,0],[6.4,0.44,0]], tee: [0, 0.5], cup: [2.2, 9.6], aim0: 0,
+  { par: 5, crazy: true, sol: [[10,0.92,1],[6,0.52,0]], tee: [0, 0.5], cup: [2.2, 9.6], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [3.2, 3.6], [3.2, 10.8], [-0.8, 10.8]],
     inner: [[[-0.8, 6.8], [1.6, 6.8]], [[2.4, 6.8], [3.2, 6.8]]],
     ramps: [{ x0: -0.8, z0: 2.6, x1: 0.8, z1: 3.8, axis: 'z', h0: 0, h1: 0.18 }, { x0: 0.8, z0: 3.6, x1: 2, z1: 5.2, axis: 'x', h0: 0.18, h1: 0.32 }],
@@ -5436,7 +5436,7 @@ registerWorld(30, { holes: [
     movers: [{ kind: 'gate', ax: -0.35, az: 1.8, bx: 0.35, bz: 1.8, len: 0.25, ang: 90, period: 2.2, look: 'gate' }] },
   /* 5. northern lights (long green): a 13 m three-tier green; up the front bank onto the long
      plateau, then down the back step to the cup shelf, all of it leaning left */
-  { par: 3, sol: [[4,1,0]], tee: [0, 0.6], cup: [-0.6, 12.0],
+  { par: 3, sol: [[6,0.92,0]], tee: [0, 0.6], cup: [-0.6, 12.0],
     shape: [[-1, 0], [1, 0], [1.8, 2.5], [2.2, 6], [2.4, 9.5], [1.8, 12.4], [0.2, 13.4], [-1.6, 13], [-2.4, 10.5], [-2.2, 6.5], [-1.8, 2.5]],
     tiers: [{ poly: rect(-3, -1, 3, 3.5), h: 0, sx: 0.015 }, { poly: rect(-3, 3.5, 3, 5), h: -0.21, sx: 0.015, sz: 0.06 }, { poly: rect(-3, 5, 3, 9), h: 0.09, sx: 0.015 },
       { poly: rect(-3, 9, 3, 10), h: 0.54, sx: 0.015, sz: -0.05 }, { poly: rect(-3, 10, 3, 14), h: 0.04, sx: 0.015 }],

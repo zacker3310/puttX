@@ -116,7 +116,7 @@ registerWorld(26, { holes: [
     bumps: [{ x: 0, z: 1.4, r: 0.45, h: 0.22 }, { x: 0, z: 4, r: 0.5, h: 0.24 }],
     zones: [V26_LAVA(rect(1.2, 0, 1.8, 1.2)), V26_LAVA(rect(-1.8, 3.2, -1.3, 3.9)), V26_MUD(rect(0.2, 2.75, 0.6, 5.35)), V26_LAVA(rect(-1.8, 7.85, -0.4, 8.2))] },
   /* 15: the stacked decks: ramp up, ramp up again, then a gated drop to the crater (crazy, 4 stages) */
-  { par: 4, crazy: true, sol: [[11.7,0.92,0],[100.5,0.8,0],[192,0.68,0]], tee: [0, 0.5], cup: [1.6, 2], aim0: 0,
+  { par: 4, crazy: true, sol: [[6,1,0],[122,1,0]], tee: [0, 0.5], cup: [1.6, 2], aim0: 0,
     shape: [[-0.9, 0], [0.9, 0], [0.9, 6.4], [1.2, 6.4], [1.2, 0.6], [2.6, 0.6], [2.6, 8], [-0.9, 8]],
     inner: [[[-0.9, 5.6], [0, 5.6]]],
     ramps: [{ x0: -0.9, z0: 2, x1: 0.9, z1: 3.2, axis: 'z', h0: 0, h1: 0.18 }, { x0: 0, z0: 4.8, x1: 0.9, z1: 5.8, axis: 'z', h0: 0.18, h1: 0.36 }],
@@ -125,7 +125,7 @@ registerWorld(26, { holes: [
     bumps: [{ x: -0.3, z: 4.2, r: 0.4, h: 0.18 }, ...V26_CRATER(1.9, 1.7, 0.75)],
     zones: [V26_LAVA(rect(-0.9, 7.5, 0.3, 8)), V26_LAVA(rect(2.1, 6.6, 2.6, 7.4)), V26_MUD(rect(-0.9, 1, -0.3, 1.6))] },
   /* 16: the tube maze: ramp to the deck, the crater tube or the drop, the boulder ledge and the cup plateau (crazy, 4 stages) */
-  { par: 5, crazy: true, sol: [[37.1,1,0],[95.2,0.48,0],[183,0.64,0]], tee: [0, 0.5], cup: [3, 0.8], aim0: 0,
+  { par: 5, crazy: true, sol: [[328,0.92,0],[2,0.88,0]], tee: [0, 0.5], cup: [3, 0.8], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 2], [0.8, 3.4], [2.2, 3.4], [2.2, 0], [3.8, 0], [3.8, 5.4], [-0.8, 5.4]],
     ramps: [{ x0: -0.8, z0: 2, x1: 0.8, z1: 3.4, axis: 'z', h0: 0, h1: 0.34 }, { x0: 2.2, z0: 1.6, x1: 3.8, z1: 2.6, axis: 'z', h0: 0.16, h1: 0 }],
     tiers: [{ poly: rect(-0.9, 3.4, 3.9, 5.5), h: 0.34 }, { poly: rect(2.1, -0.1, 3.9, 1.6), h: 0.16 }],
@@ -139,7 +139,7 @@ registerWorld(26, { holes: [
     tiers: [{ poly: rect(-1.7, -0.1, 1.7, 9.7), h: 0.15, sx: -0.035 }],
     bumps: [{ x: 0, z: 5, r: 1.2, h: 0.12 }, { x: 1, z: 7.5, r: 1, h: -0.05 }] },
   /* 18: the summit: boulder run, switchback up two decks, the gated vent, the summit crater, or the tube (crazy, 4 stages) */
-  { par: 5, crazy: true, sol: [[4.7,1,0],[60.5,0.56,0],[313.6,0.48,0],[6.4,0.44,0]], tee: [0, 0.5], cup: [2.2, 9.6], aim0: 0,
+  { par: 5, crazy: true, sol: [[10,0.92,1],[6,0.52,0]], tee: [0, 0.5], cup: [2.2, 9.6], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [3.2, 3.6], [3.2, 10.8], [-0.8, 10.8]],
     inner: [[[-0.8, 6.8], [1.6, 6.8]], [[2.4, 6.8], [3.2, 6.8]]],
     ramps: [{ x0: -0.8, z0: 2.6, x1: 0.8, z1: 3.8, axis: 'z', h0: 0, h1: 0.18 }, { x0: 0.8, z0: 3.6, x1: 2, z1: 5.2, axis: 'x', h0: 0.18, h1: 0.32 }],

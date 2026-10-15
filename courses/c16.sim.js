@@ -89,13 +89,13 @@ registerWorld(16, { holes: [
     tiers: [{ poly: rect(-2.3, -0.1, 2.3, 13.5), h: 0.2, sx: 0.025, sz: -0.004 }],
     bumps: [{ x: -1, z: 4.5, r: 2, h: -0.12 }, { x: 1.2, z: 7.5, r: 2.2, h: 0.16 }, { x: -0.8, z: 10.2, r: 1.4, h: 0.08 }] },
   /* 13: lava jumps: two kickers over two rivers to the crater green (crazy, 3 parts) */
-  { par: 4, crazy: true, sol: [[18,0.96,0],[358.2,0.8,0]], tee: [0, 0.5], cup: [-0.3, 9], shape: rect(-1.1, 0, 1.1, 10),
+  { par: 4, crazy: true, sol: [[4,1,0],[42,0.6,0]], tee: [0, 0.5], cup: [-0.3, 9], shape: rect(-1.1, 0, 1.1, 10),
     ramps: [{ x0: -1.1, z0: 2.2, x1: 1.1, z1: 3.2, axis: 'z', h0: 0, h1: 0.22 }, { x0: -0.2, z0: 5.6, x1: 0.6, z1: 6.6, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [...V16_CRATER(-0.3, 9, 0.9)],
     movers: [V16_ROCK(-0.74, 4.9, 0.74, 4.9, 2.4)],
     zones: [V16_LAVA(rect(-1.1, 3.2, 1.1, 4.2)), V16_LAVA(rect(-1.1, 6.6, 1.1, 7.4)), V16_MUD(rect(-1.1, 5.4, -0.4, 6))] },
   /* 14: the spinning basalt arm on the tilted green, then a ramp to the cup shelf (3 parts) */
-  { par: 3, sol: [[19.8,0.92,0]], tee: [0, 0.5], cup: [0.4, 7.4], shape: rect(-1.4, 0, 1.4, 8.4),
+  { par: 3, sol: [[22,0.92,0]], tee: [0, 0.5], cup: [0.4, 7.4], shape: rect(-1.4, 0, 1.4, 8.4),
     tiers: [{ poly: rect(-1.5, -0.1, 1.5, 5.4), h: 0, sx: 0.04 }, { poly: rect(-1.5, 6.2, 1.5, 8.5), h: 0.25 }],
     ramps: [{ x0: -0.4, z0: 5.4, x1: 1.4, z1: 6.2, axis: 'z', h0: 0, h1: 0.25 }],
     inner: [[[-1.4, 6.2], [-0.4, 6.2]]],
@@ -103,14 +103,14 @@ registerWorld(16, { holes: [
     bumps: [...V16_CRATER(0.4, 7.4, 0.85)],
     zones: [V16_LAVA(rect(-1.4, 4.4, -0.6, 4.9)), V16_LAVA(rect(-1.4, 8.1, 1.4, 8.4))] },
   /* 15: the gated drop: a sliding basalt gate guards the gap off the deck (crazy, 3 parts) */
-  { par: 4, crazy: true, sol: [[356,0.84,0]], tee: [0, 0.5], cup: [0.8, 8], shape: rect(-1.4, 0, 1.4, 9),
+  { par: 4, crazy: true, sol: [[0,0.72,0]], tee: [0, 0.5], cup: [0.8, 8], shape: rect(-1.4, 0, 1.4, 9),
     tiers: [{ poly: rect(-1.5, -0.1, 1.5, 4), h: 0.4 }],
     inner: [[[-1.4, 4], [-0.45, 4]], [[0.45, 4], [1.4, 4]]],
     movers: [{ kind: 'gate', ax: -0.84, az: 3.6, bx: 0.84, bz: 3.6, len: 0.3, ang: 90, period: 3.4, look: 'basalt' }],
     bumps: [{ x: -0.5, z: 5.8, r: 0.5, h: 0.25 }, ...V16_CRATER(0.8, 8, 0.85)],
     zones: [V16_LAVA(rect(-1.4, 6.6, -0.2, 7.1)), V16_MUD(rect(0.6, 5, 1.4, 5.6)), V16_LAVA(rect(-1.4, 8.7, 0, 9))] },
   /* 16: chained tubes: crater to the upper deck, crater to the cup green, or the long way down the ramps (crazy, 4 parts) */
-  { par: 4, crazy: true, sol: [[299.4,0.84,0],[80.2,0.4,0],[192,0.44,0]], tee: [0, 0.5], cup: [2.6, 1.2], aim0: 0,
+  { par: 4, crazy: true, sol: [[332,0.96,0],[26,0.96,0]], tee: [0, 0.5], cup: [2.6, 1.2], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 4.4], [1.8, 4.4], [1.8, 0], [3.4, 0], [3.4, 7], [-0.8, 7]],
     tiers: [{ poly: rect(-0.9, 4.4, 3.5, 7.1), h: 0.35 }],
     ramps: [{ x0: -0.8, z0: 3.2, x1: 0.8, z1: 4.4, axis: 'z', h0: 0, h1: 0.35 }, { x0: 1.8, z0: 3.4, x1: 3.4, z1: 4.4, axis: 'z', h0: 0, h1: 0.35 }],
@@ -119,7 +119,7 @@ registerWorld(16, { holes: [
     posts: [V16_COL(2.2, 2.4)],
     zones: [V16_LAVA(rect(1.8, 4.4, 2.2, 5)), V16_LAVA(rect(3, 6.2, 3.4, 7)), V16_MUD(rect(-0.8, 6.6, 0.4, 7))] },
   /* 17: long green: off the high tee shelf, down the broad bank and over a knoll to a flat cup */
-  { par: 3, sol: [[21,1,0],[51,0.7,0]], tee: [0, 0.5], cup: [-0.7, 9.4], shape: rect(-1.7, 0, 1.7, 10.4),
+  { par: 3, sol: [[0,0.64,0]], tee: [0, 0.5], cup: [-0.7, 9.4], shape: rect(-1.7, 0, 1.7, 10.4),
     tiers: [{ poly: rect(-1.8, -0.1, 1.8, 3.5), h: 0.25 }, { poly: rect(-1.8, 4.7, 1.8, 10.5), h: 0.12 }],
     ramps: [{ x0: -1.7, z0: 3.5, x1: 1.7, z1: 4.7, axis: 'z', h0: 0.25, h1: 0.12 }],
     bumps: [{ x: 0.9, z: 7.4, r: 1.4, h: 0.1 }, { x: -1, z: 2, r: 1.2, h: -0.06 }, { x: -1.3, z: 6.2, r: 1.2, h: 0.07 }] },

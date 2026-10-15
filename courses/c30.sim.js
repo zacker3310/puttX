@@ -39,7 +39,7 @@ registerWorld(30, { holes: [
     movers: [{ kind: 'gate', ax: -0.35, az: 1.8, bx: 0.35, bz: 1.8, len: 0.25, ang: 90, period: 2.2, look: 'gate' }] },
   /* 5. northern lights (long green): a 13 m three-tier green; up the front bank onto the long
      plateau, then down the back step to the cup shelf, all of it leaning left */
-  { par: 3, sol: [[4,1,0]], tee: [0, 0.6], cup: [-0.6, 12.0],
+  { par: 3, sol: [[6,0.92,0]], tee: [0, 0.6], cup: [-0.6, 12.0],
     shape: [[-1, 0], [1, 0], [1.8, 2.5], [2.2, 6], [2.4, 9.5], [1.8, 12.4], [0.2, 13.4], [-1.6, 13], [-2.4, 10.5], [-2.2, 6.5], [-1.8, 2.5]],
     tiers: [{ poly: rect(-3, -1, 3, 3.5), h: 0, sx: 0.015 }, { poly: rect(-3, 3.5, 3, 5), h: -0.21, sx: 0.015, sz: 0.06 }, { poly: rect(-3, 5, 3, 9), h: 0.09, sx: 0.015 },
       { poly: rect(-3, 9, 3, 10), h: 0.54, sx: 0.015, sz: -0.05 }, { poly: rect(-3, 10, 3, 14), h: 0.04, sx: 0.015 }],

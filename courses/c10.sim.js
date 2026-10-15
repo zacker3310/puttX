@@ -41,7 +41,7 @@ registerWorld(10, { holes: [
       { kind: 'gate', ax: -0.7, az: 5.0, bx: 0.7, bz: 5.0, len: 0.35, ang: 90, period: 3.2, look: 'gate' }] },
   /* 6. tube isles: the safe tube to the high island and down its ramp, or the bare rainbow straight
      across; the tilted cup green drains toward an open edge */
-  { par: 2, sol: [[10,1,0]], tee: [0, 0.6], cup: [1.5, 7.4],
+  { par: 2, sol: [[10,0.56,0]], tee: [0, 0.6], cup: [1.5, 7.4],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.2, 2.2, 0.2, 5.4), rect(1.8, 2.4, 3.4, 5.4), rect(-1.2, 5.4, 3.4, 8)],
     walls: [[[-0.2, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.2, 2.2]],
       [[1.8, 4.8], [1.8, 2.4], [3.4, 2.4], [3.4, 4.8]], [[-1.2, 7.4], [-1.2, 8], [3.4, 8], [3.4, 5.4]]],
@@ -50,7 +50,7 @@ registerWorld(10, { holes: [
     zones: [{ surf: 'fast', poly: rect(-0.2, 2.2, 0.2, 5.4) }],
     tubes: [{ a: [0.45, 1.7], b: [2.6, 2.9], dir: 0 }] },
   /* 7. gale steps: two ramp bridges up two islands while a fan blows across the middle one */
-  { par: 3, sol: [[178,0.8,0],[24,1,0]], tee: [-0.2, 0.6], cup: [0.6, 7.6],
+  { par: 3, sol: [[178,0.8,0],[26,0.84,0]], tee: [-0.2, 0.6], cup: [0.6, 7.6],
     floors: [rect(-0.8, 0, 0.8, 2), rect(-0.6, 2, 0, 3), rect(-1.4, 3, 1.4, 5), rect(0.6, 5, 1.2, 6), rect(-1, 6, 1.4, 8.4)],
     walls: [[[-0.6, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0, 2]], [[-1, 6.6], [-1, 8.4], [1.4, 8.4], [1.4, 6.8]]],
     ramps: [{ x0: -0.6, z0: 2, x1: 0, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: 0.6, z0: 5, x1: 1.2, z1: 6, axis: 'z', h0: 0.25, h1: 0.5 }],
@@ -101,7 +101,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 3.1, r: 0.35, h: 0.08 }, { x: 0.65, z: 8.05, r: 0.3, h: -0.05 }] },
   /* 13. thunder run: up a railed diagonal rainbow into a headwind, past a windmill on the high island,
      then off the kicker down onto a tilted crater green */
-  { crazy: true, par: 4, sol: [[5,1,1],[46,0.8,0],[265,0.28,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
+  { crazy: true, par: 4, sol: [[312,1,0],[52,0.92,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 6.6, 2.8, 9.4)],
     walls: [[[1.35, 4.4], [-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2], [1.85, 4.4]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 6.6]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
@@ -126,7 +126,7 @@ registerWorld(10, { holes: [
     tiers: [{ poly: rect(-3, -1, 4, 15), h: 0, sx: -0.02, sz: 0.008 }],
     bumps: [{ x: 0.2, z: 6.5, r: 2.2, h: 0.15 }, { x: 1.8, z: 9.5, r: 1.5, h: -0.1 }, { x: 1.2, z: 12.2, r: 1.2, h: 0.06 }, { x: -0.6, z: 3, r: 1.4, h: -0.06 }] },
   /* 16. rainbow relay: three bare rainbows between three tiny islands, each with its own crosswind */
-  { par: 4, sol: [[354,0.5,0],[81,0.31,0],[353,0.76,0]], tee: [0, 0.6], cup: [3.3, 8.2],
+  { par: 4, sol: [[354,0.6,0],[62,0.44,0],[4,0.84,0]], tee: [0, 0.6], cup: [3.3, 8.2],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(0.6, 3.85, 2.6, 4.35), rect(2.6, 3.4, 3.6, 5.2),
       rect(2.85, 5.2, 3.35, 7.2), rect(2.0, 7.2, 4.4, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[0.6, 4.6], [-0.6, 4.6], [-0.6, 3.6]],

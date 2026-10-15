@@ -72,7 +72,7 @@ registerWorld(7, { holes: [
     bumps: [{ x: 0.3, z: 5.5, r: 0.5, h: 0.2 }],
     movers: [C7_MILL(0.1, 6.2, 0.5, 1.5, 0)] },
   /* 11: down the dungeon and back through the portcullis, a ghost on patrol */
-  { par: 3, sol: [[342,0.76,2],[4,0.6,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
+  { par: 3, sol: [[342,0.76,2],[4,0.96,0]], tee: [0, 0.5], cup: [2.4, 1.5], aim0: 0, shape: [[-0.7, 0], [0.7, 0], [0.7, 4.1], [1.7, 4.1], [1.7, 0.8], [3.1, 0.8], [3.1, 5.5], [-0.7, 5.5]],
     inner: [[[1.7, 3], [2.15, 3]], [[2.65, 3], [3.1, 3]]],
     bumps: [{ x: -0.1, z: 4.85, r: 0.5, h: 0.2 }],
     movers: [C7_GHOST(1.2, 4.45, 1.2, 5.15, 2.2, 0), C7_GATE(2.4, 3, 2.85, 3, 0.25, 90, 2.8, 0)] },
@@ -85,7 +85,7 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(-0.65, 5.95), C7_GARG(0.65, 5.95), C7_GARG(0.25, 6.8)],
     movers: [C7_GHOST(-0.75, 3.0, 0.75, 3.0, 3.0, 0), C7_GHOST(0.75, 4.5, -0.75, 4.5, 2.4, 1.2)] },
   /* 13: windmill ramp to the rampart, down the narrow drawbridge (or jump the moat), then the tilted courtyard */
-  { par: 4, sol: [[46,1,1.5],[0,0.12,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
+  { par: 4, sol: [[332,0.88,0.5],[80,0.4,0]], tee: [0, 0.5], cup: [-0.5, 8.7], shape: rect(-1.2, 0, 1.2, 9.6),
     ramps: [{ x0: -1.2, z0: 2.6, x1: 1.2, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.55, z0: 5.4, x1: 1.05, z1: 6.5, axis: 'z', h0: 0.3, h1: 0.07 }],
     tiers: [{ poly: rect(-1.2, 3.6, 1.2, 5.4), h: 0.3 }, { poly: rect(-1.2, 6.5, 1.2, 9.6), h: 0.2, sz: -0.02 }],
     zones: [C7_MOAT(rect(-1.2, 5.4, 0.55, 6.5)), C7_MOAT(rect(1.05, 5.4, 1.2, 6.5)), C7_MOAT(rect(-1.2, 9.25, 1.2, 9.6))],

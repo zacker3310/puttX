@@ -90,7 +90,7 @@ registerWorld(15, (() => {
       tubes: [{ a: [-1.0, 5.6], b: [-0.8, 9.0], dir: 90 }],
       bumps: [{ x: 0.2, z: 5.6, r: 0.45, h: 0.15 }], zones: [sand(rect(-1.2, 9.6, -0.2, 10.4))], posts: [BARREL(-0.6, 1.4)] },
     /* 13 the hold: the long gangplank or the cave up to the top deck, then past the drawbridge and down */
-    { par: 4, crazy: true, sol: [[9,0.95,0],[57,0.8,0]], tee: [0.4, 0.5], cup: [0.3, 8.3], aim0: 0, shape: rect(-1.8, 0, 1.8, 9.2),
+    { par: 4, crazy: true, sol: [[10,0.76,0],[84,0.56,0]], tee: [0.4, 0.5], cup: [0.3, 8.3], aim0: 0, shape: rect(-1.8, 0, 1.8, 9.2),
       ramps: [{ x0: -1.8, z0: 1.4, x1: -1.2, z1: 5.0, axis: 'z', h0: 0, h1: 0.4 }],
       tiers: [{ poly: rect(-1.2, 3.4, 1.9, 7.0), h: 0.4 }, { poly: rect(-1.9, 5.0, -1.2, 7.0), h: 0.4 }],
       inner: [[[-1.2, 1.4], [-1.2, 3.4], [1.8, 3.4]], [[-1.8, 7.0], [-0.2, 7.0]], [[0.8, 7.0], [1.8, 7.0]]],

@@ -12,7 +12,7 @@ registerWorld(20, { holes: [
     zones: [{ surf: 'fast', poly: rect(0.35, 2.2, 0.75, 3.8) }],
     bumps: [{ x: 0.45, z: 5.5, r: 0.6, h: 0.15 }, { x: 0.45, z: 5.5, r: 0.25, h: -0.06 }] },
   /* 2. gale rails: a windy rainbow to the windmill isle, then a ramp bridge up to the green */
-  { par: 3, sol: [[358,0.9,0],[21,0.77,0],[244,0.16,0]], tee: [0, 0.6], cup: [-0.4, 8.6],
+  { par: 3, sol: [[356,0.84,0.5],[0,0.56,0]], tee: [0, 0.6], cup: [-0.4, 8.6],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.25, 2, 0.25, 4.4), rect(-1.1, 4.4, 1.1, 6.2), rect(-0.3, 6.2, 0.3, 7.2), rect(-1.2, 7.2, 1.2, 9.4)],
     walls: [[[-0.25, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.25, 2]],
       [[-0.3, 6.2], [-1.1, 6.2], [-1.1, 4.4], [-0.25, 4.4]], [[0.3, 6.2], [1.1, 6.2], [1.1, 4.4], [0.25, 4.4]], [[-1.2, 8.4], [-1.2, 9.4], [1.2, 9.4], [1.2, 8.4]]],
@@ -46,7 +46,7 @@ registerWorld(20, { holes: [
     movers: [{ kind: 'spin', x: 0, z: 2.8, len: 0.3, w: 1.7, phase: 0, blades: 1, look: 'windmill' },
       { kind: 'spin', x: 0, z: 6.9, len: 0.3, w: -1.9, phase: 0.6, blades: 1, look: 'windmill' }] },
   /* 6. cloud steps: four islands stepping down over gaps under a crosswind, or the tube from the second straight to the green */
-  { par: 3, sol: [[353,0.82,0]], tee: [0, 0.6], cup: [0.65, 8.05],
+  { par: 3, sol: [[10,0.8,0]], tee: [0, 0.6], cup: [0.65, 8.05],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.9, 2.3, 0.9, 4), rect(-0.9, 4.3, 0.9, 6), rect(-1.2, 6.3, 1.2, 8.6)],
     walls: [[[-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2]], [[-1.2, 7.6], [-1.2, 8.6], [1.2, 8.6], [1.2, 7.3], [0, 7.3]]],
     tiers: [{ poly: C20_PAD(-0.7, 0, 0.7, 2), h: 0.6 }, { poly: rect(-0.9, 2.3, 0.9, 4), h: 0.4 }, { poly: rect(-0.9, 4.3, 0.9, 6), h: 0.2 }],
@@ -93,7 +93,7 @@ registerWorld(20, { holes: [
       { a: [3.5, 1.1], b: [1.37, 7.6], dir: 30, keep: 0, add: 1.8, color: '#6fc0df' },
       { a: [2.5, 7.6], b: [0.53, 8.6], dir: 240, keep: 0, add: 2.4, color: '#ef7d6d' }] },
   /* 10. switchback: up the rainbow rail, swing round the high deck, up the second rail the other way, then along the railed ridge to the crown green */
-  { par: 5, crazy: true, sol: [[2,0.75,0],[90,0.3,0],[180,0.7,0],[107,0.2,0],[3,0.97,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
+  { par: 5, crazy: true, sol: [[350,0.84,0],[18,1,0],[165,1,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
     floors: [rect(-1.5, 0, -0.5, 1.5), rect(-1.3, 1.5, -0.7, 4), rect(-1.5, 4, 0.9, 5.3), rect(0.3, 1.6, 0.9, 4), rect(0.1, 0.2, 2.3, 1.6), rect(1.5, 1.6, 2.1, 3.6), rect(1.2, 3.6, 2.6, 6)],
     walls: [[[-0.7, 1.5], [-0.5, 1.5], [-0.5, 0], [-1.5, 0], [-1.5, 1.5], [-1.3, 1.5]], [[-1.3, 1.5], [-1.3, 4]], [[-0.7, 1.5], [-0.7, 4]],
       [[-1.3, 4], [-1.5, 4], [-1.5, 5.3], [0.9, 5.3], [0.9, 4]], [[0.3, 4], [0.3, 1.6]], [[0.9, 4], [0.9, 1.6]],
@@ -127,7 +127,7 @@ registerWorld(20, { holes: [
       { x: 1.0, z: 6.5, r: 0.14, e: 1.15, look: 'cloud' }, { x: -1.0, z: 6.9, r: 0.14, e: 1.15, look: 'cloud' }],
     movers: [{ kind: 'gate', ax: -0.65, az: 9.1, bx: 0.65, bz: 9.1, len: 0.25, ang: 90, period: 2.6, look: 'gate' }] },
   /* 14. thunder kicker: up a windy railed diagonal rainbow, past the windmill (or its tube), off the kicker onto the green and up to the crown */
-  { par: 4, crazy: true, sol: [[27,0.95,0],[256,0.48,0]], tee: [-0.66, 0.95], cup: [0.1, 9.0], aim0: 34,
+  { par: 4, crazy: true, sol: [[26,0.88,0],[80,0.8,0]], tee: [-0.66, 0.95], cup: [0.1, 9.0], aim0: 34,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 7, 2.8, 9.4)],
     walls: [[[1.35, 4.4], [-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2], [1.85, 4.4]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 8.4]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 },
@@ -143,7 +143,7 @@ registerWorld(20, { holes: [
     tiers: [{ poly: rect(-3, -1, 4, 13), h: 0, sx: 0.015 }],
     bumps: [{ x: 0.4, z: 8.6, r: 1.8, h: -0.12 }, { x: 0, z: 4.5, r: 1.6, h: 0.15 }, { x: -1.4, z: 9.4, r: 1.2, h: 0.08 }] },
   /* 16. rainbow relay: three bare rainbows between tiny islands, each with its own crosswind, onto a gated green */
-  { par: 4, crazy: true, sol: [[3,0.58,0],[278,0.34,0],[358,0.7,0]], tee: [0, 0.6], cup: [-3.3, 8.4],
+  { par: 4, crazy: true, sol: [[2,0.56,0],[278,0.32,0],[0,0.64,0]], tee: [0, 0.6], cup: [-3.3, 8.4],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(-2.6, 3.85, -0.6, 4.35), rect(-3.6, 3.4, -2.6, 5.2),
       rect(-3.35, 5.2, -2.85, 7.2), rect(-4.4, 7.2, -2.0, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[-0.6, 4.6], [0.6, 4.6], [0.6, 3.6]],

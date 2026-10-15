@@ -49,7 +49,7 @@ function checkHole(S, h) {
     : [[m.ax, m.az, m.bx, m.bz, m.r]];
   const inSweep = (m, x, z, pad) => sweep(m).some(([ax, az, bx, bz, r]) => ptSeg(x, z, [ax, az, bx, bz]) < r + pad);
 
-  check('par 2..5', h.par >= 2 && h.par <= 5, 'par ' + h.par);
+  check('par 2..5 (the bonus nine: up to 6)', h.par >= 2 && h.par <= (h.key.startsWith(S.BONUS + '-') ? 6 : 5), 'par ' + h.par);
   for (const [what, p] of [['tee', h.tee], ['cup', h.cup]]) {
     const ok = S.onFloor(h, ...p) && wallGap(...p) >= R + (what === 'cup' ? S.CUP_R : 0.01) && !water(...p) && flat(...p, what === 'cup' ? S.CUP_R + S.BALL_R : S.BALL_R * 2)
       && h.posts.every(q => Math.hypot(p[0] - q.x, p[1] - q.z) >= q.r + S.BALL_R + (what === 'cup' ? S.CUP_R : 0.05))
@@ -134,11 +134,11 @@ function checkHole(S, h) {
   const S = require('./sim.cjs').loadSim();
   const STRICT = process.env.PUTTX_ALL_WORLDS === '1';
   const worlds = S.allCourses();
-  if (STRICT) check('all thirty courses are registered', worlds.length === 30, worlds.join());
-  for (const w of worlds) check(`course ${w}: ${S.HOLES_PER} holes`, S.WORLDS[w].holes.length === S.HOLES_PER || !STRICT, 'has ' + S.WORLDS[w].holes.length);
+  if (STRICT) check('all thirty courses are registered (plus the bonus nine)', worlds.filter(w => w !== S.BONUS).length === 30, worlds.join());
+  for (const w of worlds) check(`course ${w}: ${S.HOLES_PER} holes`, S.WORLDS[w].holes.length === (w === S.BONUS ? 9 : S.HOLES_PER) || !STRICT, 'has ' + S.WORLDS[w].holes.length);
   for (const w of worlds) {
     const hs = S.WORLDS[w].holes, auto = hs.filter(h => h.auto).length, crazy = hs.filter(h => h.crazy).length;
-    check(`course ${w}: at most 2 auto holes, 3 to 6 crazy holes`, auto <= 2 && ((crazy >= 3 && crazy <= 6) || !STRICT), `auto ${auto}, crazy ${crazy}`);
+    check(`course ${w}: at most 2 auto holes, 3 to 6 crazy holes`, auto <= 2 && ((crazy >= 3 && crazy <= 6) || w === S.BONUS || !STRICT), `auto ${auto}, crazy ${crazy}`);
   }
   check('at least one course registered', worlds.length > 0);
   const keys = worlds.flatMap(w => S.WORLDS[w].holes.map(h => h.key));

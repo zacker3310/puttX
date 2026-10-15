@@ -33,7 +33,7 @@ const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per
 const STOP_V = 0.03;
 const SETTLE_T = 0.4;            /* slower than STOP_V this long = at rest, even pressed on a wall or a lip */
 const STATIC_MU = 0.1;           /* a stopped ball stays put on slopes gentler than this */
-const MAX_SIM_T = 25;
+const MAX_SIM_T = 40;            /* a putt that runs this long is called stopped: room for the bonus nine's ice */
 const G = 9.8;
 const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slope */
 const SKID_MU = 0.22, SKID_END = 0.92;  /* the struck ball slides (sliding friction) until it has shed 12% and rolls */
@@ -409,7 +409,9 @@ const playable = () => WORLD_ORDER.filter(w => WORLDS[w]);
 /* each world has three courses of 18: course w, then w + 10 and w + 20, each more intricate */
 const COURSE_STEP = 10, COURSES_PER = 3;
 const coursesOf = w => Array.from({ length: COURSES_PER }, (_, k) => w + k * COURSE_STEP).filter(c => WORLDS[c]);
-const allCourses = () => WORLD_ORDER.flatMap(coursesOf);
+/* the bonus nine: a practice course of its own, always open, every hole playable from the start */
+const BONUS = 99;
+const allCourses = () => WORLD_ORDER.flatMap(coursesOf).concat(WORLDS[BONUS] ? [BONUS] : []);
 const worldOf = c => ((c % 100) - 1) % COURSE_STEP + 1;
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
@@ -430,6 +432,7 @@ function recordHole(p, key, score, par, maxStars = 3) {
 }
 function holeUnlocked(p, key) {
   const [w, n] = key.split('-').map(Number);
+  if (w === BONUS) return !!WORLDS[BONUS];
   return p.worlds.includes(w) && (n === 1 || !!p.holes[w + '-' + (n - 1)]);
 }
 /* ---- 2h. course packs ---- */
@@ -2009,6 +2012,7 @@ function initExtras() {
 
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
+const BONUS_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 L40 22 L61 24 L45 38 L50 59 L32 48 L14 59 L19 38 L3 24 L24 22 Z" fill="#ff3df2" stroke="#2ef2ff" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="34" r="9" fill="#fffdf7"/></svg>';
 const CRAZY_SVG = '<svg class="crazy" viewBox="0 0 64 64" aria-hidden="true"><path d="M36 2 L12 36 H30 L24 62 L52 24 H34 Z" fill="#ffd66e" stroke="#c95a4c" stroke-width="4" stroke-linejoin="round"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
@@ -2053,6 +2057,7 @@ function showWorlds() {
     worldGrid.append(b);
   });
   soundBtn.classList.toggle('off', !progress.sound);
+  bonusBtn.classList.toggle('locked', !WORLDS[BONUS]);
   renderWallet();
 }
 /* a world's map, Mario style: its three courses along one winding road, left to right. Gold when
@@ -2109,10 +2114,10 @@ function showMap(w) {
   renderMap();
 }
 function renderMap() {
-  const w = worldOf((mapWorld)), k = coursesOf(w).indexOf((mapWorld)) + 1;
-  mapBadge.querySelector('.ic').innerHTML = lookOf(w).icon || ''; mapBadgeN.textContent = k;
+  const w = worldOf(mapWorld), k = coursesOf(w).indexOf(mapWorld) + 1, bonus = mapWorld === BONUS;
+  mapBadge.querySelector('.ic').innerHTML = bonus ? BONUS_SVG : lookOf(w).icon || ''; mapBadgeN.textContent = bonus ? WORLDS[BONUS].holes.length : k;
   mapBadge.classList.toggle('night', !!progress.neon);
-  const sky = lookOf(w).sky;
+  const sky = lookOf(mapWorld).sky;
   map.style.background = progress.neon ? 'linear-gradient(#05020f, #2a0b4d)' : `linear-gradient(${sky[0]}, ${sky[1]})`;
   const holes = WORLDS[mapWorld] ? WORLDS[mapWorld].holes : [], pts = NODE_POS.slice(0, holes.length);
   pathLine.innerHTML = `<path d="M${pts.map(p => p.join(' ')).join(' L')}" fill="none" stroke="var(--v-surface-line)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 34"/>`;
@@ -2153,7 +2158,7 @@ function showCard(w) {
   cardTotal.textContent = total;
   cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
   cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
-  const list = playable(), d = w, nd = WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd;
+  const list = playable(), d = w, nd = w === BONUS ? null : WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd;
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
   cardNext.onclick = () => { sfx('tap'); showWorld(worldOf((next))); };
   showScene('card');
@@ -2296,8 +2301,9 @@ function boot() {
   titleGo.addEventListener('click', () => { sfx('tap'); showWorlds(); });
   worldsHome.addEventListener('click', () => { sfx('tap'); wipe(); showTitle(); });
   worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
-  mapBack.addEventListener('click', () => { sfx('tap'); showWorld(worldOf((mapWorld))); });
-  cardMap.addEventListener('click', () => { sfx('tap'); showWorld(worldOf((mapWorld))); });
+  mapBack.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
+  bonusBtn.addEventListener('click', () => { if (WORLDS[BONUS]) { sfx('tap'); showMap(BONUS); } else sfx('boink'); });
+  cardMap.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
   doneRetry.addEventListener('click', () => goHole(play.key, { daily: play.daily, friend: play.friend }));
   initExtras();

@@ -543,6 +543,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #setPanel { left: 320px; width: 560px; }
 #soundBtn { left: 30px; top: 34px; } #neonSet { left: 134px; top: 34px; } #handR { left: 238px; top: 34px; } #handL { left: 342px; top: 34px; } #setClose { left: 446px; top: 34px; }
 #worldNodes .cnode.locked { background: var(--v-mute); border-color: var(--v-mute-line); box-shadow: 0 8px 0 var(--v-mute-down); color: var(--v-ink-soft); }
+#bonusBtn { left: 128px; top: 24px; width: 160px; background: #1d1240; border-color: #ff3df2; box-shadow: 0 6px 0 #0b0620, 0 0 16px #ff3df2; color: #2ef2ff; display: flex; gap: 6px; }
+#bonusBtn svg { width: 54px; height: 54px; } #bonusBtn .n { font: 900 44px var(--v-font); }
+#bonusBtn.locked { opacity: .4; }
 </style>
 </head>
 <body>
@@ -664,6 +667,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <button class="btn" id="setBtn" aria-label="settings"><svg viewBox="0 0 64 64"><path d="M32 6 l5 7 8-3 1 9 8 3-4 8 4 8-8 3-1 9-8-3-5 7-5-7-8 3-1-9-8-3 4-8-4-8 8-3 1-9 8 3z" fill="#a8804e"/><circle cx="32" cy="32" r="10" fill="#fff8ec"/></svg></button>
     <div class="chip" id="mapWallet" aria-label="coins"><svg class="coin" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="35" r="26" fill="#c69334"/><circle cx="32" cy="30" r="26" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="32" cy="30" r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M32 20 L35 27 L42 27 L36.5 31.5 L38.5 39 L32 34.5 L25.5 39 L27.5 31.5 L22 27 L29 27 Z" fill="#dca63f"/></svg><span id="mapCoinsN">0</span></div>
     <button class="btn" id="shopBtn" aria-label="pro shop"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="11" y="28" width="42" height="28" rx="4" fill="#fff8ec" stroke="#a8804e" stroke-width="4"/><rect x="26" y="36" width="12" height="20" rx="3" fill="#6fc0df"/><path d="M6 12 H58 L58 24 H6 Z" fill="#ef7d6d"/><path d="M19 12 V24 M32 12 V24 M45 12 V24" stroke="#fff8ec" stroke-width="6"/><path d="M6 24 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 Z" fill="#c95a4c"/></svg></button>
+    <button class="btn" id="bonusBtn" aria-label="bonus nine"><svg viewBox="0 0 64 64"><path d="M32 3 L40 22 L61 24 L45 38 L50 59 L32 48 L14 59 L19 38 L3 24 L24 22 Z" fill="#ff3df2" stroke="#2ef2ff" stroke-width="4" stroke-linejoin="round"/></svg><span class="n">9</span></button>
     <div id="worldGrid"></div>
     <div id="settings" class="live" aria-label="settings">
       <div id="setPanel">

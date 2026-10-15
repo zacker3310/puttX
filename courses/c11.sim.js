@@ -111,7 +111,7 @@ registerWorld(11, { holes: [
     zones: [{ push: [-1.1, 0], poly: rect(-1.4, 7.9, 1.4, 8.3) }, { surf: 'sand', poly: rect(-1.4, 9, -0.4, 9.6) }],
     bumps: [{ x: 0.2, z: 7.4, r: 0.4, h: 0.16 }] },
   /* 14: pipe relay (4 parts). The pipe or the gap into the crane yard, the second pipe or the top gap, then down the belt lane */
-  { par: 4, crazy: true, sol: [[352,0.96,0],[106,0.92,0],[51,0.44,0]], tee: [-1, 0.5], cup: [1, 1.4], aim0: 0, shape: rect(-2, 0, 2, 9),
+  { par: 4, crazy: true, sol: [[352,1,0],[56,0.36,0]], tee: [-1, 0.5], cup: [1, 1.4], aim0: 0, shape: rect(-2, 0, 2, 9),
     inner: [[[0, 0], [0, 8.2]], [[-1.4, 4], [0, 4]]],
     movers: [{ kind: 'spin', x: -1, z: 6, len: 0.6, w: 1.3, phase: 0, look: 'crane' }],
     tubes: [{ a: [-0.4, 3.4], b: [-1.2, 8.3], dir: 90 }, { a: [-1.6, 4.6], b: [1, 6.6], dir: 180 }],
@@ -123,7 +123,7 @@ registerWorld(11, { holes: [
     tiers: [{ poly: rect(-1.6, 0, 3.4, 14), h: 0, sx: 0.01, sz: 0.006 }],
     bumps: [{ x: -0.8, z: 4, r: 1.8, h: 0.16 }, { x: 1.2, z: 9, r: 1.5, h: -0.08 }, { x: 0.4, z: 11.5, r: 1.2, h: 0.1 }] },
   /* 16: skywalk (3 parts, open). Walk the bare plank over the drop, or take the walled catwalk through the dirt */
-  { par: 4, crazy: true, sol: [[0,0.86,0]], tee: [0, 0.5], cup: [0.7, 8.4], aim0: 0,
+  { par: 4, crazy: true, sol: [[0,0.76,0]], tee: [0, 0.5], cup: [0.7, 8.4], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 2.5), rect(-0.3, 2.45, 0.3, 6), rect(-1.2, 5.95, 1.35, 9), rect(0.75, 1.5, 1.35, 6)],
     walls: [[[-0.3, 5.95], [-1.2, 5.95], [-1.2, 9], [1.35, 9], [1.35, 1.5], [0.8, 1.5], [0.8, 0], [-0.8, 0], [-0.8, 2.5], [-0.3, 2.5]],
             [[0.3, 2.5], [0.75, 2.5], [0.75, 5.95], [0.3, 5.95]]],

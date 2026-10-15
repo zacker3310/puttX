@@ -60,7 +60,7 @@ registerWorld(26, { holes: [
     bumps: [...V26_CRATER(-0.4, 7.4, 0.85)],
     zones: [V26_LAVA(rect(-1.4, 4.6, -0.7, 5.6)), V26_MUD(rect(0.3, 6.2, 1.4, 6.7)), V26_LAVA(rect(-1.4, 8.1, 0.4, 8.4))] },
   /* 8: lava falls: four decks stepping down through offset gaps, a gate on the first (crazy, 4 stages) */
-  { par: 4, crazy: true, sol: [[357,0.48,0],[42.8,1,0]], tee: [0, 0.5], cup: [-0.6, 10.4], shape: rect(-1.2, 0, 1.2, 11.2),
+  { par: 4, crazy: true, sol: [[238,1,1.5],[192,0.72,0]], tee: [0, 0.5], cup: [-0.6, 10.4], shape: rect(-1.2, 0, 1.2, 11.2),
     inner: [[[-1.2, 2.8], [-0.35, 2.8]], [[0.35, 2.8], [1.2, 2.8]], [[-1.2, 5.6], [0.3, 5.6]], [[-0.3, 8.4], [1.2, 8.4]]],
     tiers: [{ poly: rect(-1.4, -0.2, 1.4, 2.8), h: 0.42 }, { poly: rect(-1.4, 2.8, 1.4, 5.6), h: 0.28 }, { poly: rect(-1.4, 5.6, 1.4, 8.4), h: 0.14 }],
     movers: [V26_GATE(-0.55, 2.4, 0.55, 2.4, 0.3, 90, 3)],
@@ -108,7 +108,7 @@ registerWorld(26, { holes: [
     tubes: [{ a: [-2.3, 5.8], b: [-0.7, 3.5], dir: 270, keep: 0, add: 1 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 1.6, 0.4, 3.2) }, { surf: 'fast', push: [-0.5, 0], poly: rect(-3, 2.85, -0.45, 4.15) }, { surf: 'fast', push: [0, -0.6], poly: rect(-3.65, 0.9, -3.05, 3.3) }] },
   /* 14: switchback with a gate on the top leg and lava on the hairpins (3 stages) */
-  { par: 4, sol: [[329.7,0.76,0],[49.7,1,0],[271.7,0.88,0]], tee: [0, 0.5], cup: [-1.2, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
+  { par: 4, sol: [[320,1,2],[16,0.48,0]], tee: [0, 0.5], cup: [-1.2, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
     inner: [[[-1, 2.7], [1.8, 2.7]], [[-1.8, 5.4], [1, 5.4]]],
     tiers: [{ poly: rect(-1.9, 2.7, 1.9, 5.4), h: 0.18 }, { poly: rect(-1.9, 5.4, 1.9, 8.3), h: 0.36 }],
     ramps: [{ x0: -1.8, z0: 2.2, x1: -1, z1: 3.2, axis: 'z', h0: 0, h1: 0.18 }, { x0: 1, z0: 4.9, x1: 1.8, z1: 5.9, axis: 'z', h0: 0.18, h1: 0.36 }],

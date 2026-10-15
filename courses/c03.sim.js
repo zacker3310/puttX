@@ -24,7 +24,7 @@ registerWorld(3, { holes: [
     ramps: [{ x0: -1.6, z0: 7.2, x1: 1.6, z1: 8.0, axis: 'z', h0: 0.06, h1: 0.2 }],
     bumps: [{ x: -0.5, z: 3.6, r: 1.5, h: 0.12 }, { x: 0.9, z: 5.6, r: 1.1, h: -0.07 }] },
   /* 5: the boulder rolls across the far bank of the river */
-  { par: 3, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [0.3, 5.9], shape: rect(-1, 0, 1, 6.6),
+  { par: 3, sol: [[0,1,0]], tee: [0, 0.5], cup: [0.3, 5.9], shape: rect(-1, 0, 1, 6.6),
     zones: [J3_WATER(rect(-1, 2.6, -0.22, 3.5)), J3_WATER(rect(0.22, 2.6, 1, 3.5))],
     movers: [J3_ROCK(-0.6, 4.4, 0.6, 4.4, 2.6)], bumps: [{ x: -0.5, z: 1.6, r: 0.5, h: 0.12 }] },
   /* 6: the waterfall. Jump the plunge pool off the upper deck, or take the side tunnel down */

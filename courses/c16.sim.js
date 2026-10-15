@@ -8,7 +8,7 @@ const V16_COL = (x, z, r = 0.12) => ({ x, z, r, top: 0.3, look: 'basalt' });
 const V16_ROCK = (ax, az, bx, bz, period, phase = 0, r = 0.18) => ({ kind: 'slide', ax, az, bx, bz, r, period, phase, look: 'boulder' });
 registerWorld(16, { holes: [
   /* 1: long green: the dusk apron, an 8 m lag across the fall line over a low ridge */
-  { par: 2, sol: [[0,0.68,0]], tee: [0, 0.5], cup: [0.5, 7.9], shape: rect(-1.5, 0, 1.5, 8.9),
+  { par: 2, sol: [[0,0.76,0]], tee: [0, 0.5], cup: [0.5, 7.9], shape: rect(-1.5, 0, 1.5, 8.9),
     tiers: [{ poly: rect(-1.6, -0.1, 1.6, 9), h: 0.15, sx: -0.03 }],
     bumps: [{ x: -0.6, z: 4.5, r: 1.5, h: 0.1 }, { x: 1, z: 2.4, r: 1, h: -0.05 }] },
   /* 2: off the ash deck through the gap, over the creek bridge (3 parts) */
@@ -77,7 +77,7 @@ registerWorld(16, { holes: [
     tubes: [{ a: [0.8, 4], b: [0.9, 6.6], dir: 330 }, { a: [-0.8, 4], b: [-1, 0.6], dir: 20 }],
     zones: [V16_LAVA(rect(-1.5, 6.6, -0.4, 7.1)), V16_LAVA(rect(0.4, 8.7, 1.5, 9))] },
   /* 11: switchback up the flank: three legs, two ramps, a basalt gate on the top leg (3 parts) */
-  { par: 4, sol: [[30.3,0.64,0],[298.3,0.84,0],[86.4,0.84,0]], tee: [0, 0.5], cup: [1.2, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
+  { par: 4, sol: [[44,1,2],[34,0.76,0]], tee: [0, 0.5], cup: [1.2, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
     inner: [[[-1.8, 2.7], [1, 2.7]], [[-1, 5.4], [1.8, 5.4]]],
     tiers: [{ poly: rect(-1.9, 2.7, 1.9, 5.4), h: 0.2 }, { poly: rect(-1.9, 5.4, 1.9, 8.3), h: 0.4 }],
     ramps: [{ x0: 1, z0: 2.2, x1: 1.8, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.8, z0: 4.9, x1: -1, z1: 5.9, axis: 'z', h0: 0.2, h1: 0.4 }],

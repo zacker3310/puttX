@@ -23,7 +23,7 @@ registerWorld(23, { holes: [
     ramps: [{ x0: -1.6, z0: 5, x1: 2.6, z1: 5.8, axis: 'z', h0: 0.25, h1: 0.1 }, { x0: -1.6, z0: 10, x1: 2.6, z1: 10.8, axis: 'z', h0: 0.1, h1: 0.25 }],
     bumps: [{ x: 0.6, z: 2.8, r: 1.3, h: 0.1 }, { x: 1.4, z: 8.0, r: 1.2, h: 0.12 }, { x: 0.6, z: 12.6, r: 0.9, h: -0.06 }] },
   /* 4: the zigzag: up, across the canopy, up the back stair, drop into the cup lane and climb to the shrine */
-  { par: 4, sol: [[30,1,0],[332,0.8,0],[196,0.85,0],[330,0.66,0]], tee: [0, 0.5], cup: [2.8, 4.7], aim0: 0,
+  { par: 4, sol: [[28,0.92,0],[174,1,0],[0,0.44,0]], tee: [0, 0.5], cup: [2.8, 4.7], aim0: 0,
     shape: [[-0.4, 0], [0.4, 0], [0.4, 4.2], [1.2, 4.2], [1.2, 0], [3.4, 0], [3.4, 3.8], [3.4, 5.4], [-0.4, 5.4]],
     inner: [[[2.2, 0.8], [2.2, 5.4]]],
     ramps: [{ x0: -0.4, z0: 3.4, x1: 0.4, z1: 4.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 1.2, z0: 3.2, x1: 2.2, z1: 4.2, axis: 'z', h0: 0.4, h1: 0.2 },
@@ -57,7 +57,7 @@ registerWorld(23, { holes: [
     tubes: [{ a: [-0.7, 4.2], b: [0.6, 6.0], dir: 0, keep: 0, add: 0.45 }],
     zones: [J23_MUD(rect(-1, 3.2, -0.4, 3.6))], posts: [J23_IDOL(0.1, 3.8), J23_IDOL(0.1, 6.6)] },
   /* 9: the valley lawn, a long green: a broad leaning lawn with a deep swale across the middle and a low ridge off the back left */
-  { par: 3, sol: [[6,0.8,0]], tee: [0, 0.5], cup: [0.9, 11.5], shape: rect(-1.8, 0, 1.8, 12.6),
+  { par: 3, sol: [[6,0.88,0]], tee: [0, 0.5], cup: [0.9, 11.5], shape: rect(-1.8, 0, 1.8, 12.6),
     tiers: [{ poly: rect(-1.8, 0, 1.8, 12.6), h: 0.2, sx: 0.012 }],
     bumps: [{ x: 0.3, z: 6.2, r: 2.2, h: -0.18 }, { x: -1.0, z: 9.6, r: 1.2, h: 0.08 }] },
   /* 10: two stone doors, two drops, a side tunnel round the second door, and a crater cup */
@@ -90,7 +90,7 @@ registerWorld(23, { holes: [
     tubes: [{ a: [0, 3.3], b: [2.6, 0.4], dir: 0, keep: 0.5 }],
     zones: [J23_MUD(rect(1.8, 1.6, 2.4, 2.2))], posts: [J23_IDOL(-0.5, 1.6), J23_IDOL(0.5, 1.6), J23_IDOL(0.8, 5.2), J23_IDOL(-0.5, 6.2)] },
   /* 14: the aqueduct: up the stair, ride the temple conveyor across the top, down the far stair to the cup */
-  { par: 4, sol: [[345,0.97,0],[164,0.74,0]], tee: [0, 0.5], cup: [3.0, 0.8], aim0: 0,
+  { par: 4, sol: [[344,0.92,0],[0,0.88,0]], tee: [0, 0.5], cup: [3.0, 0.8], aim0: 0,
     shape: [[-0.5, 0], [0.5, 0], [0.5, 5], [2.5, 5], [2.5, 0], [3.5, 0], [3.5, 6], [-0.5, 6]],
     ramps: [{ x0: -0.5, z0: 3.4, x1: 0.5, z1: 4.2, axis: 'z', h0: 0, h1: 0.2 }, { x0: 2.5, z0: 3.6, x1: 3.5, z1: 5, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-0.5, 4.2, 0.5, 5), h: 0.2 }, { poly: rect(-0.5, 5, 3.5, 6), h: 0.2 }],

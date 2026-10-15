@@ -13,7 +13,7 @@ registerWorld(15, (() => {
   const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + Math.sin(a) * r, cz + Math.cos(a) * r]; });
   return { holes: [
     /* 1 shore lane: round the corner, or the cave in the far corner */
-    { par: 2, sol: [[22,0.76,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
+    { par: 2, sol: [[328,0.88,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
       shape: [[-0.8, 0], [0.8, 0], [0.8, 4.2], [2.6, 4.2], [2.6, 6.2], [-0.8, 6.2]],
       zones: [sand(rect(-0.8, 2.0, 0.1, 2.8))], bumps: [{ x: 0.9, z: 5.3, r: 0.45, h: 0.14 }],
       tubes: [{ a: [-0.45, 5.6], b: [2.25, 4.6], dir: 0 }], posts: [BARREL(1.3, 4.6)] },
@@ -69,7 +69,7 @@ registerWorld(15, (() => {
       inner: [[[-1.4, 4], [-0.5, 4]], [[0.5, 4], [1.4, 4]]],
       zones: [lagoon(rect(-1.4, 6.6, -0.4, 8)), sand(rect(0.7, 4.6, 1.4, 5.4))], bumps: [{ x: 0.9, z: 3.0, r: 0.4, h: 0.15 }] },
     /* 10 the two-tier green: 12 m, down a broad step from the fort lawn to a lower green that rolls away round a hollow */
-    { par: 3, sol: [[6,1,0]], tee: [-0.8, 0.5], cup: [1.1, 11.2], shape: rect(-2, 0, 2, 12.2),
+    { par: 3, sol: [[0,0.72,0]], tee: [-0.8, 0.5], cup: [1.1, 11.2], shape: rect(-2, 0, 2, 12.2),
       tiers: [{ poly: rect(-2.1, -0.1, 2.1, 5.2), h: 0.15, sx: 0 }, { poly: rect(-2.1, 6.4, 2.1, 12.3), h: 0.064, sz: -0.01 }],
       ramps: [{ x0: -2, z0: 5.2, x1: 2, z1: 6.4, axis: 'z', h0: 0.15, h1: 0 }],
       bumps: [{ x: -0.5, z: 2.8, r: 1.3, h: 0.1 }, { x: 0.4, z: 8.6, r: 1.5, h: -0.12 }, { x: -1.0, z: 10.6, r: 1.1, h: 0.12 }],

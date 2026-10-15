@@ -104,7 +104,7 @@ const SHOTS = process.env.PUTTX_SHOTS;
   /* shot codes */
   const code = await page.evaluate(() => {
     const k = playable()[0] + '-1', log = [[12.5, 0.62, 0], [181.25, 0.3, 3.1]], c = encodeShot(k, log), d = decodeShot(c);
-    const junk = ['', 'x', '1-1', '99-1_1~1~0', '1-1_1~2~0', '1-1_a~b~c', '1-1_' + Array(30).fill('1~0.1~0').join('_')].map(decodeShot);
+    const junk = ['', 'x', '1-1', '88-1_1~1~0', '1-1_1~2~0', '1-1_a~b~c', '1-1_' + Array(30).fill('1~0.1~0').join('_')].map(decodeShot);
     return { c, ok: !!d && d.key === k && JSON.stringify(d.log) === JSON.stringify(log), junk: junk.every(j => !j), safe: /^[0-9A-Za-z._~-]+$/.test(c) };
   });
   check('shot codes round trip in plain URL characters and reject junk', code.ok && code.junk && code.safe, JSON.stringify(code));

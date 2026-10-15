@@ -71,7 +71,8 @@ const realErrors = errs => errs.filter(e => !/Failed to load resource/.test(e));
   const f0 = await page.evaluate(() => ({ coins: progress.coins, mull: progress.mulligans, owned: progress.owned.join(), eq: progress.equipped, feel: JSON.stringify(FEEL) === JSON.stringify(FEEL_BASE),
     head: GEAR.putter.head, ball: GEAR.ball.base, map: !!ballMesh.material.map, wallet: mapCoinsN.textContent }));
   check('fresh save: 0 coins, 5 mulligans, starters owned and equipped, FEEL is base', f0.coins === 0 && f0.mull === 5 && f0.owned === 'p1,b1' && f0.eq.putter === 'p1' && f0.eq.ball === 'b1' && f0.feel && f0.head === '#c9ced6' && f0.ball === '#fffdf7' && f0.map && f0.wallet === '0', JSON.stringify(f0));
-  check('map: wallet and shop button, no words, no small targets', await page.evaluate(() => getComputedStyle(mapWallet).display !== 'none' && shopBtn.getBoundingClientRect().width >= 64)
+  await page.evaluate(() => showWorlds());
+  check('worlds: wallet and shop button, no words, no small targets', await page.evaluate(() => getComputedStyle(mapWallet).display !== 'none' && shopBtn.getBoundingClientRect().width >= 64)
     && (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
 
   /* economy through the real finishHole */
@@ -258,9 +259,9 @@ const realErrors = errs => errs.filter(e => !/Failed to load resource/.test(e));
   check('the starter putter puts FEEL back to base exactly', back.feel && back.head === '#c9ced6' && back.glow === 0 && back.ball === '#fffdf7', JSON.stringify(back));
   check('cannot equip what you do not own', await page.evaluate(() => shopEquip('p9') === false && progress.equipped.putter === 'p1'));
 
-  /* back to the map */
-  await page.evaluate(() => { showMap(1); shopBtn.click(); shopBack.click(); });
-  check('the house button goes back to the map with the wallet', await page.evaluate(() => currentScene === 'map' && mapCoinsN.textContent === '160'));
+  /* back to the worlds */
+  await page.evaluate(() => { showWorlds(); shopBtn.click(); shopBack.click(); });
+  check('the house button goes back to the worlds with the wallet', await page.evaluate(() => currentScene === 'worlds' && mapCoinsN.textContent === '160'));
 
   /* corrupt shop saves repair at boot */
   for (const [name, junk] of [

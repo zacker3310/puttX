@@ -546,6 +546,28 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #bonusBtn { left: 128px; top: 24px; width: 160px; background: #1d1240; border-color: #ff3df2; box-shadow: 0 6px 0 #0b0620, 0 0 16px #ff3df2; color: #2ef2ff; display: flex; gap: 6px; }
 #bonusBtn svg { width: 54px; height: 54px; } #bonusBtn .n { font: 900 44px var(--v-font); }
 #bonusBtn.locked { opacity: .4; }
+/* ---------- 22. PROFILES ---------- */
+#profiles { background: var(--v-surface); background-image: var(--v-dots); background-size: var(--v-dots-size); }
+#profilesBack { left: 24px; top: 24px; }
+#profileRow .pcard { position: absolute; top: 130px; width: 320px; height: 400px; padding: 0; cursor: pointer; border-radius: var(--v-r-xl);
+  background: #fffdf7; border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#profileRow .pcard:active { transform: translateY(4px); }
+#profileRow .pcard.last { border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#profileRow .pcard.empty { background: transparent; border-style: dashed; box-shadow: none; }
+#profileRow .num { position: absolute; left: 18px; top: 10px; font: 800 44px var(--v-font); color: var(--v-ink-strong); }
+#profileRow .ball { width: 150px; height: 150px; }
+#profileRow .row { display: flex; gap: 12px; }
+#profileRow .tally { display: flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 999px; background: var(--v-surface); border: 3px solid var(--v-surface-line); font: 800 28px var(--v-font); color: var(--v-ink-strong); }
+#profileRow .tally svg { width: 30px; height: 30px; }
+#profileRow .tally .star { fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 4; }
+#profileRow .plus { width: 136px; height: 136px; border-radius: 50%; display: grid; place-items: center; background: var(--v-accent-green); box-shadow: 0 6px 0 var(--v-green-down); }
+#profileRow .plus svg { width: 80px; height: 80px; }
+#profileRow .bin { top: 566px; color: #8a7360; }
+#profileRow .bin.armed { background: var(--v-accent-red); border-color: var(--v-red-line); box-shadow: 0 6px 0 var(--v-red-down); color: #fff; animation: binShake .4s ease-in-out 2; }
+@keyframes binShake { 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+@media (prefers-reduced-motion: reduce) { #profileRow .pcard, #profileRow .bin.armed { animation: none; } }
 </style>
 </head>
 <body>
@@ -661,6 +683,10 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <button class="btn" id="doneRetry" aria-label="play this hole again"><svg viewBox="0 0 64 64"><path d="M50 32 A18 18 0 1 1 40 16" fill="none" stroke="#a8804e" stroke-width="8" stroke-linecap="round"/><path d="M33 7 L43 16 L33 26" fill="none" stroke="#a8804e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     </div>
+  </section>
+  <section class="scene panel" id="profiles" aria-label="profiles">
+    <button class="btn" id="profilesBack" aria-label="title"><svg viewBox="0 0 64 64"><path d="M40 12 L20 32 L40 52" fill="none" stroke="#a8804e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div id="profileRow"></div>
   </section>
   <section class="scene panel" id="worlds" aria-label="worlds">
     <button class="btn" id="worldsHome" aria-label="title"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>

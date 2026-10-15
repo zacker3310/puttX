@@ -24,6 +24,28 @@ const { check, done, open, URL } = require('./lib.cjs');
   await reload();
   const v1 = await page.evaluate(() => ({ holes: Object.keys(progress.holes).length, old: !!localStorage.getItem('puttx.v1') }));
   check('a v1 save starts the v2 game fresh and is not destroyed', v1.holes === 0 && v1.old, JSON.stringify(v1));
+  /* three profiles: separate saves, the last one used comes back, erasing takes two taps */
+  await page.evaluate(() => { localStorage.clear(); });
+  await reload();
+  const slots = await page.evaluate(() => {
+    useSlot(1); recordHole(progress, playable()[0] + '-1', 2, 2); progress.coins = 40; saveProgress();
+    useSlot(2); const fresh2 = Object.keys(progress.holes).length === 0 && progress.coins === 0;
+    recordHole(progress, playable()[0] + '-1', 1, 2); recordHole(progress, playable()[0] + '-2', 1, 2); saveProgress();
+    useSlot(1); const back1 = progress.holes[playable()[0] + '-1'].best === 2 && !progress.holes[playable()[0] + '-2'] && progress.coins === 40;
+    useSlot(2);
+    return { fresh2, back1, s1: slotSummary(1), s2: slotSummary(2), s3: slotSummary(3) };
+  });
+  check('each profile keeps its own save', slots.fresh2 && slots.back1 && slots.s1.stars === 2 && slots.s1.coins === 40 && slots.s2.stars === 6 && slots.s3 === null, JSON.stringify(slots));
+  await reload();
+  check('the last profile played comes back after a reload', await page.evaluate(() => slot === 2 && Object.keys(progress.holes).length === 2));
+  const bin = await page.evaluate(() => {
+    showProfiles();
+    const bins = () => profileRow.querySelectorAll('.bin');
+    const n0 = bins().length; bins()[0].click(); const armed = bins()[0].classList.contains('armed') && slotUsed(1);
+    bins()[0].click();
+    return { n0, armed, gone: slotSummary(1) === null, other: slotSummary(2) !== null, n1: bins().length, active: slot };
+  });
+  check('erasing a profile takes two taps and leaves the others alone', bin.n0 === 2 && bin.armed && bin.gone && bin.other && bin.n1 === 1 && bin.active === 2, JSON.stringify(bin));
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

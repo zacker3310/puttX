@@ -18,6 +18,13 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   check('title: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0);
 
   await tap(page, 'titleGo');
+  const prof = await page.evaluate(() => { for (const a of document.getAnimations()) { try { a.finish(); } catch (e) {} } return { scene: currentScene, cards: profileRow.querySelectorAll('.pcard').length, empty: profileRow.querySelectorAll('.pcard.empty').length, bins: profileRow.querySelectorAll('.bin').length }; });
+  check('profiles: three save slots, all new on a fresh install', prof.scene === 'profiles' && prof.cards === 3 && prof.empty === 3 && prof.bins === 0, JSON.stringify(prof));
+  check('profiles: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
+  await page.evaluate(() => profileRow.querySelectorAll('.pcard')[0].click());
+  const tee = await page.evaluate(() => ({ scene: currentScene, key: play.key, slot, first: playable()[0] + '-1' }));
+  check('a new profile tees off on world 1, course 1, hole 1', tee.scene === 'hole' && tee.key === tee.first && tee.slot === 1, JSON.stringify(tee));
+  await page.evaluate(() => showWorlds());
   const worlds = await page.evaluate(() => ({ scene: currentScene, cards: worldGrid.children.length, locked: worldGrid.querySelectorAll('.locked').length }));
   check('worlds: ten world cards, only the first open', worlds.scene === 'worlds' && worlds.cards === 10 && worlds.locked === 9, JSON.stringify(worlds));
   check('worlds: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));

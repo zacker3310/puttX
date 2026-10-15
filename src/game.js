@@ -442,11 +442,15 @@ function holeUnlocked(p, key) {
 // #endregion sim
 
 /* ============ 3. SAVE ============ */
-const SAVE_KEY = 'puttx.v2';     /* v1 saves were for the old 27 holes; the courses changed, so they start fresh */
+/* three profiles, three saves. Slot 1 keeps the original key so a save from before profiles is
+   simply profile 1; the active slot is remembered on its own key. */
+const SLOTS = 3, SLOT_KEY = 'puttx.slot';
+const slotKey = n => n === 1 ? 'puttx.v2' : 'puttx.v2.p' + n;   /* v1 saves were for the old 27 holes; the courses changed, so they start fresh */
+let slot = 1, SAVE_KEY = slotKey(1);
 let progress = freshProgress();
-function loadProgress() {
+function loadProgress(key = SAVE_KEY) {
   try {
-    const p = JSON.parse(localStorage.getItem(SAVE_KEY));
+    const p = JSON.parse(localStorage.getItem(key));
     if (!p || p.v !== 2 || typeof p.holes !== 'object' || !p.holes || !Array.isArray(p.worlds)) return freshProgress();
     const worlds = p.worlds.filter(w => !!WORLDS[w]);
     if (!worlds.includes(freshProgress().worlds[0])) return freshProgress();
@@ -459,6 +463,9 @@ function loadProgress() {
   } catch (e) { return freshProgress(); }
 }
 function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {} }
+function readSlot() { try { const n = Number(localStorage.getItem(SLOT_KEY)); return n >= 1 && n <= SLOTS && Number.isInteger(n) ? n : 1; } catch (e) { return 1; } }
+function slotUsed(n) { try { return !!localStorage.getItem(slotKey(n)); } catch (e) { return false; } }
+function eraseSlot(n) { try { localStorage.removeItem(slotKey(n)); } catch (e) {} }
 
 /* ============ 4. AUDIO ============ */
 /* Every sound is synthesized: oscillators and filtered noise through one master gain and a
@@ -2104,6 +2111,67 @@ function setNeon(on) {
   neonBtn.classList.toggle('on', progress.neon); neonSet.classList.toggle('on', progress.neon);
   if (currentScene === 'world') showWorld(mapWorld);
 }
+/* three profiles: a card per save with its ball, stars, coins and furthest world. A new profile
+   tees straight off on world 1, course 1, hole 1. Erasing takes two taps: the first arms the bin. */
+const BIN_SVG = '<svg viewBox="0 0 64 64"><path d="M14 18 H50 L46 58 H18 Z" fill="#fffdf7" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M8 18 H56 M24 18 V10 H40 V18 M26 28 V48 M38 28 V48" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>';
+const FLAG_SVG = '<svg class="flag" viewBox="0 0 64 64"><path d="M18 58 V6" stroke="#4a3826" stroke-width="5" stroke-linecap="round"/><path d="M20 8 L52 18 L20 30 Z" fill="#ef7d6d"/></svg>';
+const ballSvg = (b, n) => `<svg class="ball" viewBox="0 0 64 64"><defs><clipPath id="pball${n}"><circle cx="32" cy="32" r="26"/></clipPath></defs><circle cx="32" cy="34" r="27" fill="rgba(74,53,35,.18)"/><circle cx="32" cy="32" r="26" fill="${b.base}"/><g clip-path="url(#pball${n})"><rect x="0" y="27" width="64" height="10" fill="${b.band}"/><circle cx="44" cy="20" r="4" fill="${b.mark}"/></g><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(74,53,35,.35)" stroke-width="3"/><ellipse cx="23" cy="20" rx="7" ry="4" fill="#fff" opacity=".6" transform="rotate(-30 23 20)"/></svg>`;
+function slotSummary(n) {
+  if (!slotUsed(n)) return null;
+  const p = loadProgress(slotKey(n)), holes = Object.values(p.holes);
+  if (!holes.length) return null;
+  shopRepair(p);
+  const b = SHOP_ITEMS[p.equipped.ball];
+  return { stars: holes.reduce((a, r) => a + r.stars, 0), coins: p.coins, world: Math.max(...p.worlds.filter(c => c !== BONUS).map(worldOf)), ball: b };
+}
+function useSlot(n) {
+  slot = n; SAVE_KEY = slotKey(n);
+  try { localStorage.setItem(SLOT_KEY, String(n)); } catch (e) {}
+  progress = loadProgress();
+  repairExtras(progress); shopRepair(progress); saveProgress();
+  applyGear(); setHand(progress.hand);
+  if (master) master.gain.value = progress.sound ? 0.8 : 0;
+  soundBtn.classList.toggle('off', !progress.sound);
+  neonSet.classList.toggle('on', progress.neon); neonBtn.classList.toggle('on', progress.neon);
+  renderWallet();
+}
+let binArmed = 0, binTimer = 0;
+function showProfiles() {
+  if (currentScene === 'title') wipe();
+  setRead(false); play.swing = null; play.aimDrag = null; hideAim();
+  showScene('profiles');
+  renderProfiles();
+}
+function renderProfiles() {
+  profileRow.innerHTML = '';
+  for (let n = 1; n <= SLOTS; n++) {
+    const sum = slotSummary(n), card = document.createElement('button'), x = 72 + (n - 1) * 368;
+    card.className = 'pcard' + (sum ? '' : ' empty') + (sum && n === slot ? ' last' : '');
+    card.style.left = x + 'px'; card.style.animationDelay = ((n - 1) * 0.07) + 's';
+    card.setAttribute('aria-label', 'profile ' + n);
+    card.innerHTML = `<span class="num">${n}</span>` + (sum
+      ? `${ballSvg(sum.ball, n)}<span class="row"><span class="tally">${STAR_SVG}${sum.stars}</span><span class="tally">${COIN_SVG}${sum.coins}</span></span><span class="tally world">${FLAG_SVG}${sum.world}</span>`
+      : '<span class="plus"><svg viewBox="0 0 64 64"><path d="M32 12 V52 M12 32 H52" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg></span>');
+    card.onclick = () => {
+      useSlot(n);
+      if (sum) { sfx('tap'); showWorlds(); } else goHole(playable()[0] + '-1');
+    };
+    profileRow.append(card);
+    if (!sum) continue;
+    const bin = document.createElement('button');
+    bin.className = 'btn bin' + (binArmed === n ? ' armed' : '');
+    bin.style.left = (x + 116) + 'px';
+    bin.setAttribute('aria-label', 'erase profile ' + n);
+    bin.innerHTML = BIN_SVG;
+    bin.onclick = () => {
+      clearTimeout(binTimer);
+      if (binArmed !== n) { binArmed = n; sfx('tick'); binTimer = setTimeout(() => { binArmed = 0; if (currentScene === 'profiles') renderProfiles(); }, 3000); }
+      else { binArmed = 0; eraseSlot(n); sfx('boink'); if (n === slot) useSlot(n); }
+      renderProfiles();
+    };
+    profileRow.append(bin);
+  }
+}
 function showMap(w) {
   if (currentScene !== 'map') wipe();
   setRead(false);
@@ -2271,6 +2339,7 @@ function initUpdates() {
 
 /* ============ 9. BOOT ============ */
 function boot() {
+  slot = readSlot(); SAVE_KEY = slotKey(slot);
   progress = loadProgress();
   repairExtras(progress);
   fit();
@@ -2298,8 +2367,9 @@ function boot() {
   neonSet.classList.toggle('on', !!progress.neon);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
-  titleGo.addEventListener('click', () => { sfx('tap'); showWorlds(); });
-  worldsHome.addEventListener('click', () => { sfx('tap'); wipe(); showTitle(); });
+  titleGo.addEventListener('click', () => { sfx('tap'); showProfiles(); });
+  profilesBack.addEventListener('click', () => { sfx('tap'); showTitle(); });
+  worldsHome.addEventListener('click', () => { sfx('tap'); showProfiles(); });
   worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
   mapBack.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
   bonusBtn.addEventListener('click', () => { if (WORLDS[BONUS]) { sfx('tap'); showMap(BONUS); } else sfx('boink'); });

@@ -58,7 +58,7 @@ registerWorld(30, { holes: [
     tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 2.2, color: '#ffd66e' },
       { a: [5.6, 1.2], b: [4.43, 6.0], dir: 240, keep: 0, add: 2.4, color: '#6fc0df' }] },
   /* 7. switchback: up the rainbow rail, round the windmill deck, up the second rail the other way, along the walled ridge to the crown */
-  { par: 5, crazy: true, sol: [[358,0.75,0],[265,0.7,1],[170,0.95,0],[270,0.3,0],[355,0.7,0]], tee: [1.0, 0.6], cup: [-1.8, 5.2], aim0: 0,
+  { par: 5, crazy: true, sol: [[350,0.96,2],[204,1,0],[2,0.56,0]], tee: [1.0, 0.6], cup: [-1.8, 5.2], aim0: 0,
     floors: [rect(0.5, 0, 1.5, 1.5), rect(0.7, 1.5, 1.3, 4), rect(-0.9, 4, 1.5, 5.3), rect(-0.9, 1.6, -0.3, 4), rect(-2.3, 0.2, -0.1, 1.6), rect(-2.1, 1.6, -1.5, 3.6), rect(-2.6, 3.6, -1.2, 6)],
     walls: [[[0.7, 1.5], [0.5, 1.5], [0.5, 0], [1.5, 0], [1.5, 1.5], [1.3, 1.5]], [[1.3, 1.5], [1.3, 4]], [[0.7, 1.5], [0.7, 4]],
       [[1.3, 4], [1.5, 4], [1.5, 5.3], [-0.9, 5.3], [-0.9, 4]], [[-0.3, 4], [-0.3, 1.6]], [[-0.9, 4], [-0.9, 1.6]],
@@ -132,7 +132,7 @@ registerWorld(30, { holes: [
     movers: [{ kind: 'spin', x: 0.9, z: 3.9, len: 0.3, w: 1.9, phase: 0, blades: 2, look: 'windmill' }],
     tubes: [{ a: [1.2, 3.2], b: [-3.2, 5.85], dir: 0, keep: 0, add: 0.6 }] },
   /* 15. aurora relay: four bare rainbows between tiny islands, each with its own crosswind, up to the crown */
-  { par: 5, crazy: true, sol: [[356,0.58,0],[71,0.36,0],[1,0.85,0],[355,0.61,0]], tee: [0, 0.6], cup: [3.3, 11.6],
+  { par: 5, crazy: true, sol: [[358,0.56,0],[70,0.36,0],[4,0.72,0]], tee: [0, 0.6], cup: [3.3, 11.6],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(0.6, 3.85, 2.6, 4.35), rect(2.6, 3.4, 3.6, 5.2),
       rect(2.85, 5.2, 3.35, 7.2), rect(2.0, 7.2, 4.4, 9), rect(2.8, 9, 3.5, 10.6), rect(2.0, 10.6, 4.4, 12.4)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[0.6, 4.6], [-0.6, 4.6], [-0.6, 3.6]],

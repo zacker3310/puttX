@@ -92,7 +92,7 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(-0.1, 8.1), C7_GARG(-0.9, 8.15)],
     movers: [C7_MILL(0, 2.0, 0.6, 1.5, 0), C7_GHOST(-0.85, 7.35, 0.6, 7.35, 2.6, 0)] },
   /* 14: three dungeon rooms joined by secret passages; pick the right mouths */
-  { par: 4, crazy: true, sol: [[140,1,0],[56,0.88,1.2],[4,0.88,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 14, floors: [rect(-1, 0, 1, 2.8), rect(-1, 3.6, 1, 6.4), rect(-1, 7.2, 1, 10)],
+  { par: 4, crazy: true, sol: [[12,0.96,0],[296,0.6,1],[2,0.48,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 14, floors: [rect(-1, 0, 1, 2.8), rect(-1, 3.6, 1, 6.4), rect(-1, 7.2, 1, 10)],
     walls: [ring(rect(-1, 0, 1, 2.8)), ring(rect(-1, 3.6, 1, 6.4)), ring(rect(-1, 7.2, 1, 10)), [[-1, 5], [-0.25, 5]], [[0.25, 5], [1, 5]]],
     zones: [{ surf: 'sand', poly: rect(-1, 3.6, -0.3, 4.4) }],
     tubes: [{ a: [0.6, 2.35], b: [0.7, 3.95], dir: 0 }, { a: [0, 2.35], b: [-0.7, 0.45], dir: 20 }, { a: [-0.6, 2.35], b: [-0.7, 3.95], dir: 0 },

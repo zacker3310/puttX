@@ -546,6 +546,28 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #bonusBtn { left: 128px; top: 24px; width: 160px; background: #1d1240; border-color: #ff3df2; box-shadow: 0 6px 0 #0b0620, 0 0 16px #ff3df2; color: #2ef2ff; display: flex; gap: 6px; }
 #bonusBtn svg { width: 54px; height: 54px; } #bonusBtn .n { font: 900 44px var(--v-font); }
 #bonusBtn.locked { opacity: .4; }
+/* ---------- 22. PROFILES ---------- */
+#profiles { background: var(--v-surface); background-image: var(--v-dots); background-size: var(--v-dots-size); }
+#profilesBack { left: 24px; top: 24px; }
+#profileRow .pcard { position: absolute; top: 130px; width: 320px; height: 400px; padding: 0; cursor: pointer; border-radius: var(--v-r-xl);
+  background: #fffdf7; border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#profileRow .pcard:active { transform: translateY(4px); }
+#profileRow .pcard.last { border-color: var(--v-yellow-line); box-shadow: 0 6px 0 var(--v-yellow-down); }
+#profileRow .pcard.empty { background: transparent; border-style: dashed; box-shadow: none; }
+#profileRow .num { position: absolute; left: 18px; top: 10px; font: 800 44px var(--v-font); color: var(--v-ink-strong); }
+#profileRow .ball { width: 150px; height: 150px; }
+#profileRow .row { display: flex; gap: 12px; }
+#profileRow .tally { display: flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 999px; background: var(--v-surface); border: 3px solid var(--v-surface-line); font: 800 28px var(--v-font); color: var(--v-ink-strong); }
+#profileRow .tally svg { width: 30px; height: 30px; }
+#profileRow .tally .star { fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 4; }
+#profileRow .plus { width: 136px; height: 136px; border-radius: 50%; display: grid; place-items: center; background: var(--v-accent-green); box-shadow: 0 6px 0 var(--v-green-down); }
+#profileRow .plus svg { width: 80px; height: 80px; }
+#profileRow .bin { top: 566px; color: #8a7360; }
+#profileRow .bin.armed { background: var(--v-accent-red); border-color: var(--v-red-line); box-shadow: 0 6px 0 var(--v-red-down); color: #fff; animation: binShake .4s ease-in-out 2; }
+@keyframes binShake { 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+@media (prefers-reduced-motion: reduce) { #profileRow .pcard, #profileRow .bin.armed { animation: none; } }
 </style>
 </head>
 <body>
@@ -662,6 +684,10 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
       <button class="btn go" id="doneNext" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     </div>
   </section>
+  <section class="scene panel" id="profiles" aria-label="profiles">
+    <button class="btn" id="profilesBack" aria-label="title"><svg viewBox="0 0 64 64"><path d="M40 12 L20 32 L40 52" fill="none" stroke="#a8804e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div id="profileRow"></div>
+  </section>
   <section class="scene panel" id="worlds" aria-label="worlds">
     <button class="btn" id="worldsHome" aria-label="title"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
     <button class="btn" id="setBtn" aria-label="settings"><svg viewBox="0 0 64 64"><path d="M32 6 l5 7 8-3 1 9 8 3-4 8 4 8-8 3-1 9-8-3-5 7-5-7-8 3-1-9-8-3 4-8-4-8 8-3 1-9 8 3z" fill="#a8804e"/><circle cx="32" cy="32" r="10" fill="#fff8ec"/></svg></button>
@@ -744,7 +770,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = '80c3ef43189e';
+const BUILD_ID = 'f5963598fb08';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1994,7 +2020,7 @@ registerWorld(7, { holes: [
     posts: [C7_GARG(-0.1, 8.1), C7_GARG(-0.9, 8.15)],
     movers: [C7_MILL(0, 2.0, 0.6, 1.5, 0), C7_GHOST(-0.85, 7.35, 0.6, 7.35, 2.6, 0)] },
   /* 14: three dungeon rooms joined by secret passages; pick the right mouths */
-  { par: 4, crazy: true, sol: [[140,1,0],[56,0.88,1.2],[4,0.88,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 14, floors: [rect(-1, 0, 1, 2.8), rect(-1, 3.6, 1, 6.4), rect(-1, 7.2, 1, 10)],
+  { par: 4, crazy: true, sol: [[12,0.96,0],[296,0.6,1],[2,0.48,0]], tee: [0, 0.5], cup: [0.4, 9.4], aim0: 14, floors: [rect(-1, 0, 1, 2.8), rect(-1, 3.6, 1, 6.4), rect(-1, 7.2, 1, 10)],
     walls: [ring(rect(-1, 0, 1, 2.8)), ring(rect(-1, 3.6, 1, 6.4)), ring(rect(-1, 7.2, 1, 10)), [[-1, 5], [-0.25, 5]], [[0.25, 5], [1, 5]]],
     zones: [{ surf: 'sand', poly: rect(-1, 3.6, -0.3, 4.4) }],
     tubes: [{ a: [0.6, 2.35], b: [0.7, 3.95], dir: 0 }, { a: [0, 2.35], b: [-0.7, 0.45], dir: 20 }, { a: [-0.6, 2.35], b: [-0.7, 3.95], dir: 0 },
@@ -3460,7 +3486,7 @@ registerWorld(17, { holes: [
     movers: [C17_GATE(0, 3.0, 0.39, 3.0, 0.25, 2.8, 0), C17_MILL(0, 5.0, 0.5, 1.4, 0)] },
   /* 18: the showpiece: through the gate, up the switchback stair, into the right passage and
      onto the throne dais past a ghost */
-  { par: 5, crazy: true, sol: [[295,1,0],[275,1,0],[309,0.85,1.5]], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
+  { par: 5, crazy: true, sol: [[184,0.92,0.5],[250,0.96,2],[0,0.44,0]], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
     inner: [[[-2.0, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [2.0, 2.6]], [[-2.0, 3.6], [1.0, 3.6]], [[-1.0, 4.6], [2.0, 4.6]], [[-2.0, 5.6], [2.0, 5.6]]],
     tiers: [{ poly: [[1.0, 2.6], [2.0, 2.6], [2.0, 4.6], [0.6, 4.6], [0.6, 3.6], [1.0, 3.6]], h: 0.15 },
       { poly: [[-2.0, 3.6], [-1.0, 3.6], [-1.0, 4.6], [2.0, 4.6], [2.0, 5.6], [-2.0, 5.6]], h: 0.3 },
@@ -5455,7 +5481,7 @@ registerWorld(30, { holes: [
     tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 2.2, color: '#ffd66e' },
       { a: [5.6, 1.2], b: [4.43, 6.0], dir: 240, keep: 0, add: 2.4, color: '#6fc0df' }] },
   /* 7. switchback: up the rainbow rail, round the windmill deck, up the second rail the other way, along the walled ridge to the crown */
-  { par: 5, crazy: true, sol: [[358,0.75,0],[265,0.7,1],[170,0.95,0],[270,0.3,0],[355,0.7,0]], tee: [1.0, 0.6], cup: [-1.8, 5.2], aim0: 0,
+  { par: 5, crazy: true, sol: [[350,0.96,2],[204,1,0],[2,0.56,0]], tee: [1.0, 0.6], cup: [-1.8, 5.2], aim0: 0,
     floors: [rect(0.5, 0, 1.5, 1.5), rect(0.7, 1.5, 1.3, 4), rect(-0.9, 4, 1.5, 5.3), rect(-0.9, 1.6, -0.3, 4), rect(-2.3, 0.2, -0.1, 1.6), rect(-2.1, 1.6, -1.5, 3.6), rect(-2.6, 3.6, -1.2, 6)],
     walls: [[[0.7, 1.5], [0.5, 1.5], [0.5, 0], [1.5, 0], [1.5, 1.5], [1.3, 1.5]], [[1.3, 1.5], [1.3, 4]], [[0.7, 1.5], [0.7, 4]],
       [[1.3, 4], [1.5, 4], [1.5, 5.3], [-0.9, 5.3], [-0.9, 4]], [[-0.3, 4], [-0.3, 1.6]], [[-0.9, 4], [-0.9, 1.6]],
@@ -5529,7 +5555,7 @@ registerWorld(30, { holes: [
     movers: [{ kind: 'spin', x: 0.9, z: 3.9, len: 0.3, w: 1.9, phase: 0, blades: 2, look: 'windmill' }],
     tubes: [{ a: [1.2, 3.2], b: [-3.2, 5.85], dir: 0, keep: 0, add: 0.6 }] },
   /* 15. aurora relay: four bare rainbows between tiny islands, each with its own crosswind, up to the crown */
-  { par: 5, crazy: true, sol: [[356,0.58,0],[71,0.36,0],[1,0.85,0],[355,0.61,0]], tee: [0, 0.6], cup: [3.3, 11.6],
+  { par: 5, crazy: true, sol: [[358,0.56,0],[70,0.36,0],[4,0.72,0]], tee: [0, 0.6], cup: [3.3, 11.6],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(0.6, 3.85, 2.6, 4.35), rect(2.6, 3.4, 3.6, 5.2),
       rect(2.85, 5.2, 3.35, 7.2), rect(2.0, 7.2, 4.4, 9), rect(2.8, 9, 3.5, 10.6), rect(2.0, 10.6, 4.4, 12.4)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[0.6, 4.6], [-0.6, 4.6], [-0.6, 3.6]],
@@ -5745,11 +5771,15 @@ registerWorld(99, { holes: [
 // #endregion sim
 
 /* ============ 3. SAVE ============ */
-const SAVE_KEY = 'puttx.v2';     /* v1 saves were for the old 27 holes; the courses changed, so they start fresh */
+/* three profiles, three saves. Slot 1 keeps the original key so a save from before profiles is
+   simply profile 1; the active slot is remembered on its own key. */
+const SLOTS = 3, SLOT_KEY = 'puttx.slot';
+const slotKey = n => n === 1 ? 'puttx.v2' : 'puttx.v2.p' + n;   /* v1 saves were for the old 27 holes; the courses changed, so they start fresh */
+let slot = 1, SAVE_KEY = slotKey(1);
 let progress = freshProgress();
-function loadProgress() {
+function loadProgress(key = SAVE_KEY) {
   try {
-    const p = JSON.parse(localStorage.getItem(SAVE_KEY));
+    const p = JSON.parse(localStorage.getItem(key));
     if (!p || p.v !== 2 || typeof p.holes !== 'object' || !p.holes || !Array.isArray(p.worlds)) return freshProgress();
     const worlds = p.worlds.filter(w => !!WORLDS[w]);
     if (!worlds.includes(freshProgress().worlds[0])) return freshProgress();
@@ -5762,6 +5792,9 @@ function loadProgress() {
   } catch (e) { return freshProgress(); }
 }
 function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {} }
+function readSlot() { try { const n = Number(localStorage.getItem(SLOT_KEY)); return n >= 1 && n <= SLOTS && Number.isInteger(n) ? n : 1; } catch (e) { return 1; } }
+function slotUsed(n) { try { return !!localStorage.getItem(slotKey(n)); } catch (e) { return false; } }
+function eraseSlot(n) { try { localStorage.removeItem(slotKey(n)); } catch (e) {} }
 
 /* ============ 4. AUDIO ============ */
 /* Every sound is synthesized: oscillators and filtered noise through one master gain and a
@@ -9141,6 +9174,67 @@ function setNeon(on) {
   neonBtn.classList.toggle('on', progress.neon); neonSet.classList.toggle('on', progress.neon);
   if (currentScene === 'world') showWorld(mapWorld);
 }
+/* three profiles: a card per save with its ball, stars, coins and furthest world. A new profile
+   tees straight off on world 1, course 1, hole 1. Erasing takes two taps: the first arms the bin. */
+const BIN_SVG = '<svg viewBox="0 0 64 64"><path d="M14 18 H50 L46 58 H18 Z" fill="#fffdf7" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M8 18 H56 M24 18 V10 H40 V18 M26 28 V48 M38 28 V48" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>';
+const FLAG_SVG = '<svg class="flag" viewBox="0 0 64 64"><path d="M18 58 V6" stroke="#4a3826" stroke-width="5" stroke-linecap="round"/><path d="M20 8 L52 18 L20 30 Z" fill="#ef7d6d"/></svg>';
+const ballSvg = (b, n) => `<svg class="ball" viewBox="0 0 64 64"><defs><clipPath id="pball${n}"><circle cx="32" cy="32" r="26"/></clipPath></defs><circle cx="32" cy="34" r="27" fill="rgba(74,53,35,.18)"/><circle cx="32" cy="32" r="26" fill="${b.base}"/><g clip-path="url(#pball${n})"><rect x="0" y="27" width="64" height="10" fill="${b.band}"/><circle cx="44" cy="20" r="4" fill="${b.mark}"/></g><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(74,53,35,.35)" stroke-width="3"/><ellipse cx="23" cy="20" rx="7" ry="4" fill="#fff" opacity=".6" transform="rotate(-30 23 20)"/></svg>`;
+function slotSummary(n) {
+  if (!slotUsed(n)) return null;
+  const p = loadProgress(slotKey(n)), holes = Object.values(p.holes);
+  if (!holes.length) return null;
+  shopRepair(p);
+  const b = SHOP_ITEMS[p.equipped.ball];
+  return { stars: holes.reduce((a, r) => a + r.stars, 0), coins: p.coins, world: Math.max(...p.worlds.filter(c => c !== BONUS).map(worldOf)), ball: b };
+}
+function useSlot(n) {
+  slot = n; SAVE_KEY = slotKey(n);
+  try { localStorage.setItem(SLOT_KEY, String(n)); } catch (e) {}
+  progress = loadProgress();
+  repairExtras(progress); shopRepair(progress); saveProgress();
+  applyGear(); setHand(progress.hand);
+  if (master) master.gain.value = progress.sound ? 0.8 : 0;
+  soundBtn.classList.toggle('off', !progress.sound);
+  neonSet.classList.toggle('on', progress.neon); neonBtn.classList.toggle('on', progress.neon);
+  renderWallet();
+}
+let binArmed = 0, binTimer = 0;
+function showProfiles() {
+  if (currentScene === 'title') wipe();
+  setRead(false); play.swing = null; play.aimDrag = null; hideAim();
+  showScene('profiles');
+  renderProfiles();
+}
+function renderProfiles() {
+  profileRow.innerHTML = '';
+  for (let n = 1; n <= SLOTS; n++) {
+    const sum = slotSummary(n), card = document.createElement('button'), x = 72 + (n - 1) * 368;
+    card.className = 'pcard' + (sum ? '' : ' empty') + (sum && n === slot ? ' last' : '');
+    card.style.left = x + 'px'; card.style.animationDelay = ((n - 1) * 0.07) + 's';
+    card.setAttribute('aria-label', 'profile ' + n);
+    card.innerHTML = `<span class="num">${n}</span>` + (sum
+      ? `${ballSvg(sum.ball, n)}<span class="row"><span class="tally">${STAR_SVG}${sum.stars}</span><span class="tally">${COIN_SVG}${sum.coins}</span></span><span class="tally world">${FLAG_SVG}${sum.world}</span>`
+      : '<span class="plus"><svg viewBox="0 0 64 64"><path d="M32 12 V52 M12 32 H52" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg></span>');
+    card.onclick = () => {
+      useSlot(n);
+      if (sum) { sfx('tap'); showWorlds(); } else goHole(playable()[0] + '-1');
+    };
+    profileRow.append(card);
+    if (!sum) continue;
+    const bin = document.createElement('button');
+    bin.className = 'btn bin' + (binArmed === n ? ' armed' : '');
+    bin.style.left = (x + 116) + 'px';
+    bin.setAttribute('aria-label', 'erase profile ' + n);
+    bin.innerHTML = BIN_SVG;
+    bin.onclick = () => {
+      clearTimeout(binTimer);
+      if (binArmed !== n) { binArmed = n; sfx('tick'); binTimer = setTimeout(() => { binArmed = 0; if (currentScene === 'profiles') renderProfiles(); }, 3000); }
+      else { binArmed = 0; eraseSlot(n); sfx('boink'); if (n === slot) useSlot(n); }
+      renderProfiles();
+    };
+    profileRow.append(bin);
+  }
+}
 function showMap(w) {
   if (currentScene !== 'map') wipe();
   setRead(false);
@@ -10256,6 +10350,7 @@ function initUpdates() {
 
 /* ============ 9. BOOT ============ */
 function boot() {
+  slot = readSlot(); SAVE_KEY = slotKey(slot);
   progress = loadProgress();
   repairExtras(progress);
   fit();
@@ -10283,8 +10378,9 @@ function boot() {
   neonSet.classList.toggle('on', !!progress.neon);
   homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
-  titleGo.addEventListener('click', () => { sfx('tap'); showWorlds(); });
-  worldsHome.addEventListener('click', () => { sfx('tap'); wipe(); showTitle(); });
+  titleGo.addEventListener('click', () => { sfx('tap'); showProfiles(); });
+  profilesBack.addEventListener('click', () => { sfx('tap'); showTitle(); });
+  worldsHome.addEventListener('click', () => { sfx('tap'); showProfiles(); });
   worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
   mapBack.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
   bonusBtn.addEventListener('click', () => { if (WORLDS[BONUS]) { sfx('tap'); showMap(BONUS); } else sfx('boink'); });

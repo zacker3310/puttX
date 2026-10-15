@@ -48,7 +48,8 @@ putting game on an iPad. v1 (27 gentle holes for a 3-5 year old) is superseded.
 
 Each course has 18 holes, par 2 to 5, at least five 3-4 part holes, and difficulty climbing
 through the course and across courses. At most 2% of tee shots ace any hole. Finishing hole 18
-unlocks the next course.
+unlocks the next course in the same world. The next world opens only when every hole of all three
+of this world's courses is finished.
 
 ## Play
 
@@ -91,7 +92,8 @@ cosmetic. Wordless, prices in numerals.
 
 ## Persistence
 
-`localStorage` key `puttx.v2`: per-hole best and stars, unlocked courses, sound, coins and gear,
+Three profiles, one save each: `puttx.v2` (profile 1, so older saves carry over), `puttx.v2.p2`,
+`puttx.v2.p3`; `puttx.slot` remembers the last one played. Each save holds per-hole best and stars, unlocked courses, sound, coins and gear,
 mulligan tokens, lost balls found, goal bits per hole, the daily record, ghosts and the neon setting.
 Missing or corrupt data falls back to a fresh save. v1 saves are left alone.
 

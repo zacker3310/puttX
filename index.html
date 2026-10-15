@@ -770,7 +770,7 @@ const t="170",e={LEFT:0,MIDDLE:1,RIGHT:2,ROTATE:0,DOLLY:1,PAN:2},n={ROTATE:0,PAN
    4. audio   5. render (+ world looks)   6. play   7. scenes   8. fx   9. boot */
 'use strict';
 /* this build's fingerprint (scripts/build.cjs fills it in): a home-screen app compares it with the live page to pick up updates */
-const BUILD_ID = 'f5963598fb08';
+const BUILD_ID = 'c2bb6525a39d';
 /* ============ 1. STAGE ============ */
 let stageScale = 1, currentScene = '';
 function fit() {
@@ -1188,13 +1188,12 @@ function recordHole(p, key, score, par, maxStars = 3) {
   const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, Math.min(maxStars, starsFor(score, par))) };
   p.holes[key] = rec;
   /* the last hole of a course opens the next playable course */
-  const [w, n] = key.split('-').map(Number), list = playable(), i = list.indexOf(w);
+  const [w, n] = key.split('-').map(Number), list = playable();
   const open = c => { if (WORLDS[c] && !p.worlds.includes(c)) p.worlds.push(c); };
-  if (WORLDS[w] && n === WORLDS[w].holes.length) {
-    /* a world's first course opens the next world; each course opens the next one in its world */
-    if (i >= 0 && i + 1 < list.length) open(list[i + 1]);
-    if (w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
-  }
+  if (WORLDS[w] && n === WORLDS[w].holes.length && w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
+  /* the next world opens only once every hole of every course in this world is finished */
+  const home = worldOf(w), j = list.indexOf(home);
+  if (w !== BONUS && j >= 0 && j + 1 < list.length && coursesOf(home).every(c => WORLDS[c].holes.every(hd => p.holes[hd.key]))) open(list[j + 1]);
   return rec;
 }
 function holeUnlocked(p, key) {
@@ -2260,7 +2259,7 @@ registerWorld(9, { holes: [
     tiers: [{ poly: rect(-2.2, 7.4, 2.2, 13), h: 0.16, sx: 0.011 }],
     bumps: [{ x: 1.0, z: 3.0, r: 1.6, h: 0.1 }, { x: 0.4, z: 9.4, r: 1.3, h: 0.09 }, { x: -1.6, z: 3.6, r: 1.2, h: -0.08 }] },
   /* 11: belts in a zig-zag factory floor */
-  { par: 2, sol: [[54,0.88,0]], tee: [-1, 0.5], cup: [-0.9, 7.2], aim0: 30, shape: rect(-1.5, 0, 1.5, 8),
+  { par: 2, sol: [[57,0.86,0]], tee: [-1, 0.5], cup: [-0.9, 7.2], aim0: 30, shape: rect(-1.5, 0, 1.5, 8),
     inner: [[[-1.5, 2.5], [0.8, 2.5]], [[-0.8, 5], [1.5, 5]]],
     zones: [C9_BELT(rect(-1.5, 0, 1.5, 2.5), -1.2, 0), C9_BELT(rect(-1.5, 2.5, 1.5, 5), -1.6, 0), C9_BELT(rect(-1.5, 5.6, 1.5, 6.6), 1.5, 0)],
     posts: [C9_GUM(0, 3.7)] },
@@ -2302,7 +2301,7 @@ registerWorld(9, { holes: [
       { surf: 'mud', poly: rect(-0.85, 6.3, -0.6, 7.5) }],
     posts: [C9_GUM(-0.5, 5.5), C9_GUM(-1.4, 5.4), C9_GUM(0.4, 5.9)] },
   /* 18: the production line: belt up the ramp, gumdrop maze to the pipe, taffy-guarded cup */
-  { par: 5, crazy: true, sol: [[8,1,0],[48,0.8,0]], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[12,0.68,0],[48,0.8,0]], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]], rect(-0.6, 8.5, 3.4, 11.6)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]]), ring(rect(-0.6, 8.5, 3.4, 11.6))],
     ramps: [{ x0: -0.6, z0: 2, x1: 0.6, z1: 4.5, axis: 'z', h0: 0, h1: 0.45 }],
@@ -4764,7 +4763,7 @@ registerWorld(25, (() => {
       drains: [{ x: -2.7, z: 5.85, r: 1.1, depth: 0.35, flat: 0.13 }, { x: -3.2, z: 1.2, r: 1.1, depth: 0.35 }],
       tubes: [{ a: [-2.7, 5.85], b: [-2.7, 4.3], dir: 176, keep: 0, add: 2.5 }] },
     /* 18 the galleon: gangplank, the main deck's wheel and cannon, the quarterdeck's drawbridge, then walk the plank or the cave to treasure island */
-    { par: 5, crazy: true, sol: [[324,1,0],[210,0.9,0],[3,0.95,0]], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
+    { par: 5, crazy: true, sol: [[326,0.96,0],[46,1,0]], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
       ramps: [{ x0: -2, z0: 2.4, x1: -1.3, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }, { x0: 1.3, z0: 6.4, x1: 2, z1: 7.6, axis: 'z', h0: 0.25, h1: 0.44 }],
       tiers: [{ poly: rect(-2.1, 3.6, 2.1, 9), h: 0.25 }, { poly: rect(-2.1, 7.6, 2.1, 9), h: 0.44 }, { poly: rect(-0.2, 9, 0.2, 10), h: 0.44 }],
       inner: [[[-1.3, 3.6], [2, 3.6]], [[-2, 7.6], [1.3, 7.6]], [[-2, 9], [-0.2, 9]], [[0.2, 9], [2, 9]]],
@@ -5294,14 +5293,14 @@ registerWorld(29, { holes: [
     tiers: [{ poly: rect(-0.9, 4.6, 0.9, 7.5), h: 0.2 }],
     posts: [C29_GUM(0.3, 5.6)] },
   /* 2: two candy-cane pipes chain three pads */
-  { par: 3, sol: [[10,0.84,0],[4,0.84,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 0,
+  { par: 3, sol: [[10,0.84,0],[4,0.96,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 2.6), rect(-2.6, 3.2, -0.6, 5.6), rect(-0.7, 6.2, 1.4, 8.8)],
     walls: [ring(rect(-0.7, 0, 0.7, 2.6)), ring(rect(-2.6, 3.2, -0.6, 5.6)), ring(rect(-0.7, 6.2, 1.4, 8.8))],
     zones: [C29_BELT(rect(-2.6, 3.2, -0.6, 4.2), 0, 0.9), C29_MUD(0.2, 7.5, 1.4, 7.65)],
     posts: [C29_GUM(-1.9, 4.8)],
     tubes: [C29_PIPE([0, 2.1], [-1.6, 3.6], 0), C29_PIPE([-1.2, 5.1], [-0.2, 6.6], 20)] },
   /* 3: up the ramp, past the lollipop on the deck, off the edge to the taffy green */
-  { par: 3, sol: [[0,0.84,0]], tee: [0, 0.5], cup: [-0.4, 8.0], shape: rect(-1.1, 0, 1.1, 9),
+  { par: 3, sol: [[16,0.96,0]], tee: [0, 0.5], cup: [-0.4, 8.0], shape: rect(-1.1, 0, 1.1, 9),
     ramps: [{ x0: -1.1, z0: 1.2, x1: 1.1, z1: 2.4, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.1, 2.4, 1.1, 5.2), h: 0.3 }],
     movers: [C29_POP(0, 3.8, 0.55, 1.5, 0, 2)],
@@ -5390,7 +5389,7 @@ registerWorld(29, { holes: [
     movers: [C29_POP(-0.6, 8.0, 0.45, 1.4, 0, 1)],
     tubes: [C29_PIPE([0.3, 1.9], [1.6, 3.4], 30), C29_PIPE([3.0, 4.8], [3.0, 6.4], 330), C29_PIPE([1.6, 7.8], [-0.6, 6.4], 0)] },
   /* 15: long green: the sugar dogleg, a broad green leaning right round a ridge at the corner */
-  { par: 3, sol: [[6,0.88,0]], tee: [0, 0.5], cup: [4.4, 10.6], aim0: 0, shape: [[-1.5, 0], [1.5, 0], [1.5, 8.5], [5.5, 8.5], [5.5, 12], [-1.5, 12]],
+  { par: 3, sol: [[332,0.92,0]], tee: [0, 0.5], cup: [4.4, 10.6], aim0: 0, shape: [[-1.5, 0], [1.5, 0], [1.5, 8.5], [5.5, 8.5], [5.5, 12], [-1.5, 12]],
     tiers: [{ poly: [[-1.5, 0], [1.5, 0], [1.5, 8.5], [5.5, 8.5], [5.5, 12], [-1.5, 12]], h: 0.1, sx: -0.012, sz: 0.006 }],
     bumps: [{ x: 0, z: 10, r: 1.4, h: 0.15 }, { x: 3.5, z: 9.6, r: 1.2, h: -0.08 }] },
   /* 16: the switchback: a belt up, a belt across the top, down the return lane into the pipe, out on the green */

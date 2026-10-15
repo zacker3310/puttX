@@ -421,13 +421,12 @@ function recordHole(p, key, score, par, maxStars = 3) {
   const rec = { best: prev ? Math.min(prev.best, score) : score, stars: Math.max(prev ? prev.stars : 0, Math.min(maxStars, starsFor(score, par))) };
   p.holes[key] = rec;
   /* the last hole of a course opens the next playable course */
-  const [w, n] = key.split('-').map(Number), list = playable(), i = list.indexOf(w);
+  const [w, n] = key.split('-').map(Number), list = playable();
   const open = c => { if (WORLDS[c] && !p.worlds.includes(c)) p.worlds.push(c); };
-  if (WORLDS[w] && n === WORLDS[w].holes.length) {
-    /* a world's first course opens the next world; each course opens the next one in its world */
-    if (i >= 0 && i + 1 < list.length) open(list[i + 1]);
-    if (w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
-  }
+  if (WORLDS[w] && n === WORLDS[w].holes.length && w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
+  /* the next world opens only once every hole of every course in this world is finished */
+  const home = worldOf(w), j = list.indexOf(home);
+  if (w !== BONUS && j >= 0 && j + 1 < list.length && coursesOf(home).every(c => WORLDS[c].holes.every(hd => p.holes[hd.key]))) open(list[j + 1]);
   return rec;
 }
 function holeUnlocked(p, key) {

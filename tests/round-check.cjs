@@ -56,7 +56,13 @@ const list = S.playable().filter(w => w < 90), second = list[1], last = S.WORLDS
 S.recordHole(p, k(last - 1 > 0 ? last - 1 : 1), 4, 3);
 check('a hole before the last opens nothing new', p.worlds.length === 1, p.worlds.join());
 S.recordHole(p, k(last), 4, 3);
-check('finishing the last hole opens the next world and the next course in this one', !second || (p.worlds.join() === [first, second].concat(S.WORLDS[first + S.COURSE_STEP] ? [first + S.COURSE_STEP] : []).join() && S.holeUnlocked(p, second + '-1')), p.worlds.join());
+const c2 = S.WORLDS[first + S.COURSE_STEP] ? first + S.COURSE_STEP : 0;
+check('finishing a course opens the next course in its world, not the next world', p.worlds.join() === [first].concat(c2 ? [c2] : []).join(), p.worlds.join());
+const cs = S.coursesOf(first), allKeys = cs.flatMap(c => S.WORLDS[c].holes.map(h => h.key));
+for (const key of allKeys.slice(0, -1)) S.recordHole(p, key, 4, 3);
+check('one hole short of the whole world keeps the next world shut', !second || !p.worlds.includes(second), p.worlds.join());
+S.recordHole(p, allKeys[allKeys.length - 1], 4, 3);
+check('every hole of every course in the world opens the next world', !second || (p.worlds.includes(second) && S.holeUnlocked(p, second + '-1')), p.worlds.join());
 check('ten courses in order', S.WORLD_ORDER.join() === '1,2,3,4,5,6,7,8,9,10' && S.HOLES_PER === 18);
 
 done();

@@ -57,7 +57,7 @@ registerWorld(9, { holes: [
     tiers: [{ poly: rect(-2.2, 7.4, 2.2, 13), h: 0.16, sx: 0.011 }],
     bumps: [{ x: 1.0, z: 3.0, r: 1.6, h: 0.1 }, { x: 0.4, z: 9.4, r: 1.3, h: 0.09 }, { x: -1.6, z: 3.6, r: 1.2, h: -0.08 }] },
   /* 11: belts in a zig-zag factory floor */
-  { par: 2, sol: [[54,0.88,0]], tee: [-1, 0.5], cup: [-0.9, 7.2], aim0: 30, shape: rect(-1.5, 0, 1.5, 8),
+  { par: 2, sol: [[57,0.86,0]], tee: [-1, 0.5], cup: [-0.9, 7.2], aim0: 30, shape: rect(-1.5, 0, 1.5, 8),
     inner: [[[-1.5, 2.5], [0.8, 2.5]], [[-0.8, 5], [1.5, 5]]],
     zones: [C9_BELT(rect(-1.5, 0, 1.5, 2.5), -1.2, 0), C9_BELT(rect(-1.5, 2.5, 1.5, 5), -1.6, 0), C9_BELT(rect(-1.5, 5.6, 1.5, 6.6), 1.5, 0)],
     posts: [C9_GUM(0, 3.7)] },
@@ -99,7 +99,7 @@ registerWorld(9, { holes: [
       { surf: 'mud', poly: rect(-0.85, 6.3, -0.6, 7.5) }],
     posts: [C9_GUM(-0.5, 5.5), C9_GUM(-1.4, 5.4), C9_GUM(0.4, 5.9)] },
   /* 18: the production line: belt up the ramp, gumdrop maze to the pipe, taffy-guarded cup */
-  { par: 5, crazy: true, sol: [[8,1,0],[48,0.8,0]], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[12,0.68,0],[48,0.8,0]], tee: [0, 0.5], cup: [0.4, 11.0], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]], rect(-0.6, 8.5, 3.4, 11.6)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 4.5], [3.4, 4.5], [3.4, 7.5], [-0.6, 7.5]]), ring(rect(-0.6, 8.5, 3.4, 11.6))],
     ramps: [{ x0: -0.6, z0: 2, x1: 0.6, z1: 4.5, axis: 'z', h0: 0, h1: 0.45 }],

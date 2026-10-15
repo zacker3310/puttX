@@ -45,7 +45,7 @@ registerWorld(26, { holes: [
     tubes: [{ a: [2.3, 5.8], b: [1.4, 0.5], dir: 0, keep: 0, add: 1.45 }, { a: [2.3, 2], b: [6.4, 0.6], dir: 0, keep: 0, add: 1.6 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 1.6, 0.4, 3.2) }] },
   /* 6: switchback up the crater wall: three legs, two ramps, ash on the middle leg (3 stages) */
-  { par: 4, sol: [[44.25,0.92,0]], tee: [0, 0.5], cup: [1.1, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
+  { par: 4, sol: [[30,0.92,0.5],[92,0.84,0]], tee: [0, 0.5], cup: [1.1, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
     inner: [[[-1.8, 2.7], [1, 2.7]], [[-1, 5.4], [1.8, 5.4]]],
     tiers: [{ poly: rect(-1.9, 2.7, 1.9, 5.4), h: 0.18 }, { poly: rect(-1.9, 5.4, 1.9, 8.3), h: 0.36 }],
     ramps: [{ x0: 1, z0: 2.2, x1: 1.8, z1: 3.2, axis: 'z', h0: 0, h1: 0.18 }, { x0: -1.8, z0: 4.9, x1: -1, z1: 5.9, axis: 'z', h0: 0.18, h1: 0.36 }],

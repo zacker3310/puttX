@@ -82,7 +82,7 @@ registerWorld(11, { holes: [
     ramps: [{ x0: -1.9, z0: 4, x1: 1.9, z1: 5.5, axis: 'z', h0: 0.3, h1: 0.12 }],
     bumps: [{ x: 0.8, z: 7.5, r: 2, h: 0.12 }, { x: -1, z: 9.5, r: 1.4, h: 0.1 }] },
   /* 11: scaffold switchback (3 parts). Up the right ramp, across the top, up the middle ramp the wrong way, along the top deck */
-  { par: 4, sol: [[356,1,0],[188,1,0],[0,0.43,0],[9,0.52,0]], tee: [1.06, 0.5], cup: [-1.06, 6.1], aim0: 0, shape: rect(-1.6, 0, 1.6, 7),
+  { par: 4, sol: [[12,0.96,0],[186,1,0],[2,0.36,0]], tee: [1.06, 0.5], cup: [-1.06, 6.1], aim0: 0, shape: rect(-1.6, 0, 1.6, 7),
     inner: [[[0.53, 0], [0.53, 5.6]], [[-0.53, 1.4], [-0.53, 7]]],
     tiers: [{ poly: rect(0.53, 4, 1.6, 7), h: 0.2 }, { poly: rect(-0.53, 5, 0.53, 7), h: 0.2 },
             { poly: rect(-0.53, 0, 0.53, 3), h: 0.4 }, { poly: rect(-1.6, 0, -0.53, 7), h: 0.4 }],

@@ -13,6 +13,11 @@ Play at **https://zacker3310.github.io/puttX/**.
 - **Mishits are real:** decelerate and it comes up short, jab and it runs long, drift sideways and
   you push or pull it, strike off the sweet spot and it dies and twists. The readout after each
   putt shows your path, strike point and tempo.
+- **Real physics:** the ball slides off the putter before it rolls, checks off the rails, and the cup is a
+  real hole: hit it too hard and it hops out or lips round the edge.
+- **Against the rail?** Real mini golf lets you move it out a putter head. PuttX does it for you.
+- **Friends:** the three balls on a course map start pass and play for 2 to 4 players, with a crown for each
+  hole's best and a scorecard at the end.
 - Coins from every hole buy putters (more forgiving) and balls (pure style) in the pro shop.
 
 ## For grown-ups

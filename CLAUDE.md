@@ -19,7 +19,8 @@ Never hand-edit or Read `index.html` (the three.js line is ~690 KB). Edit the so
   logo on the title sign (`data-logo`).
 - No fail states: every hole finishes (the stroke cap, double par, auto-sinks); stars and bests only go up.
 - Tap targets at least 64 px rendered at 1024x768 (88 stage px buttons).
-- Toybox look: the `--v-*` tokens from vroom, flat shadows, big radii.
+- Toybox UI: the `--v-*` tokens from vroom, flat shadows, big radii for the DOM (buttons, chips, cards).
+  The 3D course is realistic: procedural turf, material borders, landscaping, a real cup.
 - The `// #region sim` block is DOM-free, THREE-free and deterministic (no Math.random, no
   clocks). `tests/sim.cjs` runs it in Node straight from `src/` and `courses/`. Keep it that way.
   The pro shop may change how a swing gesture becomes (angle, power) via `FEEL`, never the sim.
@@ -35,6 +36,7 @@ Never hand-edit or Read `index.html` (the three.js line is ~690 KB). Edit the so
     npm test                               # every suite (builds preview/test.html itself)
     npm run lint                           # ESLint over the assembled game script, 0 findings
     npm run solve -- --course 5 --bot      # prove pars, print sol arrays, measure difficulty
+    node scripts/resolve.cjs [--course 5]  # after a physics change: re-prove every hole, write sols back
     PUTTX_ONLY=5 node tests/holes-check.cjs  # one course's holes
     npm run shot -- --course 5 [--swing]   # PNGs of every hole in preview/shots/
     python3 -m http.server 4173            # then http://localhost:4173/?hole=1-3 or ?map

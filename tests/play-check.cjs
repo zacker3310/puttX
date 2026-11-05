@@ -177,7 +177,7 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
   const fin = await page.evaluate(() => {
     progress.worlds.push(97); startHole('97-1'); loopPaused = true;   /* only holes you have reached are saved */
     play.ball = newBall(play.hole, 0, 5.2);
-    beginPutt(0, 0.02);
+    beginPutt(0, 0.06);
     let pinOut = 0, gap = Infinity;
     for (let i = 0; i < 400 && play.phase !== 'done'; i++) {
       advance(1 / 60); renderFrame(1 / 60);

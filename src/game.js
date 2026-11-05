@@ -584,8 +584,8 @@ function audio() {
   const d = noiseBuf.getChannelData(0);
   let s = 99; for (let i = 0; i < d.length; i++) { s = (s * 16807) % 2147483647; d[i] = s / 1073741823.5 - 1; }
   const src = actx.createBufferSource(), lp = actx.createBiquadFilter();
-  src.buffer = noiseBuf; src.loop = true; lp.type = 'lowpass'; lp.frequency.value = 700;
-  rollGain = actx.createGain(); rollGain.gain.value = 0;
+  src.buffer = noiseBuf; src.loop = true; lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 0.7;
+  rollGain = actx.createGain(); rollGain.gain.value = 0; rollFilter = lp;
   src.connect(lp); lp.connect(rollGain); rollGain.connect(master); src.start();
   return actx;
 }
@@ -613,7 +613,14 @@ function noise(dur, { vol = 0.2, freq = 2000, q = 1, type = 'bandpass', delay = 
 const SFX = {
   /* a clean strike rings; a toe or heel strike thuds */
   putt: (p, clean = 1) => { noise(0.03, { vol: 0.25 + p * 0.3, freq: 2200 + 1500 * clean, q: 2 }); tone(500 + p * 400 + clean * 300, 0.06, { type: 'triangle', vol: 0.2 + p * 0.2, slide: -300 }); },
-  clonk: v => tone(170 + Math.min(v, 4) * 30, 0.09, { type: 'triangle', vol: Math.min(0.45, 0.12 + v * 0.1) }),
+  /* a wall knock sounds like what the border is made of: aluminium rails ring, timber tocks, stone clacks */
+  clonk: v => {
+    const k = Math.min(v, 4), vol = Math.min(0.45, 0.12 + v * 0.1);
+    if (wallKindNow === 'steel') { tone(1400 + k * 90, 0.12, { type: 'triangle', vol: vol * 0.5 }); tone(2950 + k * 120, 0.18, { vol: vol * 0.18 }); noise(0.02, { vol: vol * 0.5, freq: 4200, q: 3 }); }
+    else if (wallKindNow === 'stone' || wallKindNow === 'brick' || wallKindNow === 'marble') { noise(0.03, { vol: vol * 0.9, freq: 2400, q: 2.2 }); tone(620 + k * 40, 0.04, { type: 'triangle', vol: vol * 0.5 }); }
+    else if (wallKindNow === 'paint') tone(520 + k * 50, 0.06, { type: 'sine', vol: vol * 0.8, slide: -120 });
+    else { tone(330 + k * 30, 0.07, { type: 'triangle', vol }); noise(0.025, { vol: vol * 0.45, freq: 900, q: 2 }); }
+  },
   boing: v => tone(320, 0.2, { vol: Math.min(0.3, 0.1 + v * 0.08), slide: 260 }),
   cup: () => tone(1500, 0.04, { type: 'triangle', vol: 0.12, slide: -300 }),
   rattle: (v = 0.5) => { tone(1900 - v * 500, 0.035, { type: 'square', vol: 0.05 + v * 0.07 }); noise(0.04, { vol: 0.08 + v * 0.1, freq: 3200, q: 4 }); },
@@ -630,14 +637,57 @@ const SFX = {
   coin: () => { tone(988, 0.07, { type: 'square', vol: 0.08 }); tone(1319, 0.14, { type: 'square', vol: 0.08, delay: 0.07 }); },
   jingle: w => lookOf(w).jingle.forEach((f, i) => tone(f, 0.16, { type: 'triangle', vol: 0.18, delay: i * 0.11 })),
   fanfare: () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.22, { type: 'square', vol: 0.12, delay: i * 0.09 })),
+  /* the clubhouse bell on the last hole; rung twice and brighter for an ace */
+  bell: (ace = 0) => { for (let i = 0; i < (ace ? 3 : 1); i++) { tone(1568, 1.2, { vol: 0.16, delay: i * 0.28 }); tone(3920, 0.6, { vol: 0.05, delay: i * 0.28 }); tone(784, 1.4, { type: 'triangle', vol: 0.08, delay: i * 0.28 }); } },
+  /* the ball lifted and set down out from the border */
+  place: () => { tone(880, 0.04, { type: 'triangle', vol: 0.1 }); noise(0.03, { vol: 0.08, freq: 1200, q: 2, delay: 0.12 }); },
 };
+let wallKindNow = 'wood';
+/* ---- the course's soundscape: very quiet, under everything. Water burbles where a hole has water,
+   wind blows on the peaks and in the sky, birds call by day and crickets by night ---- */
+const amb = { key: '', bed: null, birds: 0, crickets: 0, next: 0 };
+function setAmbience(look, h) {
+  const water = h.zones.some(z => z.surf === 'water'), w = worldOf(holeWorld(h)), wind = w === 4 || w === 10 || w === 2;
+  amb.birds = look.night || w === 8 ? 0 : w === 3 ? 1.6 : 0.6; amb.crickets = look.night || w === 7 ? 1 : 0;
+  const key = [water, wind].join();
+  if (!actx || !master || key === amb.key) return;
+  amb.key = key;
+  if (amb.bed) { const old = amb.bed; old.g.gain.setTargetAtTime(0, actx.currentTime, 0.4); setTimeout(() => { try { old.src.stop(); } catch (e) { /* already stopped */ } }, 2000); amb.bed = null; }
+  if (!water && !wind) return;
+  const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain(), lfo = actx.createOscillator(), lg = actx.createGain();
+  src.buffer = noiseBuf; src.loop = true; f.type = water ? 'bandpass' : 'lowpass'; f.frequency.value = water ? 650 : 380; f.Q.value = water ? 0.9 : 0.5;
+  lfo.frequency.value = water ? 3.1 : 0.13; lg.gain.value = water ? 260 : 160; lfo.connect(lg); lg.connect(f.frequency);
+  g.gain.value = 0; g.gain.setTargetAtTime(water ? 0.05 : 0.07, actx.currentTime, 1.2);
+  src.connect(f); f.connect(g); g.connect(master); src.start(); lfo.start();
+  amb.bed = { src, g };
+}
+function tickAmbience(dt) {
+  if (!actx || !master || currentScene !== 'hole') { if (amb.bed && actx) amb.bed.g.gain.setTargetAtTime(0, actx.currentTime, 0.3); return; }
+  if (amb.bed) amb.bed.g.gain.setTargetAtTime(amb.key.startsWith('true') ? 0.05 : 0.07, actx.currentTime, 0.6);
+  if ((amb.next -= dt) > 0) return;
+  amb.next = 0.6 + Math.random() * 2.4;
+  if (amb.birds && Math.random() < 0.35 * amb.birds) {
+    const f0 = 2400 + Math.random() * 1800, n = 2 + (Math.random() * 3 | 0);
+    for (let i = 0; i < n; i++) tone(f0 + (i % 2 ? 380 : 0), 0.07, { vol: 0.018, slide: (Math.random() - 0.3) * 900, delay: i * 0.11 });
+  }
+  if (amb.crickets && Math.random() < 0.6) for (let i = 0; i < 6; i++) tone(4400, 0.025, { type: 'square', vol: 0.006, delay: i * 0.045 });
+}
+/* a touch of haptics where the device has them (Android Chrome); quiet mode keeps them off too */
+function buzz(p) { try { if (progress.sound && navigator.vibrate) navigator.vibrate(p); } catch (e) { /* no haptics */ } }
 function sfx(name, ...args) {
   sfxLog.push(name); if (sfxLog.length > 200) sfxLog.shift();
   if (actx && master && SFX[name]) SFX[name](...args);
 }
 /* rolling hiss follows ball speed; 0 silences it */
-function setRoll(speed) {
-  if (rollGain) rollGain.gain.setTargetAtTime(0, actx.currentTime, 0.03);   /* the rolling hiss is gone: the ball rolls quietly */
+/* the ball's roll, heard: a soft rumble that grows and brightens with speed, coloured by what it
+   rolls on (felt hushes, fast carpet is brighter, ice hisses, sand crunches, mud thuds) */
+let rollFilter = null;
+const ROLL_SOUND = { felt: [380, 0.045], fast: [900, 0.05], ice: [3200, 0.03], sand: [1500, 0.07], mud: [220, 0.06], water: [600, 0] };
+function setRoll(speed, surf = 'felt') {
+  if (!rollGain) return;
+  const [f, k] = ROLL_SOUND[surf] || ROLL_SOUND.felt, t = actx.currentTime;
+  rollGain.gain.setTargetAtTime(Math.min(0.11, k * Math.sqrt(Math.max(0, speed))), t, 0.04);
+  rollFilter.frequency.setTargetAtTime(f * (0.6 + 0.4 * Math.min(2.5, speed)), t, 0.05);
 }
 
 /* ============ 5. RENDER ============ */
@@ -662,7 +712,7 @@ const lookOf = w => {
 };
 /* what the player has equipped; the pro shop fills these in (see applyGear) */
 const GEAR = { ball: { base: '#fffdf7', band: '#ffd66e', mark: '#ef7d6d' }, putter: { head: '#c9ced6', metal: 0.85, shaft: '#d9dde3', grip: '#4a3826', shape: 'blade' } };
-let renderer = null, hemi = null, scene, camera, sun, holeGroup = null, ballMesh, flagGroup, moverMeshes = [], flowTex = [];
+let ballShadow = null, renderer = null, hemi = null, scene, camera, sun, holeGroup = null, ballMesh, flagGroup, moverMeshes = [], flowTex = [];
 const camNow = { pos: null, look: null };
 const play = { key: null, hole: null, round: null, ball: null, phase: 'idle', time: 0, from: null, t0: 0, aim: 0, swing: null, aimDrag: null,
   overview: false, cam: { yaw: 0 }, fx: {}, lastShot: null };
@@ -670,7 +720,8 @@ const play = { key: null, hole: null, round: null, ball: null, phase: 'idle', ti
 function initRenderer() {
   renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true, powerPreference: 'high-performance' });
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  /* PCF (PCF soft ignores the radius for a sun in r170): crisp shadows, as a real sun casts */
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   scene = new THREE.Scene();
@@ -681,12 +732,18 @@ function initRenderer() {
   sun = new THREE.DirectionalLight(0xffe2b8, 2.4);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
-  sun.shadow.radius = 4;
-  sun.shadow.bias = -0.0004;
+  sun.shadow.radius = 1.5;
+  sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.01;
   scene.add(sun, sun.target);
-  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshPhysicalMaterial({ map: ballTexture(GEAR.ball), bumpMap: dimpleTexture(), bumpScale: 0.6, roughness: 0.32, clearcoat: 0.7, clearcoatRoughness: 0.18 }));
+  initSky();
+  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), (() => { const d = texOf(dimpleNormalCanvas(), false); d.wrapT = THREE.ClampToEdgeWrapping; d.userData.keep = true;
+    return new THREE.MeshPhysicalMaterial({ map: ballTexture(GEAR.ball), normalMap: d, normalScale: new THREE.Vector2(0.9, 0.9), roughness: 0.45, clearcoat: 1, clearcoatRoughness: 0.07, clearcoatNormalMap: d, clearcoatNormalScale: new THREE.Vector2(0.6, 0.6) }); })());
   ballMesh.castShadow = true;
   scene.add(ballMesh);
+  /* a soft contact shadow under the ball: the sun's shadow map is too coarse to ground a 5 cm ball */
+  ballShadow = new THREE.Mesh(new THREE.CircleGeometry(BALL_R * 1.25, 24), new THREE.MeshBasicMaterial({ map: canvasTex(64, 64, x => { const g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64); }),
+    transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 }));
+  ballShadow.rotation.x = -Math.PI / 2; ballShadow.renderOrder = 2; scene.add(ballShadow);
   resizeRenderer();
 }
 function resizeRenderer() {
@@ -761,12 +818,12 @@ const TURF_PX = 512;
 function turfCanvas(hex) {
   return cachedCanvas('turf:' + hex, TURF_PX, TURF_PX, (x, w, h) => {
     const [r0, g0, b0] = hexRGB(hex), m = fbm(17, 4, 4), f = fbm(29, 32, 2);
-    paint(x, w, h, (u, v) => { const k = 0.9 + 0.16 * m(u, v) + 0.1 * (f(u, v) - 0.5); return [r0 * k, g0 * k, b0 * k]; });
+    paint(x, w, h, (u, v) => { const k = 0.98 + 0.16 * m(u, v) + 0.1 * (f(u, v) - 0.5); return [Math.min(255, r0 * k), Math.min(255, g0 * k), Math.min(255, b0 * k)]; });
     const r = rng32(7);
     x.lineCap = 'round';
     for (let i = 0; i < 26000; i++) {
       const px = r() * w, py = r() * h, a = r() * Math.PI * 2, L = 1.2 + r() * 2.6, t = r();
-      const lit = t < 0.5 ? 1.18 + r() * 0.2 : 0.74 + r() * 0.14, warm = r() < 0.3 ? 1.08 : r() < 0.3 ? 0.92 : 1;
+      const lit = t < 0.55 ? 1.2 + r() * 0.25 : 0.8 + r() * 0.12, warm = r() < 0.3 ? 1.08 : r() < 0.3 ? 0.92 : 1;
       x.strokeStyle = `rgba(${Math.min(255, r0 * lit * warm) | 0},${Math.min(255, g0 * lit) | 0},${Math.min(255, b0 * lit / warm) | 0},${0.35 + r() * 0.35})`;
       x.lineWidth = 0.8 + r() * 0.7;
       for (const ox of [0, -w, w]) for (const oy of [0, -h, h]) {
@@ -852,21 +909,61 @@ function scaleBoxUV(geo, len, hgt, wid, tile = 0.5) {
   uv.needsUpdate = true;
   return geo;
 }
-/* the sky as a real environment: a gradient with a sun, prefiltered so everything shiny reflects it */
-let skyEnv = null, skyEnvKey = '';
-function skyEnvironment(look) {
-  const key = look.sky.join() + (look.night ? 'n' : '');
-  if (skyEnv && key === skyEnvKey) return skyEnv;
-  if (skyEnv) skyEnv.dispose();
-  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
-  const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 128);
-  g.addColorStop(0, look.sky[0]); g.addColorStop(0.48, look.sky[1]); g.addColorStop(0.52, look.ground || '#6f7f5a'); g.addColorStop(1, new THREE.Color(look.ground || '#6f7f5a').multiplyScalar(0.5).getStyle());
-  x.fillStyle = g; x.fillRect(0, 0, 256, 128);
-  if (!look.night) { const s = x.createRadialGradient(170, 30, 0, 170, 30, 26); s.addColorStop(0, 'rgba(255,250,235,1)'); s.addColorStop(1, 'rgba(255,250,235,0)'); x.fillStyle = s; x.fillRect(140, 0, 60, 60); }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.mapping = THREE.EquirectangularReflectionMapping;
-  const pm = new THREE.PMREMGenerator(renderer);
-  skyEnv = pm.fromEquirectangular(t).texture; pm.dispose(); t.dispose(); skyEnvKey = key;
-  return skyEnv;
+/* ---- one sky: the visible dome and the image-based light come from the same shader, so the
+   horizon tracks the camera and the light holds real (above 1) energy. Colours are linear. ---- */
+const SKY = { top: { value: new THREE.Color() }, horizon: { value: new THREE.Color() }, ground: { value: new THREE.Color() },
+  sunDir: { value: new THREE.Vector3(0, 1, 0) }, sunCol: { value: new THREE.Color(1, 0.93, 0.8) }, disc: { value: 1 } };
+let skyDome = null, envScene = null, envRT = null, envKey = '';
+function initSky() {
+  const m = new THREE.ShaderMaterial({ uniforms: SKY, side: THREE.BackSide, depthWrite: false,
+    vertexShader: 'varying vec3 vDir;\nvoid main() { vDir = position; gl_Position = ( projectionMatrix * modelViewMatrix * vec4( position, 1.0 ) ).xyww; }',
+    fragmentShader: `uniform vec3 top, horizon, ground, sunDir, sunCol; uniform float disc; varying vec3 vDir;
+      void main() {
+        vec3 d = normalize( vDir );
+        vec3 c = d.y > 0.0 ? mix( horizon, top, pow( d.y, 0.5 ) ) : mix( horizon, ground, pow( -d.y, 0.3 ) );
+        float s = max( dot( d, sunDir ), 0.0 );
+        c += sunCol * ( pow( s, 8.0 ) * 0.25 + pow( s, 64.0 ) * 0.6 );
+        c += sunCol * smoothstep( 0.9995, 0.9998, s ) * 20.0 * disc;
+        gl_FragColor = vec4( c, 1.0 );
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }` });
+  const g = new THREE.SphereGeometry(100, 32, 16);
+  skyDome = new THREE.Mesh(g, m); skyDome.frustumCulled = false; skyDome.renderOrder = 1000; skyDome.name = 'sky';
+  scene.add(skyDome);
+  envScene = new THREE.Scene(); envScene.add(new THREE.Mesh(g, m));
+}
+function setSky(look) {
+  SKY.top.value.set(look.sky[0]); SKY.horizon.value.set(look.sky[1]); SKY.ground.value.set(look.ground || '#55603f');
+  SKY.sunDir.value.copy(sun.position).sub(sun.target.position).normalize();
+  SKY.sunCol.value.set(look.night ? 0x9a8cff : 0xfff0d8);
+  const key = look.sky.join() + (look.ground || '') + (look.night ? 'n' : '');
+  if (key !== envKey) {
+    /* once per look, never per frame; the disc stays out of the light (the sun lamp gives its highlight) */
+    SKY.disc.value = 0;
+    const pm = new THREE.PMREMGenerator(renderer);
+    if (envRT) envRT.dispose();
+    envRT = pm.fromScene(envScene, 0.02, 0.1, 200); pm.dispose(); envKey = key;
+  }
+  SKY.disc.value = look.night ? 0 : 1;
+  scene.environment = envRT.texture; scene.background = null;
+}
+/* the sun's shadow box fitted tightly round the hole in the light's own space: more texels per metre */
+const _fitM = new THREE.Matrix4(), _fitP = new THREE.Vector3();
+function fitSun(h) {
+  const B = holeBounds(h), c = new THREE.Vector3(B.cx, 0, B.cz), dir = new THREE.Vector3(5, 6.5, -4.5).normalize();
+  sun.target.position.copy(c); sun.position.copy(c).addScaledVector(dir, 12);
+  sun.updateMatrixWorld(); sun.target.updateMatrixWorld();
+  const cam = sun.shadow.camera; cam.position.copy(sun.position); cam.lookAt(c); cam.updateMatrixWorld();
+  _fitM.copy(cam.matrixWorld).invert();
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (const x of [B.x0 - 0.4, B.x1 + 0.4]) for (const y of [-0.6, 1.2]) for (const z of [B.z0 - 0.4, B.z1 + 0.4]) {
+    _fitP.set(x, y, z).applyMatrix4(_fitM);
+    x0 = Math.min(x0, _fitP.x); x1 = Math.max(x1, _fitP.x); y0 = Math.min(y0, _fitP.y); y1 = Math.max(y1, _fitP.y); z0 = Math.min(z0, _fitP.z); z1 = Math.max(z1, _fitP.z);
+  }
+  const half = Math.max(x1 - x0, y1 - y0) / 2, mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  Object.assign(cam, { left: mx - half, right: mx + half, bottom: my - half, top: my + half, near: Math.max(0.1, -z1 - 0.5), far: -z0 + 0.5 });
+  cam.updateProjectionMatrix();
 }
 /* a toy ball with a band and a star, so the roll reads; colours come from the equipped ball */
 function ballTexture(b) {
@@ -878,14 +975,27 @@ function ballTexture(b) {
     x.fill();
   });
 }
-/* dimples for the ball's bump map: a staggered grid of soft dots */
-function dimpleTexture() {
-  return canvasTex(256, 128, x => {
-    x.fillStyle = '#fff'; x.fillRect(0, 0, 256, 128);
-    for (let j = 0; j < 12; j++) for (let i = 0; i < 24; i++) {
-      const g = x.createRadialGradient(i * 10.7 + (j % 2) * 5.3 + 5, j * 10.7 + 5, 0, i * 10.7 + (j % 2) * 5.3 + 5, j * 10.7 + 5, 4.5);
-      g.addColorStop(0, '#888'); g.addColorStop(1, '#fff'); x.fillStyle = g; x.fillRect(i * 10.7 + (j % 2) * 5.3, j * 10.7, 10.7, 10.7);
+/* dimples: 336 of them spread evenly on a Fibonacci sphere (no pinching at the poles), baked to a
+   normal map in the sphere's own UVs; the clear urethane topcoat follows them too */
+function dimpleNormalCanvas(n = 336, W = 512, H = 256) {
+  return cachedCanvas('dimples:' + n, W, H, x => {
+    const ga = Math.PI * (3 - Math.sqrt(5)), C = [];
+    for (let i = 0; i < n; i++) { const y = 1 - 2 * (i + 0.5) / n, r = Math.sqrt(1 - y * y); C.push([Math.cos(i * ga) * r, y, Math.sin(i * ga) * r]); }
+    const R = 0.48 * Math.sqrt(8 * Math.PI / (Math.sqrt(3) * n)), Hh = new Float32Array(W * H);
+    for (let j = 0; j < H; j++) {
+      const th = (j + 0.5) / H * Math.PI, st = Math.sin(th), ct = Math.cos(th), cand = C.filter(c => Math.abs(c[1] - ct) < R);
+      for (let i = 0; i < W; i++) {
+        const ph = (i + 0.5) / W * Math.PI * 2, dx = -Math.cos(ph) * st, dz = Math.sin(ph) * st;
+        let best = 4; for (const c of cand) { const e = (dx - c[0]) ** 2 + (ct - c[1]) ** 2 + (dz - c[2]) ** 2; if (e < best) best = e; }
+        const t = Math.sqrt(best) / R; Hh[j * W + i] = t < 1 ? -(1 - t * t) : 0;
+      }
     }
+    const at = (i, j) => Hh[Math.min(H - 1, Math.max(0, j)) * W + ((i + W) % W)];
+    paint(x, W, H, (u, v, i, j) => {
+      const st = Math.max(0.15, Math.sin((j + 0.5) / H * Math.PI)), k = 3.0;
+      const gx = (at(i + 1, j) - at(i - 1, j)) * k / st, gy = (at(i, j + 1) - at(i, j - 1)) * k, l = Math.hypot(gx, gy, 1);
+      return [(-gx / l * 0.5 + 0.5) * 255, (gy / l * 0.5 + 0.5) * 255, (1 / l * 0.5 + 0.5) * 255];
+    });
   });
 }
 /* ripples for water: scrolled slowly in renderFrame */
@@ -906,9 +1016,6 @@ function flowTexture(hex) {
     x.beginPath(); x.moveTo(14, 44); x.lineTo(32, 24); x.lineTo(50, 44); x.stroke();
   });
   t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
-}
-function skyTexture(top, bottom) {
-  return canvasTex(2, 256, x => { const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, top); g.addColorStop(1, bottom); x.fillStyle = g; x.fillRect(0, 0, 2, 256); });
 }
 function holeBounds(h) {
   const pts = h.floors.flat(), xs = pts.map(p => p[0]), zs = pts.map(p => p[1]);
@@ -935,13 +1042,20 @@ function gridGeometry(h, keep, lift = 0, shade = null) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   if (shade) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-  g.setIndex(idx); g.computeVertexNormals();
+  g.setIndex(idx);
+  /* normals straight from the ground's own shape (central differences), so there are no dark seams
+     where the grid is cut round the cup or at a tier's lip */
+  const nor = [], e = 0.02;
+  for (let i = 0; i < pos.length; i += 3) {
+    const x = pos[i], z = pos[i + 2], nx = groundH(h, x - e, z) - groundH(h, x + e, z), nz = groundH(h, x, z - e) - groundH(h, x, z + e), l = Math.hypot(nx, 2 * e, nz);
+    nor.push(nx / l, 2 * e / l, nz / l);
+  }
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
   return g;
 }
 /* the turf's baked light, per vertex: contact shadow where it meets a wall, a post or the foot of a
-   step, broad mowing stripes across the line of play, and a slow mottle so no two metres match */
+   step, and a slow mottle so no two metres match (the mowing stripes live in the turf shader) */
 function floorShade(h) {
-  const dx = h.cup[0] - h.tee[0], dz = h.cup[1] - h.tee[1], dl = Math.hypot(dx, dz) || 1, px = -dz / dl, pz = dx / dl;
   const mott = noiseField(97 + h.key.length, 64);
   return (x, z) => {
     let ao = 1;
@@ -956,8 +1070,7 @@ function floorShade(h) {
     let rise = 0;
     for (const [ox, oz] of [[0.05, 0], [-0.05, 0], [0, 0.05], [0, -0.05]]) rise = Math.max(rise, groundH(h, x + ox, z + oz) - y);
     if (rise > 0.02) ao *= 1 - Math.min(0.28, (rise - 0.02) * 4);
-    const band = Math.sin((x * px + z * pz) / 0.75 * Math.PI), stripe = 1 + 0.15 * Math.tanh(band * 3);
-    return ao * stripe * (0.96 + 0.08 * mott(x / 9, z / 9));
+    return ao * (0.96 + 0.08 * mott(x / 9, z / 9));
   };
 }
 /* walls stand from below their lowest ground to WALL_TOP over their highest, as the physics measures them */
@@ -1112,8 +1225,8 @@ function teeMatTexture() {
     x.fillStyle = '#2b2f2c'; x.fillRect(0, 0, 64, 128);
     const r = rng32(5); for (let i = 0; i < 500; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.15)'; x.fillRect(r() * 64, r() * 128, 1.5, 1.5); }
     x.strokeStyle = 'rgba(255,255,255,0.22)'; x.lineWidth = 3; x.strokeRect(3, 3, 58, 122);
-    x.fillStyle = '#1b1e1c'; x.beginPath(); x.arc(32, 128 * 0.65, 7, 0, 7); x.fill();
-    x.strokeStyle = 'rgba(255,255,255,0.35)'; x.lineWidth = 2; x.beginPath(); x.arc(32, 128 * 0.65, 9, 0, 7); x.stroke();
+    x.fillStyle = '#1b1e1c'; x.beginPath(); x.arc(32, 128 * 0.35, 7, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,0.35)'; x.lineWidth = 2; x.beginPath(); x.arc(32, 128 * 0.35, 9, 0, 7); x.stroke();
   });
 }
 function markerTexture(n, hex) {
@@ -1139,6 +1252,9 @@ function tubeGroup(h) {
       const hole = new THREE.Mesh(new THREE.CircleGeometry(TUBE_R * 0.92, 32), mat(end === 'a' ? '#1d150e' : '#3a2c1e', { roughness: 1 })); hole.rotation.x = -Math.PI / 2; hole.position.y = 0.003;
       const rim = new THREE.Mesh(new THREE.TorusGeometry(TUBE_R, 0.022, 10, 36), mat(col, { roughness: 0.45 })); rim.rotation.x = -Math.PI / 2; rim.position.y = 0.012;
       rim.castShadow = true; o.add(hole, rim);
+      /* a shape per pair as well as a colour, so the pairs read without colour vision */
+      const glyph = new THREE.Mesh(new THREE.ShapeGeometry(tubeGlyph(i)), new THREE.MeshBasicMaterial({ color: col, toneMapped: false, side: THREE.DoubleSide }));
+      glyph.rotation.x = -Math.PI / 2; glyph.position.y = 0.005; o.add(glyph);
       if (end === 'b') {
         const s = new THREE.Shape(); s.moveTo(-0.05, 0); s.lineTo(0.05, 0); s.lineTo(0, 0.07); s.closePath();
         const arrow = new THREE.Mesh(new THREE.ShapeGeometry(s), new THREE.MeshBasicMaterial({ color: col, side: THREE.DoubleSide, toneMapped: false }));
@@ -1150,6 +1266,14 @@ function tubeGroup(h) {
     }
   });
   return g;
+}
+function tubeGlyph(i) {
+  const s = new THREE.Shape(), r = 0.035, k = i % 4;
+  if (k === 0) s.absarc(0, 0, r * 0.8, 0, Math.PI * 2);
+  else if (k === 1) { s.moveTo(0, r); s.lineTo(r * 0.95, -r * 0.7); s.lineTo(-r * 0.95, -r * 0.7); s.closePath(); }
+  else if (k === 2) { s.moveTo(-r * 0.75, -r * 0.75); s.lineTo(r * 0.75, -r * 0.75); s.lineTo(r * 0.75, r * 0.75); s.lineTo(-r * 0.75, r * 0.75); s.closePath(); }
+  else for (let j = 0; j < 10; j++) { const a = j * Math.PI / 5 + Math.PI / 2, rr = j % 2 ? r * 0.45 : r; j ? s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  return s;
 }
 function defaultPost(p, look) {
   const m = new THREE.Mesh(new THREE.CylinderGeometry(p.r, p.r * 1.08, p.top || 0.22, 24), mat(look.wall, { roughness: 0.5 }));
@@ -1195,9 +1319,41 @@ const holeWorld = h => Number(h.key.split('-')[0]);
 /* the putting surface: a real-looking carpet of turf. Sheen gives it the soft velvet glow turf has
    against the light; the baked shade rides in the vertex colours. Night keeps its flat black-light look. */
 function turfMaterial(hex, o = {}) {
-  const c = new THREE.Color(hex);
-  return new THREE.MeshPhysicalMaterial(Object.assign({ color: 0xffffff, map: texOf(turfCanvas(hex)), normalMap: texOf(turfNormal(), false), normalScale: new THREE.Vector2(0.55, 0.55),
-    roughness: 0.93, sheen: 0.55, sheenRoughness: 0.55, sheenColor: c.clone().lerp(new THREE.Color(0xfff6d8), 0.45), vertexColors: true }, o));
+  const c = new THREE.Color(hex), m = new THREE.MeshPhysicalMaterial(Object.assign({ color: 0xffffff, map: texOf(turfCanvas(hex)), normalMap: texOf(turfNormal(), false), normalScale: new THREE.Vector2(0.55, 0.55),
+    roughness: 0.93, sheen: 0.42, sheenRoughness: 0.42, sheenColor: c.clone().lerp(new THREE.Color(0xcfe39a), 0.6), vertexColors: true }, o));
+  patchTurf(m);
+  return m;
+}
+/* mowing stripes the way real ones work: each band's blades lean the way it was cut, so a band reads
+   light when its blades lean away from you and dark when they lean toward you, and the bands swap as
+   the camera turns. Plus a slow world-space mottle that breaks the texture's tiling, and a touch of
+   roughness variation. Shared uniforms: set per hole, no recompile. */
+/* time for decorative shader motion (water ripples): frozen under reduced motion */
+const FX_TIME = { value: 0 };
+const TURF_U = { uAlong: { value: new THREE.Vector2(0, 1) }, uStripeW: { value: 0.7 }, uStripeK: { value: 0.13 } };
+function patchTurf(mat) {
+  mat.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, TURF_U);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 vWXZ;')
+      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWXZ = ( modelMatrix * vec4( transformed, 1.0 ) ).xz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying vec2 vWXZ; uniform vec2 uAlong; uniform float uStripeW, uStripeK;
+        float h21( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
+        float vnoise( vec2 p ) { vec2 i = floor( p ), f = fract( p ); f = f * f * ( 3.0 - 2.0 * f );
+          return mix( mix( h21( i ), h21( i + vec2( 1, 0 ) ), f.x ), mix( h21( i + vec2( 0, 1 ) ), h21( i + vec2( 1, 1 ) ), f.x ), f.y ); }`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        vec2 across = vec2( -uAlong.y, uAlong.x );
+        float mown = clamp( sin( dot( vWXZ, across ) * PI / uStripeW ) * 6.0, -1.0, 1.0 );
+        vec2 toCam = normalize( cameraPosition.xz - vWXZ + 1e-4 );
+        float away = -mown * dot( uAlong, toCam );
+        float macro = vnoise( vWXZ * 0.35 ) * 0.6 + vnoise( vWXZ * 1.7 ) * 0.4;
+        diffuseColor.rgb *= ( 1.0 + uStripeK * away ) * ( 0.93 + 0.14 * macro );`)
+      .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+        roughnessFactor = clamp( roughnessFactor + 0.06 * ( 0.5 - macro ) - 0.04 * away, 0.0, 1.0 );`);
+  };
+  mat.customProgramCacheKey = () => 'turf-v1';
 }
 /* the world's border material: timber, stone, brick, painted steel, marble, or plain paint */
 const WALL_KIND_OF = { 1: 'steel', 2: 'stone', 3: 'stone', 4: 'wood', 5: 'wood', 6: 'stone', 7: 'brick', 8: 'steel', 9: 'paint', 10: 'marble' };
@@ -1214,8 +1370,21 @@ function zoneMaterial(zn, look) {
   }
   switch (zn.surf) {
     case 'ice': return new THREE.MeshPhysicalMaterial({ color: look.ice, roughness: 0.06, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.05, transparent: true, opacity: 0.9, envMapIntensity: 1.4 });
-    case 'water': { const t = waterTexture(look.water); flowTex.push({ t, speed: 0.25 }); const n = texOf(normalCanvas('ripple', 128, fbm(83, 4, 3), 3), false); flowTex.push({ t: n, speed: 0.12 });
-      return new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: t, normalMap: n, normalScale: new THREE.Vector2(0.35, 0.35), roughness: 0.04, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.02, transparent: true, opacity: 0.9, envMapIntensity: 1.6 }); }
+    case 'water': {
+      /* real water: a 2% mirror at normal incidence (IOR 1.333) that grows to a full mirror at grazing
+         angles, over two ripple layers drifting against each other so the surface never repeats */
+      const t = waterTexture(look.water); flowTex.push({ t, speed: 0.25 }); const n = texOf(normalCanvas('ripple', 128, fbm(83, 4, 3), 3), false);
+      const m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: t, normalMap: n, normalScale: new THREE.Vector2(0.4, 0.4), roughness: 0.05, metalness: 0, ior: 1.333, transparent: true, opacity: 0.9, envMapIntensity: 1.2 });
+      m.onBeforeCompile = sh => {
+        sh.uniforms.uT = FX_TIME;
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uT;')
+          .replace('vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;',
+            `vec3 mapN = normalize( texture2D( normalMap, vNormalMapUv + uT * vec2( 0.031, 0.017 ) ).xyz * 2.0 - 1.0
+              + texture2D( normalMap, vNormalMapUv * 1.7 - uT * vec2( 0.023, -0.029 ) ).xyz * 2.0 - 1.0 );`);
+      };
+      m.customProgramCacheKey = () => 'water-v1';
+      return m;
+    }
     case 'fast': return turfMaterial(look.fast, { roughness: 0.6, sheen: 0.35, normalScale: new THREE.Vector2(0.25, 0.25), vertexColors: false });
     case 'mud': return mat('#ffffff', { map: texOf(grainCanvas('mud', look.mud, { contrast: 0.3, speck: 0.08, seed: 9 })), normalMap: texOf(normalCanvas('mud', 128, fbm(87, 8, 3), 3), false), roughness: 0.75 });
     default: return mat('#ffffff', { map: texOf(grainCanvas('sand', look.sand, { scale: 128, contrast: 0.18, speck: 0.22, seed: 7 })), normalMap: texOf(normalCanvas('sand', 128, noiseField(89, 64), 1.5), false), roughness: 1 });
@@ -1254,7 +1423,6 @@ function edgingGroup(h, look) {
 }
 function buildHoleScene(h) {
   if (holeGroup) { scene.remove(holeGroup); disposeGroup(holeGroup); }
-  if (scene.background && scene.background.dispose) scene.background.dispose();
   flowTex = [];
   const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= COLLAR_R && h.tubes.every(t => Math.hypot(x - t.a[0], z - t.a[1]) >= TUBE_R * 0.9);
   holeGroup = new THREE.Group(); moverMeshes = [];
@@ -1282,21 +1450,21 @@ function buildHoleScene(h) {
   for (const dr of h.drains) holeGroup.add(drainSpiral(h, dr));
   if (look.prop) scatterProps(holeGroup, h, look);
   if (look.decor) look.decor(holeGroup, h);
-  scene.background = skyTexture(look.sky[0], look.sky[1]);
   scene.fog = look.fog ? new THREE.Fog(look.sky[1], 16, 55) : null;
   /* night: moonlight, stars, and a warm lamp in the cup */
   /* daylight: a warm low sun for long soft shadows and real modelling of every slope, the sky itself as
      image-based light (so turf, water, ice, the ball and the putter all reflect the world they are in) */
-  scene.environment = skyEnvironment(look);
-  scene.environmentIntensity = look.night ? 0.25 : 0.55;
-  hemi.intensity = look.night ? 0.4 : 0.85; hemi.color.set(look.night ? 0x9a7cff : 0xfff4e0);
-  sun.intensity = look.night ? 0.7 : 2.6; sun.color.set(look.night ? 0xb89cff : 0xffe6c4);
+  wallKindNow = look.night ? 'paint' : look.wallKind || WALL_KIND_OF[worldOf(holeWorld(h))] || 'wood';
+  setAmbience(look, h);
+  /* the sky carries the ambient light now; the hemisphere only lifts the shade a touch */
+  scene.environmentIntensity = look.night ? 0.35 : 1.0;
+  hemi.intensity = look.night ? 0.35 : 0.35; hemi.color.set(look.night ? 0x9a7cff : 0xfff4e0);
+  sun.intensity = look.night ? 0.7 : 3.0; sun.color.set(look.night ? 0xb89cff : 0xffe6c4);
   if (look.night) nightDecor(holeGroup, h);
-  const B = holeBounds(h), ext = B.ext + 1.5;
-  /* a sun about 45 degrees up, off the tee's shoulder: long soft shadows off every wall and real light and shade on every slope */
-  sun.position.set(B.cx + 5, 6.5, B.cz - 4.5); sun.target.position.set(B.cx, 0, B.cz);
-  Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 0.5, far: 30 });
-  sun.shadow.camera.updateProjectionMatrix();
+  /* a sun about 45 degrees up, off the tee's shoulder: long crisp shadows off every wall and real light and shade on every slope */
+  fitSun(h);
+  setSky(look);
+  TURF_U.uAlong.value.set(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]).normalize(); TURF_U.uStripeK.value = look.night ? 0 : 0.13;
   scene.add(holeGroup);
   updateMovers(play.time);
 }
@@ -1322,6 +1490,17 @@ function syncBall(dt) {
   if ((play.phase === 'roll' || play.phase === 'drift') && w > 1e-6) { _axis.set(b.wx / w, b.wy / w, b.wz / w); _q.setFromAxisAngle(_axis, w * simDt); ballMesh.quaternion.premultiply(_q); }
   else if (d > 1e-6 && d < 0.5) { _axis.set(dz / d, 0, -dx / d); _q.setFromAxisAngle(_axis, d / BALL_R); ballMesh.quaternion.premultiply(_q); }
   p.set(b.x, b.y + BALL_R, b.z);
+  if (ballShadow) {
+    const gy = play.hole ? groundH(play.hole, b.x, b.z) : b.y, up = Math.max(0, b.y - gy);
+    ballShadow.visible = ballMesh.visible && up < 0.4 && !(play.hole && Math.hypot(b.x - play.hole.cup[0], b.z - play.hole.cup[1]) < CUP_R);
+    ballShadow.position.set(b.x, gy + 0.002, b.z); ballShadow.scale.setScalar(1 + up * 6); ballShadow.material.opacity = Math.max(0, 1 - up * 4);
+  }
+  const pl = play.fx.place;
+  if (pl) {
+    const k = Math.min(1, (pl.t += dt) / 0.35), e = k * k * (3 - 2 * k);
+    p.set(pl.from[0] + (b.x - pl.from[0]) * e, b.y + BALL_R + Math.sin(k * Math.PI) * 0.04, pl.from[1] + (b.z - pl.from[1]) * e);
+    if (k >= 1 || reducedMotion()) play.fx.place = null;
+  }
 }
 /* aiming: behind the ball along the aim, pitched to frame the ball and the ground ahead (the cup
    when the aim is near it). Rolling: chase the ball, turning with it. Overview: the whole hole. */
@@ -1391,18 +1570,22 @@ function renderFrame(dt) {
   const intro = play.intro ? '1' : '';
   if (hs.dataset.intro !== intro) hs.dataset.intro = intro;
   /* the 2D scenes cover the whole stage: no point drawing a hole behind them */
+  tickAmbience(dt);
   if (!play.hole || ['map', 'shop', 'title', 'worlds', 'world'].includes(currentScene)) return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
+  if (!reducedMotion()) FX_TIME.value += dt;
   const lk = lookOf(holeWorld(play.hole)); if (lk.tick) lk.tick(holeGroup, dt, play.time);
   syncLost(dt); tickNight(dt, play.time); updateSinkRing(dt);
   syncBall(dt);
   syncGhost();
   updatePuffs(dt);
   updateAimLine();
+  updatePinTag();
   updatePutter(dt);
   updateFx(dt);
   updateCamera(dt);
+  skyDome.position.copy(camera.position);
   renderer.render(scene, camera);
 }
 
@@ -1667,6 +1850,8 @@ function setOverview(on) { play.overview = on; viewBtn.classList.toggle('on', on
 function strike(st) {
   const s = play.swing;
   play.swing = null;
+  if (!reducedMotion()) play.fx.hold = st.clean ? 0.045 + 0.04 * st.power : 0.03;
+  buzz(st.clean ? 8 + 18 * st.power : [6, 20, 6]);
   play.lastShot = st;
   play.lastPath = { samples: s.samples.slice(), clean: st.clean };
   const a = play.aim * Math.PI / 180;
@@ -1712,7 +1897,7 @@ function startHole(key, opts = {}) {
   if (!h) return false;
   Object.assign(play, { key, hole: h, round: newRound(h), ball: newBall(h, h.tee[0], h.tee[1]), phase: 'aim', time: 0, from: null, t0: 0, swing: null, aimDrag: null, fx: {}, lastOutcome: null, lastShot: null,
     log: [], undo: null, mulls: 0, touched: false, ghost: null, intro: null, replay: null, camZoom: play.key === key ? play.camZoom : 0,
-    practice: !opts.daily && !opts.friend && practiceMode, daily: opts.daily || null, friend: opts.friend || null, lost: null });
+    practice: !opts.daily && !opts.friend && (practiceMode || party.on), daily: opts.daily || null, friend: opts.friend || null, lost: null });
   play.aim = h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - h.tee[0], h.cup[1] - h.tee[1]) * 180 / Math.PI;
   setOverview(false);
   simAcc = 0;
@@ -1721,7 +1906,7 @@ function startHole(key, opts = {}) {
   hideAim();
   for (const m of trailDots.concat(confetti)) m.visible = false;
   holeDone.classList.remove('show'); shotPanel.classList.remove('show'); play.lastPath = null; holeBanner.classList.remove('show');
-  setRead(false); initGhost(h); startLostSearch(h); updateMode(); updateMulligan();
+  setRead(false); initGhost(h); startLostSearch(h); updateMode(); partyDress(); updateMulligan(); clearTrace();
   for (const p of puffs) p.visible = false;
   syncBall(0);
   showScene('hole');
@@ -1734,7 +1919,25 @@ function goHole(key, opts) {
   /* the hole introduces itself: a sweep from over the cup back to the tee, with its number and par */
   if (!reducedMotion()) { play.intro = { t: 0, dur: 2.4 }; snapCamera(); }
   holeBannerN.textContent = key.split('-')[1]; holeBannerPar.textContent = play.hole.par;
+  holeBannerMap.innerHTML = holeMapSvg(play.hole, play.aim);
   holeBanner.classList.remove('show'); void holeBanner.offsetWidth; holeBanner.classList.add('show');
+}
+/* the tee sign's picture of the hole: its outline seen from the tee (the line of play points up), the
+   walls, water and sand, the tee and the flag. Like the layout drawing on a real course's tee sign. */
+function holeMapSvg(h, aimDeg) {
+  const a = aimDeg * Math.PI / 180, fx = Math.sin(a), fz = Math.cos(a), rx = -Math.cos(a), rz = Math.sin(a);
+  const P = ([x, z]) => [x * rx + z * rz, -(x * fx + z * fz)];
+  const pts = h.floors.flat().map(P), xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), k = 84 / Math.max(x1 - x0, y1 - y0, 0.5);
+  const ox = 48 - (x0 + x1) / 2 * k, oy = 48 - (y0 + y1) / 2 * k;
+  const S = p => { const [x, y] = P(p); return `${(x * k + ox).toFixed(1)},${(y * k + oy).toFixed(1)}`; };
+  const poly = (ring, fill, stroke = 'none', sw = 0) => `<polygon points="${ring.map(S).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  const zf = { water: '#6fc0df', sand: '#e9cf9a', ice: '#cfeaf5', mud: '#8a6a4a', fast: '#5f8fc4' };
+  const [tx, ty] = S(h.tee).split(','), [cx, cy] = S(h.cup).split(',');
+  return '<svg viewBox="0 0 96 96" aria-hidden="true">' + h.floors.map(f => poly(f, '#74c465', '#fffdf7', 3)).join('') +
+    h.zones.filter(z => zf[z.surf]).map(z => poly(z.poly, zf[z.surf])).join('') +
+    h.walls.map(w => `<polyline points="${w.map(S).join(' ')}" fill="none" stroke="#fffdf7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`).join('') +
+    `<circle cx="${tx}" cy="${ty}" r="4.5" fill="#fffdf7" stroke="#2f241a" stroke-width="1.5"/><path d="M${cx} ${cy} V${+cy - 14}" stroke="#fffdf7" stroke-width="2"/><path d="M${cx} ${+cy - 14} L${+cx + 9} ${+cy - 10.5} L${cx} ${+cy - 7} Z" fill="#ef7d6d"/><circle cx="${cx}" cy="${cy}" r="3" fill="#2f241a"/></svg>`;
 }
 function skipIntro() { if (play.intro) { play.intro = null; holeBanner.classList.remove('show'); } }
 function beginPutt(angle, power, clean = true) {
@@ -1746,6 +1949,7 @@ function beginPutt(angle, power, clean = true) {
   play.log.push([+angle.toFixed(3), +power.toFixed(4), +play.time.toFixed(6)]);
   play.ball = launch(newBall(play.hole, b.x, b.z), angle, power);
   play.phase = 'roll'; play.swing = null; play.aimDrag = null;
+  clearTrace(); recordTrace(play.ball);
   ghostPutt(play.log.length - 1);
   updateMulligan();
   sfx('putt', power, clean ? 1 : 0);
@@ -1770,16 +1974,23 @@ function cupInSight(h, x, z) {
 }
 function endRoll(end) {
   const r = { end, x: play.ball.x, z: play.ball.z }, h = play.hole;
+  if (end !== 'sunk') showTrace();
   const out = play.phase === 'drift' ? resolveDrift(play.round, r, play.from) : resolvePutt(play.round, r, play.from);
   play.lastOutcome = out;
   setRoll(0);
   if (out === 'sunk') {
     play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [r.x, r.z]; startSink(play.ball.vx, play.ball.vz); sfx('cup');
+    if (!reducedMotion()) play.fx.hold = 0.07;
+    buzz([18, 40, 30]);
+    /* the last hole of a course keeps your ball: it rattles away down the return pipe and the clubhouse bell rings */
+    if (isLastHole(play.key) && (!play.practice || party.on)) { play.fx.swallow = true; sfx('bell', play.round.score === 1 ? 1 : 0); }
     if (play.round.score === 1) { burst(new THREE.Vector3(h.cup[0], groundH(h, ...h.cup) + 0.1, h.cup[1])); sfx('fanfare'); if (!reducedMotion() && play.log.length === 1) play.fx.wantReplay = true; }
   }
   else if (out === 'auto') { play.phase = 'auto'; play.fx.autoT = 0; play.fx.autoFrom = end === 'oob' ? play.from.slice() : [r.x, r.z]; }
   else {
     if (out === 'oob') sfx('boink');
+    /* the border rule moved it out from a rail: lift it and set it down there, as a player would */
+    if (out !== 'oob' && Math.hypot(r.x - play.round.at[0], r.z - play.round.at[1]) > 0.005) { play.fx.place = { from: [r.x, r.z], t: 0 }; sfx('place'); }
     play.ball = newBall(h, play.round.at[0], play.round.at[1]);
     if (cupInSight(h, play.ball.x, play.ball.z)) play.aim = Math.atan2(h.cup[0] - play.ball.x, h.cup[1] - play.ball.z) * 180 / Math.PI;
     play.phase = 'aim';
@@ -1788,7 +1999,7 @@ function endRoll(end) {
 }
 /* the mulligan: take the last stroke back (ball, count and penalty) for one token. Tokens come
    from lost balls, goals, the daily hole and the pro shop; practice takes them back for free. */
-const canMulligan = () => play.phase === 'aim' && !play.daily && !!play.undo && play.round.strokes > 0 && (play.practice || progress.mulligans > 0);
+const canMulligan = () => play.phase === 'aim' && !party.on && !play.daily && !!play.undo && play.round.strokes > 0 && (play.practice || progress.mulligans > 0);
 function updateMulligan() {
   mulliganBtn.classList.toggle('show', canMulligan());
   mulliganN.textContent = play.practice ? '\u221e' : progress.mulligans;
@@ -1814,7 +2025,7 @@ function drainHits() {
   for (const [kind, v] of play.ball.hits) {
     if (kind === 'wall' || kind === 'post') { hitSfx('clonk', v); if (play.phase === 'roll') play.touched = true; }
     else if (kind === 'bump' || kind === 'mover') hitSfx('boing', v);
-    else if (kind === 'lip') sfx('lip');
+    else if (kind === 'lip') { sfx('lip'); buzz([6, 30, 6]); }
     else if (kind === 'land') { hitSfx('land', v); if (v > 0.8) puff(play.ball, 'dust', Math.min(14, 4 + v * 4)); if (v > 1.6) play.fx.shake = Math.min(1, v / 4); }
     else if (kind === 'splash') { sfx('splash'); puff(play.ball, 'water', 22); }
     else if (kind === 'tubeIn') sfx('tube');
@@ -1833,6 +2044,9 @@ function advance(dt) {
   if (play.phase === 'title') { play.time += dt; return; }
   if (play.intro) { play.intro.t += dt; if (play.intro.t >= play.intro.dur) skipIntro(); }
   if (play.phase === 'replay') { advanceReplay(dt); return; }
+  /* hit-stop: the world holds for a beat at contact and on the drop (only the pacing: the putt's
+     start time is already fixed, so the result is the same to the bit) */
+  if (play.fx.hold > 0) { play.fx.hold -= dt; return; }
   /* a slow ball closing on the cup plays in slow motion: only the pacing, never the result */
   const b0b = play.ball, near = ((play.phase === 'roll' || play.phase === 'drift') && !b0b.tube && Math.hypot(b0b.x - play.hole.cup[0], b0b.z - play.hole.cup[1]) < 0.35 && Math.hypot(b0b.vx, b0b.vz) < 1.2)
     || (play.phase === 'sunk' && (play.fx.sunkT || 0) < 0.18);
@@ -1842,7 +2056,7 @@ function advance(dt) {
   while (simAcc >= SIM_DT) { simAcc -= SIM_DT; tickSim(); }
   drainHits();
   stepLost();
-  if (play.phase === 'roll' || play.phase === 'drift') setRoll(play.ball.air || play.ball.tube ? 0 : Math.hypot(play.ball.vx, play.ball.vz));
+  if (play.phase === 'roll' || play.phase === 'drift') { const b = play.ball, zn = zoneAt(play.hole, b.x, b.z); setRoll(b.air || b.tube ? 0 : Math.hypot(b.vx, b.vz), zn && zn.surf ? zn.surf : 'felt'); recordTrace(b); }
   const h = play.hole, b = play.ball, cy = groundH(h, h.cup[0], h.cup[1]);
   if (play.phase === 'auto') {
     const t = (play.fx.autoT += dt) / 0.9, k = Math.min(1, t), e = k * k * (3 - 2 * k), [fx, fz] = play.fx.autoFrom;
@@ -1858,6 +2072,7 @@ function advance(dt) {
     if (t > 1.45) { play.fx.sink = null; if (play.fx.wantReplay) startReplay(); else finishHole(); }
   }
 }
+const isLastHole = key => { const [w, n] = String(key).split('-').map(Number); return !!WORLDS[w] && n === WORLDS[w].holes.length; };
 /* the drop, drawn (the result was settled when the cup caught the ball): the ball carries its
    pace over the lip, falls, clacks off the white liner, rattles round it and plunks onto the floor
    of a cup drawn deeper than the physics needs. A ring of light pops on the green and the camera
@@ -1895,6 +2110,13 @@ function stepSink(dt) {
         if (vn > 0.15 && k.walls < 3) { k.walls++; sfx('rattle', Math.min(1, vn)); }
       }
       k.x = nx * wall; k.z = nz * wall;
+    }
+    if (play.fx.swallow && k.floor && (k.swT = (k.swT || 0) + d) > 0.35) {
+      /* down the drain and away to the clubhouse */
+      if (!k.gone) { k.gone = true; sfx('tube'); }
+      k.vy -= G * d * 0.5; k.y += k.vy * d * 0.5;
+      if (k.y < floor - 0.12) play.fx.ballHidden = true;
+      continue;
     }
     if (k.y < floor) {
       k.y = floor;
@@ -1963,6 +2185,7 @@ function updateHud() {
 function finishHole() {
   play.phase = 'done';
   const { key, round, hole } = play;
+  if (party.on) { updateMulligan(); partyFinish(round.score); return; }
   /* practice keeps nothing; a daily or friend's hole you have not reached yet counts only for itself */
   const counts = !play.practice && holeUnlocked(progress, key), prev = progress.holes[key];
   if (counts) {
@@ -2056,6 +2279,51 @@ function setRead(on) {
   inst.count = spots.length; inst.renderOrder = 2; inst.frustumCulled = false;
   readGroup.add(inst); scene.add(readGroup);
 }
+/* the putt tracer: the whole line the last putt took stays painted on the green until the next one,
+   coloured by its pace (sky blue slow, sun yellow, coral fast), so the break and the bank can be read */
+let traceMesh = null, tracePts = [];
+function recordTrace(b) {
+  if (b.tube) return;
+  const l = tracePts[tracePts.length - 1];
+  if (!l || Math.hypot(b.x - l[0], b.z - l[2]) > 0.025) tracePts.push([b.x, b.y, b.z, Math.hypot(b.vx, b.vz)]);
+}
+function clearTrace() { tracePts = []; if (traceMesh) traceMesh.visible = false; }
+const TRACE_COLS = [new THREE.Color('#6fc0df'), new THREE.Color('#ffd66e'), new THREE.Color('#ef7d6d')];
+function showTrace() {
+  if (tracePts.length < 3) return;
+  if (!traceMesh) {
+    traceMesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3 }));
+    traceMesh.renderOrder = 2; traceMesh.frustumCulled = false; scene.add(traceMesh);
+  }
+  const pos = [], col = [], idx = [], w = 0.007, n = tracePts.length, c = new THREE.Color();
+  for (let i = 0; i < n; i++) {
+    const a = tracePts[Math.max(0, i - 1)], b = tracePts[Math.min(n - 1, i + 1)], p = tracePts[i], dx = b[0] - a[0], dz = b[2] - a[2], d = Math.hypot(dx, dz) || 1;
+    const sx = dz / d * w, sz = -dx / d * w, k = Math.min(1, p[3] / 3) * 2, fade = Math.min(1, i / 4, (n - 1 - i) / 4);
+    c.copy(TRACE_COLS[Math.min(1, Math.floor(k))]).lerp(TRACE_COLS[Math.min(2, Math.floor(k) + 1)], k - Math.floor(k)).multiplyScalar(0.4 + 0.6 * fade);
+    pos.push(p[0] + sx, p[1] + 0.004, p[2] + sz, p[0] - sx, p[1] + 0.004, p[2] - sz); col.push(c.r, c.g, c.b, c.r, c.g, c.b);
+    if (i) idx.push(i * 2 - 2, i * 2 - 1, i * 2, i * 2 - 1, i * 2 + 1, i * 2);
+  }
+  traceMesh.geometry.dispose();
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx);
+  traceMesh.geometry = g; traceMesh.visible = true;
+}
+/* the pin tag: while you aim, a little tag rides over the flag with the distance to the cup (metres)
+   and how far it rises or falls (centimetres), the numbers a caddie would give you */
+let pinTagKey = '';
+function updatePinTag() {
+  const show = play.phase === 'aim' && !play.overview && !play.intro && !!play.hole && currentScene === 'hole';
+  if (!show) { if (pinTag.classList.contains('show')) pinTag.classList.remove('show'); return; }
+  const h = play.hole, b = play.ball, cy = groundH(h, h.cup[0], h.cup[1]), v = new THREE.Vector3(h.cup[0], cy + 0.86, h.cup[1]).project(camera);
+  if (v.z > 1 || Math.abs(v.x) > 0.92 || v.y > 0.8 || v.y < -0.9) { pinTag.classList.remove('show'); return; }
+  const d = Math.hypot(h.cup[0] - b.x, h.cup[1] - b.z), rise = Math.round((cy - b.y) * 100), key = d.toFixed(1) + '/' + rise;
+  if (key !== pinTagKey) {
+    pinTagKey = key; pinTagD.textContent = d.toFixed(1);
+    pinTagR.textContent = Math.abs(rise) >= 2 ? Math.abs(rise) : ''; pinTag.classList.toggle('up', rise >= 2); pinTag.classList.toggle('down', rise <= -2);
+  }
+  pinTag.style.left = ((v.x + 1) / 2 * 1200) + 'px'; pinTag.style.top = ((1 - v.y) / 2 * 700) + 'px';
+  pinTag.classList.add('show');
+}
 /* puffs: a small pool of dust and water particles for landings, splashes and tube exits */
 function initPuffs() {
   const geo = new THREE.SphereGeometry(0.018, 8, 6);
@@ -2091,6 +2359,70 @@ function wipe() {
 }
 
 
+/* ---- 6b2. pass and play: 2 to 4 players on one device, the way a group plays a real course ----
+   Each player has a ball colour. On every hole each player plays it out in turn (to the cup or the
+   double-par cap), then a little scoreboard crowns the hole's best. The honour (who putts first on
+   the next hole) goes to the lowest score on the last one, ties keeping the old order. At the end
+   the scorecard has a row per player and a crown for the winner. Nothing is saved: no stars, coins
+   or mulligans, like practice. */
+const PARTY_BALLS = ['#fffdf7', '#ffd66e', '#ef7d6d', '#6fc0df'];
+const party = { on: false, n: 0, course: 0, order: [], turn: 0, scores: {} };
+const CROWN_SVG = '<svg class="crown" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 50 L12 18 L24 32 L32 12 L40 32 L52 18 L56 50 Z" fill="#ffd66e" stroke="#dca63f" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="40" r="5" fill="#ef7d6d"/></svg>';
+const partyBall = (p, size = 40) => `<span class="pball" style="width:${size}px;height:${size}px;background:${PARTY_BALLS[p]}"><b>${p + 1}</b></span>`;
+const partyPlayer = () => party.order[party.turn];
+function startParty(n, course) {
+  Object.assign(party, { on: true, n, course, order: Array.from({ length: n }, (_, i) => i), turn: 0, scores: {} });
+  partyPick.classList.remove('show');
+  goHole(course + '-1');
+}
+function endParty() {
+  party.on = false;
+  if (ballMesh) ballMesh.material.color.set('#ffffff');
+  partyChip.classList.remove('show'); partyPass.classList.remove('show'); partyDone.classList.remove('show');
+}
+/* called by startHole: the active player's ball and chip */
+function partyDress() {
+  if (!party.on) { partyChip.classList.remove('show'); if (ballMesh) ballMesh.material.color.set('#ffffff'); return; }
+  const p = partyPlayer();
+  ballMesh.material.color.set(p === 0 ? '#ffffff' : PARTY_BALLS[p]);
+  partyChipBall.innerHTML = partyBall(p, 44); partyChip.classList.add('show');
+  play.ghost = null; play.lost = null; if (lostMesh) lostMesh.visible = false;
+}
+/* the hole is finished for this player: next player, or the hole's scoreboard */
+function partyFinish(score) {
+  const key = play.key, sc = party.scores[key] || (party.scores[key] = []);
+  sc[partyPlayer()] = score;
+  if (party.turn + 1 < party.n) {
+    party.turn++;
+    const p = partyPlayer();
+    partyPassBall.innerHTML = partyBall(p, 150);
+    partyPass.classList.add('show'); sfx('tap');
+    clearTimeout(partyPass._t); partyPass._t = setTimeout(partyGo, 1600);
+    return;
+  }
+  /* everyone is in: the hole's scoreboard, the best score crowned, running totals beside */
+  const best = Math.min(...sc), keys = Object.keys(party.scores);
+  partyRows.innerHTML = party.order.map(p => {
+    const tot = keys.reduce((a, k) => a + (party.scores[k][p] || 0), 0);
+    return `<div class="prow">${partyBall(p, 56)}<span class="ps">${sc[p]}</span><span class="pc">${sc[p] === best ? CROWN_SVG : ''}</span><span class="pt">${tot}</span></div>`;
+  }).join('');
+  partyDone.classList.add('show'); sfx('star', 2);
+  /* the honour: lowest score on this hole putts first on the next, ties keep the order */
+  party.order = party.order.slice().sort((a, b) => sc[a] - sc[b] || party.order.indexOf(a) - party.order.indexOf(b));
+  party.turn = 0;
+}
+function partyGo() {
+  clearTimeout(partyPass._t);
+  if (!partyPass.classList.contains('show')) return;
+  partyPass.classList.remove('show');
+  startHole(play.key);
+}
+function partyNext() {
+  partyDone.classList.remove('show');
+  const k = nextKey(play.key);
+  if (k) { goHole(k); return; }
+  sfx('tap'); showCard(party.course);
+}
 /* ---- 6c. extras: modes, lost balls, goals, the daily hole, shot codes, night ---- */
 let practiceMode = false;
 /* save fields this section owns: mulligans (tokens), lost (key -> 1), obj (key -> goal bits), daily */
@@ -2106,7 +2438,11 @@ function repairExtras(p) {
   const d = p.daily;
   p.daily = d && typeof d.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(d.d) && Number.isInteger(d.best) && d.best >= 1 && Number.isInteger(d.streak) && d.streak >= 1
     ? { d: d.d, best: d.best, streak: d.streak } : null;
+  /* ghosts are putt inputs, replayed through the physics: ones recorded under older physics would
+     roll somewhere else now, so they go (bests and stars stay, they only ever go up) */
+  if (p.phys !== PHYS_VERSION) { p.ghosts = {}; p.phys = PHYS_VERSION; }
 }
+const PHYS_VERSION = 3;
 const addCoins = n => { progress.coins = Math.min(COIN_MAX, (progress.coins || 0) + n); return n; };
 
 /* the mode chip: practice (a target), the daily hole (a calendar), a friend's putt (their score) */
@@ -2116,7 +2452,7 @@ const MODE_ICONS = {
   friend: '<svg viewBox="0 0 64 64"><path d="M12 56 V28 A20 20 0 0 1 52 28 V56 L45 50 L38 56 L32 50 L26 56 L19 50 Z" fill="#fffdf7" stroke="#d38bbf" stroke-width="4" stroke-linejoin="round"/><circle cx="25" cy="30" r="4" fill="#4a3826"/><circle cx="39" cy="30" r="4" fill="#4a3826"/></svg>',
 };
 function updateMode() {
-  const m = play.practice ? 'practice' : play.daily ? 'daily' : play.friend ? 'friend' : '';
+  const m = party.on ? '' : play.practice ? 'practice' : play.daily ? 'daily' : play.friend ? 'friend' : '';
   hudMode.className = 'chip' + (m ? ' show ' + m : '');
   if (!m) return;
   hudMode.querySelector('.ic').innerHTML = MODE_ICONS[m];
@@ -2575,7 +2911,7 @@ function renderProfiles() {
     if (!sum) continue;
     const bin = document.createElement('button');
     bin.className = 'btn bin' + (binArmed === n ? ' armed' : '');
-    bin.style.left = (x + 116) + 'px';
+    bin.style.left = (x + 50) + 'px';
     bin.setAttribute('aria-label', 'erase profile ' + n);
     bin.innerHTML = BIN_SVG;
     bin.onclick = () => {
@@ -2585,7 +2921,24 @@ function renderProfiles() {
       renderProfiles();
     };
     profileRow.append(bin);
+    /* carry on: one tap from here to this profile's next unplayed hole */
+    const next = nextHoleFor(loadProgress(slotKey(n)));
+    if (!next) continue;
+    const go = document.createElement('button');
+    go.className = 'btn go cont'; go.style.left = (x + 182) + 'px';
+    go.setAttribute('aria-label', 'carry on with profile ' + n);
+    go.innerHTML = '<svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg><span class="hn">' + next.split('-')[1] + '</span>';
+    go.onclick = () => { useSlot(n); goHole(next); };
+    profileRow.append(go);
   }
+}
+/* the first hole a profile has open but not yet finished, course by course */
+function nextHoleFor(p) {
+  for (const w of WORLD_ORDER) for (const c of coursesOf(w)) {
+    if (!p.worlds.includes(c)) continue;
+    for (const h of WORLDS[c].holes) if (!p.holes[h.key] && holeUnlocked(p, h.key)) return h.key;
+  }
+  return null;
 }
 function showMap(w) {
   if (currentScene !== 'map') wipe();
@@ -2625,18 +2978,49 @@ function renderMap() {
 }
 function showCard(w) {
   mapWorld = w;
-  const holes = WORLDS[w].holes;
+  const holes = WORLDS[w].holes, inParty = party.on && party.course === w;
   /* a course played out of order (?hole=, or a gapped save) has no full card yet: back to its map */
-  if (holes.some(h => !progress.holes[h.key])) { showMap(w); return; }
+  if (!inParty && holes.some(h => !progress.holes[h.key])) { showMap(w); return; }
+  /* a real paper scorecard: the hole numbers, the par row and a row per player, a subtotal for each nine,
+     scores marked the way golfers mark them: a circle under par, two for two under, a square over */
   cardRow.innerHTML = '';
   let total = 0, par = 0, stars = 0;
-  holes.forEach((h, i) => {
-    const r = progress.holes[h.key], c = document.createElement('div');
-    total += r.best; par += h.par; stars += r.stars;
-    c.className = 'cell' + (r.best < h.par ? ' under' : r.best === h.par ? ' par' : '');
-    c.innerHTML = `<small>${i + 1}</small>${r.best}`;
-    cardRow.append(c);
-  });
+  const FLAG = '<svg viewBox="0 0 64 64"><path d="M20 58 V6" stroke="#8a7360" stroke-width="6" stroke-linecap="round"/><path d="M22 8 L52 18 L22 30 Z" fill="#ef7d6d"/></svg>';
+  const BALL = '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#fffdf7" stroke="#8a7360" stroke-width="5"/><circle cx="25" cy="26" r="3" fill="#cdbf9f"/><circle cx="37" cy="26" r="3" fill="#cdbf9f"/><circle cx="31" cy="37" r="3" fill="#cdbf9f"/></svg>';
+  const players = inParty ? Array.from({ length: party.n }, (_, p) => ({ icon: partyBall(p, 32), best: h => party.scores[h.key][p] }))
+    : [{ icon: BALL, best: h => progress.holes[h.key].best }];
+  const sums = players.map(() => 0);
+  cardPanel.classList.toggle('party', inParty);
+  for (let k = 0; k < holes.length; k += 9) {
+    const ns = holes.slice(k, k + 9), t = document.createElement('div');
+    const p9 = ns.reduce((a, h) => a + h.par, 0);
+    const rows = [[['', 'hd'], ...ns.map((h, i) => [String(k + i + 1), 'hd']), [`${k + 1}-${k + ns.length}`, 'hd sub']],
+      [[FLAG, 'lb'], ...ns.map(h => [String(h.par), 'par']), [String(p9), 'par sub']]];
+    players.forEach((pl, j) => {
+      let s9 = 0;
+      const row = [[pl.icon, 'lb']];
+      ns.forEach(h => { const b = pl.best(h), d = b - h.par; s9 += b; row.push([`<span class="mk ${d <= -2 ? 'e' : d === -1 ? 'b' : d === 1 ? 'o' : d >= 2 ? 'd' : ''}">${b}</span>`, 'me']); });
+      row.push([String(s9), 'me sub']); rows.push(row); sums[j] += s9;
+    });
+    if (!inParty) ns.forEach(h => { stars += progress.holes[h.key].stars; });
+    par += p9;
+    t.className = 'nine'; t.style.gridTemplateColumns = `64px repeat(${ns.length}, 1fr) 112px`;
+    t.innerHTML = rows.map(row => row.map(([v, c]) => `<div class="sc ${c}">${v}</div>`).join('')).join('');
+    cardRow.append(t);
+  }
+  total = Math.min(...sums);
+  if (inParty) {
+    const win = sums.indexOf(total);
+    const diff = total - par;
+    cardTotal.innerHTML = partyBall(win, 72) + total;
+    cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
+    cardStars.innerHTML = sums.filter(v => v === total).length > 1 ? '' : CROWN_SVG;
+    cardNext.style.display = 'none';
+    showScene('card');
+    burst(new THREE.Vector3().copy(camera.position).add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(1.6)), 140);
+    sfx('fanfare');
+    return;
+  }
   const diff = total - par;
   cardTotal.textContent = total;
   cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
@@ -2780,7 +3164,13 @@ function boot() {
   setClose.addEventListener('click', () => { sfx('tap'); settings.classList.remove('show'); });
   setHand(progress.hand);
   neonSet.classList.toggle('on', !!progress.neon);
-  homeBtn.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
+  homeBtn.addEventListener('click', () => { sfx('tap'); endParty(); showMap(Number(play.key.split('-')[0])); });
+  partyBtn.addEventListener('click', () => { sfx('tap'); partyPick.classList.add('show'); });
+  partyPickClose.addEventListener('click', () => { sfx('tap'); partyPick.classList.remove('show'); });
+  [2, 3, 4].forEach(n => document.getElementById('partyN' + n).addEventListener('click', () => { sfx('tap'); startParty(n, mapWorld); }));
+  partyPass.addEventListener('click', () => { sfx('tap'); partyGo(); });
+  partyNextBtn.addEventListener('click', () => { sfx('tap'); partyNext(); });
+  partyMap.addEventListener('click', () => { sfx('tap'); const w = party.course; endParty(); showMap(w); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   titleGo.addEventListener('click', () => { sfx('tap'); showProfiles(); });
   profilesBack.addEventListener('click', () => { sfx('tap'); showTitle(); });
@@ -2788,7 +3178,7 @@ function boot() {
   worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
   mapBack.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
   bonusBtn.addEventListener('click', () => { if (WORLDS[BONUS]) { sfx('tap'); showMap(BONUS); } else sfx('boink'); });
-  cardMap.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
+  cardMap.addEventListener('click', () => { sfx('tap'); const was = party.on; endParty(); if (was) showMap(mapWorld); else if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
   doneRetry.addEventListener('click', () => goHole(play.key, { daily: play.daily, friend: play.friend }));
   initExtras();

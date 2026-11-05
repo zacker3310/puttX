@@ -38,6 +38,15 @@ const { check, done, open, URL } = require('./lib.cjs');
   check('each profile keeps its own save', slots.fresh2 && slots.back1 && slots.s1.stars === 2 && slots.s1.coins === 40 && slots.s2.stars === 6 && slots.s3 === null, JSON.stringify(slots));
   await reload();
   check('the last profile played comes back after a reload', await page.evaluate(() => slot === 2 && Object.keys(progress.holes).length === 2));
+  const cont = await page.evaluate(() => {
+    showProfiles();
+    const gos = profileRow.querySelectorAll('.cont'), f = playable()[0];
+    const label = gos[1] && gos[1].querySelector('.hn').textContent;
+    gos[0].click();
+    return { n: gos.length, label, key: play.key, slot, scene: currentScene, want: f + '-2' };
+  });
+  check('a profile card carries on with one tap at its next unplayed hole', cont.n === 2 && cont.label === '3' && cont.key === cont.want && cont.slot === 1 && cont.scene === 'hole', JSON.stringify(cont));
+  await page.evaluate(() => useSlot(2));
   const bin = await page.evaluate(() => {
     showProfiles();
     const bins = () => profileRow.querySelectorAll('.bin');

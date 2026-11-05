@@ -7,11 +7,11 @@ const J23_WATER = poly => ({ surf: 'water', poly });
 const J23_MUD = poly => ({ surf: 'mud', poly });
 registerWorld(23, { holes: [
   /* 1: up the temple step, across the terrace, drop round the lintel to the cup */
-  { par: 3, sol: [[352.75,0.93,0]], tee: [0, 0.5], cup: [0, 6.6], shape: [[-1, 0], [1, 0], [1, 2.4], [1, 4.6], [1, 7.4], [-1, 7.4], [-1, 4.6], [-1, 2.4]],
+  { par: 3, sol: [[352.75,0.93,0],[2,1,0]], tee: [0, 0.5], cup: [0, 6.6], shape: [[-1, 0], [1, 0], [1, 2.4], [1, 4.6], [1, 7.4], [-1, 7.4], [-1, 4.6], [-1, 2.4]],
     ramps: [{ x0: -0.3, z0: 1.6, x1: 0.3, z1: 2.4, axis: 'z', h0: 0, h1: 0.25 }], tiers: [{ poly: rect(-1, 2.4, 1, 4.6), h: 0.25 }],
     inner: [[[-0.5, 4.6], [0.5, 4.6]]], zones: [J23_MUD(rect(-1, 3.0, -0.3, 3.6))], posts: [J23_IDOL(0.55, 5.8)] },
   /* 2: two tunnels in a chain, or the plank straight over the gorge */
-  { par: 3, sol: [[2,0.92,0]], tee: [0, 0.5], cup: [0.6, 5.2], aim0: 0,
+  { par: 3, sol: [[3,0.92,0]], tee: [0, 0.5], cup: [0.6, 5.2], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 2.4), rect(-0.2, 2.4, 0.2, 3.2), rect(1.6, 0, 3.2, 2.4), rect(-0.8, 3.2, 3.2, 6.0)],
     walls: [[[-0.2, 2.4], [-0.8, 2.4], [-0.8, 0], [0.8, 0], [0.8, 2.4], [0.2, 2.4]], ring(rect(1.6, 0, 3.2, 2.4)), [[-0.2, 3.2], [-0.8, 3.2], [-0.8, 6], [3.2, 6], [3.2, 3.2], [0.2, 3.2]]],
     tubes: [{ a: [0.5, 2.0], b: [1.9, 0.4], dir: 0, keep: 0.6 }, { a: [2.9, 2.0], b: [2.9, 3.6], dir: 0, keep: 0, add: 0.5 }],

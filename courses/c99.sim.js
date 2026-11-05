@@ -134,7 +134,7 @@ registerWorld(99, { holes: [
      island in the middle; a half-pipe up the first straight, a kicker jump along the top, moguls
      down the far side, banked hairpins and chamfered corners all the way in. Every touch on the
      ice travels for ever, so play it in stages and let the walls turn you */
-  { par: 6, crazy: true, sol: [[356,1,0],[168,0.95,0],[212,0.95,0]], tee: [0, 0.6], cup: [4.4, 5.2], aim0: 0,
+  { par: 6, crazy: true, sol: [[356,1,0],[182,1,0],[234,1,0]], tee: [0, 0.6], cup: [4.4, 5.2], aim0: 0,
     shape: rect(-0.7, 0, 9.1, 9.8),
     inner: [[[0.7, 0], [0.7, 8.4], [7.7, 8.4], [7.7, 1.4], [2.1, 1.4], [2.1, 7.0], [6.3, 7.0], [6.3, 2.8], [3.5, 2.8]],
       [[-0.7, 9.1], [0, 9.8]], [[8.4, 9.8], [9.1, 9.1]], [[9.1, 0.7], [8.4, 0]], [[1.4, 0], [0.7, 0.7]],

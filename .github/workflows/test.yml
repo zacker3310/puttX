@@ -15,7 +15,7 @@ permissions:
 jobs:
   suites:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60   # holes-check proves 567 holes (about 20 minutes on 4 cores)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

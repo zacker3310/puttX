@@ -119,7 +119,7 @@ registerWorld(27, { holes: [
     posts: [C27_GARG(1.05, 5.6)],
     movers: [C27_GHOST(-0.35, 2.6, 0.35, 2.6, 2.0, 0)] },
   /* 15: the crypt descent: four floating floors, a portcullis on the first drop, passages to skip ahead */
-  { par: 4, sol: [[200,1,0],[10,0.96,0]], tee: [0, 0.5], cup: [-0.3, 9.7], floors: [rect(-0.7, 0, 0.7, 2.6), rect(-1.2, 2.9, 1.2, 5.1), rect(-1.2, 5.4, 1.2, 7.6), rect(-1.0, 7.9, 1.0, 10.5)],
+  { par: 4, sol: [[330,0.8,0],[42,0.56,0]], tee: [0, 0.5], cup: [-0.3, 9.7], floors: [rect(-0.7, 0, 0.7, 2.6), rect(-1.2, 2.9, 1.2, 5.1), rect(-1.2, 5.4, 1.2, 7.6), rect(-1.0, 7.9, 1.0, 10.5)],
     tiers: [{ poly: rect(-0.7, 0, 0.7, 2.6), h: 0.45 }, { poly: rect(-1.2, 2.9, 1.2, 5.1), h: 0.3 }, { poly: rect(-1.2, 5.4, 1.2, 7.6), h: 0.15 }],
     walls: [[[-0.25, 2.6], [-0.7, 2.6], [-0.7, 0], [0.7, 0], [0.7, 2.6], [0.25, 2.6]],
       [[-0.5, 2.9], [-1.2, 2.9], [-1.2, 5.1], [0.3, 5.1]], [[0.5, 2.9], [1.2, 2.9], [1.2, 5.1], [0.9, 5.1]],
@@ -129,7 +129,7 @@ registerWorld(27, { holes: [
     movers: [C27_GATE(0, 2.6, 0.45, 2.6, 0.25, 90, 2.8, 0), C27_MILL(-0.2, 6.5, 0.4, 1.5, 0)] },
   /* 16: the twin towers: up the stair to the near tower, through the passage to the far one,
      then drop through the portcullis to the courtyard; or jump down and take the long way */
-  { par: 4, crazy: true, sol: [[330.5,0.9,0.5],[37.5,0.811,0]], tee: [0, 0.5], cup: [-0.6, 8.7], shape: rect(-1.6, 0, 1.6, 9.5),
+  { par: 4, crazy: true, sol: [[331.75,0.58,1]], tee: [0, 0.5], cup: [-0.6, 8.7], shape: rect(-1.6, 0, 1.6, 9.5),
     tiers: [{ poly: rect(-1.6, 2.0, -0.4, 5.0), h: 0.3 }, { poly: rect(0.4, 4.0, 1.6, 7.0), h: 0.45 }],
     ramps: [{ x0: -1.6, z0: 1.2, x1: -0.4, z1: 2.0, axis: 'z', h0: 0, h1: 0.3 }],
     inner: [[[0.4, 7.0], [0.75, 7.0]], [[1.25, 7.0], [1.6, 7.0]]],
@@ -138,7 +138,7 @@ registerWorld(27, { holes: [
     movers: [C27_GATE(1.0, 7.0, 1.5, 7.0, 0.25, 90, 2.6, 0), C27_GHOST(-1.2, 7.9, 0.2, 7.9, 2.8, 0)] },
   /* 17: the moat-side green: the longest lag in the castle, a swale running across it on the
      diagonal, a back tier and a mound guarding the left of the cup */
-  { par: 3, sol: [[18,1,0]], tee: [0, 0.5], cup: [-0.9, 13.6], shape: rect(-2.0, 0, 2.0, 14.6),
+  { par: 3, sol: [[18,1,0],[58,0.92,0]], tee: [0, 0.5], cup: [-0.9, 13.6], shape: rect(-2.0, 0, 2.0, 14.6),
     ramps: [{ x0: -2.0, z0: 9.6, x1: 2.0, z1: 10.6, axis: 'z', h0: 0, h1: 0.12 }],
     tiers: [{ poly: rect(-2.0, 10.6, 2.0, 14.6), h: 0.12 }],
     bumps: [{ x: 1.2, z: 3.6, r: 1.2, h: -0.08 }, { x: 0, z: 5.6, r: 1.2, h: -0.08 }, { x: -1.2, z: 7.6, r: 1.2, h: -0.08 },

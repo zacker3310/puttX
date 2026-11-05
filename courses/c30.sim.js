@@ -6,12 +6,12 @@ const C30_PAD = (x0, z0, x1, z1) => rect(x0 - 0.1, z0 - 0.1, x1 + 0.1, z1 + 0.1)
 registerWorld(30, { holes: [
   /* 1. aurora green (long green): a 9 m opener that falls right to left and climbs gently to the
      back, with a swale on the left and a low hump on the right; read it and roll it */
-  { par: 2, sol: [[6,0.84,0]], tee: [0, 0.6], cup: [0.9, 8.0],
+  { par: 2, sol: [[6.5,0.91,0]], tee: [0, 0.6], cup: [0.9, 8.0],
     shape: [[-0.9, 0], [0.9, 0], [1.6, 2], [2.2, 5], [2.2, 8], [1.4, 9.6], [-0.4, 9.8], [-1.6, 8.4], [-1.8, 5], [-1.4, 2]],
     tiers: [{ poly: rect(-3, -1, 3, 11), h: 0, sx: -0.02, sz: 0.012 }],
     bumps: [{ x: -0.6, z: 5, r: 1.4, h: -0.08 }, { x: 1.2, z: 3.5, r: 1.2, h: 0.08 }] },
   /* 2. tube hop: a bare rainbow or the tube to the windmill isle, then drop off its lip onto the green */
-  { par: 3, sol: [[2,0.76,0]], tee: [0, 0.6], cup: [0.5, 7.6],
+  { par: 3, sol: [[4,0.74,0]], tee: [0, 0.6], cup: [0.5, 7.6],
     floors: [rect(-0.8, 0, 0.8, 2), rect(-0.25, 2, 0.25, 4.2), rect(-1.2, 4.2, 1.2, 6), rect(-1.4, 6, 1.4, 8.4)],
     walls: [[[-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2]], [[-1.2, 4.2], [-1.2, 6], [-1.4, 6], [-1.4, 8.4], [1.4, 8.4], [1.4, 6], [1.2, 6], [1.2, 4.2]]],
     tiers: [{ poly: C30_PAD(-0.8, 0, 0.8, 2), h: 0.3 }, { poly: rect(-0.25, 2, 0.25, 4.2), h: 0.3 }, { poly: rect(-1.3, 4.1, 1.3, 6), h: 0.3 }],

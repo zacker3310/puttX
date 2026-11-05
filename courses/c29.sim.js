@@ -39,14 +39,14 @@ registerWorld(29, { holes: [
     posts: [C29_GUM(-0.8, 7.3)],
     tubes: [C29_PIPE([1.1, 2.2], [1.1, 4.7], 340)] },
   /* 6: the conveyor switchback: belt up, belt across the top deck, then down the return lane */
-  { par: 3, sol: [[26,0.64,0]], tee: [0, 0.5], cup: [2.4, 1.4], aim0: 0,
+  { par: 3, sol: [[26,0.64,0],[22,0.72,0]], tee: [0, 0.5], cup: [2.4, 1.4], aim0: 0,
     shape: [[-0.4, 0], [0.4, 0], [0.4, 4.4], [2.0, 4.4], [2.0, 0.8], [2.8, 0.8], [2.8, 5.2], [-0.4, 5.2]],
     ramps: [{ x0: -0.4, z0: 1, x1: 0.4, z1: 3, axis: 'z', h0: 0, h1: 0.3 }, { x0: 2.0, z0: 2.4, x1: 2.8, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.4, 3, 2.8, 5.2), h: 0.3 }],
     zones: [C29_BELT(rect(-0.4, 1, 0.4, 3), 0, 1.8), C29_BELT(rect(0.4, 4.4, 2.0, 5.2), 1.0, 0), C29_MUD(2.0, 1.95, 2.55, 2.1)],
     posts: [C29_GUM(2.6, 3.0)] },
   /* 7: three layers: off the high deck past a press, off the middle deck past another, down to the green */
-  { par: 4, sol: [[36,0.83,0],[38,0.68,0]], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.2, 0, 1.2, 9.4),
+  { par: 4, sol: [[36,0.83,0],[86,1,1.5]], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.2, 0, 1.2, 9.4),
     inner: [[[-1.2, 3.2], [0.2, 3.2]], [[-0.2, 6.2], [1.2, 6.2]]],
     tiers: [{ poly: rect(-1.2, 0, 1.2, 3.2), h: 0.44 }, { poly: rect(-1.2, 3.2, 1.2, 6.2), h: 0.22 }],
     movers: [C29_PRESS(0.7, 2.95, 1.45, 2.95, 0.5, 90, 3), C29_PRESS(-0.7, 5.95, -1.45, 5.95, 0.5, 90, 2.6, 1)],
@@ -64,7 +64,7 @@ registerWorld(29, { holes: [
     drains: [{ x: 2.6, z: 6.3, r: 1.2, depth: 0.3, flat: 0.13 }, { x: -0.6, z: 10.4, r: 1.2, depth: 0.3, flat: 0.12 }],
     tubes: [C29_PIPE([0, 3.95], [1.35, 7.3], 90, 0, 1.2), C29_PIPE([2.6, 6.3], [0.65, 11.4], 270, 0, 1.2)] },
   /* 9: floating wafers: a belt bridge that shoves you off, or the pipe; then jump the gap or pipe down */
-  { par: 4, crazy: true, sol: [[0,0.76,0]], tee: [0, 0.5], cup: [0.4, 9.0], aim0: 0,
+  { par: 4, crazy: true, sol: [[0,0.77,0]], tee: [0, 0.5], cup: [0.4, 9.0], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 2.4), rect(-0.25, 2.4, 0.25, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.4, 7.0, 1.4, 9.6)],
     walls: [[[-0.25, 2.4], [-0.7, 2.4], [-0.7, 0], [0.7, 0], [0.7, 2.4], [0.25, 2.4]],
       [[-0.25, 4.6], [-1.4, 4.6], [-1.4, 6.6], [-0.6, 6.6]], [[0.25, 4.6], [1.4, 4.6], [1.4, 6.6]],
@@ -74,11 +74,11 @@ registerWorld(29, { holes: [
     posts: [C29_GUM(-0.2, 8.4)],
     tubes: [C29_PIPE([0.4, 1.9], [1.0, 5.0], 0), C29_PIPE([-1.0, 6.1], [-1.0, 7.5], 20)] },
   /* 10: long green: the big dipper, a deep wide swale across the middle and a low ridge by the cup */
-  { par: 2, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [-0.6, 10.6], shape: rect(-2.2, 0, 2.2, 12),
+  { par: 2, sol: [[-2,0.8,0]], tee: [0, 0.5], cup: [-0.6, 10.6], shape: rect(-2.2, 0, 2.2, 12),
     tiers: [{ poly: rect(-2.2, 0, 2.2, 12), h: 0.05, sz: 0.01 }],
     bumps: [{ x: 0, z: 6, r: 2.5, h: -0.18 }, { x: 1.2, z: 9.8, r: 1.0, h: 0.08 }] },
   /* 11: four stages: ramp to the lollipop deck, drop to the belt deck, drop to the taffy green */
-  { par: 4, sol: [[350,1,0],[16,0.96,0]], tee: [0, 0.5], cup: [-0.3, 10.2], shape: rect(-1.2, 0, 1.2, 11),
+  { par: 4, sol: [[350,1,0],[16.5,0.99,0]], tee: [0, 0.5], cup: [-0.3, 10.2], shape: rect(-1.2, 0, 1.2, 11),
     inner: [[[-0.6, 5.4], [1.2, 5.4]], [[-1.2, 8], [0.6, 8]]],
     ramps: [{ x0: -1.2, z0: 1.2, x1: 1.2, z1: 2.4, axis: 'z', h0: 0, h1: 0.4 }],
     tiers: [{ poly: rect(-1.2, 2.4, 1.2, 5.4), h: 0.4 }, { poly: rect(-1.2, 5.4, 1.2, 8), h: 0.2 }],
@@ -86,7 +86,7 @@ registerWorld(29, { holes: [
     zones: [C29_BELT(rect(-1.2, 5.4, 1.2, 8), 1.0, 0), C29_MUD(-1.2, 9.5, -0.6, 9.65), C29_MUD(0, 9.5, 1.2, 9.65)],
     posts: [C29_GUM(0.2, 6.7), C29_GUM(0.6, 9.0)] },
   /* 12: a tilted hard-candy slab of gumdrops, the pipe down, the crater green */
-  { par: 3, sol: [[340,1,0],[16,0.42,0]], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.4, 0, 1.4, 9.4),
+  { par: 3, sol: [[340,1,0],[16,0.42,0],[12,0.84,0]], tee: [0, 0.5], cup: [0.5, 8.6], shape: rect(-1.4, 0, 1.4, 9.4),
     inner: [[[-1.4, 5], [1.4, 5]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 5), h: 0.3, sx: 0.03 }],
     zones: [{ surf: 'fast', poly: rect(-1.4, 1.2, 1.4, 5) }],
@@ -94,7 +94,7 @@ registerWorld(29, { holes: [
     posts: [C29_GUM(0.5, 2.4), C29_GUM(-0.4, 3.0), C29_GUM(0.2, 3.8), C29_GUM(1.0, 4.3), C29_GUM(-1.0, 3.9)],
     tubes: [C29_PIPE([-0.8, 4.5], [-0.8, 5.6], 25)] },
   /* 13: presses guard both drops off the high deck; the pipe takes you down to the lollipop green */
-  { par: 4, crazy: true, sol: [[334,1,0],[24,0.88,0]], tee: [0, 0.5], cup: [0.6, 9.2], shape: rect(-1.4, 0, 1.4, 10),
+  { par: 4, crazy: true, sol: [[334,1,0],[24,0.88,0],[332,0.96,1]], tee: [0, 0.5], cup: [0.6, 9.2], shape: rect(-1.4, 0, 1.4, 10),
     inner: [[[-0.9, 3], [0.9, 3]], [[-1.4, 6.5], [1.4, 6.5]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 3), h: 0.44 }, { poly: rect(-1.4, 3, 1.4, 6.5), h: 0.22 }],
     movers: [C29_PRESS(1.15, 2.8, 1.8, 2.8, 0.25, 90, 2.4), C29_PRESS(-1.15, 2.8, -1.8, 2.8, 0.25, 90, 2.4, 1.6), C29_POP(-0.4, 8.4, 0.45, 1.4, 0, 1)],

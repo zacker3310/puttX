@@ -110,7 +110,7 @@ registerWorld(22, { holes: [
     zones: [...C22_DEVIL(0, 3.0, 0.85, 1.6), ...C22_DEVIL(0, 5.4, 0.85, -1.6), { surf: 'sand', poly: rect(0.5, 6.6, 1.4, 7.4) }],
     posts: [C22_CACTUS(1.1, 1.6), C22_CACTUS(-1.1, 1.6), C22_CACTUS(-0.2, 9.3), C22_ROCK(1.05, 9.6, 0.12)] },
   /* 13. island hop: kick over the first gap, kick over the second, then the shaft or a long carry to the green */
-  { par: 4, crazy: true, sol: [[305,0.8,0],[35,0.1,0],[130,0.9,2]], tee: [0, 0.5], cup: [0.5, 11.6],
+  { par: 4, crazy: true, sol: [[2,0.92,0.5],[265,0.91,0.5]], tee: [0, 0.5], cup: [0.5, 11.6],
     floors: [rect(-0.7, 0, 0.7, 3.0), rect(-1.0, 3.6, 1.0, 6.0), rect(-1.0, 6.6, 1.0, 9.0), rect(-1.2, 9.6, 1.4, 12.4)],
     walls: [[[-0.7, 3.0], [-0.7, 0], [0.7, 0], [0.7, 3.0]], [[-1.0, 3.6], [-1.0, 6.0]], [[1.0, 3.6], [1.0, 6.0]], [[-1.0, 6.6], [-1.0, 9.0]], [[1.0, 6.6], [1.0, 9.0]],
       [[-1.2, 9.6], [-1.2, 12.4], [1.4, 12.4], [1.4, 9.6]]],
@@ -122,7 +122,7 @@ registerWorld(22, { holes: [
     posts: [C22_CACTUS(-0.2, 11.2), C22_CACTUS(1.1, 10.8)] },
   /* 14. the switchback mesa: up the lane, round the top, down the leaning mesa, then through the gated gap
      into the low canyon; or the shaft from the first lane */
-  { par: 4, sol: [[20,0.85,1],[10,0.7,0]], tee: [0, 0.5], cup: [-4.2, 6.6], aim0: 0,
+  { par: 4, sol: [[32,0.8,1],[204,0.96,0.5]], tee: [0, 0.5], cup: [-4.2, 6.6], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 7.6], [-3.4, 7.6], [-5.0, 7.6], [-5.0, 0], [-3.4, 0], [-3.4, 1], [-1.8, 1], [-1.8, 6], [-0.8, 6]],
     inner: [[[-3.4, 2.0], [-3.4, 7.6]]],
     ramps: [{ x0: -1.8, z0: 6, x1: -0.8, z1: 7.7, axis: 'x', h0: 0.3, h1: 0 }],
@@ -133,7 +133,7 @@ registerWorld(22, { holes: [
     movers: [C22_GATE(-3.4, 0.9, -3.4, 2.1, 0.3, 0, 2.6), C22_WEED(-2.2, 3.6, -3.0, 3.6, 2.4)],
     posts: [C22_CACTUS(0.45, 5.6), C22_CACTUS(-4.7, 5.8), C22_CACTUS(-2.6, 6.8)] },
   /* 15. four terraces: drop right, through the gate on the left, drop right again, round the spur */
-  { par: 4, crazy: true, sol: [[320,1,1.5],[195,0.75,2],[20,0.75,0]], tee: [0, 0.5], cup: [0.5, 9.2],
+  { par: 4, crazy: true, sol: [[320,1,1.5],[195,0.75,2],[20,0.75,0],[34,0.72,1.5]], tee: [0, 0.5], cup: [0.5, 9.2],
     shape: [[-1.4, 0], [1.4, 0], [1.4, 6.2], [1.4, 10], [-1.4, 10], [-1.4, 6.2]],
     inner: [[[-0.6, 2.6], [1.4, 2.6]], [[-1.4, 5], [0.45, 5]], [[1.0, 5], [1.4, 5]], [[-0.5, 7.4], [1.4, 7.4]], [[1.4, 8.4], [0.2, 8.4]]],
     tiers: [{ poly: rect(-1.5, -0.1, 1.5, 2.6), h: 0.45 }, { poly: rect(-1.5, 2.6, 1.5, 5), h: 0.3 }, { poly: rect(-1.5, 5, 1.5, 7.4), h: 0.15 }],
@@ -142,7 +142,7 @@ registerWorld(22, { holes: [
     posts: [C22_CACTUS(0.5, 1.6), C22_CACTUS(-0.9, 8.6), C22_CACTUS(-0.1, 9.6)] },
   /* 16. long green: the dogleg. Up the long lane and round the corner to the left, a ridge on the corner and the
      whole green leaning back toward the tee; the lag has to turn the corner off the far wall or die at it */
-  { par: 3, sol: [[336,1,0],[16,0.7,0]], tee: [0.2, 0.5], cup: [4.9, 9.0], aim0: 0,
+  { par: 3, sol: [[336,1,0],[16,0.7,0],[18,0.6,0]], tee: [0.2, 0.5], cup: [4.9, 9.0], aim0: 0,
     shape: [[-1.0, 0], [1.4, 0], [1.4, 7.5], [6.0, 7.5], [6.0, 10.5], [-1.0, 10.5]],
     tiers: [{ poly: rect(-1.1, -0.1, 6.1, 10.6), h: 0.1, sz: 0.01, sx: 0.006 }],
     bumps: [{ x: 0.2, z: 9.0, r: 1.2, h: 0.12 }, { x: 0.2, z: 4.0, r: 1.3, h: -0.07 }, { x: 3.2, z: 9.6, r: 1.0, h: 0.07 }],

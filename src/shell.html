@@ -218,6 +218,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #cardPanel.party #cardRow .sc .pball { width: 26px; height: 26px; border-width: 3px; }
 #cardPanel.party #cardRow .sc .pball b { font-size: 14px; }
 #cardPanel.party #cardSum { top: 404px; font-size: 64px; }
+/* four players: six rows a nine, so each row is tighter and the back nine ends above the map button */
+#cardPanel.party.p4 #cardRow { top: 18px; gap: 8px; }
+#cardPanel.party.p4 #cardRow .sc { height: 26px; font-size: 20px; }
+#cardPanel.party.p4 #cardRow .nine { background-image: repeating-linear-gradient(#fffdf3 0 24px, #c9dbe8 24px 26px); }
+#cardPanel.party.p4 #cardRow .mk { height: 22px; }
+#cardPanel.party.p4 #cardRow .sc .pball { width: 22px; height: 22px; }
 #cardTotal { display: flex; align-items: center; gap: 14px; }
 #cardTotal .pball { width: 72px; height: 72px; } #cardTotal .pball b { font-size: 36px; }
 @media (prefers-reduced-motion: reduce) { #partyPickPanel, #partyPass .pball, #partyDone { animation: none; } }

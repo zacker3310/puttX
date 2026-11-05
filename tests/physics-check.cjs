@@ -83,8 +83,9 @@ check('a straight putt from the tee can sink', sinks > 0, 'sinking powers: ' + s
   const box = S.makeHole({ tee: [0, 0.5], cup: [0, 5.5], shape: S.rect(-0.6, 0, 0.6, 6) }), cx = 0.6 - S.WALL_HALF - S.BALL_R - 0.002, cz = 6 - S.WALL_HALF - S.BALL_R - 0.002, cr = S.restSpot(box, cx, cz);
   check('a ball wedged in a corner comes out clear of both walls', cr[0] < cx - 0.05 && cr[1] < cz - 0.05, JSON.stringify(cr));
   check('a ball in the open stays where it stopped; a ball against a post is moved off it', open[0] === 0.1 && open[1] === 2 && post[1] < 3 - 0.1 - S.BALL_R - 0.1, JSON.stringify([open, post]));
-  const r = S.simulatePutt(lane, [0.45, 0.5], 8, 0.5), d = 0.6 - Math.abs(r.x) - S.WALL_HALF - S.BALL_R;
-  check('a putt that dies on the rail ends with room to swing', r.end !== 'stop' || d > S.RELIEF_GAP, JSON.stringify(r));
+  /* a putt that really comes to rest against the right rail (without relief its gap is about 1 mm) */
+  const r = S.simulatePutt(lane, [0.45, 0.5], 4, 0.2), d = 0.6 - Math.abs(r.x) - S.WALL_HALF - S.BALL_R;
+  check('a putt that dies on the rail ends with room to swing', r.end === 'stop' && d > S.RELIEF_GAP, JSON.stringify(r));
 }
 
 /* 5. surfaces: ice > fast > felt > sand > mud roll-out; full power rolls about 17 m */

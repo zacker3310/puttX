@@ -169,9 +169,9 @@ registerWorld(30, { holes: [
       { poly: [[4.0, 0.6], [5.5, 0.6], [5.5, 1.4], [4.0, 1.4]], h: 0.3 }, { poly: C10_PEN(3.2, 5.6, 1.46), h: 0.45 }, { poly: C10_PEN(-0.1, 8.4, 1.74), h: 0.1 }],
     ramps: [{ x0: -0.4, z0: 1.4, x1: 0.4, z1: 3.4, axis: 'z', h0: 0, h1: 0.3 }],
     zones: [{ surf: 'fast', poly: rect(-0.3, 1.4, 0.3, 3.4) }, { surf: 'fast', poly: rect(1.2, 0.7, 5.4, 1.3) }],
-    drains: [{ x: 3.2, z: 5.6, r: 1.2, depth: 0.3, flat: 0.14 }, { x: -0.1, z: 8.4, r: 1.5, depth: 0.35 }],
-    tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 2.5, color: '#ffd66e' },
-      { a: [5.1, 1.0], b: [4.33, 5.6], dir: 330, keep: 0, add: 1.8, color: '#6fc0df' },
+    drains: [{ x: 3.2, z: 5.6, r: 1.2, depth: 0.3, flat: 0.12 }, { x: -0.1, z: 8.4, r: 1.5, depth: 0.35 }],
+    tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 1.6, color: '#ffd66e' },
+      { a: [5.1, 1.0], b: [4.33, 5.6], dir: 330, keep: 0, add: 1.0, color: '#6fc0df' },
       { a: [3.2, 5.6], b: [1.33, 8.4], dir: 240, keep: 0, add: 2.4, color: '#ef7d6d' }] },
   /* 18. the sky throne: the gold tube chains through the perch to the windmill isle (or ride the windy rainbow), take the
      gated kicker over the gap onto the slick court past two gates, then up the royal ramp to the throne */

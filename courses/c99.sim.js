@@ -65,10 +65,10 @@ registerWorld(99, { holes: [
       { poly: C99_PEN(0.2, 10.4, 1.74), h: 0.1 }],
     ramps: [{ x0: -0.4, z0: 1.4, x1: 0.4, z1: 3.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: -1.4, z0: 8.2, x1: -0.6, z1: 8.6, axis: 'z', h0: 0.5, h1: 0.62 }],
     zones: [{ surf: 'fast', poly: rect(-0.3, 1.4, 0.3, 3.4) }, { surf: 'fast', poly: rect(1.2, 0.7, 5.4, 1.3) }, { surf: 'fast', push: [0, 1.2], poly: rect(-1.3, 5.2, -0.7, 8.0) }],
-    drains: [{ x: 3.2, z: 5.6, r: 1.2, depth: 0.3, flat: 0.14 }, { x: 0.2, z: 10.4, r: 1.5, depth: 0.35 }],
-    tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 2.5, color: '#ffd66e' },
+    drains: [{ x: 3.2, z: 5.6, r: 1.36, depth: 0.3, flat: 0.12 }, { x: 0.2, z: 10.4, r: 1.64, depth: 0.44 }],
+    tubes: [{ a: [0, 3.7], b: [1.5, 1.0], dir: 90, keep: 0, add: 1.6, color: '#ffd66e' },
       { a: [5.1, 1.0], b: [4.33, 5.6], dir: 330, keep: 0, add: 1.8, color: '#6fc0df' },
-      { a: [3.2, 5.6], b: [-1.0, 4.85], dir: 0, keep: 0, add: 1.0, color: '#ef7d6d' }] },
+      { a: [3.2, 5.6], b: [-1.0, 4.85], dir: 0, keep: 0, add: 2.8, color: '#ef7d6d' }] },
   /* 6. stunt run (ten parts): 1 the neon ramp, 2 the windmill deck, 3 the drop, 4 the ice chute,
      5 the crosswind fan, 6 the whirlwind, 7 the red tube out of its eye, 8 the sliding gate,
      9 the kicker over the gap, 10 the crater green with its patrolling puck */

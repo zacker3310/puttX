@@ -96,9 +96,10 @@ function checkHole(S, h) {
   }
   check('movers never pinch a ball against a wall', pinch.length === 0, pinch.slice(0, 2).join(' | '));
 
-  let at = h.tee, last = null;
-  for (const [a, p, t0] of h.sol || []) { last = S.simulatePutt(h, at, a, p, t0); if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
-  check(`bot solution sinks within par ${h.par}`, !!h.sol && h.sol.length <= h.par && last && last.end === 'sunk', JSON.stringify(h.sol));
+  /* a putt into the water costs two strokes in play (the stroke and the penalty), so it counts two here */
+  let at = h.tee, last = null, cost = 0;
+  for (const [a, p, t0] of h.sol || []) { last = S.simulatePutt(h, at, a, p, t0); cost += last.end === 'oob' ? 2 : 1; if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
+  check(`bot solution sinks within par ${h.par}`, !!h.sol && cost <= h.par && last && last.end === 'sunk', JSON.stringify(h.sol));
 
   if (h.auto) {
     /* an "auto" hole is a showpiece: one controlled line that nearly plays itself into the cup.

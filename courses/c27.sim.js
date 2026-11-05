@@ -57,14 +57,14 @@ registerWorld(27, { holes: [
   /* 8: the vortex crypt: up the tower stair, round the landing, off the battlement edge onto the
      ghost wind, into the secret passage, then three spectral vortices in a row, each one's drain
      dropping into the passage to the next, the last spinning the ball into the cup. */
-  { par: 4, auto: true, sol: [[1.5,0.95,0]], tee: [0.4, 0.5], cup: [-8.6, 3.3], aim0: 0,
+  { par: 4, auto: true, sol: [[16,1,0]], tee: [0.4, 0.5], cup: [-8.6, 3.3], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 4.6), C7_VORTEX(-2.6, 3.3, 2), C7_VORTEX(-5.6, 3.3, 2), C7_VORTEX(-8.6, 3.3, 2)],
     walls: [ring(rect(-0.8, 0, 0.8, 4.6)), ring(C7_VORTEX(-2.6, 3.3, 2)), ring(C7_VORTEX(-5.6, 3.3, 2)), ring(C7_VORTEX(-8.6, 3.3, 2)), [[0, 0], [0, 3.8]],
       [[0.8, 4.0], [0.4, 4.6]], [[-0.8, 4.0], [-0.4, 4.6]], [[-0.8, 1.3], [-0.6, 0.6], [-0.6, 0]], [[0, 1.3], [-0.2, 0.6], [-0.2, 0]]],
     tiers: [{ poly: rect(0, 2.7, 0.8, 4.6), h: 0.4 }, { poly: rect(-0.8, 3.1, 0, 4.6), h: 0.4 }],
     ramps: [{ x0: 0, z0: 1.3, x1: 0.8, z1: 2.7, axis: 'z', h0: 0, h1: 0.4 }],
     zones: [{ push: [0, -0.9], poly: rect(-0.8, 0, 0, 3.1) }],
-    drains: [C7_DRAIN(-2.6, 3.3), C7_DRAIN(-5.6, 3.3), C7_DRAIN(-8.6, 3.3)],
+    drains: [{ ...C7_DRAIN(-2.6, 3.3), flat: 0.11 }, { ...C7_DRAIN(-5.6, 3.3), flat: 0.11 }, { ...C7_DRAIN(-8.6, 3.3), flat: 0.11 }],
     tubes: [{ a: [-0.4, 0.35], b: [-1.65, 1.7], dir: 0, keep: 0, add: 1.3 }, { a: [-2.6, 3.3], b: [-4.65, 1.7], dir: 0, keep: 0, add: 1.3 },
       { a: [-5.6, 3.3], b: [-7.65, 1.7], dir: 0, keep: 0, add: 1.3 }] },
   /* 9: the grand switchback: three flights of the stair, then the portcullis on the top landing */

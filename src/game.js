@@ -1057,7 +1057,7 @@ function initSky() {
         #include <colorspace_fragment>
       }` });
   const g = new THREE.SphereGeometry(100, 32, 16);
-  skyDome = new THREE.Mesh(g, m); skyDome.frustumCulled = false; skyDome.renderOrder = 1000; skyDome.name = 'sky';
+  skyDome = new THREE.Mesh(g, m); skyDome.frustumCulled = false; skyDome.renderOrder = -1000; skyDome.name = 'sky';   /* first: the backdrop the ground plane is drawn over */
   scene.add(skyDome);
   envScene = new THREE.Scene(); envScene.add(new THREE.Mesh(g, m));
 }
@@ -1225,21 +1225,23 @@ function wallGroup(h, m) {
 }
 /* the sides of every floor, so raised and floating floors read as solid slabs */
 function skirtGeometry(h, bottom) {
-  const pos = [], idx = [];
+  const pos = [], uv = [], idx = [], TILE = 0.5;
   for (const f of h.floors) {
     const cx = f.reduce((a, p) => a + p[0], 0) / f.length, cz = f.reduce((a, p) => a + p[1], 0) / f.length;
+    let run = 0;   /* metres along the outline, so the stone courses run round the slab unbroken */
     for (let i = 0; i < f.length; i++) {
-      const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], n = Math.max(1, Math.ceil(Math.hypot(bx - ax, bz - az) / 0.08));
+      const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], L = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.ceil(L / 0.08));
       for (let k = 0; k <= n; k++) {
         const u = k / n, x = ax + (bx - ax) * u, z = az + (bz - az) * u, d = Math.hypot(cx - x, cz - z) || 1;
-        const y = groundH(h, x + (cx - x) / d * 0.02, z + (cz - z) / d * 0.02);
+        const y = groundH(h, x + (cx - x) / d * 0.02, z + (cz - z) / d * 0.02), lo = Math.min(bottom, y - 0.05), s = (run + L * u) / TILE;
         if (k) { const v = pos.length / 3; idx.push(v - 2, v - 1, v, v - 1, v + 1, v); }
-        pos.push(x, y, z, x, Math.min(bottom, y - 0.05), z);
+        pos.push(x, y, z, x, lo, z); uv.push(s, y / TILE, s, lo / TILE);
       }
+      run += L;
     }
   }
   const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
@@ -1529,12 +1531,13 @@ function zoneMaterial(zn, look) {
       const m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: t, normalMap: n, normalScale: new THREE.Vector2(0.4, 0.4), roughness: 0.05, metalness: 0, ior: 1.333, transparent: true, opacity: 0.9, envMapIntensity: 1.2 });
       m.onBeforeCompile = sh => {
         sh.uniforms.uT = FX_TIME;
-        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uT;')
-          .replace('vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;',
-            `vec3 mapN = normalize( texture2D( normalMap, vNormalMapUv + uT * vec2( 0.031, 0.017 ) ).xyz * 2.0 - 1.0
-              + texture2D( normalMap, vNormalMapUv * 1.7 - uT * vec2( 0.023, -0.029 ) ).xyz * 2.0 - 1.0 );`);
+        /* the normal-map line lives inside an #include, so the chunk is copied in already patched */
+        const chunk = THREE.ShaderChunk.normal_fragment_maps.replace('vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;',
+          `vec3 mapN = normalize( texture2D( normalMap, vNormalMapUv + uT * vec2( 0.031, 0.017 ) ).xyz * 2.0 - 1.0
+            + texture2D( normalMap, vNormalMapUv * 1.7 - uT * vec2( 0.023, -0.029 ) ).xyz * 2.0 - 1.0 );`);
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uT;').replace('#include <normal_fragment_maps>', chunk);
       };
-      m.customProgramCacheKey = () => 'water-v1';
+      m.customProgramCacheKey = () => 'water-v2';
       return m;
     }
     case 'fast': return turfMaterial(look.fast, { roughness: 0.6, sheen: 0.35, normalScale: new THREE.Vector2(0.25, 0.25), vertexColors: false });
@@ -1641,7 +1644,10 @@ function edgingGroup(h, look) {
   if (!e || !look.ground || look.night) return null;
   const W = 0.32, o = WALL_HALF + 0.01, pos = [], uv = [], idx = [];
   const put = (x, z) => { pos.push(x, -0.027, z); uv.push(x * 1.2, z * 1.2); return pos.length / 3 - 1; };
-  for (const f of h.floors) {
+  for (const f0 of h.floors) {
+    /* a repeated point (often the closing one) is a zero-length edge with no normal: drop it, or its corners get no fan */
+    const f = f0.filter((p, i, a) => { const q = a[(i + 1) % a.length]; return Math.hypot(q[0] - p[0], q[1] - p[1]) > 1e-6; });
+    if (f.length < 3) continue;
     let area = 0;
     for (let i = 0; i < f.length; i++) { const a = f[i], b = f[(i + 1) % f.length]; area += a[0] * b[1] - b[0] * a[1]; }
     const sg = area > 0 ? 1 : -1, n = f.length;
@@ -2256,6 +2262,7 @@ function endRoll(end) {
     /* the border rule moved it out from a rail: lift it and set it down there, as a player would */
     if (out !== 'oob' && Math.hypot(r.x - play.round.at[0], r.z - play.round.at[1]) > 0.005) { play.fx.place = { from: [r.x, r.z], t: 0 }; sfx('place'); }
     play.ball = newBall(h, play.round.at[0], play.round.at[1]);
+    if (tracePts.length && tracePts[tracePts.length - 1] !== null) tracePts.push(null);   /* a drift from the new lie is a new run */
     if (cupInSight(h, play.ball.x, play.ball.z)) play.aim = Math.atan2(h.cup[0] - play.ball.x, h.cup[1] - play.ball.z) * 180 / Math.PI;
     play.phase = 'aim';
   }
@@ -2453,11 +2460,11 @@ function updateHud() {
   const [, n] = play.key.split('-');
   hudHoleN.textContent = n; hudParN.textContent = play.hole.par; hudStrokesN.textContent = Math.min(play.round.strokes, capOf(play.hole));
 }
-/* leaving a hole: a ball already in the cup keeps its result, written now (before any profile can
-   change, and with no fanfare over the next scene); a ball still rolling is abandoned, as if never
-   struck. Either way nothing plays on behind the map. */
+/* leaving a hole: a ball already in the cup (or rolling itself in at the stroke cap) keeps its result,
+   written now (before any profile can change, and with no fanfare over the next scene); a ball still
+   rolling is abandoned, as if never struck. Either way nothing plays on behind the map. */
 function leaveHole() {
-  if (play.phase === 'sunk' || play.phase === 'replay') { replayTag.classList.remove('show'); finishHole(true); }
+  if (play.phase === 'sunk' || play.phase === 'replay' || play.phase === 'auto') { replayTag.classList.remove('show'); finishHole(true); }
   if (play.phase !== 'title') play.phase = 'idle';
   setRoll(0);
 }
@@ -2518,7 +2525,7 @@ function ghostPutt(k) {
   const g = play.ghost;
   if (!g || k >= g.log.length || g.done) return;
   const [a, p, t0] = g.log[k];
-  g.b = launch(newBall(play.hole, g.b.x, g.b.z), a, p); g.t = t0; g.live = true; g.k = k + 1;
+  g.from = [g.b.x, g.b.z]; g.b = launch(newBall(play.hole, g.b.x, g.b.z), a, p); g.t = t0; g.live = true; g.k = k + 1;
 }
 function stepGhost() {
   const g = play.ghost;
@@ -2526,7 +2533,7 @@ function stepGhost() {
   if (g && g.auto && !g.live && !g.done && g.k < g.log.length) { if ((g.wait -= SIM_DT) <= 0) ghostPutt(g.k); return; }
   if (!g || !g.live) return;
   const end = stepBall(play.hole, g.b, g.t); g.t += SIM_DT; g.b.hits.length = 0;
-  if (end) { g.live = false; g.wait = 0.6; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, g.b.x, g.b.z); else if (end === 'stop') { const [x, z] = restSpot(play.hole, g.b.x, g.b.z); g.b = newBall(play.hole, x, z); } }
+  if (end) { g.live = false; g.wait = 0.6; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, ...(g.from || [g.b.x, g.b.z])); else if (end === 'stop') { const [x, z] = restSpot(play.hole, g.b.x, g.b.z); g.b = newBall(play.hole, x, z); } }
 }
 /* show me: in practice, a green ghost plays the hole's proven line (its par, by the solver) from the tee */
 const canGuide = () => play.practice && !party.on && play.phase === 'aim' && !!play.hole && Array.isArray(play.hole.sol) && play.hole.sol.length > 0;
@@ -2596,7 +2603,8 @@ function showTrace() {
     for (let i = 0; i < n; i++) {
       const a = run[Math.max(0, i - 1)], b = run[Math.min(n - 1, i + 1)], p = run[i], dx = b[0] - a[0], dz = b[2] - a[2], d = Math.hypot(dx, dz) || 1;
       const sx = dz / d * w, sz = -dx / d * w, k = Math.min(1, p[3] / 3) * 2, fade = Math.min(1, i / 4, (n - 1 - i) / 4);
-      c.copy(TRACE_COLS[Math.min(1, Math.floor(k))]).lerp(TRACE_COLS[Math.min(2, Math.floor(k) + 1)], k - Math.floor(k)).multiplyScalar(0.4 + 0.6 * fade);
+      const k0 = Math.min(1, Math.floor(k));
+      c.copy(TRACE_COLS[k0]).lerp(TRACE_COLS[k0 + 1], k - k0).multiplyScalar(0.4 + 0.6 * fade);
       pos.push(p[0] + sx, p[1] + 0.004, p[2] + sz, p[0] - sx, p[1] + 0.004, p[2] - sz); col.push(c.r, c.g, c.b, c.r, c.g, c.b);
       const j = base + i;
       if (i) idx.push(j * 2 - 2, j * 2 - 1, j * 2, j * 2 - 1, j * 2 + 1, j * 2);
@@ -2681,12 +2689,15 @@ function endParty() {
   if (party.on && currentScene === 'hole' && play.phase !== 'title') { play.phase = 'idle'; replayTag.classList.remove('show'); }
   party.on = false;
   if (ballMesh) ballMesh.material.color.set('#ffffff');
+  if (party.plain) { party.plain = false; if (ballMesh) dressBall(ballMesh.material, SHOP_ITEMS[progress.equipped.ball]); }
   partyChip.classList.remove('show'); partyPass.classList.remove('show'); partyDone.classList.remove('show');
 }
 /* called by startHole: the active player's ball and chip */
 function partyDress() {
   if (!party.on) { partyChip.classList.remove('show'); if (ballMesh) ballMesh.material.color.set('#ffffff'); return; }
   const p = partyPlayer();
+  /* a plain ball under the player's colour, so a shop skin (or its glow) never hides whose ball it is */
+  if (!party.plain) { dressBall(ballMesh.material, SHOP_ITEMS[STARTER.ball]); party.plain = true; }
   ballMesh.material.color.set(p === 0 ? '#ffffff' : PARTY_BALLS[p]);
   partyChipBall.innerHTML = partyBall(p, 44); partyChip.classList.add('show');
   play.ghost = null; play.lost = null; if (lostMesh) lostMesh.visible = false;
@@ -2855,8 +2866,8 @@ function finishDaily(score) {
 function renderDaily() {
   const ds = dayStr(), d = progress.daily, y = new Date(); y.setDate(y.getDate() - 1);
   const key = dailyKey(ds), [c, n] = key.split('-').map(Number), w = worldOf(c);
-  dailyWorld.innerHTML = lookOf(w).icon || ''; dailyHole.textContent = n;
-  dailyPips.innerHTML = '<i></i>'.repeat(coursesOf(w).indexOf(c) + 1);
+  dailyWorld.innerHTML = c === CLASSIC ? CLASSIC_SVG : c === BONUS ? BONUS_SVG : lookOf(w).icon || ''; dailyHole.textContent = n;
+  dailyPips.innerHTML = isExtra(c) ? '' : '<i></i>'.repeat(coursesOf(w).indexOf(c) + 1);
   dailyBtn.classList.toggle('done', !!d && d.d === ds);
   const live = d && (d.d === ds || d.d === dayStr(y));
   dailyStreakN.textContent = live ? d.streak : '';
@@ -3091,6 +3102,9 @@ let mapWorld = 1;
 /* the title flies round each course's showpiece 18th in turn; the strip below picks a course */
 const titleCourse = 0;
 function showTitle() {
+  /* leaving a hole for the title (a daily or shared hole on a course not yet open): settle it first,
+     before the title's own hole replaces play, so a ball already in the cup keeps its result */
+  if (currentScene === 'hole') leaveHole();
   const list = playable(), w = list[titleCourse % list.length], hs = WORLDS[w].holes, key = hs[hs.length - 1].key;
   if (!play.hole || play.key !== key) startHole(key);
   play.phase = 'title';
@@ -3300,10 +3314,10 @@ function showCard(w) {
   let total = 0, par = 0, stars = 0;
   const FLAG = '<svg viewBox="0 0 64 64"><path d="M20 58 V6" stroke="#8a7360" stroke-width="6" stroke-linecap="round"/><path d="M22 8 L52 18 L22 30 Z" fill="#ef7d6d"/></svg>';
   const BALL = '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#fffdf7" stroke="#8a7360" stroke-width="5"/><circle cx="25" cy="26" r="3" fill="#cdbf9f"/><circle cx="37" cy="26" r="3" fill="#cdbf9f"/><circle cx="31" cy="37" r="3" fill="#cdbf9f"/></svg>';
-  const players = inParty ? Array.from({ length: party.n }, (_, p) => ({ icon: partyBall(p, 32), best: h => party.scores[h.key][p] }))
+  const players = inParty ? Array.from({ length: party.n }, (_, p) => ({ icon: partyBall(p, party.n === 4 ? 22 : 26), best: h => party.scores[h.key][p] }))
     : [{ icon: BALL, best: h => progress.holes[h.key].best }];
   const sums = players.map(() => 0);
-  cardPanel.classList.toggle('party', inParty);
+  cardPanel.classList.toggle('party', inParty); cardPanel.classList.toggle('p4', inParty && party.n === 4);   /* four rows a nine: a tighter card, clear of the map button */
   for (let k = 0; k < holes.length; k += 9) {
     const ns = holes.slice(k, k + 9), t = document.createElement('div');
     const p9 = ns.reduce((a, h) => a + h.par, 0);
@@ -3438,12 +3452,13 @@ function checkUpdate() {
     if (!m || m[1] === BUILD_ID || !/^[0-9a-f]{12}$/.test(BUILD_ID)) return;
     updateReady = true;
     /* mid-hole a button offers it; over a scorecard or a party it waits for showScene to take it between rounds */
-    if (currentScene === 'hole') updateBtn.classList.add('show'); else if (currentScene !== 'card' && !party.on) location.reload();
+    if (party.on) return;
+    if (currentScene === 'hole') updateBtn.classList.add('show'); else if (currentScene !== 'card') location.reload();
   }).catch(() => {});
 }
 function initUpdates() {
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-  updateBtn.addEventListener('click', () => location.reload());
+  updateBtn.addEventListener('click', () => { if (!party.on) location.reload(); });
   addEventListener('visibilitychange', () => {
     /* hidden, the frame loop stops: silence the roll and the soundscape until the player is back */
     if (document.visibilityState === 'hidden') { setRoll(0); if (actx && actx.state === 'running') actx.suspend().catch(() => {}); }

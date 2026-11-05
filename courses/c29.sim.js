@@ -61,8 +61,8 @@ registerWorld(29, { holes: [
     tiers: [{ poly: rect(-0.4, 3, 0.4, 4.4), h: 0.3 }, { poly: rect(1.0, 4.6, 4.2, 8.0), h: 0.25 }],
     zones: [C29_BELT(rect(-0.4, 0.8, 0.4, 3.4), 0, 2.0)],
     bumps: [{ x: 0, z: 3.95, r: 0.35, h: -0.08 }],
-    drains: [{ x: 2.6, z: 6.3, r: 1.2, depth: 0.3, flat: 0.13 }, { x: -0.6, z: 10.4, r: 1.2, depth: 0.3 }],
-    tubes: [C29_PIPE([0, 3.95], [1.35, 7.3], 90, 0, 1.4), C29_PIPE([2.6, 6.3], [0.65, 11.4], 270, 0, 1.4)] },
+    drains: [{ x: 2.6, z: 6.3, r: 1.2, depth: 0.3, flat: 0.13 }, { x: -0.6, z: 10.4, r: 1.2, depth: 0.3, flat: 0.12 }],
+    tubes: [C29_PIPE([0, 3.95], [1.35, 7.3], 90, 0, 1.2), C29_PIPE([2.6, 6.3], [0.65, 11.4], 270, 0, 1.2)] },
   /* 9: floating wafers: a belt bridge that shoves you off, or the pipe; then jump the gap or pipe down */
   { par: 4, crazy: true, sol: [[0,0.76,0]], tee: [0, 0.5], cup: [0.4, 9.0], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 2.4), rect(-0.25, 2.4, 0.25, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.4, 7.0, 1.4, 9.6)],

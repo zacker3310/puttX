@@ -39,10 +39,11 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
   /* a course can use shape helpers its world's first course defines (c17 uses c07's), so load both */
   process.env.PUTTX_ONLY = c <= 30 ? [((c - 1) % 10) + 1, c].join() : String(c);
   const { solve, sweep, walkField, S } = require('./solve.cjs');
+  /* a putt into the water costs two (the stroke and the penalty) and the ball goes back where it was hit from, as in play */
   const replay = (h, sol) => {
-    let at = h.tee, last = null;
-    for (const [a, p, t0] of sol) { last = S.simulatePutt(h, at, a, p, t0); if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
-    return sol.length <= h.par && last && last.end === 'sunk';
+    let at = h.tee, last = null, cost = 0;
+    for (const [a, p, t0] of sol) { last = S.simulatePutt(h, at, a, p, t0); cost += last.end === 'oob' ? 2 : 1; if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
+    return cost <= h.par && last && last.end === 'sunk';
   };
   /* an auto hole's line, as holes-check measures it: of 21 putts round (a, p) from the tee (aim
      +-0.6 deg, pace in 0.012 steps, start time 0), how many ace. It needs at least AUTO_MIN. */
@@ -85,8 +86,10 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
   const repair = (h, sol) => {
     if (!sol || !sol.length) return null;
     if (h.auto) sol = [[sol[0][0], sol[0][1], 0]];   /* an auto hole is one ace from the tee */
+    /* the earlier putts that stop (a water putt is dropped: it only costs strokes and leaves the ball where it was) */
     let at = h.tee;
-    for (const [a, p, t0] of sol.slice(0, -1)) { const r = S.simulatePutt(h, at, a, p, t0); if (r.end === 'stop') at = [r.x, r.z]; else if (r.end !== 'oob') return null; }
+    const pre = [];
+    for (const s of sol.slice(0, -1)) { const r = S.simulatePutt(h, at, s[0], s[1], s[2]); if (r.end === 'stop') { at = [r.x, r.z]; pre.push(s); } else if (r.end !== 'oob') return null; }
     const [a0, p0, t0] = sol[sol.length - 1], cands = [];
     for (let da = -6; da <= 6.0001; da += 0.25) for (let dp = -0.3; dp <= 0.3001; dp += 0.01) cands.push([da, dp]);
     cands.sort((u, v) => (Math.abs(u[0]) / 6 + Math.abs(u[1]) / 0.3) - (Math.abs(v[0]) / 6 + Math.abs(v[1]) / 0.3));
@@ -94,7 +97,7 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
     for (const [da, dp] of cands) {
       const a = +(a0 + da).toFixed(2), p = +Math.min(1, Math.max(0.01, p0 + dp)).toFixed(2);
       if (S.simulatePutt(h, at, a, p, t0).end !== 'sunk') continue;
-      const out = sol.slice(0, -1).concat([[a, p, t0]]);
+      const out = pre.concat([[a, p, t0]]);
       if (!h.auto) return out;
       const near = autoNear(h, a, p);
       if (near > bestScore) { bestScore = near; best = out; }
@@ -106,13 +109,13 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
      that sinks (and, failing that, from the spot before its last putt). One solver node, not a beam. */
   const extend = (h, sol) => {
     if (!sol || !sol.length || h.auto) return null;
+    /* the path keeps only putts that stop: a water putt in a proof would cost a penalty stroke in play */
     const far = walkField(h), spots = [{ at: h.tee, path: [] }];
-    let at = h.tee;
-    for (let i = 0; i < sol.length; i++) {
-      const [a, p, t0] = sol[i], r = S.simulatePutt(h, at, a, p, t0);
-      if (r.end === 'sunk') return i + 1 <= h.par ? sol.slice(0, i + 1) : null;
-      if (r.end === 'stop') at = [r.x, r.z]; else if (r.end !== 'oob') return null;
-      spots.push({ at, path: sol.slice(0, i + 1) });
+    let at = h.tee, path = [];
+    for (const s of sol) {
+      const r = S.simulatePutt(h, at, s[0], s[1], s[2]);
+      if (r.end === 'sunk') return path.length + 1 <= h.par ? path.concat([s]) : null;
+      if (r.end === 'stop') { at = [r.x, r.z]; path = path.concat([s]); spots.push({ at, path }); } else if (r.end !== 'oob') return null;
     }
     for (const sp of spots.reverse()) {
       if (sp.path.length + 1 > h.par) continue;
@@ -152,7 +155,7 @@ const all = fs.readdirSync(path.join(ROOT, 'courses')).filter(f => /^c\d\d\.sim\
 const courses = val('--course') ? val('--course').split(',').map(Number) : all;
 const jobs = Number(val('--jobs')) || Math.max(1, os.cpus().length);
 const report = val('--report');
-const results = {};
+const results = {}, crashed = [];
 let next = 0;
 function runOne(c) {
   return new Promise(res => {
@@ -160,18 +163,12 @@ function runOne(c) {
     const ch = spawn(process.execPath, [__filename], { env: { ...process.env, PUTTX_RESOLVE_CHILD: String(c), PUTTX_RESOLVE_FORCE: args.includes('--force') ? '1' : '' } });
     ch.stdout.on('data', d => { out += d; });
     ch.stderr.on('data', d => process.stdout.write(`[c${c}] ${d}`));
-    ch.on('close', () => {
-      let rows = [];
-      try { rows = JSON.parse(out); } catch (e) { console.log(`[c${c}] crashed`); }
-      /* write back: re-read the file now, in case another course's child finished first (different file) */
-      const f = fileOf(c);
-      let src = fs.readFileSync(f, 'utf8');
-      const spans = solSpans(src);
-      const edits = [];
-      /* exact numbers: a rounded sol is already short, and one that only sinks unrounded must stay unrounded */
-      rows.forEach((r, k) => { if (r.sol && spans[k]) edits.push([spans[k], JSON.stringify(r.sol)]); });
-      for (const [[a, b], txt] of edits.sort((x, y) => y[0][0] - x[0][0])) src = src.slice(0, a) + txt + src.slice(b);
-      if (edits.length) fs.writeFileSync(f, src);
+    ch.on('close', (code, sig) => {
+      let rows = [], bad = !!(code || sig);
+      try { rows = JSON.parse(out); } catch (e) { bad = true; }
+      if (bad) { crashed.push(c); console.log(`[c${c}] crashed (${sig || 'exit ' + code})`); }
+      /* no write-back here: the child saves each hole as it is proven, and writing the whole run's sols
+         again at the end would undo any hand fix made to the course file while the child was running */
       results[c] = rows;
       const kept = rows.filter(r => r.kept).length, rep = rows.filter(r => r.repaired).length, fixed = rows.filter(r => r.sol && !r.repaired).length, missed = rows.filter(r => !r.kept && !r.sol);
       console.log(`[c${c}] done: ${kept} kept, ${rep} repaired, ${fixed} re-solved, ${missed.length} miss par${missed.length ? ': ' + missed.map(r => r.key).join(' ') : ''}`);
@@ -183,7 +180,7 @@ function runOne(c) {
   const t0 = Date.now();
   await Promise.all(Array.from({ length: Math.min(jobs, courses.length) }, async () => { while (next < courses.length) await runOne(courses[next++]); }));
   const missed = Object.values(results).flat().filter(r => !r.kept && !r.sol).map(r => r.key);
-  console.log(`\nresolve: ${courses.length} courses in ${((Date.now() - t0) / 60000).toFixed(1)} min; ${missed.length} holes miss par${missed.length ? ': ' + missed.join(' ') : ''}`);
+  console.log(`\nresolve: ${courses.length} courses in ${((Date.now() - t0) / 60000).toFixed(1)} min; ${missed.length} holes miss par${missed.length ? ': ' + missed.join(' ') : ''}${crashed.length ? '; crashed: c' + crashed.join(' c') : ''}`);
   if (report) fs.writeFileSync(report, JSON.stringify(results, null, 1));
-  process.exit(missed.length ? 1 : 0);
+  process.exit(missed.length || crashed.length ? 1 : 0);
 })();

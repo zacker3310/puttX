@@ -43,7 +43,7 @@ registerWorld(99, { holes: [
   /* 4. the ice serpent (long ice): four 10 m lanes of glare ice joined by chamfered hairpins, a
      half-pipe on the way back down and a mogul run on the way back up; the lightest touch
      travels forever, so find the pace that lands you on the felt at the end */
-  { par: 5, crazy: true, sol: [[16,1,0],[44,1,0]], tee: [0, 0.6], cup: [3.6, 2.4], aim0: 0,
+  { par: 5, crazy: true, sol: [[350,1,0],[12,0.84,0]], tee: [0, 0.6], cup: [3.6, 2.4], aim0: 0,
     shape: rect(-0.6, 0, 4.2, 12),
     inner: [[[0.6, 0], [0.6, 10.6]], [[1.8, 1.4], [1.8, 12]], [[3.0, 0], [3.0, 10.6]],
       [[-0.6, 11.3], [-0.1, 12]], [[1.1, 12], [1.8, 11.3]], [[1.8, 11.3], [2.5, 12]], [[3.5, 12], [4.2, 11.3]],
@@ -72,7 +72,7 @@ registerWorld(99, { holes: [
   /* 6. stunt run (ten parts): 1 the neon ramp, 2 the windmill deck, 3 the drop, 4 the ice chute,
      5 the crosswind fan, 6 the whirlwind, 7 the red tube out of its eye, 8 the sliding gate,
      9 the kicker over the gap, 10 the crater green with its patrolling puck */
-  { par: 5, crazy: true, sol: [[4,0.9,0],[177,0.8,0]], tee: [0, 0.5], cup: [3.3, 4.3], aim0: 0,
+  { par: 5, crazy: true, sol: [[4,0.9,0],[177.25,0.77,0]], tee: [0, 0.5], cup: [3.3, 4.3], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 2.0), rect(-0.5, 2.0, 0.5, 3.0), rect(-1.0, 3.0, 1.0, 5.0), rect(-0.5, 5.0, 0.5, 10.1), C99_PEN(0, 11.2, 1.3),
       rect(1.9, 9.6, 4.1, 12.0), rect(2.7, 7.0, 3.3, 9.6), rect(2.0, 3.0, 4.0, 6.4)],
     walls: [[[-0.5, 2.0], [-0.7, 2.0], [-0.7, 0], [0.7, 0], [0.7, 2.0], [0.5, 2.0]], [[-0.5, 2.0], [-0.5, 3.0], [-1.0, 3.0], [-1.0, 5.0], [-0.5, 5.0]],

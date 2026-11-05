@@ -145,7 +145,7 @@ registerWorld(27, { holes: [
       { x: -1.9, z: 12.6, r: 1.0, h: 0.14 }, { x: 1.4, z: 12.0, r: 1.2, h: 0.08 }] },
   /* 18: the showpiece: the gate, the switchback stair, the right passage into the gallery and the
      next passage on to the throne room, past a ghost and up onto the dais */
-  { par: 5, crazy: true, sol: [[296,1,0],[276,0.9375,0],[4,0.5,0],[163,0.94,0]], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
+  { par: 5, crazy: true, sol: [[62,1,1],[244,1,0],[268,1,0],[90,0.92,1.5]], tee: [0, 0.5], cup: [0, 9.3], shape: rect(-2.0, 0, 2.0, 10),
     inner: [[[-2.0, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [2.0, 2.6]], [[-2.0, 3.6], [1.0, 3.6]], [[-1.0, 4.6], [2.0, 4.6]], [[-2.0, 5.6], [2.0, 5.6]],
       [[1.2, 5.6], [1.2, 8.0], [2.0, 8.0]]],
     tiers: [{ poly: [[1.0, 2.6], [2.0, 2.6], [2.0, 4.6], [0.6, 4.6], [0.6, 3.6], [1.0, 3.6]], h: 0.15 },

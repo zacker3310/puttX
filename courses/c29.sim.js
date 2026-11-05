@@ -102,7 +102,7 @@ registerWorld(29, { holes: [
     posts: [C29_GUM(-0.5, 5.0), C29_GUM(0.6, 5.3)],
     tubes: [C29_PIPE([0, 6.0], [0, 7.0], 0)] },
   /* 14: three pipes chain four pads: belt pad, gumdrop pad, the lollipop green */
-  { par: 4, sol: [[6,0.666667,0],[30,0.5,0],[330,0.95,1]], tee: [0, 0.5], cup: [-0.6, 9.3], aim0: 20,
+  { par: 4, sol: [[10,0.44,0],[18,0.6,0],[0,0.56,0]], tee: [0, 0.5], cup: [-0.6, 9.3], aim0: 20,
     floors: [rect(-0.7, 0, 0.7, 2.4), rect(1.2, 3.0, 3.4, 5.2), rect(1.2, 6.0, 3.4, 8.2), rect(-1.6, 6.0, 0.4, 10.0)],
     walls: [ring(rect(-0.7, 0, 0.7, 2.4)), ring(rect(1.2, 3.0, 3.4, 5.2)), ring(rect(1.2, 6.0, 3.4, 8.2)), ring(rect(-1.6, 6.0, 0.4, 10.0))],
     zones: [C29_BELT(rect(1.2, 3.0, 3.4, 4.0), 0, 0.8), { surf: 'fast', poly: rect(1.2, 6.0, 3.4, 8.2) }],
@@ -110,11 +110,11 @@ registerWorld(29, { holes: [
     movers: [C29_POP(-0.6, 8.0, 0.45, 1.4, 0, 1)],
     tubes: [C29_PIPE([0.3, 1.9], [1.6, 3.4], 30), C29_PIPE([3.0, 4.8], [3.0, 6.4], 330), C29_PIPE([1.6, 7.8], [-0.6, 6.4], 0)] },
   /* 15: long green: the sugar dogleg, a broad green leaning right round a ridge at the corner */
-  { par: 3, sol: [[332,0.92,0]], tee: [0, 0.5], cup: [4.4, 10.6], aim0: 0, shape: [[-1.5, 0], [1.5, 0], [1.5, 8.5], [5.5, 8.5], [5.5, 12], [-1.5, 12]],
+  { par: 3, sol: [[332,0.92,0],[14,0.56,0]], tee: [0, 0.5], cup: [4.4, 10.6], aim0: 0, shape: [[-1.5, 0], [1.5, 0], [1.5, 8.5], [5.5, 8.5], [5.5, 12], [-1.5, 12]],
     tiers: [{ poly: [[-1.5, 0], [1.5, 0], [1.5, 8.5], [5.5, 8.5], [5.5, 12], [-1.5, 12]], h: 0.1, sx: -0.012, sz: 0.006 }],
     bumps: [{ x: 0, z: 10, r: 1.4, h: 0.15 }, { x: 3.5, z: 9.6, r: 1.2, h: -0.08 }] },
   /* 16: the switchback: a belt up, a belt across the top, down the return lane into the pipe, out on the green */
-  { par: 4, crazy: true, sol: [[36,0.44,0],[26,1,0]], tee: [0, 0.5], cup: [0.4, 8.7], aim0: 0,
+  { par: 4, crazy: true, sol: [[36,0.44,0],[26,1,0],[98,0.8,0]], tee: [0, 0.5], cup: [0.4, 8.7], aim0: 0,
     floors: [[[-0.4, 0], [0.4, 0], [0.4, 4.4], [2.0, 4.4], [2.0, 0.4], [2.8, 0.4], [2.8, 5.2], [-0.4, 5.2]], rect(-0.4, 6.2, 2.8, 9.4)],
     walls: [ring([[-0.4, 0], [0.4, 0], [0.4, 4.4], [2.0, 4.4], [2.0, 0.4], [2.8, 0.4], [2.8, 5.2], [-0.4, 5.2]]), ring(rect(-0.4, 6.2, 2.8, 9.4))],
     ramps: [{ x0: -0.4, z0: 1, x1: 0.4, z1: 3, axis: 'z', h0: 0, h1: 0.4 }, { x0: 2.0, z0: 2.4, x1: 2.8, z1: 4.4, axis: 'z', h0: 0, h1: 0.4 }],
@@ -123,7 +123,7 @@ registerWorld(29, { holes: [
     posts: [C29_GUM(1.4, 7.4)],
     tubes: [C29_PIPE([2.4, 0.9], [2.4, 6.6], 330)] },
   /* 17: gumdrop pinball on a tilted hard-candy slab, off the far gap, a belt and the taffy */
-  { par: 4, sol: [[14,0.6,0]], tee: [0, 0.5], cup: [-0.8, 8.6], shape: rect(-1.5, 0, 1.5, 9.5),
+  { par: 4, sol: [[12.75,0.73,0]], tee: [0, 0.5], cup: [-0.8, 8.6], shape: rect(-1.5, 0, 1.5, 9.5),
     inner: [[[-1.5, 4.5], [0.9, 4.5]]],
     tiers: [{ poly: rect(-1.5, 0, 1.5, 4.5), h: 0.3, sx: -0.03 }],
     zones: [{ surf: 'fast', poly: rect(-1.5, 1.2, 1.5, 4.5) }, C29_BELT(rect(-1.5, 5.5, 1.5, 6.5), -0.9, 0), C29_MUD(-1.5, 7.9, -1.2, 9.5), C29_MUD(-0.4, 7.9, 0.0, 9.5)],

@@ -120,7 +120,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [-1.2, 0], poly: rect(-1.6, 7, 1.6, 7.8) }, { surf: 'sand', poly: rect(-1.6, 9.9, -0.2, 10.4) }],
     bumps: [{ x: -0.5, z: 1.4, r: 0.35, h: 0.1 }] },
   /* 15: pipe ladder (3 parts). Two ramps up two decks, or a pipe from each level straight to the top, then the jib */
-  { par: 4, sol: [[216,0.93,0],[0,0.29,0],[3,0.28,0]], tee: [0, 0.5], cup: [0.9, 8.4], shape: c21Box(-1.6, 0, 1.6, 9, [3, 6]),
+  { par: 4, sol: [[210,0.92,0],[0,0.24,0]], tee: [0, 0.5], cup: [0.9, 8.4], shape: c21Box(-1.6, 0, 1.6, 9, [3, 6]),
     tiers: [{ poly: rect(-1.6, 3, 1.6, 6), h: 0.22 }, { poly: rect(-1.6, 6, 1.6, 9), h: 0.44 }],
     ramps: [{ x0: 1, z0: 1.8, x1: 1.6, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1.6, z0: 4.8, x1: -1, z1: 6, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[-1.6, 3], [1, 3]], [[-1, 6], [1.6, 6]]],

@@ -37,7 +37,7 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
   const c = Number(process.env.PUTTX_RESOLVE_CHILD), force = process.env.PUTTX_RESOLVE_FORCE === '1';
   /* a course can use shape helpers its world's first course defines (c17 uses c07's), so load both */
   process.env.PUTTX_ONLY = c <= 30 ? [((c - 1) % 10) + 1, c].join() : String(c);
-  const { solve, S } = require('./solve.cjs');
+  const { solve, sweep, walkField, S } = require('./solve.cjs');
   const replay = (h, sol) => {
     let at = h.tee, last = null;
     for (const [a, p, t0] of sol) { last = S.simulatePutt(h, at, a, p, t0); if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
@@ -66,18 +66,44 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
     }
     return best && (!h.auto || bestScore >= 11) ? best : null;
   };
+  /* extend: play the old line until it stops short, then one full sweep from that spot for a putt
+     that sinks (and, failing that, from the spot before its last putt). One solver node, not a beam. */
+  const extend = (h, sol) => {
+    if (!sol || !sol.length || h.auto) return null;
+    const far = walkField(h), spots = [{ at: h.tee, path: [] }];
+    let at = h.tee;
+    for (let i = 0; i < sol.length; i++) {
+      const [a, p, t0] = sol[i], r = S.simulatePutt(h, at, a, p, t0);
+      if (r.end === 'sunk') return i + 1 <= h.par ? sol.slice(0, i + 1) : null;
+      if (r.end === 'stop') at = [r.x, r.z]; else if (r.end !== 'oob') return null;
+      spots.push({ at, path: sol.slice(0, i + 1) });
+    }
+    for (const sp of spots.reverse()) {
+      if (sp.path.length + 1 > h.par) continue;
+      const r = sweep(h, sp.at, far, true);
+      if (r.sink) return sp.path.concat([r.sink]);
+    }
+    return null;
+  };
+  /* each finished hole is written straight back, so a run that is stopped keeps what it proved */
+  const save = (k, sol) => {
+    const f = fileOf(c); let src = fs.readFileSync(f, 'utf8'); const sp = solSpans(src)[k];
+    if (sp) { src = src.slice(0, sp[0]) + JSON.stringify(sol) + src.slice(sp[1]); fs.writeFileSync(f, src); }
+  };
   const rows = [];
-  for (const h of S.WORLDS[c].holes) {
+  for (const [k, h] of S.WORLDS[c].holes.entries()) {
     const t = Date.now();
     if (!force && h.sol && replay(h, h.sol)) { rows.push({ key: h.key, kept: true }); continue; }
-    const fixed = !force && repair(h, h.sol);
-    if (fixed && replay(h, fixed)) { rows.push({ key: h.key, par: h.par, sol: fixed, putts: fixed.length, s: +((Date.now() - t) / 1000).toFixed(1), repaired: true }); process.stderr.write(`${h.key} repaired ${fixed.length}/${h.par} ${((Date.now() - t) / 1000).toFixed(1)}s\n`); continue; }
+    let fixed = !force && repair(h, h.sol);
+    if (!(fixed && replay(h, fixed)) && !force) { fixed = extend(h, h.sol); if (fixed && replay(h, fixed)) process.stderr.write(`${h.key} extended `); else fixed = null; }
+    if (fixed && replay(h, fixed)) { save(k, fixed); rows.push({ key: h.key, par: h.par, sol: fixed, putts: fixed.length, s: +((Date.now() - t) / 1000).toFixed(1), repaired: true }); process.stderr.write(`${h.key} repaired ${fixed.length}/${h.par} ${((Date.now() - t) / 1000).toFixed(1)}s\n`); continue; }
     const sol = solve(h);
     let out = null;
     if (sol && sol.length <= h.par) {
       const rounded = JSON.parse(fmt(sol));
       out = replay(h, rounded) ? rounded : (replay(h, sol) ? sol : null);
     }
+    if (out) save(k, out);
     rows.push({ key: h.key, par: h.par, sol: out, putts: sol ? sol.length : null, s: +((Date.now() - t) / 1000).toFixed(1) });
     process.stderr.write(`${h.key} ${out ? 'ok ' + out.length + '/' + h.par : 'MISSES PAR' + (sol ? ' (' + sol.length + ')' : ' (none)')} ${((Date.now() - t) / 1000).toFixed(1)}s\n`);
   }

@@ -130,7 +130,7 @@ function bot(h) {
   const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
   return { mean: +mean.toFixed(2), ace: scores.filter(s => s === 1).length / scores.length, par: scores.filter(s => s <= h.par).length / scores.length, scores };
 }
-module.exports = { solve, bot, walkField, S };
+module.exports = { solve, sweep, bot, walkField, S };
 
 if (require.main === module) {
   const onlyHole = val('--hole'), onlyWorld = Number(val('--course') || val('--world')) || null, doBot = args.includes('--bot'), asJson = args.includes('--json');

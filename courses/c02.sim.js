@@ -66,7 +66,7 @@ registerWorld(2, { holes: [
     zones: [{ surf: 'sand', poly: rect(-1.6, 2.2, -0.4, 3.4) }, { surf: 'sand', poly: rect(-1.6, 6.85, -0.2, 7.2) }],
     posts: [C2_CACTUS(-0.45, 5.6), C2_CACTUS(-0.9, 5.45), C2_CACTUS(-1.3, 5.7), C2_ROCK(0.7, 1.4)] },
   /* 9. the mine shaft: a tube up through the mesa, or the long ramp round the side */
-  { par: 4, sol: [[348,0.69,0],[12,0.91,0]], tee: [0, 0.5], cup: [-0.6, 7.3],
+  { par: 4, sol: [[348,0.69,0],[12,0.89,0]], tee: [0, 0.5], cup: [-0.6, 7.3],
     shape: [[-1, 0], [2.6, 0], [2.6, 8], [-1, 8]],
     inner: [[[1, 1.3], [1, 4]]],
     ramps: [{ x0: 1, z0: 2, x1: 2.6, z1: 4, axis: 'z', h0: 0, h1: 0.4 }],

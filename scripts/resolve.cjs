@@ -106,7 +106,8 @@ function runOne(c) {
       let src = fs.readFileSync(f, 'utf8');
       const spans = solSpans(src);
       const edits = [];
-      rows.forEach((r, k) => { if (r.sol && spans[k]) edits.push([spans[k], fmt(r.sol)]); });
+      /* exact numbers: a rounded sol is already short, and one that only sinks unrounded must stay unrounded */
+      rows.forEach((r, k) => { if (r.sol && spans[k]) edits.push([spans[k], JSON.stringify(r.sol)]); });
       for (const [[a, b], txt] of edits.sort((x, y) => y[0][0] - x[0][0])) src = src.slice(0, a) + txt + src.slice(b);
       if (edits.length) fs.writeFileSync(f, src);
       results[c] = rows;

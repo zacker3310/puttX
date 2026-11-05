@@ -107,7 +107,7 @@ registerWorld(15, (() => {
       zones: [sand(rect(0.4, 4.4, 1.4, 5.6)), lagoon(rect(-1.4, 6.4, -0.2, 7.0))],
       posts: [ANCHOR(0.3, 6.6), ANCHOR(1.15, 7.2)] },
     /* 15 treasure vault: through a drawbridge off the top deck, across the cannon deck, down to the vault */
-    { par: 4, crazy: true, sol: [[24.5,0.6,0],[89,0.52,0]], tee: [0, 0.5], cup: [-0.8, 8.6], shape: rect(-1.6, 0, 1.6, 9.4),
+    { par: 4, crazy: true, sol: [[24.5,0.6,0],[89,0.52,0],[48,0.99,0]], tee: [0, 0.5], cup: [-0.8, 8.6], shape: rect(-1.6, 0, 1.6, 9.4),
       tiers: [{ poly: rect(-1.7, -0.1, 1.7, 3), h: 0.4 }, { poly: rect(-1.7, 3, 1.7, 6.2), h: 0.2 }],
       inner: [[[-1.6, 3], [-1.2, 3]], [[-0.6, 3], [0.6, 3]], [[1.2, 3], [1.6, 3]], [[-1.6, 6.2], [-0.4, 6.2]], [[0.4, 6.2], [1.6, 6.2]]],
       movers: [BRIDGE(-1.15, 2.75, -0.65, 2.75, 0.2, 90, 3.0), BRIDGE(1.15, 2.75, 0.65, 2.75, 0.2, 90, 3.4, 1.5), CANNON(-1.0, 4.4, 1.0, 4.4, 2.4)],
@@ -115,7 +115,7 @@ registerWorld(15, (() => {
       zones: [lagoon(rect(0.3, 8.0, 1.6, 9.4)), sand(rect(-1.6, 6.8, -0.6, 7.4))],
       bumps: [{ x: -0.1, z: 7.6, r: 0.4, h: 0.14 }], posts: [BARREL(-0.4, 1.6), ANCHOR(-1.1, 5.4)] },
     /* 16 the shipwreck: up the plank onto the listing wreck, past the wheel, then the hull cave or off the stern */
-    { par: 4, crazy: true, sol: [[1,0.96,0],[90,0.44,0]], tee: [0.8, 0.5], cup: [1.0, 9.2], aim0: 0, shape: rect(-1.8, 0, 1.8, 10),
+    { par: 4, crazy: true, sol: [[1,0.96,0],[90,0.44,0],[50,0.68,0]], tee: [0.8, 0.5], cup: [1.0, 9.2], aim0: 0, shape: rect(-1.8, 0, 1.8, 10),
       ramps: [{ x0: 0.4, z0: 2.0, x1: 1.0, z1: 3.2, axis: 'z', h0: 0, h1: 0.34 }],
       tiers: [{ poly: rect(-1.9, 3.2, 1.9, 7), h: 0.3, sx: 0.06 }],
       inner: [[[-1.8, 3.2], [0.4, 3.2]], [[1.0, 3.2], [1.8, 3.2]], [[-1.8, 7], [-0.6, 7]], [[0.6, 7], [1.8, 7]]],
@@ -124,7 +124,7 @@ registerWorld(15, (() => {
       posts: [BARREL(1.3, 4.4), BARREL(-0.9, 6.3), BARREL(1.3, 6.3)],
       zones: [lagoon(rect(-0.4, 8.6, 0.4, 10)), sand(rect(-1.8, 1.2, -0.6, 2.2))], bumps: [{ x: 0.3, z: 7.9, r: 0.4, h: 0.14 }] },
     /* 17 the skull rock green: 13 m past the skull's shadow, over two long ridges to a cup tucked behind a hollow */
-    { par: 3, sol: [[0,0.88,0]], tee: [0.8, 0.5], cup: [-0.9, 12.3], shape: rect(-2.2, 0, 2.2, 13.3),
+    { par: 3, sol: [[0,0.9,0]], tee: [0.8, 0.5], cup: [-0.9, 12.3], shape: rect(-2.2, 0, 2.2, 13.3),
       tiers: [{ poly: rect(-2.3, -0.1, 2.3, 13.4), h: 0, sx: 0.022 }],
       bumps: [{ x: -0.8, z: 3.6, r: 2.0, h: 0.16 }, { x: 1.0, z: 7.4, r: 2.2, h: 0.14 }, { x: -0.6, z: 10.4, r: 1.2, h: -0.12 }, { x: 1.2, z: 11.6, r: 0.9, h: 0.06 }],
       zones: [sand(rect(1.4, 4.4, 2.2, 5.6)), lagoon(rect(-2.2, 7.6, -1.6, 9.4))], posts: [ANCHOR(1.8, 1.4)] },

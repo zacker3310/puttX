@@ -36,12 +36,12 @@ registerWorld(17, { holes: [
     tubes: [{ a: [-0.5, 3.0], b: [1.4, 4.75], dir: 75, keep: 0.5, add: 0.2 }],
     movers: [C17_GHOST(1.9, 4.75, 1.9, 5.65, 2.4, 0), C17_GHOST(2.7, 5.65, 2.7, 4.75, 2.0, 0.7)] },
   /* 6: island hopping: bridge, the windmill island, the other bridge */
-  { par: 3, sol: [[156,0.72,0],[254,0.96,0.5]], tee: [0, 0.5], cup: [0.6, 7.1], aim0: 15, shape: rect(-1.5, 0, 1.5, 8),
+  { par: 3, sol: [[36,0.6,0],[260,0.96,0.5],[16,0.92,0]], tee: [0, 0.5], cup: [0.6, 7.1], aim0: 15, shape: rect(-1.5, 0, 1.5, 8),
     zones: [C17_MOAT(rect(-1.5, 2.4, 0.9, 3.4)), C17_MOAT(rect(-0.9, 5.0, 1.5, 6.0))],
     posts: [C17_GARG(-0.1, 6.7)],
     movers: [C17_MILL(0, 4.2, 0.5, 1.5, 0)] },
   /* 7: the drop deck: through the portcullis and leap to the crypt green, or take the left passage down */
-  { par: 3, sol: [[0,0.96,0.5]], tee: [0, 0.5], cup: [-0.7, 7.3], floors: [rect(-0.9, 0, 0.9, 3.2), rect(-1.4, 4.0, 1.4, 8)],
+  { par: 3, sol: [[-0.5,0.96,0.5]], tee: [0, 0.5], cup: [-0.7, 7.3], floors: [rect(-0.9, 0, 0.9, 3.2), rect(-1.4, 4.0, 1.4, 8)],
     tiers: [{ poly: rect(-0.9, 0, 0.9, 3.2), h: 0.35 }],
     walls: [[[-0.25, 3.2], [-0.9, 3.2], [-0.9, 0], [0.9, 0], [0.9, 3.2], [0.25, 3.2]], [[-0.5, 4.0], [-1.4, 4.0], [-1.4, 8], [1.4, 8], [1.4, 4.0], [0.5, 4.0]]],
     tubes: [{ a: [0.6, 2.7], b: [1.0, 4.6], dir: 0 }, { a: [-0.6, 2.7], b: [-0.6, 0.5], dir: 0 }],
@@ -49,7 +49,7 @@ registerWorld(17, { holes: [
     movers: [C17_GATE(0, 3.2, 0.48, 3.2, 0.25, 2.8, 0), C17_MILL(-0.2, 6.4, 0.45, 1.5, 0)] },
   /* 8: the ballroom lawn: a long kidney of a green that leans toward the tall glass, a hollow to
      cross and a broad hump before the cup */
-  { par: 3, sol: [[344,0.96,0]], tee: [0, 0.5], cup: [1.1, 10.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [0.9, 6.0], [2.4, 8.5], [2.4, 11.2], [-0.4, 11.2], [-0.8, 7.5], [-1.6, 4.0]],
+  { par: 3, sol: [[344.75,0.96,0]], tee: [0, 0.5], cup: [1.1, 10.2], shape: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [0.9, 6.0], [2.4, 8.5], [2.4, 11.2], [-0.4, 11.2], [-0.8, 7.5], [-1.6, 4.0]],
     tiers: [{ poly: [[-1.2, 0], [1.2, 0], [1.6, 3.0], [0.9, 6.0], [2.4, 8.5], [2.4, 11.2], [-0.4, 11.2], [-0.8, 7.5], [-1.6, 4.0]], h: 0.1, sx: 0.03 }],
     bumps: [{ x: -0.2, z: 4.6, r: 1.3, h: -0.1 }, { x: 0.4, z: 8.4, r: 1.2, h: 0.12 }] },
   /* 9: the banister slide: up the stair, round the landing, down the banister on the ghost wind,

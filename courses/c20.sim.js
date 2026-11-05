@@ -77,7 +77,7 @@ registerWorld(20, { holes: [
   /* 9. (auto) twin whirlwinds: up the rainbow into the gold tube, which fires the ball round the
      banked rail bend into the blue tube, out into the first sky whirlwind; its eye swallows the ball
      into the red tube, which flings it round and round the second whirlwind and down into the cup */
-  { par: 4, auto: true, sol: [[0,0.64,0],[120,0.52,0]], tee: [0, 0.5], cup: [-0.6, 8.6], aim0: 0,
+  { par: 4, auto: true, sol: [[0,0.66,0]], tee: [0, 0.5], cup: [-0.6, 8.6], aim0: 0,
     floors: [rect(-0.35, 0, 0.35, 5.0), rect(1.15, 0.8, 1.85, 4.4), C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), rect(3.15, 0.8, 3.85, 4.4),
       C10_PEN(2.5, 7.6, 1.36), C10_PEN(-0.6, 8.6, 1.36)],
     walls: [ring(rect(-0.35, 0, 0.35, 5.0)), [[1.85, 0.8], [1.15, 0.8], ...C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), [3.85, 0.8], [3.15, 0.8]],
@@ -89,8 +89,8 @@ registerWorld(20, { holes: [
     ramps: [{ x0: -0.45, z0: 2.0, x1: 0.45, z1: 4.4, axis: 'z', h0: 0.15, h1: 0.45 }],
     zones: [{ surf: 'fast', poly: rect(-0.35, 2.0, 0.35, 4.4) }, { surf: 'fast', poly: [[1.15, 0.8], ...C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), [3.85, 0.8]] }],
     drains: [{ x: 2.5, z: 7.6, r: 1.2, depth: 0.3, flat: 0.14 }, { x: -0.6, z: 8.6, r: 1.2, depth: 0.3 }],
-    tubes: [{ a: [0, 4.7], b: [1.5, 1.1], dir: 0, keep: 0, add: 3.6, color: '#ffd66e' },
-      { a: [3.5, 1.1], b: [1.37, 7.6], dir: 30, keep: 0, add: 1.8, color: '#6fc0df' },
+    tubes: [{ a: [0, 4.7], b: [1.5, 1.1], dir: 0, keep: 0, add: 4.5, color: '#ffd66e' },
+      { a: [3.64, 1.1], b: [1.37, 7.6], dir: 30, keep: 0, add: 1.8, color: '#6fc0df' },
       { a: [2.5, 7.6], b: [0.53, 8.6], dir: 240, keep: 0, add: 2.4, color: '#ef7d6d' }] },
   /* 10. switchback: up the rainbow rail, swing round the high deck, up the second rail the other way, then along the railed ridge to the crown green */
   { par: 5, crazy: true, sol: [[348,0.84,0],[116,1,0],[156,0.96,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,

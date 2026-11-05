@@ -129,7 +129,7 @@ registerWorld(15, (() => {
       bumps: [{ x: -0.8, z: 3.6, r: 2.0, h: 0.16 }, { x: 1.0, z: 7.4, r: 2.2, h: 0.14 }, { x: -0.6, z: 10.4, r: 1.2, h: -0.12 }, { x: 1.2, z: 11.6, r: 0.9, h: 0.06 }],
       zones: [sand(rect(1.4, 4.4, 2.2, 5.6)), lagoon(rect(-2.2, 7.6, -1.6, 9.4))], posts: [ANCHOR(1.8, 1.4)] },
     /* 18 board the galleon: gangplank, the main deck's wheel and cannon, the quarterdeck, then walk the plank or the cave to treasure island */
-    { par: 5, crazy: true, sol: [[324,0.9,0],[39,0.9,0],[45,0.8,0]], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
+    { par: 5, crazy: true, sol: [[326,0.96,0],[200,0.96,0],[30,0.36,0]], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
       ramps: [{ x0: -2, z0: 2.4, x1: -1.3, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }, { x0: 1.3, z0: 6.4, x1: 2, z1: 7.6, axis: 'z', h0: 0.25, h1: 0.44 }],
       tiers: [{ poly: rect(-2.1, 3.6, 2.1, 9), h: 0.25 }, { poly: rect(-2.1, 7.6, 2.1, 9), h: 0.44 }, { poly: rect(-0.2, 9, 0.2, 10), h: 0.44 }],
       inner: [[[-1.3, 3.6], [2, 3.6]], [[-2, 7.6], [1.3, 7.6]], [[-2, 9], [-0.2, 9]], [[0.2, 9], [2, 9]]],

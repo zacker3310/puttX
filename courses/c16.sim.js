@@ -65,7 +65,7 @@ registerWorld(16, { holes: [
     inner: [[[0.4, 0], [0.4, 5.2]], [[0.4, 4.2], [3.7, 4.2]]],
     tiers: [{ poly: rect(-0.5, -0.1, 0.4, 1.6), h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 1.6, x1: 0.4, z1: 3.2, axis: 'z', h0: 0.3, h1: 0 }],
-    drains: [{ x: 2.3, z: 5.8, r: 1.5, depth: 0.3, flat: 0.11 }, { x: 2.4, z: 2, r: 1.4, depth: 0.3 }],
+    drains: [{ x: 2.3, z: 5.8, r: 1.5, depth: 0.3, flat: 0.11 }, { x: 2.4, z: 2, r: 1.4, depth: 0.3, flat: 0.12 }],
     tubes: [{ a: [2.3, 5.8], b: [1.4, 0.5], dir: 0, keep: 0, add: 1.45 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 1.6, 0.4, 3.2) }] },
   /* 10: two craters on the plateau: the left tube drops by the cup, the right one sends you back (3 parts) */

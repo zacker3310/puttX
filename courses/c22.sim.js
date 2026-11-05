@@ -11,13 +11,13 @@ const C22_DEVIL = (cx, cz, s, k) => [
   { push: [-k, 0], poly: [[cx + s, cz - s], [cx - s, cz - s], [cx, cz]] }, { push: [0, k], poly: [[cx - s, cz - s], [cx - s, cz + s], [cx, cz]] }];
 registerWorld(22, { holes: [
   /* 1. the narrow ramp straight up, or the wide one on the right; the cup hides behind a rock spur */
-  { par: 2, sol: [[24,1,0]], tee: [0, 0.5], cup: [0.5, 5.4], shape: rect(-1, 0, 1, 6),
+  { par: 2, sol: [[23.75,0.99,0]], tee: [0, 0.5], cup: [0.5, 5.4], shape: rect(-1, 0, 1, 6),
     inner: [[[1, 4.6], [0, 4.6]]],
     ramps: [{ x0: -0.3, z0: 2.4, x1: 0.3, z1: 3.4, axis: 'z', h0: 0, h1: 0.25 }, { x0: -1.1, z0: 2.4, x1: -0.6, z1: 3.4, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.1, 3.4, 1.1, 6.1), h: 0.25 }],
     posts: [C22_CACTUS(-0.45, 4.5), C22_ROCK(0.6, 1.5)] },
   /* 2. up onto the mesa, through the sliding gate, down to the leaning green */
-  { par: 3, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [-0.6, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
+  { par: 3, sol: [[0,0.94,0]], tee: [0, 0.5], cup: [-0.6, 7.6], shape: rect(-1.5, 0, 1.5, 8.5),
     inner: [[[-1.5, 5], [-0.5, 5]], [[0.3, 5], [1.5, 5]]],
     ramps: [{ x0: -1.6, z0: 1.4, x1: 1.6, z1: 2.4, axis: 'z', h0: 0, h1: 0.35 }],
     tiers: [{ poly: rect(-1.6, 2.4, 1.6, 5), h: 0.35 }, { poly: rect(-1.6, 5, 1.6, 8.6), h: 0.05, sx: 0.03 }],
@@ -26,7 +26,7 @@ registerWorld(22, { holes: [
     movers: [C22_GATE(-0.65, 5, 0.45, 5, 0.3, 90, 2.6)],
     posts: [C22_CACTUS(0.2, 7.5), C22_CACTUS(-0.7, 3.4)] },
   /* 3. over the dunes, then left up the long ramp to the shelf green */
-  { par: 3, sol: [[28,0.8,0],[42,0.84,0]], tee: [0, 0.5], cup: [2.6, 6.6], aim0: 20,
+  { par: 3, sol: [[28,0.8,0],[42,0.84,0],[42,0.96,0]], tee: [0, 0.5], cup: [2.6, 6.6], aim0: 20,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 4.2], [3.2, 4.2], [3.2, 7.4], [-0.7, 7.4]],
     inner: [[[-0.7, 6.0], [0.0, 6.0]]],
     ramps: [{ x0: 0.7, z0: 4.1, x1: 1.7, z1: 7.5, axis: 'x', h0: 0, h1: 0.3 }],
@@ -36,7 +36,7 @@ registerWorld(22, { holes: [
     posts: [C22_CACTUS(2.3, 5.2), C22_ROCK(2.9, 7.05, 0.12)] },
   /* 4. long green: the snake. Thirteen metres of canyon floor that kinks left then right, leaning left all the
      way, a ridge on the inside of the first bend and a swale short of the cup */
-  { par: 3, sol: [[0,0.84,0]], tee: [0, 0.5], cup: [-0.6, 11.8], aim0: 10,
+  { par: 3, sol: [[0.75,0.86,0]], tee: [0, 0.5], cup: [-0.6, 11.8], aim0: 10,
     shape: [[-1.2, 0], [1.2, 0], [1.2, 4], [2.8, 6.5], [2.8, 9], [0.6, 13], [-1.8, 13], [-1.8, 10], [-0.2, 7.5], [-1.2, 4]],
     tiers: [{ poly: rect(-1.9, -0.1, 2.9, 13.1), h: 0.1, sz: 0.01, sx: -0.012 }],
     bumps: [{ x: 1.6, z: 8.0, r: 1.4, h: 0.14 }, { x: -0.5, z: 3.0, r: 1.2, h: -0.07 }, { x: -0.3, z: 10.3, r: 1.0, h: -0.06 }],

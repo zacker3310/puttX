@@ -129,7 +129,7 @@ registerWorld(29, { holes: [
     zones: [{ surf: 'fast', poly: rect(-1.5, 1.2, 1.5, 4.5) }, C29_BELT(rect(-1.5, 5.5, 1.5, 6.5), -0.9, 0), C29_MUD(-1.5, 7.9, -1.2, 9.5), C29_MUD(-0.4, 7.9, 0.0, 9.5)],
     posts: [C29_GUM(-0.2, 2.6), C29_GUM(0.6, 3.4), C29_GUM(-0.9, 3.6), C29_GUM(0.2, 8.0)] },
   /* 18: the grand works: belt up the ramp, the pipe off the deck, the lollipop terrace, a press over the drop, the taffy green */
-  { par: 5, crazy: true, sol: [[336,0.83333,0],[126,0.95,1.4],[56,0.96,0]], tee: [0, 0.5], cup: [-0.4, 11.6], aim0: 0,
+  { par: 5, crazy: true, sol: [[328,0.72,0],[92,1,2],[70,1,0]], tee: [0, 0.5], cup: [-0.4, 11.6], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 3.5], [3.6, 3.5], [3.6, 6.5], [-0.6, 6.5]], rect(-1.2, 7.4, 3.6, 12.4)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 3.5], [3.6, 3.5], [3.6, 6.5], [-0.6, 6.5]]), ring(rect(-1.2, 7.4, 3.6, 12.4)),
       [[1.6, 7.4], [1.6, 10.2]], [[2.4, 10.2], [3.6, 10.2]]],

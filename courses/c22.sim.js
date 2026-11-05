@@ -150,7 +150,7 @@ registerWorld(22, { holes: [
     posts: [C22_CACTUS(-0.6, 6.0), C22_CACTUS(2.4, 7.9)] },
   /* 17. the grand chain: high deck, the shaft or the ramp to the mid mesa, the second shaft or the gated drop
      to the dunes, the plank over the flood, up to the summit green */
-  { par: 5, crazy: true, sol: [[335,1,1.5],[297,0.5,1],[110,0.45,0],[305,0.95,0]], tee: [0, 0.5], cup: [-0.6, 12.3],
+  { par: 5, crazy: true, sol: [[172,0.84,0],[306,0.96,0],[4,0.6,0]], tee: [0, 0.5], cup: [-0.6, 12.3],
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.5], [2, 3.5], [2, 13], [-2, 13], [-2, 3.5], [-0.8, 3.5]],
     inner: [[[-2, 6.3], [0.1, 6.3]], [[0.9, 6.3], [2, 6.3]]],
     ramps: [{ x0: -0.9, z0: 2.5, x1: 0.9, z1: 3.5, axis: 'z', h0: 0.45, h1: 0.25 }, { x0: -2.1, z0: 10.2, x1: 0.2, z1: 11, axis: 'z', h0: 0.05, h1: 0.3 }],

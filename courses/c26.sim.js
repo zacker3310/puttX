@@ -10,13 +10,13 @@ const V26_ROCK = (ax, az, bx, bz, period, phase = 0, r = 0.18) => ({ kind: 'slid
 const V26_GATE = (ax, az, bx, bz, len, ang, period, phase = 0) => ({ kind: 'gate', ax, az, bx, bz, len, ang, period, phase, look: 'basalt' });
 registerWorld(26, { holes: [
   /* 1: off the rim deck through the gap, past the cone, into the crater (3 stages) */
-  { par: 3, sol: [[324,1,0]], tee: [0.5, 0.6], cup: [0.4, 6.8], aim0: 345, shape: rect(-1.2, 0, 1.2, 7.8),
+  { par: 3, sol: [[324.25,1,0]], tee: [0.5, 0.6], cup: [0.4, 6.8], aim0: 345, shape: rect(-1.2, 0, 1.2, 7.8),
     inner: [[[-0.3, 2.4], [1.2, 2.4]]],
     tiers: [{ poly: rect(-1.3, -0.1, 1.3, 2.4), h: 0.3 }],
     bumps: [{ x: -0.3, z: 4.4, r: 0.5, h: 0.24 }, ...V26_CRATER(0.4, 6.8, 0.85)],
     zones: [V26_LAVA(rect(0.3, 3.8, 1.2, 4.4)), V26_MUD(rect(-1.2, 5.4, -0.5, 6)), V26_LAVA(rect(-1.2, 7.4, -0.2, 7.8))] },
   /* 2: up the ramp to the crater shelf; its tube drops you by the cup green below (3 stages) */
-  { par: 3, sol: [[346,0.72,0],[0,0.84,0]], tee: [0, 0.5], cup: [-1.9, 1.6], aim0: 0,
+  { par: 3, sol: [[346,0.72,0],[5.25,0.94,0]], tee: [0, 0.5], cup: [-1.9, 1.6], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 5.6], [-2.8, 5.6], [-2.8, 0.4], [-1.2, 0.4], [-1.2, 3.6], [-0.7, 3.6]],
     ramps: [{ x0: -0.7, z0: 1.8, x1: 0.7, z1: 3, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-0.8, 3, 0.8, 5.7), h: 0.3 }, { poly: rect(-1.25, 3.6, -0.7, 5.7), h: 0.3 }],

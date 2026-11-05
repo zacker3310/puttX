@@ -18,7 +18,7 @@ registerWorld(25, (() => {
       bumps: [{ x: 0.2, z: 4.4, r: 1.6, h: 0.12 }, { x: 1.0, z: 7.4, r: 1.0, h: -0.08 }],
       zones: [sand(rect(1.2, 8.4, 1.8, 9.8))] },
     /* 2 twin drawbridges over the moat, then the plank to the deck */
-    { par: 3, sol: [[24,0.76,0]], tee: [0, 0.5], cup: [-0.7, 7.2], shape: rect(-1.4, 0, 1.4, 8),
+    { par: 3, sol: [[31.5,0.93,0]], tee: [0, 0.5], cup: [-0.7, 7.2], shape: rect(-1.4, 0, 1.4, 8),
       zones: [lagoon(rect(-0.7, 2.8, 0.7, 3.8))],
       movers: [BRIDGE(-0.98, 2.55, -0.5, 2.55, 0.2, 90, 3.0), BRIDGE(0.98, 2.55, 0.5, 2.55, 0.2, 90, 3.4, 1.4)],
       ramps: [{ x0: -0.4, z0: 4.8, x1: 0.4, z1: 5.8, axis: 'z', h0: 0, h1: 0.25 }], tiers: [{ poly: rect(-1.5, 5.8, 1.5, 8.1), h: 0.25 }],

@@ -29,7 +29,7 @@ registerWorld(99, { holes: [
       { a: [1.28, 4.6], b: [0.6, 0.45], dir: 330, keep: 0, add: 1.0, color: '#ef7d6d' }] },
   /* 3. gate gauntlet: a long neon alley of six sliding gates, each on its own beat, then the
      windmill at the end; read the rhythm or bounce home */
-  { par: 4, crazy: true, sol: [[354,0.8,0.5]], tee: [0, 0.5], cup: [0.35, 13.2],
+  { par: 4, crazy: true, sol: [[353.75,0.88,0.5]], tee: [0, 0.5], cup: [0.35, 13.2],
     shape: rect(-0.9, 0, 0.9, 14),
     zones: [{ surf: 'fast', poly: rect(-0.9, 2.0, 0.9, 10.2) }],
     bumps: [{ x: 0.35, z: 13.2, r: 0.4, h: -0.06 }],

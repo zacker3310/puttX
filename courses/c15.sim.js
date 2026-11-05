@@ -10,7 +10,7 @@ registerWorld(15, (() => {
   const sand = poly => ({ surf: 'sand', poly });
   const lagoon = poly => ({ surf: 'water', poly });
   /* points on a circle, from angle a0 to a1 in degrees (0 is +z, 90 is +x), for round whirlpool walls */
-  const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + Math.sin(a) * r, cz + Math.cos(a) * r]; });
+  const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + dsin(a) * r, cz + dcos(a) * r]; });
   return { holes: [
     /* 1 shore lane: round the corner, or the cave in the far corner */
     { par: 2, sol: [[328,0.88,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,

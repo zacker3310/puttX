@@ -4,8 +4,8 @@
 /* a tier poly padded past its island's edge, so walls on that edge stand on the island's height both sides */
 const C10_PAD = (x0, z0, x1, z1) => rect(x0 - 0.1, z0 - 0.1, x1 + 0.1, z1 + 0.1);
 /* a round pen of n wall corners (a sky whirlwind's rim), and an arc of points from heading a0 to a1 (degrees, 0 is +z) */
-const C10_PEN = (cx, cz, r, n = 24) => Array.from({ length: n }, (_, i) => [+(cx + r * Math.sin(i * 2 * Math.PI / n)).toFixed(3), +(cz + r * Math.cos(i * 2 * Math.PI / n)).toFixed(3)]);
-const C10_ARC = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [+(cx + r * Math.sin(a)).toFixed(3), +(cz + r * Math.cos(a)).toFixed(3)]; });
+const C10_PEN = (cx, cz, r, n = 24) => Array.from({ length: n }, (_, i) => [+(cx + r * dsin(i * 2 * Math.PI / n)).toFixed(3), +(cz + r * dcos(i * 2 * Math.PI / n)).toFixed(3)]);
+const C10_ARC = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [+(cx + r * dsin(a)).toFixed(3), +(cz + r * dcos(a)).toFixed(3)]; });
 registerWorld(10, { holes: [
   /* 1. sky steps: a narrow ramp bridge up to the cup island; overcook it and you fly off the back */
   { par: 2, sol: [[2,0.76,0]], tee: [0, 0.6], cup: [0.55, 5.4],

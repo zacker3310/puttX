@@ -6,8 +6,8 @@ const C14_BALL = (ax, az, bx, bz, period, phase = 0, r = 0.17) => ({ kind: 'slid
 const C14_LIFT = (ax, az, bx, bz, len, ang, period, phase = 0) => ({ kind: 'gate', ax, az, bx, bz, len, ang, period, phase, look: 'lift' });
 /* an open-water hole in the ice: a rough n-gon (deterministic, no randomness) */
 const C14_POOL = (cx, cz, rx, rz = rx, n = 10) => Array.from({ length: n }, (_, i) => {
-  const a = i * 2 * Math.PI / n, k = 1 + 0.08 * Math.cos(3 * a);
-  return [+(cx + Math.sin(a) * rx * k).toFixed(3), +(cz + Math.cos(a) * rz * k).toFixed(3)];
+  const a = i * 2 * Math.PI / n, k = 1 + 0.08 * dcos(3 * a);
+  return [+(cx + dsin(a) * rx * k).toFixed(3), +(cz + dcos(a) * rz * k).toFixed(3)];
 });
 registerWorld(14, { holes: [
   /* 1. first chair: off the lift deck, down the ramp, over the ice to the cup on a drift */

@@ -12,7 +12,7 @@ const C7_MOAT = poly => ({ surf: 'water', poly });
 const C7_VORTEX = (cx, cz, L = 3.2) => {
   const R = 1.3, p = [[cx + R, cz]];
   for (let i = 1; i < 24; i++) {
-    const a = i / 24 * 2 * Math.PI, x = R * Math.cos(a), z = R * Math.sin(a);
+    const a = i / 24 * 2 * Math.PI, x = R * dcos(a), z = R * dsin(a);
     if (z < 0 && x > 0.6) break;
     p.push([cx + x, cz + z]);
   }

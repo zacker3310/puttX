@@ -3,7 +3,7 @@
 /* an arc of points round (cx, cz), from heading a0 to a1 in degrees (0 is +z, 90 is +x) */
 const C99_ARC = (cx, cz, r, a0, a1, n = 12) => Array.from({ length: n + 1 }, (_, i) => {
   const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180;
-  return [+(cx + r * Math.sin(a)).toFixed(3), +(cz + r * Math.cos(a)).toFixed(3)];
+  return [+(cx + r * dsin(a)).toFixed(3), +(cz + r * dcos(a)).toFixed(3)];
 });
 const C99_PEN = (cx, cz, r, n = 24) => C99_ARC(cx, cz, r, 0, 360, n).slice(0, n);
 registerWorld(99, { holes: [

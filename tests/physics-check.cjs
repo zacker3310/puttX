@@ -163,6 +163,13 @@ check('fuzz: 1080 putts stay on the floor and terminate', bad.length === 0, JSON
 /* 14. the sim region never reads clocks or randomness */
 const src = regionSource();
 check('sim region is deterministic and DOM-free', !/Math\.random|Date\b|performance|document|window|THREE/.test(src));
+{
+  /* the trig the sim uses is fdlibm in plain arithmetic: Node's exact bits in every engine */
+  let same = true, seed = 99; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 20000 && same; i++) { const x = (rnd() - 0.5) * 60; same = Object.is(S.dsin(x), Math.sin(x)) && Object.is(S.dcos(x), Math.cos(x)) && Object.is(S.dexp(-Math.abs(x)), Math.exp(-Math.abs(x))); }
+  const raw = src.replace(/const \{ dsin, dcos, dexp \}[\s\S]*?\}\)\(\);/, '');
+  check('the sim and every course pack call dsin, dcos and dexp, never Math.sin, cos or exp (engines differ there)', same && !/Math\.(sin|cos|exp|pow)\(|\*\*/.test(raw), same ? 'a Math trig call remains' : 'port differs from Node');
+}
 
 /* ---- obstacles ---- */
 const posted = S.makeHole({ tee: [0, 0.5], cup: [0, 4.5], shape: S.rect(-0.6, 0, 0.6, 5), posts: [{ x: 0, z: 2, r: 0.15 }] });

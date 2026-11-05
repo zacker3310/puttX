@@ -2134,6 +2134,7 @@ function drainHits() {
     if (kind === 'wall' || kind === 'post') { hitSfx('clonk', v); if (play.phase === 'roll') play.touched = true; }
     else if (kind === 'bump' || kind === 'mover') hitSfx('boing', v);
     else if (kind === 'lip') { sfx('lip'); buzz([6, 30, 6]); }
+    else if (kind === 'rattle') hitSfx('rattle', Math.min(1, v));
     else if (kind === 'land') { hitSfx('land', v); if (v > 0.8) puff(play.ball, 'dust', Math.min(14, 4 + v * 4)); if (v > 1.6) play.fx.shake = Math.min(1, v / 4); }
     else if (kind === 'splash') { sfx('splash'); puff(play.ball, 'water', 22); }
     else if (kind === 'tubeIn') sfx('tube');

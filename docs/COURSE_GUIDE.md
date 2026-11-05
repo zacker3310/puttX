@@ -129,14 +129,25 @@ or a lag and a tap-in.
 
 An auto hole is a Rube Goldberg ride: at least 4 stages, e.g. a chute, a banked turn, a tube that
 spits the ball at a fixed speed into a drain that spirals it round and round into the cup, or a
-drain whose drop leads into a second drain. It must still nearly play itself (the holes-check rule).
+drain whose drop leads into a second drain. It must still nearly play itself (the holes-check rule:
+its `sol` is one ace, and at least 11 of the 21 putts within 0.6 degrees and 0.036 power of it ace too).
+
+Lessons from re-proving every auto hole under the real cup (no magnet pulls a slow ball in any more):
+
+- **Centre the cup's bowl on the cup** and give it `flat: 0.12`. A wider flat bottom leaves a ring
+  beside the cup where a slow, spiralling ball simply stops.
+- **Centre each fling in its window.** With `keep: 0` everything after a tube is deterministic, so
+  scan the tube's `add` (and `dir`) and pick the middle of the range that sinks, not one lucky value.
+- **Put a tube mouth where the ball really runs.** A ball round a banked bend rides the outside rail;
+  20-9's mouth moved under that line instead of the lane's centre.
+- `node scripts/resolve.cjs --course N` checks and searches auto holes by this rule.
 
 ## Design brief: harder, for 12-year-olds
 
 - **Shape of a course:** holes 1-5 are a warm-up that teaches the course's signature mechanic, 6-12 combine it with others, 13-18 are hard, and hole 18 is the showpiece.
 - **Multi-part holes:** at least 5 holes per course are crazy 3-4 part holes. That means 3 or 4 distinct sections joined by ramps, drops, tubes or gaps: upper deck, then tube, then lower green, then a guarded cup.
 - **Drains** (`drains: [{ x, z, r, depth, flat? }]`): a coin-funnel bowl. Its bottom is flat out to
-  `flat` (default 0.18, so a cup at its centre sits on flat ground); outside that the floor rises,
+  `flat` (default CUP_R + 0.07, about 0.17; use 0.12 under a cup, see above); outside that the floor rises,
   gently at the rim and steeply near the middle. A ball fed in sideways at the right pace spirals
   round one to three laps before it drops; too slow and it stops on the shallow rim. Feed one from a
   tube with `keep: 0` and a fixed `add` for a deterministic spiral. Depth 0.2 to 0.35, r 0.9 to 1.6.

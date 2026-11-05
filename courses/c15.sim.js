@@ -54,14 +54,14 @@ registerWorld(15, (() => {
       posts: [BARREL(-0.2, 4.2), BARREL(0.2, 7.0)], zones: [sand(rect(-1.6, 1.4, -0.6, 2.2))], bumps: [{ x: 0.6, z: 1.2, r: 0.4, h: 0.15 }] },
     /* 8 the gangplank express: up the gangplank, round the banked corner on the deck, off the edge into the
        little whirlpool, down the cave at its eye, and out into the big whirlpool that spins it round into the cup */
-    { par: 3, auto: true, sol: [[0,0.84,0],[0,0.04,0]], tee: [0, 0.5], cup: [-1.85, 2.6], aim0: 0,
+    { par: 3, auto: true, sol: [[0,0.87,0]], tee: [0, 0.5], cup: [-1.85, 2.6], aim0: 0,
       floors: [rect(-0.35, 0, 0.35, 6.8), rect(-1.55, 6.2, -0.35, 6.8), arc(-2.4, 6.5, 0.95, 0, 360, 24), rect(-3.3, 0, -0.35, 5.3)],
       walls: [[[-0.35, 0], [0.35, 0], [0.35, 6.1], [-0.35, 6.8], [-1.5, 6.8], ...arc(-2.4, 6.5, 0.949, 72, -252, 16), [-1.5, 6.2], [-0.35, 6.2], [-0.35, 0],
         [-3.3, 0], [-3.3, 5.3], [-0.35, 5.3]]],
       ramps: [{ x0: -0.35, z0: 1.4, x1: 0.35, z1: 3.0, axis: 'z', h0: 0, h1: 0.3 }],
       tiers: [{ poly: rect(-0.4, 3.0, 0.4, 6.85), h: 0.3 }, { poly: rect(-1.5, 6.15, -0.3, 6.85), h: 0.3 }],
-      drains: [{ x: -2.4, z: 6.5, r: 1.1, depth: 0.3 }, { x: -1.85, z: 2.6, r: 1.3, depth: 0.35 }],
-      tubes: [{ a: [-2.4, 6.5], b: [-1.85, 1.2], dir: 46, keep: 0, add: 1.4 }] },
+      drains: [{ x: -2.4, z: 6.5, r: 1.1, depth: 0.3 }, { x: -1.85, z: 2.6, r: 1.3, depth: 0.35, flat: 0.12 }],
+      tubes: [{ a: [-2.4, 6.5], b: [-1.85, 1.2], dir: 46, keep: 0, add: 1.2 }] },
     /* 9 twin wheels: past the beach wheel, up the plank, past the deck wheel */
     { par: 3, sol: [[210,1,0],[8,0.76,0]], tee: [0, 0.5], cup: [0.6, 7.2], shape: rect(-1.4, 0, 1.4, 8),
       movers: [WHEEL(0, 2.0, 0.5, 1.4), WHEEL(-0.5, 5.6, 0.45, -1.7)],

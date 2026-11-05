@@ -44,7 +44,7 @@ registerWorld(22, { holes: [
     posts: [C22_CACTUS(1.0, 1.4), C22_ROCK(-1.4, 12.5, 0.12)] },
   /* 5. three decks down: drop through the left gap, cross the middle deck past the tumbleweed, drop through
      the right gap; or dive into the shaft on the top deck */
-  { par: 3, sol: [[228,0.92,0]], tee: [0, 0.5], cup: [0, 8.2], shape: rect(-1.5, 0, 1.5, 9),
+  { par: 3, sol: [[228,0.92,0],[50.75,1,2]], tee: [0, 0.5], cup: [0, 8.2], shape: rect(-1.5, 0, 1.5, 9),
     inner: [[[-1.5, 3], [0.6, 3]], [[-0.6, 6], [1.5, 6]]],
     tiers: [{ poly: rect(-1.6, -0.1, 1.6, 3), h: 0.42 }, { poly: rect(-1.6, 3, 1.6, 6), h: 0.22 }, { poly: rect(-1.6, 6, 1.6, 9.1), h: 0.02 }],
     tubes: [{ a: [-0.9, 2.3], b: [0.9, 6.6], dir: 0, keep: 0.5, add: 0.3 }],

@@ -317,6 +317,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #hole.lefty #viewBtn { left: auto; right: 24px; }
 /* ---------- 10. AAA LAYER: read, mulligan, banner, replay tag, wipe ---------- */
 #readBtn { left: 24px; bottom: 232px; }
+#guideBtn { left: 24px; bottom: 336px; display: none; }
+#guideBtn.show { display: grid; }
+#hole.lefty #guideBtn { left: auto; right: 24px; }
 #readBtn.on { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); }
 #hole.lefty #readBtn { left: auto; right: 24px; }
 #mulliganBtn { left: 556px; top: 24px; display: none; background: var(--v-accent-blue); border-color: var(--v-blue-line); box-shadow: 0 6px 0 var(--v-blue-down); }
@@ -374,11 +377,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #mulliganBtn { left: 452px; }
 #updateBtn { left: 556px; }
 #replayTag { margin-left: -60px; }
-#hole[data-phase="done"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
+#hole[data-phase="done"] :is(#guideBtn, #swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
 #hole[data-phase="replay"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
 #hole[data-phase="sunk"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn),
 #hole[data-phase="auto"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn) { visibility: hidden; }
-#hole[data-intro="1"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn) { visibility: hidden; }
+#hole[data-intro="1"] :is(#guideBtn, #swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn) { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { #setPanel { animation: none; } }
 /* ---------- 14. TITLE, RETRY ---------- */
 #title { background: linear-gradient(to bottom, rgba(47, 36, 26, .0) 55%, rgba(47, 36, 26, .45)); }
@@ -720,6 +723,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div class="chip" id="hudHole" aria-label="hole"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#fffdf7" stroke="#e6d2ab" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#e6d2ab"/></svg><span id="hudHoleN">1</span></div>
     <div class="chip" id="hudPar" aria-label="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/><ellipse cx="32" cy="56" rx="18" ry="5" fill="#5a4634"/></svg><span id="hudParN">2</span></div>
     <div class="chip" id="hudStrokes" aria-label="strokes"><svg viewBox="0 0 64 64"><path d="M44 6 L24 48" stroke="#8a7360" stroke-width="6" stroke-linecap="round"/><rect x="10" y="44" width="24" height="12" rx="5" fill="#6fc0df"/></svg><span id="hudStrokesN">0</span></div>
+    <button class="btn" id="guideBtn" aria-label="show me the line"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="36" r="20" fill="#cdeac6" stroke="#74c465" stroke-width="5" stroke-dasharray="7 5"/><path d="M25 30 Q25 22 32 22 Q39 22 39 29 Q39 34 32 36 V41" fill="none" stroke="#3f7a3a" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="49" r="3.5" fill="#3f7a3a"/></svg></button>
     <button class="btn" id="readBtn" aria-label="read the slope"><svg viewBox="0 0 64 64"><path d="M8 44 Q32 20 56 44" fill="none" stroke="#74c465" stroke-width="6" stroke-linecap="round"/><path d="M20 22 L14 34 L26 32 M44 22 L50 34 L38 32" fill="none" stroke="#5a4634" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="btn" id="mulliganBtn" aria-label="take the last putt back"><svg viewBox="0 0 64 64"><path d="M18 22 A18 18 0 1 1 14 40" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M8 12 L18 24 L30 16" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="tok" id="mulliganN">5</span></button>
 <div class="chip" id="hudMode" aria-label="mode"><span class="ic"></span><span id="hudModeN"></span></div>

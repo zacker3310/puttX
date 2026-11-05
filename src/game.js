@@ -1693,6 +1693,7 @@ function renderFrame(dt) {
   updateFx(dt);
   updateCamera(dt);
   skyDome.position.copy(camera.position);
+  updateGuide();
   renderer.render(scene, camera);
 }
 
@@ -2057,7 +2058,7 @@ function beginPutt(angle, power, clean = true) {
   play.ball = launch(newBall(play.hole, b.x, b.z), angle, power);
   play.phase = 'roll'; play.swing = null; play.aimDrag = null;
   clearTrace(); recordTrace(play.ball);
-  ghostPutt(play.log.length - 1);
+  if (!play.ghost || !play.ghost.auto) ghostPutt(play.log.length - 1);
   updateMulligan();
   sfx('putt', power, clean ? 1 : 0);
   return true;
@@ -2351,9 +2352,22 @@ function ghostPutt(k) {
 }
 function stepGhost() {
   const g = play.ghost;
+  /* the guide plays its whole line by itself, with a breath between putts */
+  if (g && g.auto && !g.live && !g.done && g.k < g.log.length) { if ((g.wait -= SIM_DT) <= 0) ghostPutt(g.k); return; }
   if (!g || !g.live) return;
   const end = stepBall(play.hole, g.b, g.t); g.t += SIM_DT; g.b.hits.length = 0;
-  if (end) { g.live = false; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, g.b.x, g.b.z); else if (end === 'stop') { const [x, z] = restSpot(play.hole, g.b.x, g.b.z); g.b = newBall(play.hole, x, z); } }
+  if (end) { g.live = false; g.wait = 0.6; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, g.b.x, g.b.z); else if (end === 'stop') { const [x, z] = restSpot(play.hole, g.b.x, g.b.z); g.b = newBall(play.hole, x, z); } }
+}
+/* show me: in practice, a green ghost plays the hole's proven line (its par, by the solver) from the tee */
+const canGuide = () => play.practice && !party.on && play.phase === 'aim' && !!play.hole && Array.isArray(play.hole.sol) && play.hole.sol.length > 0;
+function updateGuide() { guideBtn.classList.toggle('show', canGuide()); }
+function showGuide() {
+  if (!canGuide()) return false;
+  const h = play.hole;
+  play.ghost = { log: h.sol, k: 0, b: newBall(h, h.tee[0], h.tee[1]), live: false, t: 0, auto: true, wait: 0 };
+  ghostMesh.material.color.set(0x9df2a0);
+  ghostPutt(0); sfx('tubeOut');
+  return true;
 }
 function syncGhost() {
   const g = play.ghost;
@@ -3280,6 +3294,7 @@ function boot() {
   [2, 3, 4].forEach(n => document.getElementById('partyN' + n).addEventListener('click', () => { sfx('tap'); startParty(n, mapWorld); }));
   partyPass.addEventListener('click', () => { sfx('tap'); partyGo(); });
   partyNextBtn.addEventListener('click', () => { sfx('tap'); partyNext(); });
+  guideBtn.addEventListener('click', () => showGuide());
   partyMap.addEventListener('click', () => { sfx('tap'); const w = party.course; endParty(); showMap(w); });
   doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
   titleGo.addEventListener('click', () => { sfx('tap'); showProfiles(); });

@@ -128,6 +128,19 @@ const SHOTS = process.env.PUTTX_SHOTS;
   })()`);
   check('practice opens every hole of an open course, takes back for free, keeps nothing', prac.open === 18 && prac.free && !prac.kept && prac.hidden === 'hidden', JSON.stringify(prac));
 
+  /* show me: in practice the guide ghost plays the hole's proven line into the cup; never outside practice */
+  const guide = await page.evaluate(`(() => {
+    practiceBtn.click(); holePath.querySelectorAll('.node')[1].click(); skipIntro(); loopPaused = true; renderFrame(0.016);
+    const shown = getComputedStyle(guideBtn).display !== 'none';
+    guideBtn.click();
+    for (let i = 0; i < 60 * 40 && !(play.ghost && play.ghost.done); i++) advance(1 / 60);
+    const sunk = !!(play.ghost && play.ghost.done), putts = play.ghost ? play.ghost.k : 0, want = play.hole.sol.length;
+    practiceBtn.click(); showMap(); holePath.querySelectorAll('.node')[0].click(); skipIntro(); renderFrame(0.016);
+    return { shown, sunk, putts, want, outside: getComputedStyle(guideBtn).display };
+  })()`);
+  check('practice: the guide ghost plays the proven line into the cup, putt by putt', guide.shown && guide.sunk && guide.putts === guide.want, JSON.stringify(guide));
+  check('the guide is practice only', guide.outside === 'none', JSON.stringify(guide));
+
   /* neon night: a display mode, not a course */
   const night = await page.evaluate(`(() => {
     const w = playable()[0];

@@ -94,7 +94,7 @@ registerWorld(27, { holes: [
     posts: [C27_GARG(-0.95, 8.1), C27_GARG(0.95, 8.1)],
     movers: [C27_GHOST(-1.0, 2.6, 1.0, 2.6, 3.0, 0), C27_GHOST(0.7, 4.0, -1.0, 4.0, 2.4, 1.2), C27_GATE(0, 6.8, 0.7, 6.8, 0.35, 90, 3, 0)] },
   /* 12: the secret library: four rooms, six passages, a sloping reading room and a ghost librarian */
-  { par: 4, crazy: true, sol: [[40,0.96,2],[164,0.84,0]], tee: [-0.8, 0.5], cup: [0.5, 0.7], aim0: 0, shape: rect(-1.6, 0, 1.6, 7.2),
+  { par: 4, crazy: true, sol: [[354,0.84,1.5],[166,0.96,0],[12,1,0]], tee: [-0.8, 0.5], cup: [0.5, 0.7], aim0: 0, shape: rect(-1.6, 0, 1.6, 7.2),
     inner: [[[0, 0], [0, 7.2]], [[-1.6, 3.6], [1.6, 3.6]]],
     tiers: [{ poly: rect(0, 3.6, 1.6, 7.2), h: 0.3, sz: -0.04 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 6.0, -0.8, 7.2) }],
@@ -106,11 +106,11 @@ registerWorld(27, { holes: [
     movers: [C27_GHOST(-0.35, 5.4, -1.25, 5.4, 2.4, 0)] },
   /* 13: the rampart green: a long dogleg green under the battlements, falling away to the right,
      with a saddle between two mounds at the turn */
-  { par: 3, sol: [[14,0.84,0]], tee: [1.0, 0.5], cup: [-1.9, 11.4], shape: [[0, 0], [2.2, 0], [2.2, 6.5], [0.5, 12.6], [-3.0, 12.6], [-3.0, 9.0], [0, 5.5]],
+  { par: 3, sol: [[14,0.84,0],[60,1,0]], tee: [1.0, 0.5], cup: [-1.9, 11.4], shape: [[0, 0], [2.2, 0], [2.2, 6.5], [0.5, 12.6], [-3.0, 12.6], [-3.0, 9.0], [0, 5.5]],
     tiers: [{ poly: [[0, 0], [2.2, 0], [2.2, 6.5], [0.5, 12.6], [-3.0, 12.6], [-3.0, 9.0], [0, 5.5]], h: 0.15, sx: 0.025 }],
     bumps: [{ x: 0.2, z: 7.6, r: 1.0, h: 0.15 }, { x: 1.8, z: 9.0, r: 1.0, h: 0.12 }, { x: 1.2, z: 3.0, r: 1.2, h: -0.08 }, { x: -1.0, z: 10.6, r: 1.1, h: 0.07 }] },
   /* 14: graveyard switchbacks to the raised crypt row: hills in the turns, a passage from the first corner */
-  { par: 4, sol: [[340,0.64,0.5],[0,0.68,0]], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
+  { par: 4, sol: [[340,0.64,0.5],[154.25,1,0]], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
     inner: [[[-0.7, 0], [-0.7, 5.6]], [[0.7, 7], [0.7, 1.4]]],
     tiers: [{ poly: rect(0.7, 2.2, 2.1, 7), h: 0.15 }],
     ramps: [{ x0: 0.7, z0: 1.4, x1: 2.1, z1: 2.2, axis: 'z', h0: 0, h1: 0.15 }],

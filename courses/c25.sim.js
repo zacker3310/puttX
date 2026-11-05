@@ -123,7 +123,7 @@ registerWorld(25, (() => {
       tubes: [{ a: [0.6, 1.8], b: [0.2, 8.4], dir: 90 }],
       zones: [sand(rect(-1.6, 5.2, -0.9, 5.8))], bumps: [{ x: -0.6, z: 5.0, r: 0.4, h: 0.12 }, { x: 1.2, z: 8.6, r: 0.35, h: 0.1 }], posts: [BARREL(-0.4, 1.2)] },
     /* 16 cannon fort: three cannons on the ramparts, a cave out of the powder room, the gate to the green */
-    { par: 4, sol: [[227,0.64,0],[356,0.28,0]], tee: [0, 0.5], cup: [0.7, 9.0], shape: rect(-1.6, 0, 1.6, 9.8),
+    { par: 4, sol: [[322,1,0.5],[6,0.48,0]], tee: [0, 0.5], cup: [0.7, 9.0], shape: rect(-1.6, 0, 1.6, 9.8),
       tiers: [{ poly: rect(-1.7, -0.1, 1.7, 4.6), h: 0.35 }, { poly: rect(-1.7, 4.6, 1.7, 7.2), h: 0.15 }],
       ramps: [{ x0: -1.2, z0: 7.2, x1: -0.5, z1: 8.2, axis: 'z', h0: 0.15, h1: 0 }],
       inner: [[[-1.6, 4.6], [-0.4, 4.6]], [[0.4, 4.6], [1.6, 4.6]], [[-1.6, 7.2], [-1.2, 7.2]], [[-0.5, 7.2], [1.6, 7.2]]],

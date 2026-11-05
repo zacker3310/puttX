@@ -113,13 +113,13 @@ registerWorld(24, { holes: [
     ramps: [{ x0: -1.8, z0: 4.0, x1: 1.8, z1: 5.2, axis: 'z', h0: 0.216, h1: 0.12 }, { x0: -1.8, z0: 8.4, x1: 1.8, z1: 9.4, axis: 'z', h0: 0.12, h1: 0.02 }],
     bumps: [{ x: 0.5, z: 2.2, r: 1.2, h: -0.08 }, { x: -0.6, z: 6.8, r: 1.3, h: 0.12 }, { x: 0.2, z: 10.4, r: 0.9, h: -0.06 }] },
   /* 17. cave maze: four chambers; walk the gaps round or chain the caves through the middle */
-  { par: 4, crazy: true, sol: [[45,1,0],[7.61,1,0]], tee: [0, 0.5], cup: [-0.9, 8.0], aim0: 0, shape: rect(-1.6, 0, 1.6, 9.0),
+  { par: 4, crazy: true, sol: [[40,0.96,0],[37,0.82,0]], tee: [0, 0.5], cup: [-0.9, 8.0], aim0: 0, shape: rect(-1.6, 0, 1.6, 9.0),
     inner: [[[-1.6, 2.4], [1.0, 2.4]], [[-1.0, 4.6], [1.6, 4.6]], [[-1.6, 6.8], [1.0, 6.8]]],
     tubes: [{ a: [-0.9, 1.8], b: [0.9, 3.0], dir: 0 }, { a: [0.0, 4.0], b: [-0.9, 5.2], dir: 90 }, { a: [0.9, 6.2], b: [0.9, 7.4], dir: 270 }],
     tiers: [{ poly: rect(-1.6, 6.8, 1.6, 9.0), h: 0.15 }], ramps: [{ x0: 1.0, z0: 6.2, x1: 1.6, z1: 7.4, axis: 'z', h0: 0, h1: 0.15 }],
     zones: [{ surf: 'ice', poly: rect(-1.6, 2.4, 1.6, 4.6) }], posts: [C24_MAN(0.3, 1.2), C24_MAN(-0.2, 8.4)], movers: [C24_BALL(-0.4, 5.8, 0.6, 5.8, 2.6)] },
   /* 18. the peak: off the summit, down the ice funnel, over the moguls, through the gated fence or the cave to the lake, and the cup past the snowball */
-  { par: 5, crazy: true, sol: [[178,0.84,0]], tee: [0, 0.5], cup: [0.6, 10.6], shape: rect(-1.6, 0, 1.6, 11.6),
+  { par: 5, crazy: true, sol: [[178.5,0.83,0]], tee: [0, 0.5], cup: [0.6, 10.6], shape: rect(-1.6, 0, 1.6, 11.6),
     inner: [[[-1.6, 2.6], [-0.5, 4.4]], [[1.6, 2.6], [0.5, 4.4]], [[-1.6, 7.4], [-0.3, 7.4]], [[0.3, 7.4], [1.6, 7.4]]],
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.4), h: 0.42 }, { poly: rect(-1.6, 4.4, 1.6, 7.4), h: 0.22 }],
     ramps: [{ x0: -1.6, z0: 1.4, x1: 1.6, z1: 4.4, axis: 'z', h0: 0.42, h1: 0.22 }],

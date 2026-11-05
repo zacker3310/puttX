@@ -57,12 +57,12 @@ registerWorld(24, { holes: [
   /* 9. the grand bobsled: the push-start booster, the banked turn at the top, up the kicker onto the
      race deck and off its lip into the collector drain; its cave fires you sideways into the big
      spiral drain, whose cave feeds the cup drain. Seven stages, one putt. */
-  { par: 4, auto: true, sol: [[0, 0.7, 0]], tee: [0, 0.5], cup: [4.6, 2.0], aim0: 0, shape: rect(-0.5, 0, 5.6, 6.0),
+  { par: 4, auto: true, sol: [[-3, 0.955, 0]], tee: [0, 0.5], cup: [4.6, 2.0], aim0: 0, shape: rect(-0.5, 0, 5.6, 6.0),
     inner: [[[0.5, 0], [0.5, 4.6], [5.6, 4.6]], [[-0.5, 5.3], [0.2, 6.0]]],
     tiers: [{ poly: rect(2.4, 4.6, 3.4, 6.0), h: 0.2 }], ramps: [{ x0: 1.4, z0: 4.6, x1: 2.4, z1: 6.0, axis: 'x', h0: 0, h1: 0.2 }],
     zones: [{ surf: 'fast', push: [0, 1.2], poly: rect(-0.5, 1.0, 0.5, 4.0) }],
-    drains: [{ x: 4.7, z: 5.3, r: 0.8, depth: 0.22, flat: 0.12 }, { x: 2.1, z: 2.2, r: 1.15, depth: 0.3, flat: 0.12 }, { x: 4.6, z: 2.0, r: 1.0, depth: 0.25 }],
-    tubes: [{ a: [4.7, 5.3], b: [0.85, 2.2], dir: 40, keep: 0, add: 1.2 }, { a: [2.1, 2.2], b: [4.6, 0.85], dir: 40, keep: 0, add: 1.0 }] },
+    drains: [{ x: 4.7, z: 5.3, r: 0.8, depth: 0.22, flat: 0.12 }, { x: 2.1, z: 2.2, r: 1.15, depth: 0.3, flat: 0.12 }, { x: 4.6, z: 2.0, r: 1.0, depth: 0.25, flat: 0.12 }],
+    tubes: [{ a: [4.7, 5.3], b: [0.85, 2.2], dir: 40, keep: 0, add: 1.0 }, { a: [2.1, 2.2], b: [4.6, 0.85], dir: 40, keep: 0, add: 1.0 }] },
   /* 10. gate terraces: four terraces, each snow fence open at one gap; lift bars slide across the top two */
   { par: 4, sol: [[218,1,0],[14,0.92,0]], tee: [0, 0.5], cup: [0.4, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
     inner: [[[-1.4, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1.4, 2.6]], [[-1.4, 5.2], [0.5, 5.2]], [[1.1, 5.2], [1.4, 5.2]], [[-1.4, 7.6], [-1.1, 7.6]], [[-0.5, 7.6], [1.4, 7.6]]],

@@ -129,7 +129,7 @@ registerWorld(21, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.4, 4, 0.4, 4.8) }],
     bumps: [{ x: -0.6, z: 1.2, r: 0.35, h: 0.1 }] },
   /* 16: the crane deck (4 parts). Belt to the ramp, round the jib, the boom over the narrow ramp, past the slider into the pocket */
-  { par: 5, crazy: true, sol: [[308,1,0],[252,0.57,0],[16,0.94,0],[18,0.88,0]], tee: [1, 0.5], cup: [1.2, 10], aim0: 0, shape: c21Box(-2, 0, 2, 11, [3.2, 6.4]),
+  { par: 5, crazy: true, sol: [[308,1,0],[252,0.57,0],[16,0.94,0],[300.25,0.95,1.5]], tee: [1, 0.5], cup: [1.2, 10], aim0: 0, shape: c21Box(-2, 0, 2, 11, [3.2, 6.4]),
     tiers: [{ poly: rect(-2, 3.2, 2, 6.4), h: 0.22 }, { poly: rect(-2, 6.4, 2, 11), h: 0.44 }],
     ramps: [{ x0: -2, z0: 2, x1: -1, z1: 3.2, axis: 'z', h0: 0, h1: 0.22 }, { x0: 0.9, z0: 5.2, x1: 1.5, z1: 6.4, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[2, 3.2], [-1, 3.2]], [[2, 6.4], [1.5, 6.4]], [[0.9, 6.4], [-2, 6.4]], [[2, 8.6], [-0.8, 8.6]]],
@@ -140,7 +140,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [-1, 0], poly: rect(-0.6, 2, 2, 2.8) }, { surf: 'sand', poly: rect(-2, 10.5, -0.6, 11) }],
     bumps: [{ x: 1.2, z: 10, r: 0.45, h: -0.08 }, { x: -0.2, z: 9.6, r: 0.4, h: 0.15 }] },
   /* 17: island hop (4 parts, open). Pipe or plank to the island, pipe or plank to the green, past the jib */
-  { par: 4, crazy: true, sol: [[180,0.86,0],[12,0.93,0],[0,1,0]], tee: [0, 0.5], cup: [3.6, 8.2], aim0: 0,
+  { par: 4, crazy: true, sol: [[180,0.86,0],[12,0.93,0],[0,1,0],[254,1,0]], tee: [0, 0.5], cup: [3.6, 8.2], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 3), rect(-0.3, 2.95, 0.3, 5.05), rect(-1.2, 5, 1.2, 7), rect(1.15, 5.7, 3, 6.3), rect(2.95, 4.5, 5, 9)],
     walls: [[[-0.3, 3], [-0.8, 3], [-0.8, 0], [0.8, 0], [0.8, 3], [0.3, 3]],
             [[-0.3, 5], [-1.2, 5], [-1.2, 7], [1.2, 7], [1.2, 6.3]], [[1.2, 5.7], [1.2, 5], [0.3, 5]],

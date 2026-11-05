@@ -121,7 +121,7 @@ registerWorld(19, { holes: [
     zones: [C19_BELT(rect(-1.2, 3, 1.2, 6), 0.7, 0), C19_MUD(-0.2, 7.6, 1.2, 7.75)],
     posts: [C19_GUM(-0.3, 4.4), C19_GUM(-0.6, 8.0)] },
   /* 18: the production line: a belt up the ramp, a press across the deck, the pipe to the taffy green */
-  { par: 5, crazy: true, sol: [[330,0.714286,0],[16,0.65,0],[0,1,0]], tee: [0, 0.5], cup: [0.4, 9.8], aim0: 0,
+  { par: 5, crazy: true, sol: [[332,0.76,0],[56,0.8,0],[0,0.36,0]], tee: [0, 0.5], cup: [0.4, 9.8], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 4], [3.4, 4], [3.4, 7], [-0.6, 7]], rect(-0.6, 8, 3.4, 10.6)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 4], [3.4, 4], [3.4, 7], [-0.6, 7]]), ring(rect(-0.6, 8, 3.4, 10.6))],
     ramps: [{ x0: -0.6, z0: 1.5, x1: 0.6, z1: 4, axis: 'z', h0: 0, h1: 0.45 }],

@@ -52,7 +52,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(-1.0, 4.5, 1.0, 4.5, 2.4)],
     posts: [C22_CACTUS(0.5, 7.6), C22_CACTUS(-0.4, 7.4), C22_ROCK(0.9, 1.4)] },
   /* 6. the staircase down: three lanes, each a step below the last */
-  { par: 4, sol: [[14,0.72,0.5],[0,0.36,0]], tee: [2.0, 0.5], cup: [0, 6.4], aim0: 0,
+  { par: 4, sol: [[16,0.88,1],[206,0.92,0]], tee: [2.0, 0.5], cup: [0, 6.4], aim0: 0,
     shape: rect(-0.5, 0, 2.5, 7.2),
     inner: [[[1.5, 0], [1.5, 6]], [[0.5, 1.2], [0.5, 7.2]]],
     ramps: [{ x0: 1.5, z0: 4.8, x1: 2.6, z1: 6, axis: 'z', h0: 0.6, h1: 0.4 }, { x0: 0.5, z0: 2.4, x1: 1.5, z1: 3.6, axis: 'z', h0: 0.2, h1: 0.4 },
@@ -63,7 +63,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(1.0, 4.4, 1.0, 5.4, 2.2, 0, 0.12)],
     posts: [C22_CACTUS(0.2, 5.6), C22_CACTUS(2.0, 3.0)] },
   /* 7. the kicker over the flood or the plank, past the windmill, up to the mesa */
-  { par: 3, sol: [[20,0.84,0]], tee: [0, 0.5], cup: [-0.6, 8.4], shape: rect(-1.4, 0, 1.4, 9),
+  { par: 3, sol: [[24,0.98,0]], tee: [0, 0.5], cup: [-0.6, 8.4], shape: rect(-1.4, 0, 1.4, 9),
     ramps: [{ x0: -0.4, z0: 2.2, x1: 0.4, z1: 3.0, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1.5, z0: 6.5, x1: 1.5, z1: 7.3, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.5, 7.3, 1.5, 9.1), h: 0.25 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 2.2, 0.4, 3.0) }, { surf: 'water', poly: rect(-1.4, 3.1, 0.9, 3.9) }, { surf: 'fast', poly: rect(0.9, 3.0, 1.4, 4.0) },
@@ -71,7 +71,7 @@ registerWorld(22, { holes: [
     movers: [{ kind: 'spin', x: 0, z: 5.2, len: 0.55, w: 1.4, phase: 0 }],
     posts: [C22_CACTUS(0.3, 8.3), C22_CACTUS(-1.0, 1.6)] },
   /* 8. tumbleweed alley: three weeds across the canyon, then the narrow bridge or the wide ramp to the mesa */
-  { par: 3, sol: [[4,0.68,0]], tee: [0, 0.5], cup: [-0.8, 8.2], shape: rect(-1.6, 0, 1.6, 9),
+  { par: 3, sol: [[4,0.68,0],[40,0.52,0]], tee: [0, 0.5], cup: [-0.8, 8.2], shape: rect(-1.6, 0, 1.6, 9),
     ramps: [{ x0: -0.17, z0: 5, x1: 0.17, z1: 6, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.9, z0: 4.6, x1: 1.7, z1: 6, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.7, 6, 1.7, 9.1), h: 0.3 }],
     zones: [{ surf: 'sand', poly: rect(-1.6, 4.2, -0.4, 5.4) }],

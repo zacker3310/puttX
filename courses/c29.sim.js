@@ -14,14 +14,14 @@ registerWorld(29, { holes: [
     tiers: [{ poly: rect(-0.9, 4.6, 0.9, 7.5), h: 0.2 }],
     posts: [C29_GUM(0.3, 5.6)] },
   /* 2: two candy-cane pipes chain three pads */
-  { par: 3, sol: [[10,0.84,0],[4,0.96,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 0,
+  { par: 3, sol: [[28,0.84,0],[76,1,0]], tee: [0, 0.5], cup: [0.7, 8.1], aim0: 0,
     floors: [rect(-0.7, 0, 0.7, 2.6), rect(-2.6, 3.2, -0.6, 5.6), rect(-0.7, 6.2, 1.4, 8.8)],
     walls: [ring(rect(-0.7, 0, 0.7, 2.6)), ring(rect(-2.6, 3.2, -0.6, 5.6)), ring(rect(-0.7, 6.2, 1.4, 8.8))],
     zones: [C29_BELT(rect(-2.6, 3.2, -0.6, 4.2), 0, 0.9), C29_MUD(0.2, 7.5, 1.4, 7.65)],
     posts: [C29_GUM(-1.9, 4.8)],
     tubes: [C29_PIPE([0, 2.1], [-1.6, 3.6], 0), C29_PIPE([-1.2, 5.1], [-0.2, 6.6], 20)] },
   /* 3: up the ramp, past the lollipop on the deck, off the edge to the taffy green */
-  { par: 3, sol: [[16,0.96,0]], tee: [0, 0.5], cup: [-0.4, 8.0], shape: rect(-1.1, 0, 1.1, 9),
+  { par: 3, sol: [[19.25,1,0]], tee: [0, 0.5], cup: [-0.4, 8.0], shape: rect(-1.1, 0, 1.1, 9),
     ramps: [{ x0: -1.1, z0: 1.2, x1: 1.1, z1: 2.4, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1.1, 2.4, 1.1, 5.2), h: 0.3 }],
     movers: [C29_POP(0, 3.8, 0.55, 1.5, 0, 2)],

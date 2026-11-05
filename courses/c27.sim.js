@@ -21,7 +21,7 @@ registerWorld(27, { holes: [
     tiers: [{ poly: rect(-1.8, 6.0, 1.8, 12.8), h: 0.2, sz: -0.01 }],
     bumps: [{ x: -0.6, z: 2.8, r: 1.3, h: -0.09 }, { x: 0.9, z: 1.8, r: 0.9, h: 0.06 }, { x: -0.3, z: 9.0, r: 1.5, h: 0.13 }] },
   /* 3: the first switchback stair: across, up, back and up again to the cup */
-  { par: 3, sol: [[62,1,0]], tee: [-1.1, 0.5], cup: [-1.1, 4.2], aim0: 90, shape: rect(-1.6, 0, 1.6, 5),
+  { par: 3, sol: [[62,1,0],[44,1,0]], tee: [-1.1, 0.5], cup: [-1.1, 4.2], aim0: 90, shape: rect(-1.6, 0, 1.6, 5),
     inner: [[[-1.6, 2.5], [0.6, 2.5]]],
     tiers: [{ poly: rect(0.6, 0, 1.6, 5), h: 0.15 }, { poly: rect(-1.6, 2.5, -0.2, 5), h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 0, x1: 0.6, z1: 2.5, axis: 'x', h0: 0, h1: 0.15 }, { x0: -0.2, z0: 2.5, x1: 0.6, z1: 5, axis: 'x', h0: 0.3, h1: 0.15 }],

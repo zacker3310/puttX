@@ -3428,8 +3428,8 @@ function updateFx(dt) {
 /* ---- 8c. updates ---- */
 /* A web app on the home screen keeps the page it first loaded. On boot, on coming back to the
    foreground and every 10 minutes, fetch the live page and compare fingerprints. A newer build
-   reloads at once on the title, map, card or shop; mid-hole, a refresh button appears and the
-   next scene change takes it. sw.js (network first, cache when offline) keeps it fresh. */
+   reloads at once on the title, map or shop; mid-hole, a refresh button appears, and over a
+   scorecard or a party it waits: the next scene change between rounds takes it. sw.js (network first, cache when offline) keeps it fresh. */
 let updateReady = false;
 function checkUpdate() {
   if (!/^https?:$/.test(location.protocol) || updateReady) return;

@@ -35,7 +35,8 @@ function solSpans(src) {
 if (process.env.PUTTX_RESOLVE_CHILD) {
   /* child: one course */
   const c = Number(process.env.PUTTX_RESOLVE_CHILD), force = process.env.PUTTX_RESOLVE_FORCE === '1';
-  process.env.PUTTX_ONLY = String(c);
+  /* a course can use shape helpers its world's first course defines (c17 uses c07's), so load both */
+  process.env.PUTTX_ONLY = c <= 30 ? [((c - 1) % 10) + 1, c].join() : String(c);
   const { solve, S } = require('./solve.cjs');
   const replay = (h, sol) => {
     let at = h.tee, last = null;

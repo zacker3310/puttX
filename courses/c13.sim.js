@@ -7,35 +7,35 @@ const J13_WATER = poly => ({ surf: 'water', poly });
 const J13_MUD = poly => ({ surf: 'mud', poly });
 registerWorld(13, { holes: [
   /* 1: two stone bridges over the stream, then the temple step up to the cup */
-  { par: 3, sol: [[6,0.68,0]], tee: [0, 0.5], cup: [0.5, 6.3], shape: rect(-1, 0, 1, 7),
+  { par: 3, sol: [[5.75,0.69,0]], tee: [0, 0.5], cup: [0.5, 6.3], shape: rect(-1, 0, 1, 7),
     zones: [J13_WATER(rect(-1, 2.4, -0.55, 3.0)), J13_WATER(rect(-0.15, 2.4, 0.15, 3.0)), J13_WATER(rect(0.55, 2.4, 1, 3.0))],
     ramps: [{ x0: -0.35, z0: 4.4, x1: 0.35, z1: 5.0, axis: 'z', h0: 0, h1: 0.18 }], tiers: [{ poly: rect(-1, 5.0, 1, 7), h: 0.18 }],
     bumps: [{ x: 0.55, z: 3.8, r: 0.4, h: 0.1 }], posts: [J13_IDOL(-0.1, 5.9)] },
   /* 2: the split shrine: the long left aisle through the mud, or the right one past the pool */
-  { par: 3, sol: [[4,0.92,0]], tee: [0, 0.5], cup: [-0.6, 5.8], aim0: 0, shape: rect(-1.2, 0, 1.2, 6.6),
+  { par: 3, sol: [[4.5,0.92,0]], tee: [0, 0.5], cup: [-0.6, 5.8], aim0: 0, shape: rect(-1.2, 0, 1.2, 6.6),
     inner: [[[0, 1.6], [0, 5.0]]],
     zones: [J13_WATER(rect(-1.2, 2.6, -0.45, 3.3)), J13_MUD(rect(0.05, 3.8, 1.2, 4.4))],
     tubes: [{ a: [0.6, 3.0], b: [-0.6, 4.2], dir: 0, keep: 0, add: 0.6 }],
     posts: [J13_IDOL(0.6, 5.4), J13_IDOL(-0.15, 6.1)], bumps: [{ x: -0.6, z: 1.5, r: 0.45, h: 0.12 }] },
   /* 3: the dusk lawn, a long green doglegging left: a leaning front with a ridge, a broad bank up to the top tier, a swale before the cup */
-  { par: 3, sol: [[20,0.92,0]], tee: [0, 0.5], cup: [-1.4, 10.4],
+  { par: 3, sol: [[186,0.96,0]], tee: [0, 0.5], cup: [-1.4, 10.4],
     shape: [[-1.5, 0], [1.5, 0], [1.5, 6.5], [0.5, 7.5], [0.5, 11.4], [-2.5, 11.4], [-2.5, 6.5], [-1.5, 5.5]],
     tiers: [{ poly: rect(-2.5, 0, 1.5, 6.5), h: 0.05, sx: 0.012 }, { poly: rect(-2.5, 7.3, 1.5, 11.4), h: 0.2 }],
     ramps: [{ x0: -2.5, z0: 6.5, x1: 1.5, z1: 7.3, axis: 'z', h0: 0.05, h1: 0.2 }],
     bumps: [{ x: 0.3, z: 3.5, r: 1.4, h: 0.12 }, { x: -0.6, z: 8.6, r: 1.0, h: -0.07 }] },
   /* 4: the waterfall: drop through the gap to the middle terrace, round the wall, drop to the cup; or the tunnel */
-  { par: 3, sol: [[42,0.96,0],[0,0.56,0]], tee: [0, 0.5], cup: [0.4, 6.9], shape: rect(-1, 0, 1, 7.6),
+  { par: 3, sol: [[14,0.4,0],[22,0.76,0]], tee: [0, 0.5], cup: [0.4, 6.9], shape: rect(-1, 0, 1, 7.6),
     tiers: [{ poly: rect(-1, 0, 1, 2.6), h: 0.4 }, { poly: rect(-1, 2.6, 1, 4.6), h: 0.2 }],
     inner: [[[-1, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1, 2.6]], [[-0.4, 4.6], [1, 4.6]]],
     zones: [J13_WATER(rect(0.3, 2.6, 1, 3.3)), J13_MUD(rect(-1, 3.5, -0.2, 4.0))],
     tubes: [{ a: [0.7, 2.1], b: [0.6, 5.1], dir: 0, keep: 0, add: 0.6 }],
     posts: [J13_IDOL(-0.3, 6.3), J13_IDOL(0.75, 6.2, 0.11)], bumps: [{ x: -0.5, z: 5.6, r: 0.45, h: 0.14 }] },
   /* 5: two rivers, two bridges, a boulder behind each */
-  { par: 3, sol: [[156,1,2],[0,0.25,0]], tee: [0, 0.5], cup: [0.3, 6.5], shape: rect(-1, 0, 1, 7.2),
+  { par: 3, sol: [[38,0.92,1],[6,0.84,0]], tee: [0, 0.5], cup: [0.3, 6.5], shape: rect(-1, 0, 1, 7.2),
     zones: [J13_WATER(rect(-1, 2.0, 0.2, 2.6)), J13_WATER(rect(0.7, 2.0, 1, 2.6)), J13_WATER(rect(-1, 4.2, -0.7, 4.8)), J13_WATER(rect(-0.2, 4.2, 1, 4.8))],
     movers: [J13_ROCK(-0.6, 3.4, 0.6, 3.4, 2.4), J13_ROCK(0.6, 5.5, -0.6, 5.5, 2.8, 1)], bumps: [{ x: -0.3, z: 1.2, r: 0.4, h: 0.1 }] },
   /* 6: the switchback: up the stair, across the terrace, down the far stair; or the tunnel by the pool */
-  { par: 4, sol: [[9,0.35,0],[150,0.37,0]], tee: [0, 0.5], cup: [2.3, 0.8], aim0: 0,
+  { par: 4, sol: [[9,0.35,0],[150.5,0.67,0]], tee: [0, 0.5], cup: [2.3, 0.8], aim0: 0,
     shape: [[-0.7, 0], [0.7, 0], [0.7, 4.4], [1.7, 4.4], [1.7, 0], [2.9, 0], [2.9, 6], [-0.7, 6]],
     ramps: [{ x0: -0.7, z0: 3.6, x1: 0.7, z1: 4.4, axis: 'z', h0: 0, h1: 0.2 }, { x0: 1.7, z0: 3.2, x1: 2.9, z1: 4.4, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-0.7, 4.4, 2.9, 6), h: 0.2 }],
@@ -43,12 +43,12 @@ registerWorld(13, { holes: [
     tubes: [{ a: [0.4, 2.6], b: [2.3, 2.0], dir: 180, keep: 0, add: 0.6 }],
     movers: [J13_ROCK(2.0, 2.65, 2.6, 2.65, 2.2)], posts: [J13_IDOL(1.95, 1.3), J13_IDOL(2.65, 0.4, 0.1)] },
   /* 7: the stepped lawn, a long green: three broad tiers falling away from the tee, a hump on the middle one, a low mound by the cup */
-  { par: 3, sol: [[14,1,0]], tee: [0, 0.5], cup: [-0.5, 11.3], shape: rect(-1.5, 0, 1.5, 12.4),
+  { par: 3, sol: [[28,0.84,0]], tee: [0, 0.5], cup: [-0.5, 11.3], shape: rect(-1.5, 0, 1.5, 12.4),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 4), h: 0.3 }, { poly: rect(-1.5, 4.8, 1.5, 8.5), h: 0.15, sx: 0.01 }, { poly: rect(-1.5, 9.3, 1.5, 12.4), h: 0 }],
     ramps: [{ x0: -1.5, z0: 4, x1: 1.5, z1: 4.8, axis: 'z', h0: 0.3, h1: 0.15 }, { x0: -1.5, z0: 8.5, x1: 1.5, z1: 9.3, axis: 'z', h0: 0.15, h1: 0 }],
     bumps: [{ x: -0.6, z: 6.6, r: 1.3, h: 0.1 }, { x: 0.9, z: 10.2, r: 0.9, h: 0.06 }] },
   /* 8: the island shrine: walk the plank bridge over the gorge, or take the tunnel across */
-  { par: 3, sol: [[0, 0.65, 0]], tee: [0, 0.5], cup: [0.5, 6.2], aim0: 0,
+  { par: 3, sol: [[-0.25,0.65,0]], tee: [0, 0.5], cup: [0.5, 6.2], aim0: 0,
     floors: [rect(-0.6, 0, 0.6, 2.4), rect(-0.2, 2.4, 0.2, 4.0), rect(-1.2, 4.0, 1.2, 6.8)],
     walls: [[[-0.2, 2.4], [-0.6, 2.4], [-0.6, 0], [0.6, 0], [0.6, 2.4], [0.2, 2.4]], [[-0.2, 4.0], [-1.2, 4.0], [-1.2, 6.8], [1.2, 6.8], [1.2, 4.0], [0.2, 4.0]]],
     tubes: [{ a: [0.36, 2.0], b: [-0.8, 4.6], dir: 0, keep: 0.5 }],
@@ -65,7 +65,7 @@ registerWorld(13, { holes: [
     tubes: [{ a: [0, 3.4], b: [1.25, 3.68], dir: 90, keep: 0, add: 2.0 }, { a: [3.95, 0.85], b: [0.95, -0.6], dir: 10, keep: 0, add: 1.4 }],
     drains: [{ x: 2.0, z: 0.7, r: 1.0, depth: 0.3 }] },
   /* 10: three terraces, each stair on the other side, a boulder on top; or the tunnel past the pool */
-  { par: 4, sol: [[21,0.88,0],[10,0.4,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 4, sol: [[21,0.88,0],[10,0.66,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: rect(-1.2, 0, 1.2, 9),
     ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.15, h1: 0.3 },
       { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.45 }],
     tiers: [{ poly: rect(-1.2, 2.5, 1.2, 5), h: 0.15 }, { poly: rect(-1.2, 5, 1.2, 7), h: 0.3 }, { poly: rect(-1.2, 7, 1.2, 9), h: 0.45 }],
@@ -73,11 +73,11 @@ registerWorld(13, { holes: [
     tubes: [{ a: [0.8, 4.6], b: [-0.8, 8.4], dir: 90, keep: 0, add: 0.5 }],
     posts: [J13_IDOL(-0.6, 5.9), J13_IDOL(0.75, 3.0)], movers: [J13_ROCK(-0.8, 7.6, 0.8, 7.6, 2.4)] },
   /* 11: the long climb, a long green: a broad lawn rising away and leaning left, a big ridge, a swale, a mound guarding the back tier */
-  { par: 3, sol: [[4,1,0]], tee: [0, 0.5], cup: [1.0, 12.4], shape: rect(-2, 0, 2, 13.6),
+  { par: 3, sol: [[12,0.96,0]], tee: [0, 0.5], cup: [1.0, 12.4], shape: rect(-2, 0, 2, 13.6),
     tiers: [{ poly: rect(-2, 0, 2, 9), h: 0, sz: 0.012, sx: -0.006 }, { poly: rect(-2, 9, 2, 13.6), h: 0.108, sx: -0.006 }],
     bumps: [{ x: -0.8, z: 4.0, r: 1.8, h: 0.14 }, { x: 1.0, z: 7.5, r: 1.2, h: -0.08 }, { x: -0.6, z: 11.0, r: 1.0, h: 0.07 }] },
   /* 12: twin tunnels out of the sealed shrine, a boulder on the long green, a stair to the cup */
-  { par: 4, sol: [[60,0.55,0],[350,0.2,0],[40,0.79,0]], tee: [0, 0.5], cup: [2.4, 6.6], aim0: 20,
+  { par: 4, sol: [[56,0.64,0],[26,1,0]], tee: [0, 0.5], cup: [2.4, 6.6], aim0: 20,
     floors: [rect(-1, 0, 1, 2), rect(-1, 3, 3, 8)],
     walls: [ring(rect(-1, 0, 1, 2)), [[1, 3], [-1, 3], [-1, 8], [1, 8], [3, 8], [3, 5.5], [3, 3], [1, 3]], [[1, 5.5], [3, 5.5]], [[1, 5.5], [1, 6.6]], [[1, 7.4], [1, 8]]],
     ramps: [{ x0: 0.2, z0: 6.6, x1: 1.0, z1: 7.4, axis: 'x', h0: 0, h1: 0.3 }], tiers: [{ poly: rect(1, 5.5, 3, 8), h: 0.3 }],
@@ -85,7 +85,7 @@ registerWorld(13, { holes: [
     movers: [J13_ROCK(-0.6, 4.6, 0.6, 4.6, 2.6)],
     posts: [J13_IDOL(-0.33, 1.25, 0.11), J13_IDOL(-0.85, 1.05, 0.1), J13_IDOL(2.0, 6.2)], zones: [J13_MUD(rect(-1, 5.6, 0.2, 6.2)), J13_MUD(rect(1.6, 6.8, 2.2, 8))] },
   /* 13: the stone door slides across the only gap in the temple wall; drop through, cross the bridge; or the tunnel */
-  { par: 4, crazy: true, sol: [[0, 0.75, 1]], tee: [0, 0.5], cup: [-0.5, 7.6], shape: rect(-1.2, 0, 1.2, 8.4),
+  { par: 4, crazy: true, sol: [[0.5,0.68,1]], tee: [0, 0.5], cup: [-0.5, 7.6], shape: rect(-1.2, 0, 1.2, 8.4),
     tiers: [{ poly: rect(-1.2, 0, 1.2, 3.0), h: 0.4 }],
     inner: [[[-1.2, 3.0], [-0.35, 3.0]], [[0.35, 3.0], [1.2, 3.0]]],
     movers: [J13_DOOR(-0.6, 3.0, 0.6, 3.0, 0.25, 90, 3.0)],
@@ -102,7 +102,7 @@ registerWorld(13, { holes: [
     tubes: [{ a: [0.2, 2.55], b: [2.8, 1.4], dir: 0, keep: 0, add: 0.5 }],
     movers: [J13_ROCK(2.5, 3.2, 3.1, 3.2, 2.2, 0, 0.15)], posts: [J13_IDOL(1.7, 1.6), J13_IDOL(3.1, 3.95, 0.1)] },
   /* 15: the leap: launch off the kicker over the gorge, or creep round the narrow ledge through the mud */
-  { par: 4, crazy: true, sol: [[3,0.95,0],[0,0.79,0]], tee: [0, 0.5], cup: [-0.6, 7.2], aim0: 0,
+  { par: 4, crazy: true, sol: [[3,0.95,0],[4.5,1,0]], tee: [0, 0.5], cup: [-0.6, 7.2], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 3.6), rect(0.8, 1.6, 1.4, 4.4), rect(-1.2, 4.4, 1.4, 8)],
     walls: [[[-0.3, 3.6], [-0.8, 3.6], [-0.8, 0], [0.8, 0], [0.8, 1.6], [1.4, 1.6], [1.4, 8], [-1.2, 8], [-1.2, 4.4], [-0.45, 4.4]], [[0.3, 3.6], [0.8, 3.6], [0.8, 4.4], [0.45, 4.4]]],
     ramps: [{ x0: -0.3, z0: 2.4, x1: 0.3, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }],
@@ -110,7 +110,7 @@ registerWorld(13, { holes: [
     posts: [J13_IDOL(0.2, 6.6), J13_IDOL(-0.9, 6.0, 0.11)], bumps: [{ x: 0.5, z: 5.6, r: 0.5, h: 0.18 }],
     movers: [J13_ROCK(-0.7, 5.2, 0.0, 5.2, 2.6, 0, 0.15)] },
   /* 16: the lost city: over the hill, across the stream, up to the plaza, past the stone door into the gate tunnel */
-  { par: 5, crazy: true, sol: [[354,0.7,0],[39,1,0],[172,0.7,0],[180,0.45,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
+  { par: 5, crazy: true, sol: [[0,0.84,1],[146,0.72,0],[0,0.44,0]], tee: [0, 0.5], cup: [2.6, 1.0], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [0.8, 6.0], [1.8, 6.0], [1.8, 0], [3.4, 0], [3.4, 2.4], [3.4, 7.8], [-0.8, 7.8], [-0.8, 3.6]],
     bumps: [{ x: 0, z: 2.0, r: 0.6, h: 0.3 }],
     ramps: [{ x0: 0.8, z0: 6.0, x1: 1.8, z1: 7.8, axis: 'x', h0: 0, h1: 0.3 }],
@@ -121,14 +121,14 @@ registerWorld(13, { holes: [
     tubes: [{ a: [2.6, 3.0], b: [2.6, 2.0], dir: 180, keep: 0, add: 0.5 }],
     posts: [J13_IDOL(3.1, 3.35, 0.12), J13_IDOL(2.1, 3.35, 0.12), J13_IDOL(2.15, 0.8)] },
   /* 17: the boulder gauntlet down the sloping corridor, then off the ledge to the cup */
-  { par: 4, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [-1.6, 7.5], aim0: 0,
+  { par: 4, sol: [[0,0.82,0]], tee: [0, 0.5], cup: [-1.6, 7.5], aim0: 0,
     shape: [[-0.6, 0], [0.6, 0], [0.6, 8.4], [-2.2, 8.4], [-2.2, 6.6], [-0.6, 6.6]],
     tiers: [{ poly: rect(-0.6, 0, 0.6, 8.4), h: 0.35, sz: -0.03 }],
     zones: [J13_MUD(rect(-0.6, 1.8, -0.15, 2.4)), J13_MUD(rect(0.15, 3.6, 0.6, 4.2)), J13_WATER(rect(-2.2, 6.6, -1.1, 6.9))],
     movers: [J13_ROCK(-0.27, 2.9, 0.27, 2.9, 1.8, 0, 0.15), J13_ROCK(0.27, 4.9, -0.27, 4.9, 2.2, 1, 0.15), J13_ROCK(0, 6.3, 0, 7.9, 2.6, 0, 0.15)],
     posts: [J13_IDOL(-1.0, 8.0, 0.11)], bumps: [{ x: -1.6, z: 7.5, r: 0.45, h: -0.06 }] },
   /* 18: the sun temple: two stairs, the stone door before the idol's mouth, then jump the river to the boulder green */
-  { par: 5, crazy: true, sol: [[153,1,0],[302,0.75,0],[250,0.3,0],[346,0.8,0]], tee: [0, 0.5], cup: [0.3, 9.8], shape: rect(-1.5, 0, 1.5, 10.4),
+  { par: 5, crazy: true, sol: [[240,1,0],[302,0.8,0],[0,0.68,0]], tee: [0, 0.5], cup: [0.3, 9.8], shape: rect(-1.5, 0, 1.5, 10.4),
     ramps: [{ x0: 0.8, z0: 2.0, x1: 1.5, z1: 2.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.5, z0: 4.3, x1: -0.8, z1: 5.0, axis: 'z', h0: 0.2, h1: 0.4 },
       { x0: -0.4, z0: 7.4, x1: 0.4, z1: 8.0, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-1.5, 2.8, 1.5, 5.0), h: 0.2 }, { poly: rect(-1.5, 5.0, 1.5, 6.5), h: 0.4 }],

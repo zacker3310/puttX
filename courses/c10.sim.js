@@ -15,12 +15,12 @@ registerWorld(10, { holes: [
     tiers: [{ poly: rect(-1.2, 3.6, 1.2, 6.4), h: 0.3 }],
     bumps: [{ x: 0.55, z: 5.4, r: 0.4, h: -0.05 }, { x: 0.1, z: 4.6, r: 0.4, h: 0.1 }] },
   /* 2. rainbow fan: a narrow fast bridge with a crosswind fan; aim into the wind */
-  { par: 3, sol: [[10,0.64,0],[40,0.4,0]], tee: [0, 0.6], cup: [-0.4, 6.6],
+  { par: 3, sol: [[10,0.72,0],[48,0.64,0]], tee: [0, 0.6], cup: [-0.4, 6.6],
     floors: [rect(-0.7, 0, 0.7, 1.6), rect(-0.25, 1.6, 0.25, 5.2), rect(-1, 5.2, 1, 7.4)],
     walls: [[[-0.25, 1.6], [-0.7, 1.6], [-0.7, 0], [0.7, 0], [0.7, 1.6], [0.25, 1.6]], [[1, 6.2], [1, 7.4], [-1, 7.4], [-1, 6.6]]],
     zones: [{ surf: 'fast', push: [1.4, 0], poly: rect(-0.25, 2.6, 0.25, 4.2) }, { surf: 'fast', poly: rect(-0.25, 1.6, 0.25, 2.6) }, { surf: 'fast', poly: rect(-0.25, 4.2, 0.25, 5.2) }] },
   /* 3. sky jump: a kicker off the high tee island over the gap, or the long rainbow round the side */
-  { par: 2, sol: [[10.25,0.91,0]], tee: [0, 0.6], cup: [-0.45, 6.75], inner: [[[-0.9, 5.7], [0.15, 5.7]]],
+  { par: 2, sol: [[10.25,0.92,0]], tee: [0, 0.6], cup: [-0.45, 6.75], inner: [[[-0.9, 5.7], [0.15, 5.7]]],
     floors: [rect(-0.7, 0, 0.7, 2.6), rect(-0.9, 3.6, 0.9, 7.4), [[0.7, 0.9], [1.6, 0.9], [1.6, 5], [0.9, 5], [0.9, 4.4], [1.1, 4.4], [1.1, 1.5], [0.7, 1.5]]],
     walls: [[[-0.7, 2.6], [-0.7, 0], [0.7, 0], [0.7, 0.9], [1.6, 0.9], [1.6, 5], [0.9, 5]], [[0.7, 1.5], [0.7, 2.6]], [[-0.9, 3.6], [-0.9, 7.4], [0.9, 7.4], [0.9, 5]]],
     tiers: [{ poly: rect(-0.7, 0, 0.7, 2.6), h: 0.3 }, { poly: [[0.7, 0.9], [1.6, 0.9], [1.6, 5], [1.1, 5], [1.1, 1.5], [0.7, 1.5]], h: 0.3 }],
@@ -34,14 +34,14 @@ registerWorld(10, { holes: [
     tiers: [{ poly: rect(-3, -1, 3, 14), h: 0, sx: 0.012, sz: 0.03 }, { poly: rect(-3, 5.5, 3, 14), h: 0.143, sx: 0.012, sz: 0.004 }],
     bumps: [{ x: 1.2, z: 8, r: 1.6, h: 0.12 }, { x: -1, z: 3.5, r: 1.5, h: -0.08 }, { x: 1.4, z: 2.5, r: 1.2, h: 0.08 }] },
   /* 5. windmill neck: a cloud windmill guards a bare neck, then a sliding gate guards the cup */
-  { par: 3, sol: [[356,0.76,2],[0,0.16,0]], tee: [0, 0.6], cup: [0, 5.9], aim0: 0,
+  { par: 3, sol: [[354,0.48,1],[4,0.92,0]], tee: [0, 0.6], cup: [0, 5.9], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 2.5), rect(-0.35, 2.5, 0.35, 3.7), rect(-1.2, 3.7, 1.2, 6.6)],
     walls: [[[-0.35, 2.5], [-0.8, 2.5], [-0.8, 0], [0.8, 0], [0.8, 2.5], [0.35, 2.5]], [[-1.2, 6.6], [1.2, 6.6]]],
     movers: [{ kind: 'spin', x: 0, z: 3.1, len: 0.32, w: 1.6, phase: 0, blades: 2, look: 'windmill' },
       { kind: 'gate', ax: -0.7, az: 5.0, bx: 0.7, bz: 5.0, len: 0.35, ang: 90, period: 3.2, look: 'gate' }] },
   /* 6. tube isles: the safe tube to the high island and down its ramp, or the bare rainbow straight
      across; the tilted cup green drains toward an open edge */
-  { par: 2, sol: [[10,0.56,0]], tee: [0, 0.6], cup: [1.5, 7.4],
+  { par: 2, sol: [[10,0.61,0]], tee: [0, 0.6], cup: [1.5, 7.4],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.2, 2.2, 0.2, 5.4), rect(1.8, 2.4, 3.4, 5.4), rect(-1.2, 5.4, 3.4, 8)],
     walls: [[[-0.2, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.2, 2.2]],
       [[1.8, 4.8], [1.8, 2.4], [3.4, 2.4], [3.4, 4.8]], [[-1.2, 7.4], [-1.2, 8], [3.4, 8], [3.4, 5.4]]],
@@ -50,7 +50,7 @@ registerWorld(10, { holes: [
     zones: [{ surf: 'fast', poly: rect(-0.2, 2.2, 0.2, 5.4) }],
     tubes: [{ a: [0.45, 1.7], b: [2.6, 2.9], dir: 0 }] },
   /* 7. gale steps: two ramp bridges up two islands while a fan blows across the middle one */
-  { par: 3, sol: [[178,0.8,0],[26,0.84,0]], tee: [-0.2, 0.6], cup: [0.6, 7.6],
+  { par: 3, sol: [[178,0.8,0],[20.5,0.98,0]], tee: [-0.2, 0.6], cup: [0.6, 7.6],
     floors: [rect(-0.8, 0, 0.8, 2), rect(-0.6, 2, 0, 3), rect(-1.4, 3, 1.4, 5), rect(0.6, 5, 1.2, 6), rect(-1, 6, 1.4, 8.4)],
     walls: [[[-0.6, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0, 2]], [[-1, 6.6], [-1, 8.4], [1.4, 8.4], [1.4, 6.8]]],
     ramps: [{ x0: -0.6, z0: 2, x1: 0, z1: 3, axis: 'z', h0: 0, h1: 0.25 }, { x0: 0.6, z0: 5, x1: 1.2, z1: 6, axis: 'z', h0: 0.25, h1: 0.5 }],
@@ -65,7 +65,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 1.1, z: 2.2, r: 1.1, h: -0.07 }, { x: -0.9, z: 7.6, r: 1.3, h: 0.1 }] },
   /* 9. twin tubes: the walled high tee has no way out but two tubes; gold lands by the windmill
      on the cup island, blue on a side island with a ramp bridge down */
-  { crazy: true, par: 3, sol: [[20,0.4,0],[28,0.62,0]], tee: [0, 0.5], cup: [-0.4, 6.4], aim0: 20,
+  { crazy: true, par: 3, sol: [[22,0.64,0.5],[38,0.76,0]], tee: [0, 0.5], cup: [-0.4, 6.4], aim0: 20,
     floors: [rect(-1, 0, 1, 1.8), rect(-1.2, 3.6, 1.2, 7.2), rect(-3.2, 1, -1.8, 5), rect(-1.8, 4.1, -1.2, 4.8)],
     walls: [ring(rect(-1, 0, 1, 1.8)), [[-1.8, 4.1], [-1.8, 1], [-3.2, 1], [-3.2, 5], [-1.8, 5], [-1.8, 4.8]], [[-1.2, 6.2], [-1.2, 7.2], [1.2, 7.2], [1.2, 6.4]]],
     tiers: [{ poly: C10_PAD(-1, 0, 1, 1.8), h: 0.4 }, { poly: C10_PAD(-3.2, 1, -1.8, 5), h: 0.25 }],
@@ -83,7 +83,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0, z: 6, r: 1.1, h: 0.35 }, { x: 0, z: 6, r: 0.32, h: -0.07 }] },
   /* 11. gatehouse: a golden gate sweeps the bare bridge, a tilted court drains to the tube, and
      cloud bumpers guard the cup on the high keep (or climb the side ramp) */
-  { par: 4, sol: [[357,0.7,0],[15,0.5,0],[40,0.26,0]], tee: [0, 0.6], cup: [0.55, 8.4],
+  { par: 4, sol: [[357,0.7,0],[15,0.5,0],[40,0.31,0]], tee: [0, 0.6], cup: [0.55, 8.4],
     floors: [rect(-0.7, 0, 0.7, 2.2), rect(-0.3, 2.2, 0.3, 4.2), rect(-1.4, 4.2, 1.4, 6), rect(0.6, 6, 1.1, 7), rect(-1, 7, 1.2, 9)],
     walls: [[[-0.3, 2.2], [-0.7, 2.2], [-0.7, 0], [0.7, 0], [0.7, 2.2], [0.3, 2.2]], [[0.6, 6], [-1.4, 6], [-1.4, 4.2], [-0.3, 4.2]],
       [[-1, 8.2], [-1, 9], [1.2, 9], [1.2, 7.8]]],
@@ -93,7 +93,7 @@ registerWorld(10, { holes: [
     movers: [{ kind: 'gate', ax: -0.62, az: 3.2, bx: 0.62, bz: 3.2, len: 0.3, ang: 90, period: 2.6, look: 'gate' }],
     tubes: [{ a: [-0.95, 5.5], b: [-0.4, 7.35], dir: 0 }] },
   /* 12. cloud hopper: four islands stepping down over gaps; too soft and you drop between them */
-  { par: 2, sol: [[353,0.74,0]], tee: [0, 0.6], cup: [0.65, 8.05],
+  { par: 2, sol: [[350.5,0.84,0]], tee: [0, 0.6], cup: [0.65, 8.05],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.9, 2.3, 0.9, 4), rect(-0.9, 4.3, 0.9, 6), rect(-1.2, 6.3, 1.2, 8.6)],
     walls: [[[-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2]], [[-1.2, 7.6], [-1.2, 8.6], [1.2, 8.6], [1.2, 7.3], [0, 7.3]]],
     tiers: [{ poly: C10_PAD(-0.7, 0, 0.7, 2), h: 0.6 }, { poly: rect(-0.9, 2.3, 0.9, 4), h: 0.4 }, { poly: rect(-0.9, 4.3, 0.9, 6), h: 0.2 }, { poly: rect(-1.3, 6.3, 1.3, 8.7), h: 0.258, sz: -0.03 }],
@@ -101,7 +101,7 @@ registerWorld(10, { holes: [
     bumps: [{ x: 0.3, z: 3.1, r: 0.35, h: 0.08 }, { x: 0.65, z: 8.05, r: 0.3, h: -0.05 }] },
   /* 13. thunder run: up a railed diagonal rainbow into a headwind, past a windmill on the high island,
      then off the kicker down onto a tilted crater green */
-  { crazy: true, par: 4, sol: [[312,1,0],[52,0.92,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
+  { crazy: true, par: 4, sol: [[214,0.6,0],[44,1,1.5],[50,1,0]], tee: [0, 0.6], cup: [0.3, 8.6], aim0: 30,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 6.6, 2.8, 9.4)],
     walls: [[[1.35, 4.4], [-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2], [1.85, 4.4]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 6.6]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 }],
@@ -109,7 +109,7 @@ registerWorld(10, { holes: [
     zones: [{ surf: 'fast', push: [-0.3, -0.45], poly: [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]] }],
     movers: [{ kind: 'spin', x: 1.6, z: 5.05, len: 0.42, w: 1.5, phase: 0, blades: 2, look: 'windmill' }] },
   /* 14. ice palace: two golden gates sweep a bare cloud-ice island; the cup hides in the palace */
-  { par: 3, sol: [[1,0.52,0.5]], tee: [0, 0.6], cup: [0.1, 7.35],
+  { par: 3, sol: [[5.75,0.44,0.5]], tee: [0, 0.6], cup: [0.1, 7.35],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.35, 2, 0.35, 3), rect(-1.6, 3, 1.6, 8.2)],
     walls: [[[-0.35, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.35, 2]], [[0.9, 7.9], [-0.6, 7.9], [-0.6, 6.8], [0.9, 6.8]]],
     tiers: [{ poly: C10_PAD(-0.7, 0, 0.7, 2), h: 0.35 }],
@@ -121,12 +121,12 @@ registerWorld(10, { holes: [
       { kind: 'gate', ax: 1.05, az: 5.6, bx: -1.05, bz: 5.6, len: 0.45, ang: 90, period: 2.4, phase: 1, look: 'gate' }] },
   /* 15. sky links (long green): a 14 m sweeping green that falls left to right over a broad ridge
      and a swale; the cup sits on a soft crown at the back */
-  { par: 3, sol: [[4,0.96,0]], tee: [0, 0.6], cup: [1.2, 12.2], aim0: 5,
+  { par: 3, sol: [[1.25,0.97,0]], tee: [0, 0.6], cup: [1.2, 12.2], aim0: 5,
     shape: [[-0.9, 0], [0.9, 0], [1.8, 3], [2.8, 6], [3.2, 9], [2.8, 12], [1.6, 14], [-0.2, 14.2], [-1.2, 12.5], [-1, 9.5], [-1.8, 6.5], [-2, 3]],
     tiers: [{ poly: rect(-3, -1, 4, 15), h: 0, sx: -0.02, sz: 0.008 }],
     bumps: [{ x: 0.2, z: 6.5, r: 2.2, h: 0.15 }, { x: 1.8, z: 9.5, r: 1.5, h: -0.1 }, { x: 1.2, z: 12.2, r: 1.2, h: 0.06 }, { x: -0.6, z: 3, r: 1.4, h: -0.06 }] },
   /* 16. rainbow relay: three bare rainbows between three tiny islands, each with its own crosswind */
-  { par: 4, sol: [[354,0.6,0],[62,0.44,0],[4,0.84,0]], tee: [0, 0.6], cup: [3.3, 8.2],
+  { par: 4, sol: [[356,0.64,0],[68,0.4,0],[0,0.4,0]], tee: [0, 0.6], cup: [3.3, 8.2],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(0.6, 3.85, 2.6, 4.35), rect(2.6, 3.4, 3.6, 5.2),
       rect(2.85, 5.2, 3.35, 7.2), rect(2.0, 7.2, 4.4, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[0.6, 4.6], [-0.6, 4.6], [-0.6, 3.6]],
@@ -138,7 +138,7 @@ registerWorld(10, { holes: [
       { surf: 'fast', push: [-0.9, 0], poly: rect(2.85, 5.6, 3.35, 6.8) }, { surf: 'fast', poly: rect(2.85, 5.2, 3.35, 5.6) }, { surf: 'fast', poly: rect(2.85, 6.8, 3.35, 7.2) }],
     bumps: [{ x: 3.3, z: 8.2, r: 0.35, h: -0.05 }] },
   /* 17. sky locks: two gates lock the bare neck; then the windmill-guarded tube, or the kicker jump, to the fan-swept cup island */
-  { crazy: true, par: 4, sol: [[179,0.7,1.5],[36,0.25,0]], tee: [0, 0.6], cup: [0.6, 8.3],
+  { crazy: true, par: 4, sol: [[6,0.92,2],[0,0.12,0]], tee: [0, 0.6], cup: [0.6, 8.3],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.3, 2, 0.3, 4), rect(-1.3, 4, 1.3, 6), rect(-1.4, 6.8, 1.4, 9)],
     walls: [[[-0.3, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.3, 2]], [[1.4, 8.4], [1.4, 9], [-1.4, 9], [-1.4, 6.8]]],
     ramps: [{ x0: -1.0, z0: 5.6, x1: -0.2, z1: 6, axis: 'z', h0: 0, h1: 0.12 }],
@@ -150,7 +150,7 @@ registerWorld(10, { holes: [
     tubes: [{ a: [0.5, 5.6], b: [-0.8, 7.0], dir: 25 }] },
   /* 18. the crown kingdom: tube or windy rainbow to the windmill isle, off the kicker onto the
      cloud-ice court past the golden gate, then up the royal ramp to the crater cup on the crown */
-  { crazy: true, par: 5, sol: [[24,0.2,0],[330,1,0],[236,1,0]], tee: [0, 0.6], cup: [0.3, 11.8],
+  { crazy: true, par: 5, sol: [[180,1,1.5],[356,0.68,0.5],[34,0.52,0]], tee: [0, 0.6], cup: [0.3, 11.8],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.6, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
     /* the finale is hard, not hopeless: railed rainbow, walled windmill isle (only the kicker open), walled ice court, railed crown ramp */
     walls: [[[-0.26, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.26, 2.2]],

@@ -93,7 +93,7 @@ registerWorld(99, { holes: [
      whirlwinds swallow you back to the start, 4 the gold tube out, 5 the conveyor ramp, 6 the
      windmill deck, 7 the ice bridge with its puck, 8 the drop into the whirlwind, 9 the eye tube,
      10 the crater green in a mud moat */
-  { par: 6, crazy: true, sol: [[320,0.8,0],[295,0.55,0],[0,0.15,0],[0,0.7,0]], tee: [0, 0.5], cup: [2.8, 18.4], aim0: 0,
+  { par: 6, crazy: true, sol: [[324,0.88,0],[288,0.92,0],[56,1,0],[0,0.72,0]], tee: [0, 0.5], cup: [2.8, 18.4], aim0: 0,
     floors: [rect(-0.6, 0, 0.6, 2.4), rect(-1.5, 2.4, 1.5, 8.4), rect(-0.5, 9.0, 0.5, 11.8), rect(-1.2, 11.8, 1.2, 13.4), rect(-0.3, 13.4, 0.3, 16.3),
       C99_PEN(0, 17.5, 1.3), rect(1.8, 15.6, 3.8, 19.4)],
     walls: [[[-0.6, 2.4], [-0.6, 0], [0.6, 0], [0.6, 2.4]], [[-0.6, 2.4], [-1.5, 2.4], [-1.5, 8.4], [1.5, 8.4], [1.5, 2.4], [0.6, 2.4]],
@@ -115,7 +115,7 @@ registerWorld(99, { holes: [
   /* 8. the big air (ten parts): 1 the bumper slalom, 2 the first ramp, 3 the puck deck, 4 the
      crosswind ramp, 5 the gate, 6 the kicker, 7 the jump over the gap, 8 the ice funnel, 9 the
      tube, 10 the whirlwind with the cup in its eye */
-  { par: 5, crazy: true, sol: [[356,1,1],[54,0.84,0]], tee: [0, 0.5], cup: [3.6, 12.5], aim0: 0,
+  { par: 5, crazy: true, sol: [[356,1,1],[54,0.84,0],[310,0.68,0]], tee: [0, 0.5], cup: [3.6, 12.5], aim0: 0,
     floors: [rect(-1.2, 0, 1.2, 4.0), rect(-0.4, 4.0, 0.4, 5.2), rect(-1.2, 5.2, 1.2, 7.4), rect(-0.4, 7.4, 0.4, 8.8), rect(-1.4, 8.8, 1.4, 10.4),
       rect(-1.6, 11.1, 1.6, 14.4), C99_PEN(3.6, 12.5, 1.5)],
     walls: [[[-0.4, 4.0], [-1.2, 4.0], [-1.2, 0], [1.2, 0], [1.2, 4.0], [0.4, 4.0]], [[-0.4, 4.0], [-0.4, 5.2], [-1.2, 5.2], [-1.2, 7.4], [-0.4, 7.4], [-0.4, 8.8], [-1.4, 8.8], [-1.4, 10.4], [-0.4, 10.4]],

@@ -15,7 +15,7 @@ permissions:
 jobs:
   suites:
     runs-on: ubuntu-latest
-    timeout-minutes: 60   # holes-check proves 567 holes (about 20 minutes on 4 cores)
+    timeout-minutes: 90   # software rendering: holes-check (567 holes) and perf-check (renders every hole once) take about 20 minutes each
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

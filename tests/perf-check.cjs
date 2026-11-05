@@ -14,17 +14,12 @@ const { check, done, open } = require('./lib.cjs');
   });
   check('manifest and apple-touch-icon resolve', links.manifest && links.icon, JSON.stringify(links));
   const budget = await page.evaluate(() => {
-    /* triangle counts do not depend on resolution, so the sweep over every hole renders at a tiny
-       pixel ratio (same camera, same culling): software rendering at full size takes 20 minutes */
-    const pr = renderer.getPixelRatio();
     let maxTris = 0, worst = '';
-    renderer.setPixelRatio(0.05);
     for (const w of allCourses()) for (const h of WORLDS[w].holes) {
       startHole(h.key); renderFrame(0.016);
       const t = renderer.info.render.triangles; if (t > maxTris) { maxTris = t; worst = h.key; }
     }
-    renderer.setPixelRatio(pr);
-    return { pr, map: sun.shadow.mapSize.x, maxTris, worst };
+    return { pr: renderer.getPixelRatio(), map: sun.shadow.mapSize.x, maxTris, worst };
   });
   check('pixel ratio <= 2 and one 1024 shadow map', budget.pr <= 2 && budget.map === 1024, JSON.stringify(budget));
   check('every hole renders under 400k triangles (shadow pass included)', budget.maxTris < 400000, JSON.stringify(budget));

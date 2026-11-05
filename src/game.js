@@ -524,23 +524,41 @@ function simulatePutt(h, from, angleDeg, power, t0 = 0) {
 }
 /* the real rule for a ball against the border (WMF, PPA, BMGA): it may be placed out from the wall,
    square to it. Here it happens for you whenever the ball comes to rest with its edge within
-   RELIEF_GAP of a wall or post face, so the putter always has room; it lands RELIEF_TO from the
-   face, or a little closer if that spot is not fair (off the floor, in water, on a slope, by the cup,
-   a tube or another wall). Deterministic, so live play, ghosts, shot codes and the solver agree. */
+   RELIEF_GAP of a wall or post face, so the putter always has room; it moves RELIEF_TO out (out of a
+   corner along its bisector), or a little less if that spot is not fair (off the floor, in water, on
+   a slope, by the cup, a tube or another wall). Deterministic, so live play, ghosts, shot codes and the solver agree. */
 const RELIEF_GAP = 0.025, RELIEF_TO = 0.12;
 function restSpot(h, x, z) {
+  const y0 = groundH(h, x, z), fair = (tx, tz) => {
+    const zn = zoneAt(h, tx, tz), gg = groundGrad(h, tx, tz);
+    if (!onFloor(h, tx, tz) || (zn && zn.surf === 'water') || Math.abs(groundH(h, tx, tz) - y0) > 0.02 || hyp(gg[0], gg[1]) * ROLL > STATIC_MU) return false;
+    if (hyp(tx - h.cup[0], tz - h.cup[1]) < DISH_R || h.tubes.some(tb => hyp(tx - tb.a[0], tz - tb.a[1]) < TUBE_R + BALL_R + 0.03)) return false;
+    if (h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], tx, tz); return hyp(tx - p[0], tz - p[1]) < WALL_HALF + BALL_R + RELIEF_GAP * 1.5; })) return false;
+    return !h.posts.some(p => hyp(tx - p.x, tz - p.z) < p.r + BALL_R + RELIEF_GAP * 1.5);
+  };
+  /* the nearest face: the ball goes RELIEF_TO out from it, square to it (or a little less) */
   let bd = Infinity, px = 0, pz = 0, reach = 0;
   for (const s of h.segs) { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z), d = hyp(x - p[0], z - p[1]); if (d - WALL_HALF < bd - reach) { bd = d; px = p[0]; pz = p[1]; reach = WALL_HALF; } }
   for (const p of h.posts) { const d = hyp(x - p.x, z - p.z); if (d - p.r < bd - reach) { bd = d; px = p.x; pz = p.z; reach = p.r; } }
   if (bd - reach - BALL_R > RELIEF_GAP || bd < 1e-9) return [x, z];
-  const nx = (x - px) / bd, nz = (z - pz) / bd, y0 = groundH(h, x, z);
+  const nx = (x - px) / bd, nz = (z - pz) / bd;
   for (const to of [RELIEF_TO, RELIEF_TO * 0.7, RELIEF_TO * 0.45]) {
-    const tx = px + nx * (reach + BALL_R + to), tz = pz + nz * (reach + BALL_R + to), zn = zoneAt(h, tx, tz), gg = groundGrad(h, tx, tz);
-    if (!onFloor(h, tx, tz) || (zn && zn.surf === 'water') || Math.abs(groundH(h, tx, tz) - y0) > 0.02 || hyp(gg[0], gg[1]) * ROLL > STATIC_MU) continue;
-    if (hyp(tx - h.cup[0], tz - h.cup[1]) < DISH_R || h.tubes.some(tb => hyp(tx - tb.a[0], tz - tb.a[1]) < TUBE_R + BALL_R + 0.03)) continue;
-    if (h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], tx, tz); return hyp(tx - p[0], tz - p[1]) < WALL_HALF + BALL_R + RELIEF_GAP * 1.5; })) continue;
-    if (h.posts.some(p => hyp(tx - p.x, tz - p.z) < p.r + BALL_R + RELIEF_GAP * 1.5)) continue;
-    return [tx, tz];
+    const tx = px + nx * (reach + BALL_R + to), tz = pz + nz * (reach + BALL_R + to);
+    if (fair(tx, tz)) return [tx, tz];
+  }
+  /* wedged in a corner or pinned on a slope: out along the bisector of every face it touches, else
+     square to each of them in turn, a shorter way if need be */
+  const near = [], close = (qx, qz, r) => { const d = hyp(x - qx, z - qz); if (d > 1e-9 && d - r - BALL_R <= RELIEF_GAP) near.push([(x - qx) / d, (z - qz) / d]); };
+  for (const s of h.segs) { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); close(p[0], p[1], WALL_HALF); }
+  for (const p of h.posts) close(p.x, p.z, p.r);
+  let sx = 0, sz = 0;
+  for (const n of near) { sx += n[0]; sz += n[1]; }
+  const dirs = [], sl = hyp(sx, sz);
+  if (sl > 1e-6) dirs.push([sx / sl, sz / sl]);
+  for (const n of near) dirs.push(n);
+  for (const to of [RELIEF_TO, RELIEF_TO * 0.7, RELIEF_TO * 0.45, RELIEF_TO * 0.3]) for (const [dx, dz] of dirs) {
+    const tx = x + dx * to, tz = z + dz * to;
+    if (fair(tx, tz)) return [tx, tz];
   }
   return [x, z];
 }
@@ -2121,10 +2139,16 @@ function beginPutt(angle, power, clean = true) {
   if (play.phase !== 'aim') return false;
   const b = play.ball;
   skipIntro();
-  play.undo = { strokes: play.round.strokes, at: [b.x, b.z], aim: play.aim };
+  const g = play.ghost;
+  play.undo = { strokes: play.round.strokes, at: [b.x, b.z], aim: play.aim, touched: play.touched,
+    ghost: g ? { b: Object.assign({}, g.b, { hits: [] }), k: g.k, done: !!g.done, live: g.live, t: g.t } : null };
+  /* the putt is played from exactly what is logged (aim, power, hole time), so the ace replay, the
+     best ghost and a shared shot roll the same putt to the bit */
+  const A = +angle.toFixed(3), P = +power.toFixed(4);
+  play.time = +play.time.toFixed(6);
   play.from = [b.x, b.z]; play.t0 = play.time;
-  play.log.push([+angle.toFixed(3), +power.toFixed(4), +play.time.toFixed(6)]);
-  play.ball = launch(newBall(play.hole, b.x, b.z), angle, power);
+  play.log.push([A, P, play.time]);
+  play.ball = launch(newBall(play.hole, b.x, b.z), A, P);
   play.phase = 'roll'; play.swing = null; play.aimDrag = null;
   clearTrace(); recordTrace(play.ball);
   if (!play.ghost || !play.ghost.auto) ghostPutt(play.log.length - 1);
@@ -2187,7 +2211,9 @@ function mulligan() {
   if (!play.practice) { progress.mulligans--; saveProgress(); }
   play.round.strokes = u.strokes; play.round.at = u.at.slice(); play.aim = u.aim;
   play.ball = newBall(play.hole, u.at[0], u.at[1]); play.undo = null; play.mulls++; play.log.pop();
-  if (play.ghost) play.ghost.k = Math.max(0, play.ghost.k - 1);
+  play.touched = u.touched; play.fx.place = null; clearTrace();
+  /* the ghost goes back to where it was before the undone putt */
+  if (play.ghost && u.ghost) Object.assign(play.ghost, u.ghost); else if (play.ghost) play.ghost.k = Math.max(0, play.ghost.k - 1);
   sfx('tubeOut'); updateHud(); updateMulligan();
   return true;
 }
@@ -2240,7 +2266,10 @@ function advance(dt) {
     const t = (play.fx.autoT += dt) / 0.9, k = Math.min(1, t), e = k * k * (3 - 2 * k), [fx, fz] = play.fx.autoFrom;
     b.x = fx + (h.cup[0] - fx) * e; b.z = fz + (h.cup[1] - fz) * e; b.tube = null;
     b.y = groundH(h, b.x, b.z) + Math.sin(k * Math.PI) * 0.12; b.vy = 0;
-    if (k >= 1) { play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [fx, fz]; const d = Math.hypot(h.cup[0] - fx, h.cup[1] - fz) || 1; startSink((h.cup[0] - fx) / d * 0.5, (h.cup[1] - fz) / d * 0.5); sfx('cup'); }
+    if (k >= 1) {
+      play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [fx, fz]; const d = Math.hypot(h.cup[0] - fx, h.cup[1] - fz) || 1; startSink((h.cup[0] - fx) / d * 0.5, (h.cup[1] - fz) / d * 0.5); sfx('cup');
+      if (isLastHole(play.key) && (!play.practice || party.on)) { play.fx.swallow = true; sfx('bell', 0); }
+    }
   } else if (play.phase === 'sunk') {
     const t = (play.fx.sunkT += dt);
     if (!play.fx.sink) startSink(0, 0);
@@ -2330,7 +2359,7 @@ function updateSinkRing(dt) {
 /* the ace replay: the same putt again, from a low cinematic angle beside the line, at 70% speed. Any tap skips. */
 function startReplay() {
   const h = play.hole, [a, p, t0] = play.log[0];
-  play.fx.wantReplay = false;
+  play.fx.wantReplay = false; play.fx.ballHidden = false; play.fx.swallow = false; play.fx.sink = null;
   play.replay = { b: launch(newBall(h, h.tee[0], h.tee[1]), a, p), t: t0, acc: 0, done: false, side: Math.random() < 0.5 ? 1 : -1 };
   play.ball = play.replay.b; play.phase = 'replay'; holeBanner.classList.remove('show');
   replayTag.classList.add('show');
@@ -2475,25 +2504,32 @@ function setRead(on) {
    coloured by its pace (sky blue slow, sun yellow, coral fast), so the break and the bank can be read */
 let traceMesh = null, tracePts = [];
 function recordTrace(b) {
-  if (b.tube) return;
+  /* a tube breaks the line: the ball was under the course, not on it */
+  if (b.tube) { if (tracePts.length && tracePts[tracePts.length - 1] !== null) tracePts.push(null); return; }
   const l = tracePts[tracePts.length - 1];
+  if (l === null) { tracePts.push([b.x, b.y, b.z, Math.hypot(b.vx, b.vz)]); return; }
   if (!l || Math.hypot(b.x - l[0], b.z - l[2]) > 0.025) tracePts.push([b.x, b.y, b.z, Math.hypot(b.vx, b.vz)]);
 }
 function clearTrace() { tracePts = []; if (traceMesh) traceMesh.visible = false; }
 const TRACE_COLS = [new THREE.Color('#6fc0df'), new THREE.Color('#ffd66e'), new THREE.Color('#ef7d6d')];
 function showTrace() {
-  if (tracePts.length < 3) return;
+  if (tracePts.filter(Boolean).length < 3) return;
   if (!traceMesh) {
     traceMesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3 }));
     traceMesh.renderOrder = 2; traceMesh.frustumCulled = false; scene.add(traceMesh);
   }
-  const pos = [], col = [], idx = [], w = 0.007, n = tracePts.length, c = new THREE.Color();
-  for (let i = 0; i < n; i++) {
-    const a = tracePts[Math.max(0, i - 1)], b = tracePts[Math.min(n - 1, i + 1)], p = tracePts[i], dx = b[0] - a[0], dz = b[2] - a[2], d = Math.hypot(dx, dz) || 1;
-    const sx = dz / d * w, sz = -dx / d * w, k = Math.min(1, p[3] / 3) * 2, fade = Math.min(1, i / 4, (n - 1 - i) / 4);
-    c.copy(TRACE_COLS[Math.min(1, Math.floor(k))]).lerp(TRACE_COLS[Math.min(2, Math.floor(k) + 1)], k - Math.floor(k)).multiplyScalar(0.4 + 0.6 * fade);
-    pos.push(p[0] + sx, p[1] + 0.004, p[2] + sz, p[0] - sx, p[1] + 0.004, p[2] - sz); col.push(c.r, c.g, c.b, c.r, c.g, c.b);
-    if (i) idx.push(i * 2 - 2, i * 2 - 1, i * 2, i * 2 - 1, i * 2 + 1, i * 2);
+  const pos = [], col = [], idx = [], w = 0.007, c = new THREE.Color(), runs = [[]];
+  for (const p of tracePts) { if (p === null) runs.push([]); else runs[runs.length - 1].push(p); }
+  for (const run of runs) {
+    const n = run.length, base = pos.length / 6;
+    for (let i = 0; i < n; i++) {
+      const a = run[Math.max(0, i - 1)], b = run[Math.min(n - 1, i + 1)], p = run[i], dx = b[0] - a[0], dz = b[2] - a[2], d = Math.hypot(dx, dz) || 1;
+      const sx = dz / d * w, sz = -dx / d * w, k = Math.min(1, p[3] / 3) * 2, fade = Math.min(1, i / 4, (n - 1 - i) / 4);
+      c.copy(TRACE_COLS[Math.min(1, Math.floor(k))]).lerp(TRACE_COLS[Math.min(2, Math.floor(k) + 1)], k - Math.floor(k)).multiplyScalar(0.4 + 0.6 * fade);
+      pos.push(p[0] + sx, p[1] + 0.004, p[2] + sz, p[0] - sx, p[1] + 0.004, p[2] - sz); col.push(c.r, c.g, c.b, c.r, c.g, c.b);
+      const j = base + i;
+      if (i) idx.push(j * 2 - 2, j * 2 - 1, j * 2, j * 2 - 1, j * 2 + 1, j * 2);
+    }
   }
   traceMesh.geometry.dispose();
   const g = new THREE.BufferGeometry();
@@ -2506,8 +2542,11 @@ let pinTagKey = '';
 function updatePinTag() {
   const show = play.phase === 'aim' && !play.overview && !play.intro && !!play.hole && currentScene === 'hole';
   if (!show) { if (pinTag.classList.contains('show')) pinTag.classList.remove('show'); return; }
-  const h = play.hole, b = play.ball, cy = groundH(h, h.cup[0], h.cup[1]), v = new THREE.Vector3(h.cup[0], cy + 0.86, h.cup[1]).project(camera);
-  if (v.z > 1 || Math.abs(v.x) > 0.92 || v.y > 0.8 || v.y < -0.9) { pinTag.classList.remove('show'); return; }
+  /* anchored just above the cup; when the cup is past the top of the frame the tag rides the top edge,
+     straight above it, so it is there whenever you aim (the aim camera keeps the ball low in frame) */
+  const h = play.hole, b = play.ball, cy = groundH(h, h.cup[0], h.cup[1]), v = new THREE.Vector3(h.cup[0], cy + 0.12, h.cup[1]).project(camera);
+  if (v.z > 1 || Math.abs(v.x) > 0.95 || v.y < -0.9) { pinTag.classList.remove('show'); return; }
+  v.x = clamp(v.x, -0.78, 0.6); v.y = Math.min(v.y, 0.55);
   const d = Math.hypot(h.cup[0] - b.x, h.cup[1] - b.z), rise = Math.round((cy - b.y) * 100), key = d.toFixed(1) + '/' + rise;
   if (key !== pinTagKey) {
     pinTagKey = key; pinTagD.textContent = d.toFixed(1);
@@ -3259,7 +3298,7 @@ const activeConfetti = () => confetti.filter(m => m.visible).length;
 const PIN_NEAR = 1.2;
 function pinWanted() {
   const h = play.hole, b = play.ball, ph = play.phase;
-  if (ph === 'sunk' || ph === 'auto' || ph === 'done') return 1;
+  if (ph === 'sunk' || ph === 'auto' || ph === 'done' || ph === 'replay') return 1;
   if ((ph === 'roll' || ph === 'drift') && !b.tube && Math.hypot(b.x - h.cup[0], b.z - h.cup[1]) < PIN_NEAR) return 1;
   if (ph === 'aim' && Math.hypot(b.x - h.cup[0], b.z - h.cup[1]) < PIN_NEAR * 0.6) return 1;
   return 0;

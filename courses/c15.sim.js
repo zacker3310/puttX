@@ -18,7 +18,7 @@ registerWorld(15, (() => {
       zones: [sand(rect(-0.8, 2.0, 0.1, 2.8))], bumps: [{ x: 0.9, z: 5.3, r: 0.45, h: 0.14 }],
       tubes: [{ a: [-0.45, 5.6], b: [2.25, 4.6], dir: 0 }], posts: [BARREL(1.3, 4.6)] },
     /* 2 drawbridge, then the gangplank up to the deck */
-    { par: 3, sol: [[324,0.88,0.5]], tee: [0.6, 0.5], cup: [-0.6, 6.9], shape: rect(-1.2, 0, 1.2, 7.6),
+    { par: 3, sol: [[322,0.84,0.5],[4,0.88,0]], tee: [0.6, 0.5], cup: [-0.6, 6.9], shape: rect(-1.2, 0, 1.2, 7.6),
       zones: [lagoon(rect(-0.5, 2.6, 1.2, 3.4))], movers: [BRIDGE(-0.78, 2.35, -0.3, 2.35, 0.2, 90, 3.2)],
       ramps: [{ x0: 0.0, z0: 4.4, x1: 1.2, z1: 5.4, axis: 'z', h0: 0, h1: 0.25 }], tiers: [{ poly: rect(-1.3, 5.4, 1.3, 7.7), h: 0.25 }],
       inner: [[[-1.2, 5.4], [0.0, 5.4]]], bumps: [{ x: 0.6, z: 6.7, r: 0.4, h: 0.12 }, { x: -0.6, z: 4.0, r: 0.45, h: 0.15 }], posts: [ANCHOR(0.9, 1.8)] },

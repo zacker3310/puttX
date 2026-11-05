@@ -77,7 +77,11 @@ check('a straight putt from the tee can sink', sinks > 0, 'sinking powers: ' + s
 {
   const lane = S.makeHole({ tee: [0, 0.5], cup: [0, 5.5], shape: S.rect(-0.6, 0, 0.6, 6), posts: [{ x: 0.2, z: 3, r: 0.1 }] });
   const tight = S.restSpot(lane, 0.6 - S.WALL_HALF - S.BALL_R - 0.005, 2), open = S.restSpot(lane, 0.1, 2), post = S.restSpot(lane, 0.2, 3 - 0.1 - S.BALL_R - 0.01);
-  check('a ball at rest against a wall is placed RELIEF_TO out, square to it', Math.abs(tight[1] - 2) < 1e-9 && Math.abs(0.6 - S.WALL_HALF - S.BALL_R - tight[0] - S.RELIEF_TO) < 1e-9, JSON.stringify(tight));
+  const x0 = 0.6 - S.WALL_HALF - S.BALL_R - 0.005;
+  check('a ball at rest against a wall is placed RELIEF_TO out from it, square to it', Math.abs(tight[1] - 2) < 1e-9 && Math.abs(0.6 - S.WALL_HALF - S.BALL_R - tight[0] - S.RELIEF_TO) < 1e-9 && x0 > tight[0], JSON.stringify(tight));
+  /* in a corner it comes out along the bisector, clear of both walls */
+  const box = S.makeHole({ tee: [0, 0.5], cup: [0, 5.5], shape: S.rect(-0.6, 0, 0.6, 6) }), cx = 0.6 - S.WALL_HALF - S.BALL_R - 0.002, cz = 6 - S.WALL_HALF - S.BALL_R - 0.002, cr = S.restSpot(box, cx, cz);
+  check('a ball wedged in a corner comes out clear of both walls', cr[0] < cx - 0.05 && cr[1] < cz - 0.05, JSON.stringify(cr));
   check('a ball in the open stays where it stopped; a ball against a post is moved off it', open[0] === 0.1 && open[1] === 2 && post[1] < 3 - 0.1 - S.BALL_R - 0.1, JSON.stringify([open, post]));
   const r = S.simulatePutt(lane, [0.45, 0.5], 8, 0.5), d = 0.6 - Math.abs(r.x) - S.WALL_HALF - S.BALL_R;
   check('a putt that dies on the rail ends with room to swing', r.end !== 'stop' || d > S.RELIEF_GAP, JSON.stringify(r));

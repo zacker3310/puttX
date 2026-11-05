@@ -36,7 +36,7 @@ registerWorld(19, { holes: [
     movers: [C19_POP(0, 5.6, 0.5, 1.5, 0, 2)],
     posts: [C19_GUM(-1.1, 5.4), C19_GUM(1.2, 5.6)] },
   /* 6: three pads, two candy-cane pipes, a belt on the middle pad */
-  { par: 3, sol: [[38,0.92,0],[2,0.92,0]], tee: [0, 0.5], cup: [0.2, 8.8], aim0: 20,
+  { par: 3, sol: [[10,0.92,0],[6,0.92,0]], tee: [0, 0.5], cup: [0.2, 8.8], aim0: 20,
     floors: [rect(-0.8, 0, 0.8, 2.6), rect(1.4, 3.2, 3.6, 6.0), rect(-0.8, 7, 0.8, 9.4)],
     walls: [ring(rect(-0.8, 0, 0.8, 2.6)), ring(rect(1.4, 3.2, 3.6, 6.0)), ring(rect(-0.8, 7, 0.8, 9.4))],
     zones: [C19_BELT(rect(1.4, 3.2, 3.6, 4.4), 0, 1.0), C19_MUD(-0.8, 8.2, -0.25, 8.35), C19_MUD(0.55, 8.2, 0.8, 9.4)],

@@ -77,7 +77,7 @@ registerWorld(20, { holes: [
   /* 9. (auto) twin whirlwinds: up the rainbow into the gold tube, which fires the ball round the
      banked rail bend into the blue tube, out into the first sky whirlwind; its eye swallows the ball
      into the red tube, which flings it round and round the second whirlwind and down into the cup */
-  { par: 4, auto: true, sol: [[0, 0.8, 0]], tee: [0, 0.5], cup: [-0.6, 8.6], aim0: 0,
+  { par: 4, auto: true, sol: [[0,0.64,0],[120,0.52,0]], tee: [0, 0.5], cup: [-0.6, 8.6], aim0: 0,
     floors: [rect(-0.35, 0, 0.35, 5.0), rect(1.15, 0.8, 1.85, 4.4), C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), rect(3.15, 0.8, 3.85, 4.4),
       C10_PEN(2.5, 7.6, 1.36), C10_PEN(-0.6, 8.6, 1.36)],
     walls: [ring(rect(-0.35, 0, 0.35, 5.0)), [[1.85, 0.8], [1.15, 0.8], ...C10_ARC(2.5, 4.4, 1.35, 270, 450, 12), [3.85, 0.8], [3.15, 0.8]],

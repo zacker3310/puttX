@@ -46,7 +46,7 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
   check('course map: a node per hole, only hole 1 open', map.scene === 'map' && map.nodes === map.holes && map.open === 1, JSON.stringify(map));
   check('map: no words, no small targets', (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(await smallTargets(page)));
   const overlap = await page.evaluate(() => {
-    const rs = [...holePath.querySelectorAll('.node'), mapBack, mapBadge, practiceBtn, mapLost].map(b => b.getBoundingClientRect()), bad = [];
+    const rs = [...holePath.querySelectorAll('.node'), mapBack, mapBadge, practiceBtn, mapLost, partyBtn].map(b => b.getBoundingClientRect()), bad = [];
     rs.forEach((a, i) => rs.forEach((b, j) => { if (j > i && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) bad.push(i + '/' + j); }));
     return bad;
   });
@@ -78,7 +78,7 @@ const sinkHere = `(() => { const h = play.hole; (${sinkFrom})(h.cup[0], h.cup[1]
     startHole(hs[hs.length - 1].key); play.round.strokes = 3; ${sinkHere};
     doneNext.click();
     const pars = hs.reduce((a, h) => a + h.par, 0), total = hs.reduce((a, h) => a + progress.holes[h.key].best, 0);
-    return { scene: currentScene, cells: cardRow.children.length, holes: hs.length, total: cardTotal.textContent, want: String(total), diff: cardDiff.textContent, wantDiff: total - pars,
+    return { scene: currentScene, cells: cardRow.querySelectorAll('.sc.me:not(.sub)').length, holes: hs.length, total: cardTotal.textContent, want: String(total), diff: cardDiff.textContent, wantDiff: total - pars,
       next: getComputedStyle(cardNext).display !== 'none', worlds: progress.worlds.join(), second: playable()[1], c2: WORLDS[w + COURSE_STEP] ? w + COURSE_STEP : 0 };
   })()`);
   check('after the last hole the card shows every hole and the total', card.scene === 'card' && card.cells === card.holes && card.total === card.want, JSON.stringify(card));

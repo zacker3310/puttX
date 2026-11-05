@@ -11,7 +11,9 @@ putting game on an iPad. v1 (27 gentle holes for a 3-5 year old) is superseded.
   (double par auto-sinks) and stars and bests only go up.
 - Every tap target is at least 64 px rendered at iPad landscape (1024x768).
 - Every touch answers instantly with motion and a synthesized sound.
-- Toybox look: vroom's `--v-*` tokens, flat `0 6px 0` shadows, big radii.
+- Toybox UI: vroom's `--v-*` tokens, flat `0 6px 0` shadows, big radii for every button, chip and card.
+- Real course: the 3D scene looks like a real mini golf course (turf with fibre and nap, timber,
+  stone, brick and steel borders, landscaping, a real cup and flag), all drawn procedurally.
 - Honour `prefers-reduced-motion` for anything decorative. No em dashes anywhere.
 - Nothing is stuffed into anything: no prop, wall, post, mover, tube, putter, flagstick or aim
   line ever overlaps another or the ball.
@@ -20,14 +22,29 @@ putting game on an iPad. v1 (27 gentle holes for a 3-5 year old) is superseded.
 
 - **Sources, one shipped file.** `src/shell.html`, `src/game.js`, `src/shop.js`, `courses/cNN.*.js`
   and three.js r170 are assembled by `scripts/build.cjs` into `index.html`.
-- **Hand-rolled deterministic physics**, fixed 240 Hz, in the DOM-free `// #region sim`:
-  - **Ball:** radius 0.051 (15% smaller than v1).
-  - **Rolling:** 5/7 g sin(theta) on slopes, projected onto the ground plane; rolling resistance scales with the normal force.
-  - **Strike:** a skid phase after impact, before true roll.
-  - **Airborne:** crest launch where the ground falls away faster than gravity bends the path; landing bounces; cliff faces on tier steps.
-  - **Surfaces and hazards:** felt, fast, ice, sand and mud; water hazards; conveyor/fan push zones.
+- **Hand-rolled deterministic physics**, fixed 240 Hz, in the DOM-free `// #region sim`. The ball is a
+  rigid sphere with a spin vector; every contact is an impulse at the contact point with a
+  restitution and Coulomb friction (see `docs/research/PHYSICS.md` for the sources):
+  - **Ball:** radius 0.0255, moment of inertia 2/5 m r^2.
+  - **Strike:** the putter launches the ball with no spin; it slides (about the first 17% of the putt)
+    until friction spins it up to a true roll at 5/7 of its launch speed. Launch speeds are set so
+    every power rolls as far on felt as v2 did (full power about 17.5 m).
+  - **Rolling:** 5/7 g sin(theta) on slopes (full g while sliding); rolling resistance scales with the
+    normal force. Felt is about a 12 ft stimp.
+  - **Walls, posts, movers:** met at the ball's equator, so a rolling ball keeps its topspin through the
+    bounce: it checks as the turf grips again and comes off flatter (about 0.46 of its speed into the
+    rail), and a hard knock hops. Movers add their own surface velocity.
+  - **Airborne:** crest launch, landings as impulses against the ground normal (a rolling ball keeps its
+    spin; each surface has its own bounce), cliff faces on tier steps.
+  - **Cup:** a real hole with a rounded lip and a liner. A ball whose centre crosses the lip falls; the
+    far lip turns it in or throws it out. Dead centre catches up to about 2.4 to 2.7 m/s, the edge only
+    a crawling ball; hot balls hop or lip out, firm ones rattle in. The turf dips 6 mm round the cup.
+  - **The border rule:** a ball that stops against a wall or post is placed 12 cm out, square to it
+    (the WMF / PPA rule), so the putter always has room.
+  - **Surfaces and hazards:** felt, fast, ice, sand and mud (each with rolling, sliding and bounce
+    values); water hazards; conveyor/fan push zones.
   - **Obstacles:** posts and bumpers; spinning arms and windmills; sliding discs and gates; tubes.
-  - **Cup:** capture depends on speed and line (a dead-centre ball is caught faster than an edge ball); hot balls hop or lip out.
+  - The sim uses `Math.sqrt` instead of `Math.hypot`, so results match across browser engines.
 - **Holes are data**, proven by `scripts/solve.cjs` (beam search plus fine refinement), and rated by a noisy bot with human aim and pace error.
 - **Courses** register holes and a look (`WORLD_LOOK[n]`). See `docs/COURSE_GUIDE.md`.
 
@@ -45,6 +62,12 @@ putting game on an iPad. v1 (27 gentle holes for a 3-5 year old) is superseded.
 | 8 | Space Station | low-gravity jumps between floating decks, craters, aliens |
 | 9 | Candy Factory | conveyors, bumpers, hard candy, taffy, chocolate river |
 | 10 | Sky Kingdom | everything, floating islands, the finale |
+
+Two extra courses sit outside the worlds, always open, and unlock nothing:
+- **The Classic (98):** the original Putt-Putt kind of course. Flat green carpet, aluminium
+  bumpboards, simple geometric blockers, hills and pipes, every hole a par 2 with an ace possible
+  but rare.
+- **The bonus nine (99):** nine unhinged stunt holes.
 
 Each course has 18 holes, par 2 to 5, at least five 3-4 part holes, and difficulty climbing
 through the course and across courses. At most 2% of tee shots ace any hole. Finishing hole 18
@@ -65,7 +88,10 @@ of this world's courses is finished.
   when there is no room. The aim line drapes over the ground and stops at walls.
 - **Flagstick.** Pulled out and held aside when a ball comes near; the sunk ball rests on the
   cup floor.
-- **Readout.** After each putt: path arrow, strike dot, tempo needle and power.
+- **Readout.** After each putt: path arrow, strike dot, tempo needle and power. The putt's whole line
+  stays painted on the green (coloured by pace) until the next putt.
+- **Pin tag.** While aiming, a tag over the flag gives the distance to the cup in metres and the rise
+  or fall in centimetres.
 
 ## Extras
 
@@ -83,6 +109,18 @@ of this world's courses is finished.
 - **Practice.** The target on the map: every hole of an open course, free take-backs, nothing saved.
 - **Neon night.** A display mode for any course (the moon on a world map, or in settings): black-light
   carpet, neon tube walls, a glowing ball and a lit cup. Saved with the progress.
+
+- **Pass and play.** The three balls on a course map start a round for 2 to 4 players on one device.
+  Each plays the hole out in turn with their own ball colour; a scoreboard crowns the best score and
+  the honour (who putts first) passes to it. The course ends on a scorecard with a row per player.
+  Nothing is saved.
+- **Scorecard.** The end of a course shows a real paper scorecard: hole numbers, par and score rows,
+  a subtotal per nine, birdies circled and bogeys boxed.
+- **The last hole.** The cup on each course's last hole keeps the ball: it rattles away down the return
+  pipe and the clubhouse bell rings (three times for an ace).
+- **Sound.** Wall knocks sound like the border (aluminium rings, timber tocks, stone clacks), the roll
+  is heard and coloured by the surface, and each course has a quiet soundscape (birds, crickets,
+  wind, water). Haptics where the device has them.
 
 ## Pro shop
 
@@ -116,6 +154,7 @@ Missing or corrupt data falls back to a fresh save. v1 saves are left alone.
 | save | persistence |
 | perf | the iPad budget |
 | shop | the pro shop |
+| party | pass and play |
 | lint | 0 findings |
 
 See `docs/RESEARCH.md` for the next 20 features.

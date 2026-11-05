@@ -14,7 +14,7 @@ and w + 20 (world 3 is courses 3, 13 and 23). Each course is two files:
 
 Units are metres and seconds, and y is up. A hole lies in the x-z plane, and the tee usually sits near z = 0.5 with play heading toward +z.
 - **Angles** are degrees, 0 is +z and 90 is +x. On screen, from behind the ball, +x is to the **left**.
-- **Ball** radius is 0.051 and **cup** radius is 0.11.
+- **Ball** radius is 0.0255 and **cup** radius is 0.099.
 - **Walls** are 0.1 thick (`WALL_HALF` 0.05) and stand 0.15 over the highest ground next to them.
 - **Full power** rolls about 17 m on felt. Keep holes inside about 14 x 14 m; most are 3-8 m long.
 - **Lanes** need to be at least 0.6 m wide between wall centre lines, and choke points at least 0.4 m (the ball is 0.1 wide).
@@ -65,9 +65,13 @@ registerWorld(N, { g: 1, feltMu: 0.075, holes: [
   - A rolling ball whose centre comes within 0.12 of mouth `a` vanishes for 0.45 s.
   - It then comes out at `b` heading `dir` at `speed * keep + add` (defaults 0.7 and 0.3).
   - Mouths and exits must sit on flat floor, at least 0.19 from wall lines. The exit needs 0.3 m of clear floor in its direction.
-- **Cup** capture:
-  - A ball over the cup drops if it is slower than 1.45 m/s times the chord factor `sqrt(1 - (offset/0.11)^2)`. A ball crawling at under 0.22 m/s always drops.
-  - A faster dead-centre ball hops out. A faster off-centre ball lips out, deflected more the further off-centre it is.
+- **Cup:** a real hole. A ball whose centre crosses the lip falls; the far lip turns it in or throws it out.
+  - Dead centre drops up to about 2.4 to 2.7 m/s; the further off centre, the slower it must be. An edge ball only drops crawling.
+  - Hot balls hop out over the back or lip out round the side; firm ones rattle the liner and drop.
+  - The turf dips 6 mm within 0.22 m of the cup, so a dying putt is drawn in a little.
+- **Walls** meet the ball at its equator: a rolling ball comes off a rail at about half its speed into the rail and flatter
+  than it went in, then checks as it grips again. Banks are real but dead; a hard knock hops.
+- **The border rule:** a ball that stops with its edge within 2.5 cm of a wall or post is placed 12 cm out, square to it.
 - **`aim0`** is the opening aim at the tee in degrees. Set it whenever the cup is not the way to go from the tee: blind doglegs, tubes, bank shots.
 - **`par`** is 2 to 5. The stroke cap is double par: the ball auto-sinks and the hole scores double par, so there are no fail states.
 - **`sol`** is a list of `[angle, power, t0]` from `scripts/solve.cjs`. `holes-check` replays it, so it must sink within par.
@@ -125,14 +129,25 @@ or a lag and a tap-in.
 
 An auto hole is a Rube Goldberg ride: at least 4 stages, e.g. a chute, a banked turn, a tube that
 spits the ball at a fixed speed into a drain that spirals it round and round into the cup, or a
-drain whose drop leads into a second drain. It must still nearly play itself (the holes-check rule).
+drain whose drop leads into a second drain. It must still nearly play itself (the holes-check rule:
+its `sol` is one ace, and at least 11 of the 21 putts within 0.6 degrees and 0.036 power of it ace too).
+
+Lessons from re-proving every auto hole under the real cup (no magnet pulls a slow ball in any more):
+
+- **Centre the cup's bowl on the cup** and give it `flat: 0.12`. A wider flat bottom leaves a ring
+  beside the cup where a slow, spiralling ball simply stops.
+- **Centre each fling in its window.** With `keep: 0` everything after a tube is deterministic, so
+  scan the tube's `add` (and `dir`) and pick the middle of the range that sinks, not one lucky value.
+- **Put a tube mouth where the ball really runs.** A ball round a banked bend rides the outside rail;
+  20-9's mouth moved under that line instead of the lane's centre.
+- `node scripts/resolve.cjs --course N` checks and searches auto holes by this rule.
 
 ## Design brief: harder, for 12-year-olds
 
 - **Shape of a course:** holes 1-5 are a warm-up that teaches the course's signature mechanic, 6-12 combine it with others, 13-18 are hard, and hole 18 is the showpiece.
 - **Multi-part holes:** at least 5 holes per course are crazy 3-4 part holes. That means 3 or 4 distinct sections joined by ramps, drops, tubes or gaps: upper deck, then tube, then lower green, then a guarded cup.
 - **Drains** (`drains: [{ x, z, r, depth, flat? }]`): a coin-funnel bowl. Its bottom is flat out to
-  `flat` (default 0.18, so a cup at its centre sits on flat ground); outside that the floor rises,
+  `flat` (default CUP_R + 0.07, about 0.17; use 0.12 under a cup, see above); outside that the floor rises,
   gently at the rim and steeply near the middle. A ball fed in sideways at the right pace spirals
   round one to three laps before it drops; too slow and it stops on the shallow rim. Feed one from a
   tube with `keep: 0` and a fixed `add` for a deterministic spiral. Depth 0.2 to 0.35, r 0.9 to 1.6.

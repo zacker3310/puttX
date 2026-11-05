@@ -7,11 +7,11 @@
 const vm = require('vm');
 const { simSource, parseOnly } = require('../scripts/build.cjs');
 
-const NAMES = ['SIM_DT', 'BALL_R', 'CUP_R', 'CAP_V0', 'MIN_V', 'MAX_V', 'V_CAP', 'WALL_HALF', 'WALL_TOP', 'G', 'SURF', 'TUBE_R',
+const NAMES = ['SIM_DT', 'BALL_R', 'CUP_R', 'MIN_V', 'MAX_V', 'V_CAP', 'WALL_HALF', 'WALL_TOP', 'G', 'SURF', 'TUBE_R',
   'STEP_MAX', 'rect', 'ring', 'makeHole', 'inPoly', 'onFloor', 'zoneAt', 'baseAt', 'groundH', 'groundGrad', 'closestOnSeg', 'moverState',
   'moverTouch', 'newBall', 'launch', 'stepBall', 'simulatePutt', 'newRound', 'capOf', 'starsFor', 'resolvePutt',
-  'resolveDrift', 'WORLD_ORDER', 'HOLES_PER', 'WORLDS', 'registerWorld', 'holeAt', 'nextKey', 'playable', 'allCourses', 'coursesOf', 'worldOf', 'COURSE_STEP', 'GLIDE', 'BONUS', 'SKID_END', 'DRAIN_FLAT', 'drainY', 'FELT_MU', 'freshProgress', 'recordHole',
-  'holeUnlocked'];
+  'resolveDrift', 'WORLD_ORDER', 'HOLES_PER', 'WORLDS', 'registerWorld', 'holeAt', 'nextKey', 'playable', 'allCourses', 'coursesOf', 'worldOf', 'COURSE_STEP', 'GLIDE', 'BONUS', 'SPIN_I', 'WALL_E', 'WALL_MU', 'RIM_E', 'SUNK_DEPTH', 'DISH_R', 'DISH_D', 'dishY', 'impulse', 'cupContact', 'ROLL', 'DRAIN_FLAT', 'drainY', 'FELT_MU', 'freshProgress', 'recordHole',
+  'holeUnlocked', 'dsin', 'dcos', 'dexp', 'CLASSIC', 'EXTRAS', 'isExtra', 'restSpot', 'RELIEF_GAP', 'RELIEF_TO', 'STATIC_MU'];
 
 function regionSource(only = parseOnly(process.env.PUTTX_ONLY)) { return simSource(only); }
 function loadSim(only) {

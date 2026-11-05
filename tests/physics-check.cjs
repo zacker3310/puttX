@@ -1,5 +1,6 @@
-/* physics-check (Node): the hand-rolled ball physics. Rolling stops and skids first, the cup
-   captures by speed and line (dead centre beats the edge; too hot hops or lips out), walls bank,
+/* physics-check (Node): the hand-rolled rigid-ball physics. A putt slides, then rolls at 5/7 of its
+   launch speed; the cup is a real hole (dead centre beats the edge; too hot hops or lips out off the
+   far lip, firm rattles in); a rolling ball checks off a rail and a hard knock hops; walls bank,
    surfaces change roll-out, slopes break the ball with the exact incline force, crests launch it,
    landings bounce, cliffs stop it, tiers and ramps carry it up, tubes move it, water and the void
    cost a stroke, conveyors push, movers (arms, windmills, gates, discs) hit it, results are
@@ -13,22 +14,36 @@ const R = S.BALL_R + S.WALL_HALF;
 check('ball is half the v2 ball (0.051)', Math.abs(S.BALL_R - 0.0255) < 1e-9, String(S.BALL_R));
 const straight = S.makeHole({ par: 2, tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 4) });
 
-/* 1. a soft putt stops on the felt; a struck ball skids before it rolls */
+/* 1. a soft putt stops on the felt; a struck ball slides, and the turf spins it up to a true roll */
 const soft = S.simulatePutt(straight, [0, 0.5], 0, 0);
 check('soft putt stops on the felt', soft.end === 'stop' && soft.z > 0.55 && soft.z < 0.8 && Math.abs(soft.x) < 1e-9, JSON.stringify(soft));
 {
-  const b = S.launch(S.newBall(straight, 0, 0.5), 0, 0.5), v0 = Math.hypot(b.vx, b.vz);
-  let t = 0, n = 0; while (b.skid > 0 && n < 2000) { S.stepBall(straight, b, t); t += S.SIM_DT; n++; }
-  check('the struck ball skids, then rolls once it has shed ~8%', n > 5 && n < 200 && Math.abs(Math.hypot(b.vx, b.vz) / v0 - S.SKID_END) < 0.02, JSON.stringify({ n, ratio: Math.hypot(b.vx, b.vz) / v0 }));
+  const lane = S.makeHole({ tee: [0, 0.5], cup: [0, 39.5], shape: S.rect(-0.6, 0, 0.6, 40) });
+  const b = S.launch(S.newBall(lane, 0, 0.5), 0, 0.6), v0 = Math.hypot(b.vx, b.vz);
+  let t = 0, n = 0, end = null, slid = null, vr = 0;
+  for (; !end && n < 240 * 40; n++) { end = S.stepBall(lane, b, t); t += S.SIM_DT; if (slid === null && !b.slide) { slid = b.z - 0.5; vr = Math.hypot(b.vx, b.vz); } }
+  const total = b.z - 0.5, spinOk = Math.abs(b.wx) < 1e-9;
+  check('a putt launches with no spin, slides, then rolls at about 5/7 of its launch speed', Math.abs(vr / v0 - 5 / 7) < 0.06, JSON.stringify({ ratio: +(vr / v0).toFixed(3) }));
+  check('the slide covers 10-25% of the putt, as on a real green', slid / total > 0.1 && slid / total < 0.25, JSON.stringify({ slid: +slid.toFixed(2), total: +total.toFixed(2) }));
+  const r = S.launch(S.newBall(lane, 0, 0.5), 0, 0.6);
+  for (let i = 0; i < 240; i++) S.stepBall(lane, r, i * S.SIM_DT);
+  check('a rolling ball spins exactly with its speed (v = w R)', !r.slide && Math.abs(r.wx * S.BALL_R - r.vz) < 1e-9 && spinOk, JSON.stringify({ wR: r.wx * S.BALL_R, vz: r.vz }));
 }
 
-/* 2. the cup: slow drops, centre catches faster balls than the edge, hot balls hop or lip out */
+/* 2. the cup is a real hole: slow drops, the centre catches faster balls than the edge, a hot ball
+   strikes the far lip and hops or lips out, a firm one rattles the liner and drops */
 const longCup = S.makeHole({ tee: [0, 0.5], cup: [0, 3.5], shape: S.rect(-0.6, 0, 0.6, 12) });
-const over = (x, v) => { const b = S.newBall(longCup, x, 3.5 - S.CUP_R - 0.01); b.vz = v; let t = 0, end = null; for (let i = 0; i < 400 && !end; i++) { end = S.stepBall(longCup, b, t); t += S.SIM_DT; } return { end, hits: b.hits.map(h => h[0]) }; };
+const over = (x, v) => { const b = S.newBall(longCup, x, 3.5 - S.CUP_R - 0.012); b.vz = v; b.wx = v / S.BALL_R; let t = 0, end = null; for (let i = 0; i < 2400 && !end; i++) { end = S.stepBall(longCup, b, t); t += S.SIM_DT; } return { end, hits: b.hits.map(h => h[0]) }; };
+const capV = x => { let v = 0; for (let u = 0.05; u <= 4.0001; u += 0.05) { if (over(x, u).end === 'sunk') v = u; else if (v) break; } return +v.toFixed(2); };
+const caps = [0, 0.04, 0.07, 0.09].map(capV);
 check('a slow ball over the cup is sunk', over(0, 0.5).end === 'sunk');
-check('dead centre at 1.9 m/s drops, but 1.9 m/s along the edge lips out', over(0, 1.9).end === 'sunk' && over(0.085, 1.9).hits.includes('lip'), JSON.stringify([over(0, 1.9), over(0.085, 1.9)]));
-check('dead centre at 2.2 m/s hops the cup', over(0, 2.2).hits.includes('lip') && over(0, 2.2).end !== 'sunk');
+check('dead centre catches up to 2.2-3.1 m/s (Holmes, for this ball and cup)', caps[0] >= 2.2 && caps[0] <= 3.1, JSON.stringify(caps));
+check('the further off centre, the slower it must be to drop', caps.every((c, i) => i === 0 || c < caps[i - 1]), JSON.stringify(caps));
+check('dead centre at 3.6 m/s strikes the far lip and hops out', over(0, 3.6).end !== 'sunk' && over(0, 3.6).hits.includes('lip'), JSON.stringify(over(0, 3.6)));
+check('1.9 m/s along the edge lips out', over(0.085, 1.9).end !== 'sunk' && over(0.085, 1.9).hits.includes('lip'), JSON.stringify(over(0.085, 1.9)));
+check('a firm putt can rattle the liner and still drop', [1.8, 2, 2.2, 2.4, 2.6, 2.8].some(v => { const r = over(0, v); return r.end === 'sunk' && r.hits.includes('rattle'); }));
 check('a crawling ball at the very edge still drops', over(0.1, 0.15).end === 'sunk');
+check('the turf dips a few mm toward the cup, flat at the bottom', Math.abs(S.groundH(longCup, 0, 3.5) + S.DISH_D) < 1e-9 && S.groundH(longCup, 0, 3.5 + S.DISH_R) === 0 && S.groundH(longCup, 0, 3.6) < S.groundH(longCup, 0, 3.65));
 
 /* 3. some straight power from the tee sinks it */
 let sinks = 0;
@@ -41,6 +56,36 @@ check('a straight putt from the tee can sink', sinks > 0, 'sinking powers: ' + s
   let t = 0, hit = false;
   for (let i = 0; i < 2000 && !hit; i++) { S.stepBall(straight, b, t); t += S.SIM_DT; hit = b.hits.some(h => h[0] === 'wall'); }
   check('wall hit reflects the ball back across the lane', hit && b.vx < 0 && b.x <= 0.6 - R + 1e-9, JSON.stringify({ x: b.x, vx: b.vx }));
+}
+/* a rolling ball meets a rail at its equator: it keeps its topspin through the bounce, so it checks
+   as the turf grips again and comes off flatter; a hard knock lifts it off the turf */
+{
+  const box = S.makeHole({ tee: [0, 0.5], cup: [0, 0.4], shape: S.rect(-20, 0, 20, 6) });
+  const rail = (v, ang) => {
+    const a = ang * Math.PI / 180, b = S.newBall(box, 0, 5.5); b.vx = Math.sin(a) * v; b.vz = Math.cos(a) * v; b.wx = b.vz / S.BALL_R; b.wz = -b.vx / S.BALL_R;
+    let t = 0, pre = null, after = null, hop = 0, k = 0;
+    for (let i = 0; i < 4800 && !after; i++) { const pv = [b.vx, b.vz]; S.stepBall(box, b, t); t += S.SIM_DT; if (!pre && b.hits.length) pre = pv; if (pre) { k++; hop = Math.max(hop, b.y); if (k > 30 && !b.slide && !b.air) after = [b.vx, b.vz]; } }
+    return { n: -after[1] / pre[1], t: ang ? after[0] / pre[0] : 1, out: Math.atan2(after[0], -after[1]) * 180 / Math.PI, hop };
+  };
+  const a = rail(1.5, 30), hard = rail(3, 0);
+  check('off a rail the ball checks: 35-60% of its speed into the rail comes back once it rolls again', a.n > 0.35 && a.n < 0.6 && a.t > 0.65 && a.t < 0.95, JSON.stringify(a));
+  check('it comes off flatter than it went in', a.out > 34, JSON.stringify(a));
+  check('a hard knock straight into a rail makes the ball hop', hard.hop > 0.01 && rail(0.9, 0).hop === 0, JSON.stringify(hard));
+}
+
+/* the real rule for a ball against the border: it is placed out, square to the wall, so the putter has room */
+{
+  const lane = S.makeHole({ tee: [0, 0.5], cup: [0, 5.5], shape: S.rect(-0.6, 0, 0.6, 6), posts: [{ x: 0.2, z: 3, r: 0.1 }] });
+  const tight = S.restSpot(lane, 0.6 - S.WALL_HALF - S.BALL_R - 0.005, 2), open = S.restSpot(lane, 0.1, 2), post = S.restSpot(lane, 0.2, 3 - 0.1 - S.BALL_R - 0.01);
+  const x0 = 0.6 - S.WALL_HALF - S.BALL_R - 0.005;
+  check('a ball at rest against a wall is placed RELIEF_TO out from it, square to it', Math.abs(tight[1] - 2) < 1e-9 && Math.abs(0.6 - S.WALL_HALF - S.BALL_R - tight[0] - S.RELIEF_TO) < 1e-9 && x0 > tight[0], JSON.stringify(tight));
+  /* in a corner it comes out along the bisector, clear of both walls */
+  const box = S.makeHole({ tee: [0, 0.5], cup: [0, 5.5], shape: S.rect(-0.6, 0, 0.6, 6) }), cx = 0.6 - S.WALL_HALF - S.BALL_R - 0.002, cz = 6 - S.WALL_HALF - S.BALL_R - 0.002, cr = S.restSpot(box, cx, cz);
+  check('a ball wedged in a corner comes out clear of both walls', cr[0] < cx - 0.05 && cr[1] < cz - 0.05, JSON.stringify(cr));
+  check('a ball in the open stays where it stopped; a ball against a post is moved off it', open[0] === 0.1 && open[1] === 2 && post[1] < 3 - 0.1 - S.BALL_R - 0.1, JSON.stringify([open, post]));
+  /* a putt that really comes to rest against the right rail (without relief its gap is about 1 mm) */
+  const r = S.simulatePutt(lane, [0.45, 0.5], 4, 0.2), d = 0.6 - Math.abs(r.x) - S.WALL_HALF - S.BALL_R;
+  check('a putt that dies on the rail ends with room to swing', r.end === 'stop' && d > S.RELIEF_GAP, JSON.stringify(r));
 }
 
 /* 5. surfaces: ice > fast > felt > sand > mud roll-out; full power rolls about 17 m */
@@ -59,7 +104,7 @@ check('groundH matches the bump peak', Math.abs(S.groundH(hill, 0.3, 2.5) - 0.12
 {
   /* a ball rolling down a 1:2 tilted tier accelerates at 5/7 g sin(theta) cos(theta) horizontally, less rolling resistance */
   const tilt = S.makeHole({ tee: [0, 2], cup: [0, 9], shape: S.rect(-1, 0, 1, 10), tiers: [{ poly: S.rect(-1, 0, 1, 10), h: 5, sz: -0.5 }] });
-  const b = S.newBall(tilt, 0, 2); b.skid = 0;
+  const b = S.newBall(tilt, 0, 2);
   for (let i = 0; i < 24; i++) S.stepBall(tilt, b, i * S.SIM_DT);
   const a = b.vz / (24 * S.SIM_DT), want = S.G * 5 / 7 * 0.5 / 1.25 - S.SURF.felt.mu * S.G / Math.sqrt(1.25);   /* minus rolling resistance */
   check('incline force is 5/7 g sin(theta), projected', Math.abs(a - want) / want < 0.08, JSON.stringify({ a, want }));
@@ -123,6 +168,13 @@ check('fuzz: 1080 putts stay on the floor and terminate', bad.length === 0, JSON
 /* 14. the sim region never reads clocks or randomness */
 const src = regionSource();
 check('sim region is deterministic and DOM-free', !/Math\.random|Date\b|performance|document|window|THREE/.test(src));
+{
+  /* the trig the sim uses is fdlibm in plain arithmetic: Node's exact bits in every engine */
+  let same = true, seed = 99; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 20000 && same; i++) { const x = (rnd() - 0.5) * 60; same = Object.is(S.dsin(x), Math.sin(x)) && Object.is(S.dcos(x), Math.cos(x)) && Object.is(S.dexp(-Math.abs(x)), Math.exp(-Math.abs(x))); }
+  const raw = src.replace(/const \{ dsin, dcos, dexp \}[\s\S]*?\}\)\(\);/, '');
+  check('the sim and every course pack call dsin, dcos and dexp, never Math.sin, cos or exp (engines differ there)', same && !/Math\.(sin|cos|exp|pow)\(|\*\*/.test(raw), same ? 'a Math trig call remains' : 'port differs from Node');
+}
 
 /* ---- obstacles ---- */
 const posted = S.makeHole({ tee: [0, 0.5], cup: [0, 4.5], shape: S.rect(-0.6, 0, 0.6, 5), posts: [{ x: 0, z: 2, r: 0.15 }] });
@@ -166,7 +218,7 @@ check('a ball held at the lip of a mound cup settles', lip.end !== 'timeout', JS
    fed in fast and sideways spirals down and drops */
 {
   const dh = S.makeHole({ tee: [-1.6, 0.4], cup: [0, 2.5], shape: S.rect(-2, 0, 2, 4.5), drains: [{ x: 0, z: 2.5, r: 1.3, depth: 0.32 }] });
-  const flat = [0, 1, 2, 3].every(k => Math.abs(S.groundH(dh, k * 0.03, 2.5) + 0.32) < 1e-9);
+  const flat = [0, 1, 2, 3].every(k => Math.abs(S.groundH(dh, k * 0.03, 2.5) - S.dishY(k * 0.03)[0] + 0.32) < 1e-9);
   const steeper = S.groundH(dh, 0.6, 2.5) - S.groundH(dh, 0.4, 2.5) > S.groundH(dh, 1.2, 2.5) - S.groundH(dh, 1.0, 2.5);
   let laps = 0, best = null;
   for (let p = 0.3; p <= 0.9 && !best; p += 0.02) {

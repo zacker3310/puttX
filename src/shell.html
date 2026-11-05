@@ -121,12 +121,23 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #card { background: var(--v-scrim); }
 #cardPanel { position: absolute; left: 110px; top: 90px; width: 980px; height: 520px; border-radius: var(--v-r-xl); background: var(--v-surface);
   border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .4s cubic-bezier(.3, 1.6, .5, 1) both; }
-#cardRow { position: absolute; left: 40px; right: 40px; top: 50px; display: grid; grid-template-columns: repeat(9, 1fr); gap: 10px; }
-#cardRow .cell { height: 150px; border-radius: var(--v-r-md); background: var(--v-surface-2); display: grid; place-items: center; font: 800 54px var(--v-font); color: var(--v-ink-strong); }
-#cardRow .cell small { font-size: 22px; color: var(--v-ink-soft); }
-#cardRow .cell.under { background: var(--v-accent-green); color: #fff; }
-#cardRow .cell.par { background: var(--v-accent-yellow); }
-#cardSum { position: absolute; left: 0; right: 0; top: 240px; display: flex; justify-content: center; align-items: center; gap: 40px; font: 800 96px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+/* the scorecard: cream card stock, ruled blue, a red margin, each nine its own block */
+#cardRow { position: absolute; left: 36px; right: 36px; top: 30px; display: flex; flex-direction: column; gap: 14px; }
+#cardRow .nine { display: grid; border-radius: var(--v-r-md); overflow: hidden; background: #fffdf3; border: 3px solid #d9cfb4;
+  background-image: repeating-linear-gradient(#fffdf3 0 45px, #c9dbe8 45px 47px); }
+#cardRow .sc { height: 47px; display: grid; place-items: center; font: 800 28px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; border-left: 2px solid #e6dcc2; }
+#cardRow .sc.hd { color: var(--v-ink-soft); font-size: 22px; background: #f3ead2; }
+#cardRow .sc.lb { border-left: none; border-right: 3px solid #ef9a8a; }
+#cardRow .sc.lb svg { width: 34px; height: 34px; }
+#cardRow .sc.par { color: var(--v-ink-soft); }
+#cardRow .sc.sub { background: #f6efd9; font-size: 30px; }
+#cardRow .sc.hd.sub { font-size: 20px; }
+#cardRow .mk { display: grid; place-items: center; width: 38px; height: 38px; box-sizing: border-box; color: #2f5d8a; }
+#cardRow .mk.b { border: 3px solid #2f5d8a; border-radius: 50%; }
+#cardRow .mk.e { border: 5px double #2f5d8a; border-radius: 50%; }
+#cardRow .mk.o { border: 3px solid #2f5d8a; border-radius: 4px; }
+#cardRow .mk.d { border: 5px double #2f5d8a; border-radius: 4px; }
+#cardSum { position: absolute; left: 0; right: 0; top: 352px; display: flex; justify-content: center; align-items: center; gap: 40px; font: 800 80px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
 #cardDiff { font-size: 60px; color: var(--v-ink-soft); }
 #cardStars { display: flex; align-items: center; gap: 8px; font-size: 60px; }
 #cardStars svg { width: 64px; height: 64px; fill: var(--v-accent-yellow); stroke: var(--v-yellow-line); stroke-width: 3; }
@@ -161,10 +172,61 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #holePath .node .star { width: 22px; height: 22px; }
 #holePath .node .stars { top: -28px; }
 #holePath .node .best { bottom: -32px; font-size: 24px; }
-#cardRow { grid-template-columns: repeat(9, 1fr); gap: 8px; top: 30px; }
-#cardRow .cell { height: 92px; font-size: 40px; }
-#cardRow .cell small { font-size: 18px; }
-#cardSum { top: 250px; }
+#cardRow { top: 26px; }
+#cardSum { top: 352px; }
+#pinTag { position: absolute; display: none; translate: -50% -100%; height: 44px; padding: 0 12px 0 6px; align-items: center; gap: 4px; pointer-events: none;
+  border-radius: 14px; background: rgba(255, 253, 247, .92); border: 3px solid var(--v-surface-line); font: 800 26px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; z-index: 1; }
+#pinTag.show { display: flex; }
+#pinTag svg { width: 34px; height: 34px; }
+#pinTag .ar { display: none; width: 26px; height: 26px; }
+#pinTag.up .ar, #pinTag.down .ar { display: block; }
+#pinTag.down .ar { transform: scaleY(-1); } #pinTag.down .ar path { fill: #ef7d6d; }
+/* ---------- 10. PASS AND PLAY ---------- */
+.pball { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 4px solid rgba(74, 56, 38, .35); box-shadow: inset -4px -5px 0 rgba(0, 0, 0, .12); flex: none; }
+.pball b { font: 800 22px var(--v-font); color: var(--v-ink-strong); }
+#partyBtn { right: 124px; top: 24px; left: auto; }
+#partyBtn svg { width: 74%; height: 74%; }
+#partyPick { position: absolute; inset: 0; display: none; background: var(--v-scrim); z-index: 4; }
+#partyPick.show { display: block; }
+#partyPickPanel { position: absolute; left: 230px; top: 170px; width: 740px; height: 360px; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .3s cubic-bezier(.3, 1.6, .5, 1) both; }
+#partyPickPanel .pn { position: absolute; top: 70px; width: 196px; height: 196px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 8px; padding: 18px; }
+#partyPickPanel .pn .pball { width: 64px; height: 64px; }
+#partyPickPanel .pn .pball b { font-size: 30px; }
+#partyN2 { left: 40px; } #partyN3 { left: 266px; } #partyN4 { left: 492px; }
+#partyPickClose { right: -30px; top: -30px; }
+#partyChip { left: 452px; top: 30px; display: none; padding: 0 14px; }
+#partyChip.show { display: flex; }
+#partyPass { position: absolute; inset: 0; display: none; border: 0; padding: 0; background: var(--v-scrim); z-index: 5; cursor: pointer; }
+#partyPass.show { display: grid; place-items: center; }
+#partyPass .pball { width: 150px; height: 150px; border-width: 8px; animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#partyPass .pball b { font-size: 76px; }
+#partyDone { position: absolute; left: 340px; top: 110px; width: 520px; height: 470px; display: none; border-radius: var(--v-r-xl); background: var(--v-surface);
+  border: 6px solid var(--v-surface-line); box-shadow: var(--v-shadow-card); animation: popIn .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+#partyDone.show { display: block; }
+#partyRows { position: absolute; left: 40px; right: 40px; top: 30px; display: flex; flex-direction: column; gap: 10px; }
+.prow { display: grid; grid-template-columns: 64px 1fr 72px 90px; align-items: center; height: 66px; padding: 0 12px; border-radius: var(--v-r-md); background: var(--v-surface-2); font: 800 44px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
+.prow .ps { text-align: center; } .prow .pt { text-align: right; color: var(--v-ink-soft); font-size: 34px; }
+.prow .crown, #cardStars .crown { width: 56px; height: 56px; }
+#partyMap { left: 60px; bottom: 34px; }
+#partyNextBtn { right: 60px; bottom: 34px; width: 140px; }
+#cardPanel.party #cardRow .sc { height: 30px; font-size: 22px; }
+#cardPanel.party #cardRow .nine { background-image: repeating-linear-gradient(#fffdf3 0 28px, #c9dbe8 28px 30px); }
+#cardPanel.party #cardRow .sc.lb svg { width: 26px; height: 26px; }
+#cardPanel.party #cardRow .mk { width: 30px; height: 26px; font-size: 17px; border-width: 2px; }
+#cardPanel.party #cardRow .mk.e, #cardPanel.party #cardRow .mk.d { border-width: 4px; }
+#cardPanel.party #cardRow .sc .pball { width: 26px; height: 26px; border-width: 3px; }
+#cardPanel.party #cardRow .sc .pball b { font-size: 14px; }
+#cardPanel.party #cardSum { top: 404px; font-size: 64px; }
+/* four players: six rows a nine, so each row is tighter and the back nine ends above the map button */
+#cardPanel.party.p4 #cardRow { top: 18px; gap: 8px; }
+#cardPanel.party.p4 #cardRow .sc { height: 26px; font-size: 20px; }
+#cardPanel.party.p4 #cardRow .nine { background-image: repeating-linear-gradient(#fffdf3 0 24px, #c9dbe8 24px 26px); }
+#cardPanel.party.p4 #cardRow .mk { height: 22px; }
+#cardPanel.party.p4 #cardRow .sc .pball { width: 22px; height: 22px; }
+#cardTotal { display: flex; align-items: center; gap: 14px; }
+#cardTotal .pball { width: 72px; height: 72px; } #cardTotal .pball b { font-size: 36px; }
+@media (prefers-reduced-motion: reduce) { #partyPickPanel, #partyPass .pball, #partyDone { animation: none; } }
 /* ---------- 9. PRO SHOP (src/shop.js) ---------- */
 #mapWallet { right: 124px; top: 130px; height: 76px; }
 #mapWallet svg.coin, #shopWallet svg.coin, #shopWallet svg.tok { width: 50px; height: 50px; flex: none; }
@@ -263,6 +325,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #hole.lefty #viewBtn { left: auto; right: 24px; }
 /* ---------- 10. AAA LAYER: read, mulligan, banner, replay tag, wipe ---------- */
 #readBtn { left: 24px; bottom: 232px; }
+#guideBtn { left: 24px; bottom: 336px; display: none; }
+#guideBtn.show { display: grid; }
+#hole.lefty #guideBtn { left: auto; right: 24px; }
 #readBtn.on { background: var(--v-accent-green); border-color: var(--v-green-line); box-shadow: 0 6px 0 var(--v-green-down); }
 #hole.lefty #readBtn { left: auto; right: 24px; }
 #mulliganBtn { left: 556px; top: 24px; display: none; background: var(--v-accent-blue); border-color: var(--v-blue-line); box-shadow: 0 6px 0 var(--v-blue-down); }
@@ -273,6 +338,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #holeBanner.show { display: flex; animation: bannerIn .45s cubic-bezier(.3, 1.6, .5, 1) both; }
 #holeBanner .par { display: flex; align-items: center; gap: 8px; font-size: 92px; }
 #holeBanner svg { width: 96px; height: 96px; }
+#holeBannerMap svg { width: 120px; height: 120px; display: block; }
 /* visible from the first frame (a stalled animation must never hide it); the intro's end takes it away */
 @keyframes bannerIn { from { scale: .6; } to { scale: 1; } }
 #replayTag { position: absolute; left: 50%; top: 24px; margin-left: -60px; width: 120px; height: 76px; display: none; place-items: center; pointer-events: none;
@@ -319,11 +385,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #mulliganBtn { left: 452px; }
 #updateBtn { left: 556px; }
 #replayTag { margin-left: -60px; }
-#hole[data-phase="done"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
+#hole[data-phase="done"] :is(#guideBtn, #swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
 #hole[data-phase="replay"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn, #updateBtn),
 #hole[data-phase="sunk"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn),
 #hole[data-phase="auto"] :is(#aimL, #aimR, #viewBtn, #readBtn, #mulliganBtn) { visibility: hidden; }
-#hole[data-intro="1"] :is(#swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn) { visibility: hidden; }
+#hole[data-intro="1"] :is(#guideBtn, #swingPad, #aimL, #aimR, #viewBtn, #readBtn, #shotPanel, #mulliganBtn) { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { #setPanel { animation: none; } }
 /* ---------- 14. TITLE, RETRY ---------- */
 #title { background: linear-gradient(to bottom, rgba(47, 36, 26, .0) 55%, rgba(47, 36, 26, .45)); }
@@ -546,6 +612,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #bonusBtn { left: 128px; top: 24px; width: 160px; background: #1d1240; border-color: #ff3df2; box-shadow: 0 6px 0 #0b0620, 0 0 16px #ff3df2; color: #2ef2ff; display: flex; gap: 6px; }
 #bonusBtn svg { width: 54px; height: 54px; } #bonusBtn .n { font: 900 44px var(--v-font); }
 #bonusBtn.locked { opacity: .4; }
+#classicBtn { left: 304px; top: 24px; width: 160px; background: #e9efe6; border-color: #9aa3ad; box-shadow: 0 6px 0 #6f7881; display: flex; gap: 6px; }
+#classicBtn svg { width: 54px; height: 54px; } #classicBtn .n { font: 900 44px var(--v-font); color: #2e5a3a; }
+#classicBtn.locked { display: none; }
 /* ---------- 22. PROFILES ---------- */
 #profiles { background: var(--v-surface); background-image: var(--v-dots); background-size: var(--v-dots-size); }
 #profilesBack { left: 24px; top: 24px; }
@@ -565,6 +634,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #profileRow .plus { width: 136px; height: 136px; border-radius: 50%; display: grid; place-items: center; background: var(--v-accent-green); box-shadow: 0 6px 0 var(--v-green-down); }
 #profileRow .plus svg { width: 80px; height: 80px; }
 #profileRow .bin { top: 566px; color: #8a7360; }
+#profileRow .cont { top: 566px; }
+#profileRow .cont svg { width: 60%; height: 60%; }
+#profileRow .cont .hn { position: absolute; right: -10px; bottom: -10px; min-width: 40px; height: 40px; padding: 0 6px; border-radius: 20px; background: var(--v-surface); border: 3px solid var(--v-surface-line); font: 800 24px var(--v-font); color: var(--v-ink-strong); display: grid; place-items: center; }
 #profileRow .bin.armed { background: var(--v-accent-red); border-color: var(--v-red-line); box-shadow: 0 6px 0 var(--v-red-down); color: #fff; animation: binShake .4s ease-in-out 2; }
 @keyframes binShake { 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
 @media (prefers-reduced-motion: reduce) { #profileRow .pcard, #profileRow .bin.armed { animation: none; } }
@@ -659,11 +731,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div class="chip" id="hudHole" aria-label="hole"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#fffdf7" stroke="#e6d2ab" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#e6d2ab"/></svg><span id="hudHoleN">1</span></div>
     <div class="chip" id="hudPar" aria-label="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/><ellipse cx="32" cy="56" rx="18" ry="5" fill="#5a4634"/></svg><span id="hudParN">2</span></div>
     <div class="chip" id="hudStrokes" aria-label="strokes"><svg viewBox="0 0 64 64"><path d="M44 6 L24 48" stroke="#8a7360" stroke-width="6" stroke-linecap="round"/><rect x="10" y="44" width="24" height="12" rx="5" fill="#6fc0df"/></svg><span id="hudStrokesN">0</span></div>
+    <button class="btn" id="guideBtn" aria-label="show me the line"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="36" r="20" fill="#cdeac6" stroke="#74c465" stroke-width="5" stroke-dasharray="7 5"/><path d="M25 30 Q25 22 32 22 Q39 22 39 29 Q39 34 32 36 V41" fill="none" stroke="#3f7a3a" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="49" r="3.5" fill="#3f7a3a"/></svg></button>
     <button class="btn" id="readBtn" aria-label="read the slope"><svg viewBox="0 0 64 64"><path d="M8 44 Q32 20 56 44" fill="none" stroke="#74c465" stroke-width="6" stroke-linecap="round"/><path d="M20 22 L14 34 L26 32 M44 22 L50 34 L38 32" fill="none" stroke="#5a4634" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="btn" id="mulliganBtn" aria-label="take the last putt back"><svg viewBox="0 0 64 64"><path d="M18 22 A18 18 0 1 1 14 40" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M8 12 L18 24 L30 16" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="tok" id="mulliganN">5</span></button>
 <div class="chip" id="hudMode" aria-label="mode"><span class="ic"></span><span id="hudModeN"></span></div>
     <div class="chip" id="lostPop" aria-label="lost ball found"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg><span>+1</span></div>
-    <div id="holeBanner" aria-label="hole and par"><span id="holeBannerN">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="holeBannerPar">3</span></span></div>
+    <div id="holeBanner" aria-label="hole and par"><span id="holeBannerMap"></span><span id="holeBannerN">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="holeBannerPar">3</span></span></div>
     <div id="replayTag" aria-label="replay"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="14" fill="#fff"/><circle cx="32" cy="32" r="24" fill="none" stroke="#fff" stroke-width="5"/></svg></div>
     <button class="btn" id="updateBtn" aria-label="update"><svg viewBox="0 0 64 64"><path d="M50 30 A18 18 0 1 1 40 16" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="M34 8 L44 16 L34 26" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="live" id="swingPad" aria-label="swing"><svg id="padPath" viewBox="0 0 112 352" aria-hidden="true"><line class="line" id="padLine" x1="0" x2="112" y1="-50" y2="-50"/><path class="hint" id="padHint" d="M56 110 V240 M44 228 L56 240 L68 228 M56 240 V110 M44 122 L56 110 L68 122"/><polyline class="back" id="padBack" points=""/><polyline class="fwd" id="padFwd" points=""/><circle class="start" id="padStart" r="8" cx="-50" cy="-50"/></svg><div class="lane"></div><div id="padTicks"><i style="top:80px"></i><i style="top:160px"></i><i style="top:240px"></i><i style="top:320px"></i></div><div id="padFill"></div><div id="padGhost"></div><div id="padBall"></div><div id="padHead"></div></div>
@@ -673,6 +746,14 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div id="shotPanel" aria-label="last shot">
       <svg viewBox="0 0 220 60" aria-label="start line"><rect x="8" y="22" width="204" height="16" rx="8" fill="#f6e9d2" stroke="#e6d2ab" stroke-width="3"/><rect x="98" y="22" width="24" height="16" fill="#cdeac6"/><path d="M110 8 V52" stroke="#8a7360" stroke-width="3" stroke-linecap="round"/><circle id="shotMark" cx="110" cy="30" r="12" fill="#74c465" stroke="#fff" stroke-width="4"/></svg>
       <span id="shotPower">0</span>
+    </div>
+    <div id="pinTag" aria-label="distance to the cup"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="22" width="52" height="20" rx="4" fill="#ffd66e" stroke="#a8804e" stroke-width="4"/><path d="M16 22 V32 M26 22 V28 M36 22 V32 M46 22 V28" stroke="#a8804e" stroke-width="3"/></svg><span id="pinTagD">0</span><svg class="ar" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 10 L50 34 H38 V54 H26 V34 H14 Z" fill="#74c465"/></svg><span id="pinTagR"></span></div>
+    <div class="chip" id="partyChip" aria-label="player"><span id="partyChipBall"></span></div>
+    <button class="live" id="partyPass" aria-label="next player"><span id="partyPassBall"></span></button>
+    <div class="live" id="partyDone" aria-label="players' scores">
+      <div id="partyRows"></div>
+      <button class="btn" id="partyMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
+      <button class="btn go" id="partyNextBtn" aria-label="next hole"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
     </div>
     <div class="live" id="holeDone" aria-label="hole done">
       <div class="stars"><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg></div>
@@ -693,6 +774,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <button class="btn" id="setBtn" aria-label="settings"><svg viewBox="0 0 64 64"><path d="M32 6 l5 7 8-3 1 9 8 3-4 8 4 8-8 3-1 9-8-3-5 7-5-7-8 3-1-9-8-3 4-8-4-8 8-3 1-9 8 3z" fill="#a8804e"/><circle cx="32" cy="32" r="10" fill="#fff8ec"/></svg></button>
     <div class="chip" id="mapWallet" aria-label="coins"><svg class="coin" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="35" r="26" fill="#c69334"/><circle cx="32" cy="30" r="26" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="32" cy="30" r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M32 20 L35 27 L42 27 L36.5 31.5 L38.5 39 L32 34.5 L25.5 39 L27.5 31.5 L22 27 L29 27 Z" fill="#dca63f"/></svg><span id="mapCoinsN">0</span></div>
     <button class="btn" id="shopBtn" aria-label="pro shop"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="11" y="28" width="42" height="28" rx="4" fill="#fff8ec" stroke="#a8804e" stroke-width="4"/><rect x="26" y="36" width="12" height="20" rx="3" fill="#6fc0df"/><path d="M6 12 H58 L58 24 H6 Z" fill="#ef7d6d"/><path d="M19 12 V24 M32 12 V24 M45 12 V24" stroke="#fff8ec" stroke-width="6"/><path d="M6 24 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 a6.5 6 0 0 0 13 0 Z" fill="#c95a4c"/></svg></button>
+    <button class="btn" id="classicBtn" aria-label="the classic course"><svg viewBox="0 0 64 64"><rect x="12" y="6" width="40" height="54" rx="4" fill="#2e8a46" stroke="#c9ced6" stroke-width="5"/><circle cx="32" cy="18" r="5" fill="#1d150e"/><path d="M32 18 V4" stroke="#fffdf7" stroke-width="3"/><path d="M33 4 L44 8 L33 12 Z" fill="#ef7d6d"/><circle cx="32" cy="50" r="4" fill="#fffdf7"/></svg><span class="n">18</span></button>
     <button class="btn" id="bonusBtn" aria-label="bonus nine"><svg viewBox="0 0 64 64"><path d="M32 3 L40 22 L61 24 L45 38 L50 59 L32 48 L14 59 L19 38 L3 24 L24 22 Z" fill="#ff3df2" stroke="#2ef2ff" stroke-width="4" stroke-linejoin="round"/></svg><span class="n">9</span></button>
     <div id="worldGrid"></div>
     <div id="settings" class="live" aria-label="settings">
@@ -723,6 +805,13 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     <div class="chip" id="mapLost" aria-label="lost balls found"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg><span id="mapLostN">0</span></div>
     <svg id="pathLine" viewBox="0 0 1200 700" aria-hidden="true"></svg>
     <div id="holePath"></div>
+    <button class="btn" id="partyBtn" aria-label="pass and play"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="20" cy="40" r="13" fill="#fffdf7" stroke="#8a7360" stroke-width="4"/><circle cx="44" cy="40" r="13" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="32" cy="20" r="13" fill="#ef7d6d" stroke="#c95a4c" stroke-width="4"/></svg></button>
+    <div id="partyPick" class="live" aria-label="how many players"><div id="partyPickPanel">
+      <button class="btn pn" id="partyN2" aria-label="two players"><span class="pball" style="background:#fffdf7"><b>1</b></span><span class="pball" style="background:#ffd66e"><b>2</b></span></button>
+      <button class="btn pn" id="partyN3" aria-label="three players"><span class="pball" style="background:#fffdf7"><b>1</b></span><span class="pball" style="background:#ffd66e"><b>2</b></span><span class="pball" style="background:#ef7d6d"><b>3</b></span></button>
+      <button class="btn pn" id="partyN4" aria-label="four players"><span class="pball" style="background:#fffdf7"><b>1</b></span><span class="pball" style="background:#ffd66e"><b>2</b></span><span class="pball" style="background:#ef7d6d"><b>3</b></span><span class="pball" style="background:#6fc0df"><b>4</b></span></button>
+      <button class="btn" id="partyPickClose" aria-label="close"><svg viewBox="0 0 64 64"><path d="M18 18 L46 46 M46 18 L18 46" stroke="#a8804e" stroke-width="9" stroke-linecap="round"/></svg></button>
+    </div></div>
   </section>
   <section class="scene panel" id="card">
     <div id="cardPanel">

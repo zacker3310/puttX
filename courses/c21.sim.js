@@ -7,20 +7,20 @@ function c21Box(x0, z0, x1, z1, cuts) {
 }
 registerWorld(21, { holes: [
   /* 1: gate drop. A boom barrier slides across the only gap off the scaffold deck */
-  { par: 2, sol: [[204,0.84,0.5]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.4),
+  { par: 2, sol: [[204,0.84,0.5],[22,0.64,0]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.4),
     tiers: [{ poly: rect(-1, 0, 1, 3.5), h: 0.3 }],
     inner: [[[-1, 3.5], [-0.25, 3.5]], [[0.25, 3.5], [1, 3.5]]],
     movers: [{ kind: 'gate', ax: 0.5, az: 3.5, bx: 0, bz: 3.5, len: 0.26, ang: 90, period: 3, look: 'boom' }],
     zones: [{ surf: 'sand', poly: rect(-1, 6.6, -0.2, 7.4) }],
     bumps: [{ x: -0.4, z: 5.2, r: 0.35, h: 0.12 }] },
   /* 2: pipe skip (3 parts). Two girder walls with gaps on opposite sides, or one pipe over both */
-  { par: 3, sol: [[338,1,0],[30,0.88,0]], tee: [0, 0.5], cup: [-0.4, 8.2], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[338,1,0],[30.25,0.88,0]], tee: [0, 0.5], cup: [-0.4, 8.2], shape: rect(-1.2, 0, 1.2, 9),
     inner: [[[-1.2, 3], [0.6, 3]], [[-0.6, 6], [1.2, 6]]],
     tubes: [{ a: [-0.7, 2.3], b: [0.6, 6.7], dir: 0 }],
     zones: [{ push: [1.2, 0], poly: rect(-1.2, 3.6, 1.2, 4.6) }, { surf: 'sand', poly: rect(0.4, 8.4, 1.2, 9) }],
     bumps: [{ x: 0.2, z: 7.5, r: 0.35, h: 0.12 }] },
   /* 3: stacked decks (3 parts). Right ramp, round the jib, left ramp, across the top belt */
-  { par: 3, sol: [[32,0.96,0]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.2, 0, 1.2, 9.4),
+  { par: 3, sol: [[32,0.96,0],[166,0.8,0.5]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.2, 0, 1.2, 9.4),
     tiers: [{ poly: rect(-1.2, 3.2, 1.2, 6.2), h: 0.2 }, { poly: rect(-1.2, 6.2, 1.2, 9.4), h: 0.4 }],
     ramps: [{ x0: 0.5, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 },
             { x0: -1.2, z0: 5, x1: -0.6, z1: 6.2, axis: 'z', h0: 0.2, h1: 0.4 }],
@@ -29,7 +29,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [-1, 0], poly: rect(-1.2, 7, 1.2, 7.6) }],
     bumps: [{ x: -0.5, z: 8.5, r: 0.3, h: 0.1 }] },
   /* 4: the hairpin (3 parts). Up the right lane past the pipe, round the jib, down onto the ledge against the belt */
-  { par: 3, sol: [[184,1,1],[140,0.93,0]], tee: [0.8, 0.5], cup: [-0.8, 1], aim0: 0, shape: rect(-1.6, 0, 1.6, 7),
+  { par: 3, sol: [[26,1,2],[140,0.96,0]], tee: [0.8, 0.5], cup: [-0.8, 1], aim0: 0, shape: rect(-1.6, 0, 1.6, 7),
     inner: [[[0, 0], [0, 5.4]]],
     tiers: [{ poly: rect(-1.6, 0, 0, 1.8), h: 0.15 }],
     ramps: [{ x0: -1.6, z0: 1.8, x1: 0, z1: 2.4, axis: 'z', h0: 0.15, h1: 0 }],
@@ -38,7 +38,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [0, 0.8], poly: rect(-1.6, 2.6, 0, 4) }, { surf: 'sand', poly: rect(-1.6, 4.2, -1.1, 5.4) }] },
   /* 5: the pour (long green). Three broad slabs stepping up by gentle banks, the first leaning left and
      the second right, a dirt ridge on each and a swale beside the cup */
-  { par: 3, sol: [[346,0.96,0]], tee: [0, 0.5], cup: [-0.6, 12.4], shape: rect(-2, 0, 2, 13.5),
+  { par: 3, sol: [[343.25,0.98,0]], tee: [0, 0.5], cup: [-0.6, 12.4], shape: rect(-2, 0, 2, 13.5),
     tiers: [{ poly: rect(-2, 0, 2, 4.2), h: 0, sx: 0.01 }, { poly: rect(-2, 5.4, 2, 9), h: 0.15, sx: -0.01 }, { poly: rect(-2, 10, 2, 13.5), h: 0.26 }],
     ramps: [{ x0: -2, z0: 4.2, x1: 2, z1: 5.4, axis: 'z', h0: 0, h1: 0.15 }, { x0: -2, z0: 9, x1: 2, z1: 10, axis: 'z', h0: 0.15, h1: 0.26 }],
     bumps: [{ x: 1.4, z: 2.5, r: 1.5, h: 0.12 }, { x: -1.3, z: 7.2, r: 1.3, h: 0.12 }, { x: 0.8, z: 11.4, r: 1.1, h: -0.07 }] },
@@ -55,7 +55,7 @@ registerWorld(21, { holes: [
     tubes: [{ a: [-0.4, 0.6], b: [-1.1, 6.96], dir: 270, keep: 0, add: 1.2 }, { a: [-2.8, 6], b: [-4.5, 0.94], dir: 90, keep: 0, add: 1.2 }],
     drains: [{ x: -2.8, z: 6, r: 1.2, depth: 0.3, flat: 0.1 }, { x: -2.8, z: 1.9, r: 1.2, depth: 0.3 }] },
   /* 7: double trench (4 parts, open). Two plank launches over two trenches, or the side planks the long way */
-  { par: 4, crazy: true, sol: [[208,0.76,0],[342,1,0]], tee: [0, 0.5], cup: [0.2, 10.6],
+  { par: 4, crazy: true, sol: [[14,0.44,0],[342,1,0],[10,0.6,0]], tee: [0, 0.5], cup: [0.2, 10.6],
     floors: [rect(-0.8, 0, 0.8, 3.5), rect(0.75, 2.6, 1.35, 5.3), rect(-0.8, 4.3, 0.8, 7.5), rect(-1.35, 6.6, -0.75, 9.3), rect(-0.8, 8.3, 0.8, 11.5)],
     walls: [[[0.8, 2.6], [0.8, 0], [-0.8, 0], [-0.8, 3.5]], [[-0.8, 4.3], [-0.8, 6.6]], [[0.8, 5.3], [0.8, 7.5]],
             [[0.8, 8.3], [0.8, 11.5], [-0.8, 11.5], [-0.8, 9.3]]],
@@ -64,12 +64,12 @@ registerWorld(21, { holes: [
     bumps: [{ x: 0.3, z: 5.2, r: 0.3, h: 0.08 }, { x: -0.3, z: 9.6, r: 0.3, h: 0.1 }] },
   /* 8: the long wall (long green). A wide slab with a low spoil ridge running across it on the diagonal,
      a swale past the ridge and a dirt bunker right of the cup */
-  { par: 3, sol: [[4,0.92,0]], tee: [0, 0.5], cup: [0.7, 10.8], shape: rect(-2.2, 0, 2.2, 12),
+  { par: 3, sol: [[4,0.93,0]], tee: [0, 0.5], cup: [0.7, 10.8], shape: rect(-2.2, 0, 2.2, 12),
     tiers: [{ poly: rect(-2.2, 0, 2.2, 12), h: 0, sx: 0.008, sz: 0.006 }],
     bumps: [{ x: -1.5, z: 4, r: 1.2, h: 0.12 }, { x: -0.3, z: 5, r: 1.2, h: 0.12 }, { x: 0.9, z: 6, r: 1.2, h: 0.12 }, { x: -0.8, z: 9, r: 1.4, h: -0.09 }],
     zones: [{ surf: 'sand', poly: rect(1.6, 8, 2.2, 9.8) }] },
   /* 9: tier cascade (3 parts). Two drops each guarded by a boom, or the pipe off the middle deck, then the jib */
-  { par: 3, crazy: true, sol: [[355.5,0.76,0]], tee: [0, 0.5], cup: [0.5, 9.2], shape: c21Box(-1.4, 0, 1.4, 10, [2.8, 5.6]),
+  { par: 3, crazy: true, sol: [[355.5,0.78,0]], tee: [0, 0.5], cup: [0.5, 9.2], shape: c21Box(-1.4, 0, 1.4, 10, [2.8, 5.6]),
     tiers: [{ poly: rect(-1.4, 0, 1.4, 2.8), h: 0.42 }, { poly: rect(-1.4, 2.8, 1.4, 5.6), h: 0.21 }],
     inner: [[[-1.4, 2.8], [-0.25, 2.8]], [[0.25, 2.8], [1.4, 2.8]], [[-1.4, 5.6], [-0.9, 5.6]], [[-0.4, 5.6], [1.4, 5.6]]],
     movers: [{ kind: 'gate', ax: 0.5, az: 2.8, bx: 0, bz: 2.8, len: 0.26, ang: 90, period: 3, look: 'boom' },
@@ -78,7 +78,7 @@ registerWorld(21, { holes: [
     tubes: [{ a: [0.9, 4.4], b: [0.9, 7], dir: 0 }],
     bumps: [{ x: 0.5, z: 9.2, r: 0.45, h: -0.08 }] },
   /* 10: scaffold switchback (3 parts). Left ramp, the pipe or the top crossing, the middle ramp the wrong way, the top deck */
-  { par: 4, sol: [[16,0.92,0],[0,0.48,0]], tee: [-1.06, 0.5], cup: [1.06, 6.1], aim0: 0, shape: rect(-1.6, 0, 1.6, 7),
+  { par: 4, sol: [[12,0.84,0],[0,0.76,0]], tee: [-1.06, 0.5], cup: [1.06, 6.1], aim0: 0, shape: rect(-1.6, 0, 1.6, 7),
     inner: [[[-0.53, 0], [-0.53, 5.6]], [[0.53, 1.4], [0.53, 7]]],
     tiers: [{ poly: rect(-1.6, 4, -0.53, 7), h: 0.2 }, { poly: rect(-0.53, 5, 0.53, 7), h: 0.2 },
             { poly: rect(-0.53, 0, 0.53, 3), h: 0.4 }, { poly: rect(0.53, 0, 1.6, 7), h: 0.4 }],
@@ -88,14 +88,14 @@ registerWorld(21, { holes: [
     zones: [{ push: [0, -0.6], poly: rect(-0.53, 3, 0.53, 5) }, { surf: 'sand', poly: rect(1.1, 3, 1.6, 4.2) }],
     bumps: [{ x: 0.95, z: 4.9, r: 0.3, h: 0.08 }] },
   /* 11: pipe chain (4 parts). Three lanes joined by gaps or pipes, then the jib guarding the cup */
-  { par: 4, crazy: true, sol: [[28,0.86,0],[164,1,0],[215,0.95,0],[10,0.55,0]], tee: [-1.6, 0.5], cup: [1.6, 7.8], aim0: 0, shape: rect(-2.4, 0, 2.4, 9),
+  { par: 4, crazy: true, sol: [[28,0.86,0],[164,1,0],[215,0.95,0],[24,0.92,0]], tee: [-1.6, 0.5], cup: [1.6, 7.8], aim0: 0, shape: rect(-2.4, 0, 2.4, 9),
     inner: [[[-0.8, 0], [-0.8, 8.2]], [[0.8, 0.8], [0.8, 9]]],
     movers: [{ kind: 'spin', x: 1.6, z: 5.9, len: 0.55, w: 1.3, phase: 0, look: 'crane' }],
     tubes: [{ a: [-1.6, 4.5], b: [0, 5], dir: 90 }, { a: [0, 1.4], b: [1.6, 3.6], dir: 270 }],
     zones: [{ push: [0, -0.8], poly: rect(-0.8, 2, 0.8, 4.2) }, { surf: 'sand', poly: rect(-2.4, 6, -1.6, 7) }],
     bumps: [{ x: -1.3, z: 2.6, r: 0.35, h: 0.12 }] },
   /* 12: cantilever (3 parts, open). The bare plank over the drop, or the walled catwalk against its belt, past the slider */
-  { par: 4, sol: [[336,1,0]], tee: [0, 0.5], cup: [-0.6, 8.4], aim0: 0,
+  { par: 4, sol: [[336,1,0],[10,1,0]], tee: [0, 0.5], cup: [-0.6, 8.4], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 2.5), rect(-0.3, 2.45, 0.3, 6), rect(-1.35, 5.95, 1.2, 9), rect(-1.35, 1.5, -0.75, 6)],
     walls: [[[0.3, 5.95], [1.2, 5.95], [1.2, 9], [-1.35, 9], [-1.35, 1.5], [-0.8, 1.5], [-0.8, 0], [0.8, 0], [0.8, 2.5], [0.3, 2.5]],
             [[-0.3, 2.5], [-0.75, 2.5], [-0.75, 5.95], [-0.3, 5.95]]],
@@ -104,12 +104,12 @@ registerWorld(21, { holes: [
     bumps: [{ x: 0.5, z: 8.3, r: 0.3, h: 0.1 }] },
   /* 13: terraces (long green). Up a long leaning slab, a broad bank to the top terrace, then hard left
      along a terrace that tilts back, past a hump and a little swale to the cup */
-  { par: 3, sol: [[10,1,0]], tee: [0, 0.5], cup: [3.4, 11.2], aim0: 0, shape: [[-1.6, 0], [1.6, 0], [1.6, 9], [4.6, 9], [4.6, 12.6], [-1.6, 12.6]],
+  { par: 3, sol: [[10,1,0],[6,0.52,0]], tee: [0, 0.5], cup: [3.4, 11.2], aim0: 0, shape: [[-1.6, 0], [1.6, 0], [1.6, 9], [4.6, 9], [4.6, 12.6], [-1.6, 12.6]],
     tiers: [{ poly: rect(-1.6, 0, 1.6, 7.5), h: 0, sz: 0.012 }, { poly: rect(-1.6, 8.7, 4.6, 12.6), h: 0.2, sx: -0.012 }],
     ramps: [{ x0: -1.6, z0: 7.5, x1: 1.6, z1: 8.7, axis: 'z', h0: 0.09, h1: 0.2 }],
     bumps: [{ x: 0.9, z: 3.5, r: 1.5, h: 0.14 }, { x: -0.4, z: 11, r: 1.2, h: 0.12 }, { x: 2.2, z: 10.2, r: 0.9, h: -0.06 }] },
   /* 14: deck relay (4 parts). Ramp to the deck, the side boom, the guarded chute or the pipe, then the belt pocket */
-  { par: 4, sol: [[0,0.92,0],[278,0.84,0],[27,0.92,0]], tee: [0.8, 0.5], cup: [0.9, 9.6], aim0: 0, shape: rect(-1.6, 0, 1.6, 10.4),
+  { par: 4, sol: [[0,0.92,0],[278,0.84,0],[32,0.93,0]], tee: [0.8, 0.5], cup: [0.9, 9.6], aim0: 0, shape: rect(-1.6, 0, 1.6, 10.4),
     tiers: [{ poly: rect(-1.6, 3.2, 1.6, 6.2), h: 0.35 }],
     ramps: [{ x0: 0.4, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.35 }],
     inner: [[[1.6, 3.2], [1.2, 3.2]], [[0.4, 3.2], [-1.6, 3.2]], [[0, 3.2], [0, 4.5]], [[0, 5.1], [0, 6.2]],
@@ -120,7 +120,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [-1.2, 0], poly: rect(-1.6, 7, 1.6, 7.8) }, { surf: 'sand', poly: rect(-1.6, 9.9, -0.2, 10.4) }],
     bumps: [{ x: -0.5, z: 1.4, r: 0.35, h: 0.1 }] },
   /* 15: pipe ladder (3 parts). Two ramps up two decks, or a pipe from each level straight to the top, then the jib */
-  { par: 4, sol: [[216,0.93,0],[0,0.29,0],[3,0.28,0]], tee: [0, 0.5], cup: [0.9, 8.4], shape: c21Box(-1.6, 0, 1.6, 9, [3, 6]),
+  { par: 4, sol: [[210,0.92,0],[0,0.24,0]], tee: [0, 0.5], cup: [0.9, 8.4], shape: c21Box(-1.6, 0, 1.6, 9, [3, 6]),
     tiers: [{ poly: rect(-1.6, 3, 1.6, 6), h: 0.22 }, { poly: rect(-1.6, 6, 1.6, 9), h: 0.44 }],
     ramps: [{ x0: 1, z0: 1.8, x1: 1.6, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: -1.6, z0: 4.8, x1: -1, z1: 6, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[-1.6, 3], [1, 3]], [[-1, 6], [1.6, 6]]],
@@ -129,7 +129,7 @@ registerWorld(21, { holes: [
     zones: [{ surf: 'sand', poly: rect(-0.4, 4, 0.4, 4.8) }],
     bumps: [{ x: -0.6, z: 1.2, r: 0.35, h: 0.1 }] },
   /* 16: the crane deck (4 parts). Belt to the ramp, round the jib, the boom over the narrow ramp, past the slider into the pocket */
-  { par: 5, crazy: true, sol: [[308,1,0],[252,0.57,0],[16,0.94,0],[18,0.88,0]], tee: [1, 0.5], cup: [1.2, 10], aim0: 0, shape: c21Box(-2, 0, 2, 11, [3.2, 6.4]),
+  { par: 5, crazy: true, sol: [[308,1,0],[252,0.57,0],[16,0.94,0],[300.25,0.95,1.5]], tee: [1, 0.5], cup: [1.2, 10], aim0: 0, shape: c21Box(-2, 0, 2, 11, [3.2, 6.4]),
     tiers: [{ poly: rect(-2, 3.2, 2, 6.4), h: 0.22 }, { poly: rect(-2, 6.4, 2, 11), h: 0.44 }],
     ramps: [{ x0: -2, z0: 2, x1: -1, z1: 3.2, axis: 'z', h0: 0, h1: 0.22 }, { x0: 0.9, z0: 5.2, x1: 1.5, z1: 6.4, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[2, 3.2], [-1, 3.2]], [[2, 6.4], [1.5, 6.4]], [[0.9, 6.4], [-2, 6.4]], [[2, 8.6], [-0.8, 8.6]]],
@@ -140,7 +140,7 @@ registerWorld(21, { holes: [
     zones: [{ push: [-1, 0], poly: rect(-0.6, 2, 2, 2.8) }, { surf: 'sand', poly: rect(-2, 10.5, -0.6, 11) }],
     bumps: [{ x: 1.2, z: 10, r: 0.45, h: -0.08 }, { x: -0.2, z: 9.6, r: 0.4, h: 0.15 }] },
   /* 17: island hop (4 parts, open). Pipe or plank to the island, pipe or plank to the green, past the jib */
-  { par: 4, crazy: true, sol: [[180,0.86,0],[12,0.93,0],[0,1,0]], tee: [0, 0.5], cup: [3.6, 8.2], aim0: 0,
+  { par: 4, crazy: true, sol: [[180,0.86,0],[12,0.93,0],[0,1,0],[254,1,0]], tee: [0, 0.5], cup: [3.6, 8.2], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 3), rect(-0.3, 2.95, 0.3, 5.05), rect(-1.2, 5, 1.2, 7), rect(1.15, 5.7, 3, 6.3), rect(2.95, 4.5, 5, 9)],
     walls: [[[-0.3, 3], [-0.8, 3], [-0.8, 0], [0.8, 0], [0.8, 3], [0.3, 3]],
             [[-0.3, 5], [-1.2, 5], [-1.2, 7], [1.2, 7], [1.2, 6.3]], [[1.2, 5.7], [1.2, 5], [0.3, 5]],
@@ -151,7 +151,7 @@ registerWorld(21, { holes: [
     bumps: [{ x: 3.6, z: 8.2, r: 0.4, h: -0.06 }] },
   /* 18: topping out the tower (4 parts). Belt, the ground pipe or the switchback deck, the boom over the corner ramp,
      then the guarded drop or the pipe into the pocket past the slider */
-  { par: 5, crazy: true, sol: [[345,0.67,0],[176,0.6,1],[0,0.1,0]], tee: [-1.6, 0.5], cup: [-1.2, 10.2], aim0: 0, shape: c21Box(-2.4, 0, 2.4, 11, [3, 6, 8.6]),
+  { par: 5, crazy: true, sol: [[190,0.64,0],[224,0.72,1.5],[46,0.8,0]], tee: [-1.6, 0.5], cup: [-1.2, 10.2], aim0: 0, shape: c21Box(-2.4, 0, 2.4, 11, [3, 6, 8.6]),
     tiers: [{ poly: rect(-2.4, 3, 2.4, 6), h: 0.22 }, { poly: rect(-2.4, 6, 2.4, 8.6), h: 0.44 }, { poly: rect(-2.4, 8.6, 2.4, 11), h: 0.18 }],
     ramps: [{ x0: 1.4, z0: 1.8, x1: 2.4, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: -2.2, z0: 4.8, x1: -1.6, z1: 6, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[-2.4, 3], [1.4, 3]], [[-1.2, 4.5], [2.4, 4.5]], [[-2.4, 6], [-2.2, 6]], [[-1.6, 6], [2.4, 6]],

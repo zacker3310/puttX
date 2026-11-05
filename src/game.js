@@ -26,33 +26,52 @@ const SIM_DT = 1 / 240;          /* fixed physics step */
 const BALL_R = 0.0255;           /* a small, quick ball: about 1.2x a real one (0.021) */
 const CUP_R = 0.099;
 const CUP_SINK = 0.2;             /* how deep the cup is drawn: the drop is longer than the physics needs, for the plunk */
-const CAP_V0 = 2.1;              /* dead-centre capture speed; an off-centre ball crosses a shorter chord and needs to be slower */
-const CAP_CREEP = 0.45;          /* anything this slow with its centre over the hole drops, whatever the line */
-const MIN_V = 0.28, MAX_V = 4.27; /* putt speed at power 0 and power 1: full power rolls about 17 m of felt, for the long lag putts */
+/* The ball is a rigid sphere with a spin vector (wx, wy, wz) in rad/s. Every contact (the turf, a
+   wall, a post, a mover, the cup's rim and liner) is an impulse at the contact point with a normal
+   restitution and Coulomb friction, so spin is real: a struck ball slides until friction spins it
+   up to a true roll, a rolling ball that meets a wall at its equator hops and comes off it with
+   the wrong spin (it checks and comes off flatter), and the cup is a real hole with a rim edge. */
+const SPIN_I = 0.4;              /* moment of inertia over m R^2: a solid sphere (a golf ball is 0.38 to 0.40) */
+const SLIDE_J = SPIN_I / (1 + SPIN_I);   /* 2/7: the impulse, per unit slip, that stops a contact point sliding */
+const SLIP_EPS = 2e-3;           /* slower slip than this (m/s) is a true roll */
+/* putt speed at power 0 and power 1. A putter launches the ball with almost no spin, so it slides
+   first and rolls at 5/7 of its launch speed or a little more; these are set so the total roll on
+   felt matches the old game's (full power about 17 m), for the long lag putts */
+const MIN_V = 0.354, MAX_V = 5.4;
 const V_CAP = 6.5;               /* nothing pushes a ball past this: 0.027 m per step, well under a wall's reach (BALL_R + WALL_HALF) */
 const STOP_V = 0.03;
 const SETTLE_T = 0.4;            /* slower than STOP_V this long = at rest, even pressed on a wall or a lip */
 const STATIC_MU = 0.1;           /* a stopped ball stays put on slopes gentler than this */
 const MAX_SIM_T = 40;            /* a putt that runs this long is called stopped: room for the bonus nine's ice */
 const G = 9.8;
-const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slope */
-const SKID_MU = 0.22, SKID_END = 0.92;  /* the struck ball slides (sliding friction) until it has shed 12% and rolls */
+const ROLL = 5 / 7;              /* rolling sphere: share of gravity along a slope (1 / (1 + SPIN_I)) */
 /* water is a hazard (the ball goes back where it was putted from, plus one); push zones are
    conveyors and fans: a constant acceleration [ax, az] while the ball rolls on them */
-/* GLIDE: every surface is slicker than a real green, so the ball coasts; ice is nearly frictionless */
+/* GLIDE: every surface is slicker than a real green, so the ball coasts; ice is nearly frictionless.
+   Per surface: mu is rolling resistance (deceleration over g: felt is a stimp of about 12 ft), slide is
+   the sliding friction of the contact (carpet and turf about 0.2), e the landing restitution */
 const GLIDE = 0.62, FELT_MU = 0.075;
-const SURF = { felt: { mu: FELT_MU * GLIDE }, ice: { mu: 0.006 }, sand: { mu: 0.4 * GLIDE }, mud: { mu: 0.75 * GLIDE }, fast: { mu: 0.04 * GLIDE }, water: { mu: FELT_MU * GLIDE } };
-const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.78, WALL_SLIP = 0.94;
-const POST_E = 0.6, MOVER_E = 0.8;
+const SURF = { felt: { mu: FELT_MU * GLIDE, slide: 0.22, e: 0.5 }, ice: { mu: 0.006, slide: 0.03, e: 0.6 }, sand: { mu: 0.4 * GLIDE, slide: 0.55, e: 0.12 },
+  mud: { mu: 0.75 * GLIDE, slide: 0.7, e: 0.05 }, fast: { mu: 0.04 * GLIDE, slide: 0.16, e: 0.55 }, water: { mu: FELT_MU * GLIDE, slide: 0.22, e: 0.1 } };
+/* walls are timber or steel borders that meet the ball at its equator: restitution and friction at the rail */
+const WALL_TOP = 0.15, WALL_HALF = 0.05, WALL_E = 0.8, WALL_MU = 0.18;
+const POST_E = 0.65, MOVER_E = 0.8, HOP_V = 0.25;   /* a wall's friction that lifts the ball faster than HOP_V makes it hop */
 const STEP_MAX = 0.03;           /* ground rising more than this under the ball's leading edge is a cliff face */
 const CLIFF_E = 0.45;
-const BOUNCE_VY = 0.75, BOUNCE_E = 0.5;  /* a landing faster than BOUNCE_VY hops back up: a lively golf ball, not a marble */
+const BOUNCE_VY = 0.75;          /* a landing faster than this bounces (each surface's e); slower joins the ground */
 const OOB_Y = -1;
-/* the cup sits in a slight funnel: inside LIP_PULL_R of the rim a slow ball is drawn in, harder the closer it gets */
-const LIP_TURN = 0.5, LIP_KEEP = 0.62, HOP_KEEP = 0.55, LIP_PULL = 2.6, LIP_PULL_R = 0.25;
+/* the cup: a hole of radius CUP_R with a sharp rim edge and a plastic liner. A ball whose centre
+   crosses the rim loses the turf under it and falls; the far rim edge either turns it down into the
+   hole or throws it back out (a hop, a lip out, a horseshoe). It is in once its centre is half a ball
+   below the rim. Around it the turf dips a few millimetres, as round a well-played cup. */
+const RIM_E = 0, RIM_MU = 1, RIM_RHO = 0.008, LINER_E = 0.35, LINER_MU = 0.2, SUNK_DEPTH = 0.5;
+const DISH_R = 0.22, DISH_D = 0.006;
+const LIP_PULL_R = DISH_R;       /* the renderer's soft shade round the cup covers the dish */
 const TUBE_R = 0.12, TUBE_T = 0.45;   /* a tube mouth swallows a rolling ball whose centre comes this close; transit time */
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+/* a 2D length from sqrt, which IEEE pins down exactly in every engine (Math.hypot is not), and faster */
+const hyp = (a, b) => Math.sqrt(a * a + b * b);
 
 /* ---- 2b. hole geometry ---- */
 const rect = (x0, z0, x1, z1) => [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
@@ -83,7 +102,7 @@ function makeHole(def) {
 }
 function wallTops(h) {
   return h.segs.map(([ax, az, bx, bz]) => {
-    const n = Math.max(2, Math.ceil(Math.hypot(bx - ax, bz - az) / 0.05));
+    const n = Math.max(2, Math.ceil(hyp(bx - ax, bz - az) / 0.05));
     let hi = -Infinity, lo = Infinity;
     for (let i = 0; i <= n; i++) {
       const u = i / n, x = ax + (bx - ax) * u, z = az + (bz - az) * u, e = BALL_R;
@@ -130,10 +149,17 @@ function drainY(d, dr) {
   const u = (dr.r - d) / (dr.r - f);
   return [-dr.depth * u * u, 2 * dr.depth * u / (dr.r - f)];
 }
+/* the worn dish round the cup: DISH_D deep at the middle, smooth (zero slope) at DISH_R; returns [y, dy/dd] */
+function dishY(d) {
+  if (d >= DISH_R) return [0, 0];
+  const u = d / DISH_R, w = 1 - u * u;
+  return [-DISH_D * w * w, 4 * DISH_D * u * w / DISH_R];
+}
 function groundH(h, x, z) {
   let y = baseAt(h, x, z)[0];
   for (const b of h.bumps) { const dx = x - b.x, dz = z - b.z; y += b.h * Math.exp(-(dx * dx + dz * dz) / (b.r * b.r)); }
-  for (const dr of h.drains) y += drainY(Math.hypot(x - dr.x, z - dr.z), dr)[0];
+  for (const dr of h.drains) y += drainY(hyp(x - dr.x, z - dr.z), dr)[0];
+  if (h.cup) y += dishY(hyp(x - h.cup[0], z - h.cup[1]))[0];
   return y;
 }
 function groundGrad(h, x, z) {
@@ -144,8 +170,12 @@ function groundGrad(h, x, z) {
     gx += k * dx; gz += k * dz;
   }
   for (const dr of h.drains) {
-    const dx = x - dr.x, dz = z - dr.z, d = Math.hypot(dx, dz), s = d > 1e-9 ? drainY(d, dr)[1] / d : 0;
+    const dx = x - dr.x, dz = z - dr.z, d = hyp(dx, dz), s = d > 1e-9 ? drainY(d, dr)[1] / d : 0;
     gx += s * dx; gz += s * dz;
+  }
+  if (h.cup) {
+    const dx = x - h.cup[0], dz = z - h.cup[1], d = hyp(dx, dz);
+    if (d < DISH_R && d > 1e-9) { const s = dishY(d)[1] / d; gx += s * dx; gz += s * dz; }
   }
   return [gx, gz];
 }
@@ -156,21 +186,33 @@ function closestOnSeg(ax, az, bx, bz, x, z) {
   const t = L2 ? clamp(((x - ax) * ex + (z - az) * ez) / L2, 0, 1) : 0;
   return [ax + ex * t, az + ez * t];
 }
-/* reflect off a surface with normal n moving at (svx, svz); returns the impact speed */
-function bounce(b, nx, nz, e, svx, svz) {
-  const rvx = b.vx - svx, rvz = b.vz - svz, vn = rvx * nx + rvz * nz;
-  if (vn >= 0) return 0;
-  const tx = rvx - vn * nx, tz = rvz - vn * nz;
-  b.vx = svx + tx * WALL_SLIP - e * vn * nx;
-  b.vz = svz + tz * WALL_SLIP - e * vn * nz;
-  const s = Math.hypot(b.vx, b.vz);
+/* one contact, as an impulse at the contact point: (nx, ny, nz) is the unit normal pushing the ball
+   away, e the normal restitution, mu the friction, (svx, svy, svz) the surface's own velocity. The
+   contact point sits at -R n from the centre, so its velocity is v + w x (-R n): the normal part
+   bounces, the sliding part is opposed by friction up to the impulse that would stop it (2/7 of the
+   slip for a solid ball), and that friction also turns the spin. Unit mass. Returns the approach speed. */
+function impulse(b, nx, ny, nz, e, mu, svx = 0, svy = 0, svz = 0) {
+  const R = BALL_R, rx = -R * nx, ry = -R * ny, rz = -R * nz;
+  const ux = b.vx - svx + b.wy * rz - b.wz * ry, uy = b.vy - svy + b.wz * rx - b.wx * rz, uz = b.vz - svz + b.wx * ry - b.wy * rx;
+  const un = ux * nx + uy * ny + uz * nz;
+  if (un >= 0) return 0;
+  const jn = -(1 + e) * un, tx = ux - un * nx, ty = uy - un * ny, tz = uz - un * nz, ts = Math.sqrt(tx * tx + ty * ty + tz * tz);
+  b.vx += jn * nx; b.vy += jn * ny; b.vz += jn * nz;
+  if (ts > 1e-9) {
+    const k = Math.min(mu * jn, SLIDE_J * ts) / ts, fx = -tx * k, fy = -ty * k, fz = -tz * k, ik = 1 / (SPIN_I * R * R);
+    b.vx += fx; b.vy += fy; b.vz += fz;
+    b.wx += (ry * fz - rz * fy) * ik; b.wy += (rz * fx - rx * fz) * ik; b.wz += (rx * fy - ry * fx) * ik;
+  }
+  const s = hyp(b.vx, b.vz);
   if (s > V_CAP) { b.vx *= V_CAP / s; b.vz *= V_CAP / s; }
-  return -vn;
+  return -un;
 }
+/* a vertical face (wall, post, mover, cliff) with outward normal (nx, nz) moving at (svx, svz) */
+const bounce = (b, nx, nz, e, svx, svz, mu = WALL_MU) => impulse(b, nx, 0, nz, e, mu, svx, 0, svz);
 function hitSeg(b, ax, az, bx, bz, e, svx = 0, svz = 0) {
   const [px, pz] = closestOnSeg(ax, az, bx, bz, b.x, b.z), R = BALL_R + WALL_HALF;
   let nx = b.x - px, nz = b.z - pz;
-  const d = Math.hypot(nx, nz);
+  const d = hyp(nx, nz);
   if (d >= R || d < 1e-9) return 0;
   nx /= d; nz /= d;
   b.x = px + nx * R; b.z = pz + nz * R;
@@ -178,7 +220,7 @@ function hitSeg(b, ax, az, bx, bz, e, svx = 0, svz = 0) {
 }
 function hitCircle(b, cx, cz, cr, e, svx = 0, svz = 0) {
   let nx = b.x - cx, nz = b.z - cz;
-  const d = Math.hypot(nx, nz), R = cr + BALL_R;
+  const d = hyp(nx, nz), R = cr + BALL_R;
   if (d >= R || d < 1e-9) return 0;
   nx /= d; nz /= d;
   b.x = cx + nx * R; b.z = cz + nz * R;
@@ -208,8 +250,8 @@ function moverTouch(h, b, t) {
   for (const m of h.movers) {
     const s = moverState(m, t);
     if (s.bars) {
-      for (const [ax, az, bx, bz] of s.bars) { const p = closestOnSeg(ax, az, bx, bz, b.x, b.z); if (Math.hypot(b.x - p[0], b.z - p[1]) < BALL_R + WALL_HALF) return true; }
-    } else if (Math.hypot(b.x - s.x, b.z - s.z) < m.r + BALL_R) return true;
+      for (const [ax, az, bx, bz] of s.bars) { const p = closestOnSeg(ax, az, bx, bz, b.x, b.z); if (hyp(b.x - p[0], b.z - p[1]) < BALL_R + WALL_HALF) return true; }
+    } else if (hyp(b.x - s.x, b.z - s.z) < m.r + BALL_R) return true;
   }
   return false;
 }
@@ -242,87 +284,145 @@ function collideAll(h, b, t) {
 }
 
 /* ---- 2d. the ball ---- */
-function newBall(h, x, z) { return { x, z, y: groundH(h, x, z), vx: 0, vz: 0, vy: 0, air: false, inCup: false, skid: 0, tube: null, hits: [] }; }
+/* b.y is the height of the bottom of the ball (its centre is BALL_R above); (vx, vy, vz) its velocity,
+   (wx, wy, wz) its spin. On the ground vy follows the slope; b.slide is 1 while the contact slides. */
+function newBall(h, x, z) { return { x, z, y: groundH(h, x, z), vx: 0, vz: 0, vy: 0, wx: 0, wy: 0, wz: 0, slide: 0, air: false, tube: null, hits: [] }; }
 function puttVelocity(angleDeg, power) {
   const a = angleDeg * Math.PI / 180, v = MIN_V + (MAX_V - MIN_V) * clamp(power, 0, 1);
   return [Math.sin(a) * v, Math.cos(a) * v];
 }
+/* the putter face sends the ball off with no spin: it slides, and the turf spins it up to a roll */
 function launch(b, angleDeg, power) {
   const v = puttVelocity(angleDeg, power);
-  b.vx = v[0]; b.vz = v[1]; b.skid = Math.hypot(v[0], v[1]) * SKID_END;
+  b.vx = v[0]; b.vz = v[1]; b.wx = b.wy = b.wz = 0; b.slide = 1;
   return b;
 }
+/* spin that rolls without slipping at velocity (vx, vz) */
+function rollSpin(b) { b.wx = b.vz / BALL_R; b.wz = -b.vx / BALL_R; b.slide = 0; }
 /* a ball whose leading edge meets ground more than STEP_MAX above it hits the face of that step */
 function hitCliff(h, b, px, pz) {
-  const s = Math.hypot(b.vx, b.vz);
+  const s = hyp(b.vx, b.vz);
   if (s < 1e-9) return 0;
   const lx = b.x + b.vx / s * BALL_R * 0.8, lz = b.z + b.vz / s * BALL_R * 0.8;
   if (!onFloor(h, lx, lz) || groundH(h, lx, lz) - b.y <= STEP_MAX) return 0;
   /* the face normal points from the high ground back down to the ball */
   const e = BALL_R, H = (x, z) => groundH(h, x, z);
   let nx = -(H(lx + e, lz) - H(lx - e, lz)), nz = -(H(lx, lz + e) - H(lx, lz - e));
-  const n = Math.hypot(nx, nz);
+  const n = hyp(nx, nz);
   if (n < 1e-9) { nx = -b.vx / s; nz = -b.vz / s; } else { nx /= n; nz /= n; }
   b.x = px; b.z = pz;
   return bounce(b, nx, nz, CLIFF_E, 0, 0);
 }
+const cupDist = (h, b) => hyp(b.x - h.cup[0], b.z - h.cup[1]);
+/* the hole itself, for a ball whose centre is near it in the air: below the rim the liner (a vertical
+   cylinder) holds the ball in; at the rim the edge is a circle the ball can strike, ride or tip over.
+   Returns the strongest impact, logged as a lip (the rim) or a rattle (the liner). */
+function cupContact(h, b) {
+  const R = BALL_R, dx = b.x - h.cup[0], dz = b.z - h.cup[1], d = hyp(dx, dz);
+  if (d >= CUP_R + RIM_RHO + R) return 0;
+  const ux = d > 1e-9 ? dx / d : 1, uz = d > 1e-9 ? dz / d : 0, kr = CUP_R + RIM_RHO;
+  /* the lip's rounding: a torus whose core circle sits RIM_RHO outside and below the rim's top */
+  const kx = h.cup[0] + ux * kr, kz = h.cup[1] + uz * kr, yk = groundH(h, kx, kz) - RIM_RHO, cy = b.y + R;
+  if (cy < yk) {
+    if (d < CUP_R - R || d >= CUP_R) return 0;
+    /* inside, against the liner */
+    b.x = h.cup[0] + ux * (CUP_R - R); b.z = h.cup[1] + uz * (CUP_R - R);
+    const v = impulse(b, -ux, 0, -uz, LINER_E, LINER_MU);
+    if (v > 0.15) b.hits.push(['rattle', v]);
+    return v;
+  }
+  const ex = b.x - kx, ey = cy - yk, ez = b.z - kz, el = Math.sqrt(ex * ex + ey * ey + ez * ez), reach = R + RIM_RHO;
+  if (el >= reach || el < 1e-9) return 0;
+  const nx = ex / el, ny = ey / el, nz = ez / el;
+  b.x = kx + nx * reach; b.z = kz + nz * reach; b.y = yk + ny * reach - R;
+  /* a real knock bounces off the lip; a ball merely resting on it rides it (no bounce, no jitter) */
+  const vn = -(b.vx * nx + b.vy * ny + b.vz * nz), v = impulse(b, nx, ny, nz, vn > 0.2 ? RIM_E : 0, RIM_MU);
+  if (v > 0.3) b.hits.push(['lip', v]);
+  return v;
+}
+/* the ball's centre is over the hole (inside the lip's rounding): no flat turf under it */
+const overHole = (h, b) => cupDist(h, b) < CUP_R + RIM_RHO;
+/* in the air: gravity, walls, the cup's rim and liner, and the landing. Near the cup the step is
+   split so a fast ball cannot pass through the rim edge between two steps. */
+function stepAir(h, b, t, dt, g) {
+  const px = b.x, pz = b.z, py = b.y, dc = cupDist(h, b), s = hyp(b.vx, b.vz);
+  const near = dc < CUP_R + RIM_RHO + 2 * BALL_R + s * dt, n = near ? Math.min(8, Math.max(1, Math.ceil(s * dt / (0.2 * BALL_R)))) : 1, d = dt / n;
+  for (let i = 0; i < n; i++) {
+    b.vy -= g * d; b.x += b.vx * d; b.z += b.vz * d; b.y += b.vy * d;
+    if (near) cupContact(h, b);
+  }
+  collideAll(h, b, t);
+  const c = cupDist(h, b);
+  if (c < CUP_R && b.y + BALL_R < groundH(h, h.cup[0] + (b.x - h.cup[0]) / (c || 1) * CUP_R, h.cup[1] + (b.z - h.cup[1]) / (c || 1) * CUP_R) - SUNK_DEPTH * BALL_R) return 'sunk';
+  if (c >= CUP_R + RIM_RHO && onFloor(h, b.x, b.z)) {
+    const gh = groundH(h, b.x, b.z);
+    /* already below this floor's surface last step: it came in from the side, under the edge, so it hits the slab's face */
+    if (py < gh - STEP_MAX && b.y <= gh) {
+      const sp = hyp(b.vx, b.vz) || 1;
+      b.x = px; b.z = pz;
+      if (bounce(b, -b.vx / sp, -b.vz / sp, CLIFF_E, 0, 0)) b.hits.push(['wall', sp]);
+    } else if (b.y <= gh) {
+      /* the landing: an impulse against the ground's own normal, with that surface's bounce and friction */
+      const [gx, gz] = groundGrad(h, b.x, b.z), q = Math.sqrt(1 + gx * gx + gz * gz), nx = -gx / q, ny = 1 / q, nz = -gz / q;
+      const zn = zoneAt(h, b.x, b.z), sf = zn && zn.surf ? SURF[zn.surf] : SURF.felt, imp = -(b.vx * nx + b.vy * ny + b.vz * nz);
+      b.y = gh;
+      impulse(b, nx, ny, nz, imp > BOUNCE_VY ? sf.e : 0, sf.slide);
+      /* a soft landing joins the ground: vertical speed follows the slope, so the ball rolls on down a ramp */
+      if (imp <= BOUNCE_VY) { b.air = false; b.vy = gx * b.vx + gz * b.vz; b.slide = 1; }
+      if (imp > 0.4) b.hits.push(['land', imp]);
+    }
+  } else if (b.y < OOB_Y) return 'oob';
+  return null;
+}
 /* one fixed step at hole time t. Returns null while the putt is live, else how it ended. */
 function stepBall(h, b, t) {
-  const dt = SIM_DT, g = G * h.g;
+  const dt = SIM_DT, g = G * h.g, R = BALL_R;
   if (b.tube) {
     if ((b.tube.t -= dt) > 0) return null;
     const tb = b.tube.def, a = tb.dir * Math.PI / 180, v = clamp(b.tube.v * (tb.keep !== undefined ? tb.keep : 0.7) + (tb.add || 0.3), 0.4, V_CAP);
     b.x = tb.b[0]; b.z = tb.b[1]; b.y = groundH(h, b.x, b.z); b.vy = 0;
-    b.vx = Math.sin(a) * v; b.vz = Math.cos(a) * v; b.tube = null; b.skid = 0; b.hits.push(['tubeOut', v]);
+    b.vx = Math.sin(a) * v; b.vz = Math.cos(a) * v; b.tube = null; b.wy = 0; rollSpin(b); b.hits.push(['tubeOut', v]);
     return null;
   }
-  if (b.air) {
-    const px = b.x, pz = b.z, py = b.y;
-    b.vy -= g * dt;
-    b.x += b.vx * dt; b.z += b.vz * dt; b.y += b.vy * dt;
-    collideAll(h, b, t);
-    if (onFloor(h, b.x, b.z)) {
-      const gh = groundH(h, b.x, b.z);
-      /* already below this floor's surface last step: it came in from the side, under the edge, so it hits the slab's face */
-      if (py < gh - STEP_MAX && b.y <= gh) {
-        const s = Math.hypot(b.vx, b.vz) || 1;
-        b.x = px; b.z = pz;
-        if (bounce(b, -b.vx / s, -b.vz / s, CLIFF_E, 0, 0)) b.hits.push(['wall', s]);
-      } else if (b.y <= gh) {
-        const imp = -b.vy;
-        b.y = gh;
-        if (imp > BOUNCE_VY) { b.vy = imp * BOUNCE_E; b.vx *= 0.95; b.vz *= 0.95; }
-        else {
-          /* a soft landing joins the ground: vertical speed follows the slope under it, so the ball rolls on down a
-             ramp or a tilted green instead of skipping along it in the air (where the slope cannot pull it) */
-          const gg = groundGrad(h, b.x, b.z); b.vy = gg[0] * b.vx + gg[1] * b.vz; b.air = false;
-          const k = 1 - 0.08 * Math.min(1, imp / BOUNCE_VY); b.vx *= k; b.vz *= k;
-        }
-        if (imp > 0.4) b.hits.push(['land', imp]);
-      }
-    } else if (b.y < OOB_Y) return 'oob';
-    return null;
-  }
-  const grad = groundGrad(h, b.x, b.z), q = 1 + grad[0] * grad[0] + grad[1] * grad[1];
-  /* along the surface: gravity's slope share (5/7 for a rolling ball), projected onto the ground plane */
-  const sax = -ROLL * g * grad[0] / q, saz = -ROLL * g * grad[1] / q;
-  const zn = zoneAt(h, b.x, b.z);
-  let vx = b.vx + sax * dt, vz = b.vz + saz * dt;
+  if (b.air) return stepAir(h, b, t, dt, g);
+  const grad = groundGrad(h, b.x, b.z), q = 1 + grad[0] * grad[0] + grad[1] * grad[1], gn = g / Math.sqrt(q);
+  /* gravity along the surface, projected onto the ground plane */
+  const gax = -g * grad[0] / q, gaz = -g * grad[1] / q;
+  const zn = zoneAt(h, b.x, b.z), sf = zn && zn.surf ? SURF[zn.surf] : null;
+  const mu = sf ? sf.mu : h.feltMu, slide = sf ? sf.slide : SURF.felt.slide;
+  let vx = b.vx, vz = b.vz;
   if (zn && zn.push) { vx += zn.push[0] * dt; vz += zn.push[1] * dt; }
-  /* rolling resistance scales with the normal force; a freshly struck ball slides first */
-  const mu = zn && zn.surf ? SURF[zn.surf].mu : h.feltMu, s0 = Math.hypot(vx, vz);
-  const muNow = b.skid > 0 && s0 > b.skid ? Math.max(mu, SKID_MU) : mu;
-  if (b.skid > 0 && s0 <= b.skid) b.skid = 0;
-  const s1 = Math.max(0, s0 - muNow * g * dt / Math.sqrt(q));
-  if (s0 > 0) { vx *= s1 / s0; vz *= s1 / s0; }
-  if (s1 > V_CAP) { vx *= V_CAP / s1; vz *= V_CAP / s1; }
+  /* rolling resistance scales with the normal force */
+  const roll = (rx, rz) => { const s0 = hyp(rx, rz), s1 = Math.max(0, s0 - mu * gn * dt), k = s0 > 0 ? Math.min(s1, V_CAP) / s0 : 0; return [rx * k, rz * k]; };
+  /* the contact point's slip: v + w x (-R up) */
+  if (hyp(vx + R * b.wz, vz - R * b.wx) > SLIP_EPS) {
+    /* sliding: all of gravity's slope pull works on the centre, and sliding friction at the contact
+       both slows the ball and spins it up, until the slip is gone (it closes at 7/2 mu g) */
+    [vx, vz] = roll(vx + gax * dt, vz + gaz * dt);
+    const ux = vx + R * b.wz, uz = vz - R * b.wx, us = hyp(ux, uz) || 1;
+    const f = Math.min(slide * gn * dt, SLIDE_J * us), fx = -ux / us * f, fz = -uz / us * f, ik = 1 / (SPIN_I * R);
+    vx += fx; vz += fz; b.wx -= fz * ik; b.wz += fx * ik;
+    b.slide = hyp(vx + R * b.wz, vz - R * b.wx) > SLIP_EPS ? 1 : 0;
+  } else {
+    /* rolling: the slope pull is 5/7 g sin(theta), the spin rides along with the speed */
+    [vx, vz] = roll(vx + ROLL * gax * dt, vz + ROLL * gaz * dt);
+    b.slide = 0;
+  }
   b.vx = vx; b.vz = vz;
-  const px = b.x, pz = b.z;
+  if (!b.slide) { b.wx = vz / R; b.wz = -vx / R; }
+  /* spin about the vertical (from glancing wall hits) bleeds away in the contact patch */
+  b.wy -= Math.sign(b.wy) * Math.min(Math.abs(b.wy), 60 * slide * gn * dt);
+  const px = b.x, pz = b.z, vy0 = b.vy;
   b.x += vx * dt; b.z += vz * dt;
   collideAll(h, b, t);
   const cv = hitCliff(h, b, px, pz);
   if (cv) b.hits.push(['wall', cv]);
+  /* a hard knock against a wall's face kicks the ball up off the turf (the rail's friction on its spin) */
+  if (b.vy - vy0 > HOP_V) { b.air = true; return null; }
+  b.vy = vy0;
   if (!onFloor(h, b.x, b.z)) { b.air = true; b.vy -= g * dt; return null; }
+  /* over the hole: the turf is gone from under the ball's centre */
+  if (overHole(h, b)) { b.air = true; return null; }
   /* leaves the ground where the ground falls away faster than gravity can bend the path: crests, lips, drops */
   const gh = groundH(h, b.x, b.z), yFree = b.y + b.vy * dt - 0.5 * g * dt * dt;
   if (gh < yFree - 1e-4) { b.air = true; b.y = yFree; b.vy -= g * dt; return null; }
@@ -330,36 +430,16 @@ function stepBall(h, b, t) {
 
   const zw = zoneAt(h, b.x, b.z);
   if (zw && zw.surf === 'water') { b.hits.push(['splash', 1]); return 'oob'; }
-  for (const tb of h.tubes) if (Math.hypot(b.x - tb.a[0], b.z - tb.a[1]) < TUBE_R) {
-    b.tube = { def: tb, t: TUBE_T, v: Math.hypot(b.vx, b.vz) };
+  for (const tb of h.tubes) if (hyp(b.x - tb.a[0], b.z - tb.a[1]) < TUBE_R) {
+    b.tube = { def: tb, t: TUBE_T, v: hyp(b.vx, b.vz) };
     b.x = tb.a[0]; b.z = tb.a[1]; b.vx = b.vz = 0; b.hits.push(['tubeIn', 1]);
     return null;
   }
-
-  const s = Math.hypot(b.vx, b.vz), dx = b.x - h.cup[0], dz = b.z - h.cup[1], dc = Math.hypot(dx, dz);
-  if (dc < CUP_R) {
-    /* how far the ball's line passes from the cup centre sets the chord it crosses, and so the capture speed */
-    const off = s > 1e-6 ? Math.abs(b.vx * dz - b.vz * dx) / s : 0, chord = Math.max(0, 1 - (off / CUP_R) ** 2) ** 0.25;   /* gentle: an edge ball still gets a fair chance */
-    /* one capture decision per pass over the hole: a ball that hopped or lipped stays out unless it is crawling */
-    if (s < CAP_CREEP || (!b.inCup && s < CAP_V0 * chord)) return 'sunk';
-    if (!b.inCup) {
-      if (off < CUP_R * 0.3) { b.vx *= HOP_KEEP; b.vz *= HOP_KEEP; b.hits.push(['lip', s]); }   /* dead centre, too hot: hits the back and hops out */
-      else {
-        const a = ((b.vx * dz - b.vz * dx) > 0 ? 1 : -1) * LIP_TURN * off / CUP_R, c = Math.cos(a), sn = Math.sin(a);
-        const nvx = (b.vx * c - b.vz * sn) * LIP_KEEP, nvz = (b.vx * sn + b.vz * c) * LIP_KEEP;
-        b.vx = nvx; b.vz = nvz; b.hits.push(['lip', s]);
-      }
-    }
-    b.inCup = true;
-  } else {
-    b.inCup = false;
-    if (dc < CUP_R + LIP_PULL_R && s < CAP_V0 * 0.75) { const k = LIP_PULL * (1 - (dc - CUP_R) / LIP_PULL_R) * dt / dc; b.vx -= k * dx; b.vz -= k * dz; }
-  }
-  /* stopped when slow and the slope cannot beat whichever holds harder: static grip or rolling friction */
-  const pushA = zn && zn.push ? Math.hypot(zn.push[0], zn.push[1]) : 0;
-  if (s < STOP_V && Math.hypot(sax, saz) + pushA < Math.max(STATIC_MU, mu) * g) { b.vx = 0; b.vz = 0; return 'stop'; }
+  /* stopped when slow, not sliding, and the slope cannot beat whichever holds harder: static grip or rolling friction */
+  const s = hyp(b.vx, b.vz), pushA = zn && zn.push ? hyp(zn.push[0], zn.push[1]) : 0;
+  if (s < STOP_V && !b.slide && hyp(gax, gaz) * ROLL + pushA < Math.max(STATIC_MU, mu) * g) { b.vx = 0; b.vz = 0; b.wx = b.wy = b.wz = 0; return 'stop'; }
   b.still = s < STOP_V ? (b.still || 0) + SIM_DT : 0;
-  if (b.still >= SETTLE_T) { b.vx = 0; b.vz = 0; return 'stop'; }
+  if (b.still >= SETTLE_T) { b.vx = 0; b.vz = 0; b.wx = b.wy = b.wz = 0; return 'stop'; }
   return null;
 }
 function simulatePutt(h, from, angleDeg, power, t0 = 0) {
@@ -370,7 +450,30 @@ function simulatePutt(h, from, angleDeg, power, t0 = 0) {
     t += SIM_DT;
     if (!end && ++n * SIM_DT > MAX_SIM_T) end = 'timeout';
   }
-  return { end, x: b.x, z: b.z, t, steps: n, hits: b.hits };
+  const [x, z] = end === 'stop' ? restSpot(h, b.x, b.z) : [b.x, b.z];
+  return { end, x, z, t, steps: n, hits: b.hits };
+}
+/* the real rule for a ball against the border (WMF, PPA, BMGA): it may be placed out from the wall,
+   square to it. Here it happens for you whenever the ball comes to rest with its edge within
+   RELIEF_GAP of a wall or post face, so the putter always has room; it lands RELIEF_TO from the
+   face, or a little closer if that spot is not fair (off the floor, in water, on a slope, by the cup,
+   a tube or another wall). Deterministic, so live play, ghosts, shot codes and the solver agree. */
+const RELIEF_GAP = 0.025, RELIEF_TO = 0.12;
+function restSpot(h, x, z) {
+  let bd = Infinity, px = 0, pz = 0, reach = 0;
+  for (const s of h.segs) { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z), d = hyp(x - p[0], z - p[1]); if (d - WALL_HALF < bd - reach) { bd = d; px = p[0]; pz = p[1]; reach = WALL_HALF; } }
+  for (const p of h.posts) { const d = hyp(x - p.x, z - p.z); if (d - p.r < bd - reach) { bd = d; px = p.x; pz = p.z; reach = p.r; } }
+  if (bd - reach - BALL_R > RELIEF_GAP || bd < 1e-9) return [x, z];
+  const nx = (x - px) / bd, nz = (z - pz) / bd, y0 = groundH(h, x, z);
+  for (const to of [RELIEF_TO, RELIEF_TO * 0.7, RELIEF_TO * 0.45]) {
+    const tx = px + nx * (reach + BALL_R + to), tz = pz + nz * (reach + BALL_R + to), zn = zoneAt(h, tx, tz), gg = groundGrad(h, tx, tz);
+    if (!onFloor(h, tx, tz) || (zn && zn.surf === 'water') || Math.abs(groundH(h, tx, tz) - y0) > 0.02 || hyp(gg[0], gg[1]) * ROLL > STATIC_MU) continue;
+    if (hyp(tx - h.cup[0], tz - h.cup[1]) < DISH_R || h.tubes.some(tb => hyp(tx - tb.a[0], tz - tb.a[1]) < TUBE_R + BALL_R + 0.03)) continue;
+    if (h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], tx, tz); return hyp(tx - p[0], tz - p[1]) < WALL_HALF + BALL_R + RELIEF_GAP * 1.5; })) continue;
+    if (h.posts.some(p => hyp(tx - p.x, tz - p.z) < p.r + BALL_R + RELIEF_GAP * 1.5)) continue;
+    return [tx, tz];
+  }
+  return [x, z];
 }
 /* ---- 2e. rounds and scoring ---- */
 const capOf = h => h.par * 2;   /* the worst a hole can cost: double par, then the ball rolls itself in */
@@ -380,14 +483,14 @@ function newRound(h) { return { hole: h, strokes: 0, at: h.tee.slice(), done: fa
 function resolvePutt(round, result, from) {
   round.strokes++;
   if (result.end === 'sunk') { round.done = true; round.score = round.strokes; round.at = round.hole.cup.slice(); return 'sunk'; }
-  if (result.end === 'oob') { round.strokes++; round.at = from.slice(); } else round.at = [result.x, result.z];
+  if (result.end === 'oob') { round.strokes++; round.at = from.slice(); } else round.at = restSpot(round.hole, result.x, result.z);
   if (round.strokes >= capOf(round.hole)) { round.done = true; round.auto = true; round.score = capOf(round.hole); return 'auto'; }
   return result.end === 'oob' ? 'oob' : 'stop';
 }
 /* a mover pushed a resting ball: never the player's fault, so no stroke and no penalty */
 function resolveDrift(round, result, from) {
   if (result.end === 'sunk') { round.done = true; round.score = Math.max(1, round.strokes); round.at = round.hole.cup.slice(); return 'sunk'; }
-  round.at = result.end === 'oob' ? from.slice() : [result.x, result.z];
+  round.at = result.end === 'oob' ? from.slice() : restSpot(round.hole, result.x, result.z);
   return result.end === 'oob' ? 'oob' : 'stop';
 }
 
@@ -581,7 +684,7 @@ function initRenderer() {
   sun.shadow.radius = 4;
   sun.shadow.bias = -0.0004;
   scene.add(sun, sun.target);
-  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshStandardMaterial({ map: ballTexture(GEAR.ball), bumpMap: dimpleTexture(), bumpScale: 0.6, roughness: 0.32 }));
+  ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshPhysicalMaterial({ map: ballTexture(GEAR.ball), bumpMap: dimpleTexture(), bumpScale: 0.6, roughness: 0.32, clearcoat: 0.7, clearcoatRoughness: 0.18 }));
   ballMesh.castShadow = true;
   scene.add(ballMesh);
   resizeRenderer();
@@ -598,14 +701,172 @@ function canvasTex(w, h, draw) {
   const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'));
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
-function feltTexture(hex) {
-  const t = canvasTex(128, 128, x => {
-    const r = rng32(7); x.fillStyle = hex; x.fillRect(0, 0, 128, 128);
-    /* mowing stripes, like a real green: two bands per tile, about 33 cm each */
-    x.fillStyle = 'rgba(255,255,255,0.045)'; x.fillRect(0, 0, 128, 32); x.fillRect(0, 64, 128, 32);
-    for (let i = 0; i < 2600; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'; x.fillRect(r() * 128, r() * 128, 1.5, 1.5); }
+/* ---- 5a2. real surfaces ----
+   Everything is drawn once on canvas at runtime (no image files): tileable value noise, turf with
+   blade speckle and a normal map, sand, timber, stone, brick, steel, marble and mulch. The canvases
+   are cached by key (the GPU textures are made per hole and freed with it, so nothing leaks). */
+const CANVAS_CACHE = new Map();
+function cachedCanvas(key, w, h, draw) {
+  let c = CANVAS_CACHE.get(key);
+  if (!c) { c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); CANVAS_CACHE.set(key, c); }
+  return c;
+}
+function texOf(canvas, srgb = true, rep = 1) {
+  const t = new THREE.CanvasTexture(canvas);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep);
+  t.anisotropy = renderer ? Math.min(8, renderer.capabilities.getMaxAnisotropy()) : 4;
+  return t;
+}
+/* tileable value noise on a period x period lattice, smoothed; fbm sums octaves */
+function noiseField(seed, period) {
+  const r = rng32(seed), g = Float32Array.from({ length: period * period }, () => r());
+  const at = (i, j) => g[((j % period + period) % period) * period + ((i % period + period) % period)];
+  return (u, v) => {
+    const x = u * period, y = v * period, i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j;
+    const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+    const a = at(i, j) + (at(i + 1, j) - at(i, j)) * sx, b = at(i, j + 1) + (at(i + 1, j + 1) - at(i, j + 1)) * sx;
+    return a + (b - a) * sy;
+  };
+}
+function fbm(seed, base, oct) {
+  const fs = Array.from({ length: oct }, (_, k) => noiseField(seed + k * 101, base << k));
+  return (u, v) => { let s = 0, a = 0.5, n = 0; for (const f of fs) { s += f(u, v) * a; n += a; a *= 0.5; } return s / n; };
+}
+const hexRGB = hex => { const c = new THREE.Color(hex); return [c.r * 255, c.g * 255, c.b * 255]; };
+/* fills a canvas pixel by pixel: fn(u, v) -> [r, g, b] (0..255) */
+function paint(x, w, h, fn) {
+  const img = x.createImageData(w, h), d = img.data;
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
+    const c = fn(i / w, j / h, i, j), k = (j * w + i) * 4;
+    d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2]; d[k + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+}
+/* a tangent-space normal map from a height function (tileable when the height is) */
+function normalCanvas(key, size, height, strength) {
+  return cachedCanvas('n:' + key, size, size, (x, w, h) => {
+    const H = new Float32Array(w * h);
+    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) H[j * w + i] = height(i / w, j / h, i, j);
+    const at = (i, j) => H[((j + h) % h) * w + ((i + w) % w)];
+    paint(x, w, h, (u, v, i, j) => {
+      const dx = (at(i + 1, j) - at(i - 1, j)) * strength, dy = (at(i, j + 1) - at(i, j - 1)) * strength, l = Math.hypot(dx, dy, 1);
+      return [(-dx / l * 0.5 + 0.5) * 255, (dy / l * 0.5 + 0.5) * 255, (1 / l * 0.5 + 0.5) * 255];
+    });
   });
-  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
+}
+/* turf: the felt colour, a soft two-scale mottle, and thousands of short blades a shade lighter or
+   darker, some yellower, some bluer; the normal map gives the nap its grain */
+const TURF_PX = 512;
+function turfCanvas(hex) {
+  return cachedCanvas('turf:' + hex, TURF_PX, TURF_PX, (x, w, h) => {
+    const [r0, g0, b0] = hexRGB(hex), m = fbm(17, 4, 4), f = fbm(29, 32, 2);
+    paint(x, w, h, (u, v) => { const k = 0.9 + 0.16 * m(u, v) + 0.1 * (f(u, v) - 0.5); return [r0 * k, g0 * k, b0 * k]; });
+    const r = rng32(7);
+    x.lineCap = 'round';
+    for (let i = 0; i < 26000; i++) {
+      const px = r() * w, py = r() * h, a = r() * Math.PI * 2, L = 1.2 + r() * 2.6, t = r();
+      const lit = t < 0.5 ? 1.18 + r() * 0.2 : 0.74 + r() * 0.14, warm = r() < 0.3 ? 1.08 : r() < 0.3 ? 0.92 : 1;
+      x.strokeStyle = `rgba(${Math.min(255, r0 * lit * warm) | 0},${Math.min(255, g0 * lit) | 0},${Math.min(255, b0 * lit / warm) | 0},${0.35 + r() * 0.35})`;
+      x.lineWidth = 0.8 + r() * 0.7;
+      for (const ox of [0, -w, w]) for (const oy of [0, -h, h]) {
+        if (px + ox < -4 || px + ox > w + 4 || py + oy < -4 || py + oy > h + 4) continue;
+        x.beginPath(); x.moveTo(px + ox, py + oy); x.lineTo(px + ox + Math.cos(a) * L, py + oy + Math.sin(a) * L); x.stroke();
+      }
+    }
+  });
+}
+function turfNormal() {
+  const fine = noiseField(41, 128), mid = fbm(43, 16, 3);
+  return normalCanvas('turf', 256, (u, v) => fine(u, v) * 0.7 + mid(u, v) * 0.6, 2.2);
+}
+/* generic grainy surfaces: sand, mud, the lawn round the course, mulch, river rock */
+function grainCanvas(key, hex, { scale = 64, contrast = 0.22, speck = 0.12, seed = 5, size = 256 } = {}) {
+  return cachedCanvas(`grain:${key}:${hex}`, size, size, (x, w, h) => {
+    const [r0, g0, b0] = hexRGB(hex), m = fbm(seed, 4, 3), n = noiseField(seed + 9, scale), r = rng32(seed + 3);
+    paint(x, w, h, (u, v) => { const k = 1 - contrast / 2 + contrast * m(u, v) + speck * (n(u, v) - 0.5) + (r() - 0.5) * speck; return [r0 * k, g0 * k, b0 * k]; });
+  });
+}
+/* mulch beds and river rock: the landscaping strip round the course */
+function edgingCanvas(kind, hex) {
+  return cachedCanvas(`edge:${kind}:${hex}`, 256, 256, (x, w, h) => {
+    const [r0, g0, b0] = hexRGB(hex), r = rng32(kind === 'rock' ? 61 : 67), m = fbm(71, 4, 3);
+    paint(x, w, h, (u, v) => { const k = 0.75 + 0.3 * m(u, v); return [r0 * k * 0.8, g0 * k * 0.8, b0 * k * 0.8]; });
+    const n = kind === 'rock' ? 260 : 2200;
+    for (let i = 0; i < n; i++) {
+      const px = r() * w, py = r() * h, s = kind === 'rock' ? 5 + r() * 9 : 1.5 + r() * 4, k = 0.7 + r() * 0.6;
+      x.fillStyle = `rgb(${Math.min(255, r0 * k) | 0},${Math.min(255, g0 * k) | 0},${Math.min(255, b0 * k) | 0})`;
+      x.beginPath();
+      if (kind === 'rock') x.ellipse(px, py, s, s * (0.6 + r() * 0.3), r() * 3, 0, Math.PI * 2);
+      else { x.save(); x.translate(px, py); x.rotate(r() * 3); x.rect(-s, -s * 0.3, s * 2, s * 0.6); x.restore(); }
+      x.fill();
+    }
+  });
+}
+/* borders: the material a world builds its walls from, tinted by its wall colour */
+function wallCanvas(kind, hex) {
+  return cachedCanvas(`wall:${kind}:${hex}`, 256, 256, (x, w, h) => {
+    const [r0, g0, b0] = hexRGB(hex), r = rng32(13), m = fbm(19, 4, 4), n = noiseField(23, 64);
+    if (kind === 'wood') {
+      /* timber: grain runs along the board (u), with knots and a few plank seams */
+      const g = fbm(31, 8, 3);
+      paint(x, w, h, (u, v) => { const s = Math.sin((v * 22 + g(u * 0.3, v) * 6) * Math.PI) * 0.5 + 0.5, k = 0.78 + 0.18 * s + 0.08 * m(u, v); return [r0 * k, g0 * k, b0 * k]; });
+      x.fillStyle = 'rgba(40,24,10,0.35)'; for (let i = 0; i < 4; i++) x.fillRect(0, (i * 64 + 62) % h, w, 2);
+    } else if (kind === 'stone' || kind === 'brick') {
+      /* blocks with mortar joints; stone blocks vary in length and tone */
+      const rows = kind === 'brick' ? 8 : 4;
+      paint(x, w, h, (u, v) => { const k = 0.82 + 0.2 * m(u, v) + 0.1 * (n(u, v) - 0.5); return [r0 * k, g0 * k, b0 * k]; });
+      for (let j = 0; j < rows; j++) {
+        let u = (j % 2) * (kind === 'brick' ? 0.25 : 0.17);
+        while (u < 1.2) {
+          const len = kind === 'brick' ? 0.5 : 0.25 + r() * 0.35, k = 0.86 + r() * 0.24;
+          x.fillStyle = `rgba(${r0 * k | 0},${g0 * k | 0},${b0 * k | 0},0.55)`;
+          x.fillRect((u % 1) * w, j * h / rows, len * w, h / rows);
+          x.fillStyle = 'rgba(30,24,20,0.55)'; x.fillRect((u % 1) * w - 1, j * h / rows, 3, h / rows);
+          u += len;
+        }
+        x.fillStyle = 'rgba(30,24,20,0.55)'; x.fillRect(0, j * h / rows - 1, w, 3);
+      }
+    } else if (kind === 'steel') {
+      /* painted steel: brushed streaks, a few rivets */
+      paint(x, w, h, (u, v) => { const k = 0.86 + 0.1 * n(u * 0.05, v * 3) + 0.06 * m(u, v); return [r0 * k, g0 * k, b0 * k]; });
+      x.fillStyle = 'rgba(0,0,0,0.25)'; for (let i = 0; i < 8; i++) { x.beginPath(); x.arc((i + 0.5) * w / 8, h * 0.2, 3, 0, 7); x.fill(); x.beginPath(); x.arc((i + 0.5) * w / 8, h * 0.8, 3, 0, 7); x.fill(); }
+    } else if (kind === 'marble') {
+      const g = fbm(37, 4, 5);
+      paint(x, w, h, (u, v) => { const vein = Math.pow(Math.abs(Math.sin((u * 3 + v * 2 + g(u, v) * 4) * Math.PI)), 0.25), k = 0.84 + 0.16 * vein; return [r0 * k, g0 * k, b0 * k]; });
+    } else {
+      paint(x, w, h, (u, v) => { const k = 0.93 + 0.08 * m(u, v); return [r0 * k, g0 * k, b0 * k]; });
+    }
+  });
+}
+function wallNormalCanvas(kind) {
+  if (kind === 'wood') { const g = fbm(31, 8, 3); return normalCanvas('wood', 128, (u, v) => Math.sin((v * 22 + g(u * 0.3, v) * 6) * Math.PI) * 0.5, 1.6); }
+  if (kind === 'stone' || kind === 'brick') { const rows = kind === 'brick' ? 8 : 4, m = fbm(53, 8, 3); return normalCanvas(kind, 128, (u, v) => { const fv = (v * rows) % 1; return (fv < 0.05 || fv > 0.95 ? -1 : 0) + m(u, v) * 0.8; }, 2.4); }
+  const n = fbm(59, 16, 2);
+  return normalCanvas('fine', 128, (u, v) => n(u, v) * 0.4, 1.2);
+}
+/* UVs for a wall box in metres along its length and height, so one texture tiles at real scale */
+function scaleBoxUV(geo, len, hgt, wid, tile = 0.5) {
+  const uv = geo.attributes.uv, dims = [[len, hgt], [len, hgt], [wid, len], [wid, len], [wid, hgt], [wid, hgt]];
+  for (let f = 0; f < 6; f++) for (let k = 0; k < 4; k++) { const i = f * 4 + k; uv.setXY(i, uv.getX(i) * dims[f][0] / tile, uv.getY(i) * dims[f][1] / tile); }
+  uv.needsUpdate = true;
+  return geo;
+}
+/* the sky as a real environment: a gradient with a sun, prefiltered so everything shiny reflects it */
+let skyEnv = null, skyEnvKey = '';
+function skyEnvironment(look) {
+  const key = look.sky.join() + (look.night ? 'n' : '');
+  if (skyEnv && key === skyEnvKey) return skyEnv;
+  if (skyEnv) skyEnv.dispose();
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
+  const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 128);
+  g.addColorStop(0, look.sky[0]); g.addColorStop(0.48, look.sky[1]); g.addColorStop(0.52, look.ground || '#6f7f5a'); g.addColorStop(1, new THREE.Color(look.ground || '#6f7f5a').multiplyScalar(0.5).getStyle());
+  x.fillStyle = g; x.fillRect(0, 0, 256, 128);
+  if (!look.night) { const s = x.createRadialGradient(170, 30, 0, 170, 30, 26); s.addColorStop(0, 'rgba(255,250,235,1)'); s.addColorStop(1, 'rgba(255,250,235,0)'); x.fillStyle = s; x.fillRect(140, 0, 60, 60); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.mapping = THREE.EquirectangularReflectionMapping;
+  const pm = new THREE.PMREMGenerator(renderer);
+  skyEnv = pm.fromEquirectangular(t).texture; pm.dispose(); t.dispose(); skyEnvKey = key;
+  return skyEnv;
 }
 /* a toy ball with a band and a star, so the roll reads; colours come from the equipped ball */
 function ballTexture(b) {
@@ -656,13 +917,14 @@ function holeBounds(h) {
 }
 /* a grid over the hole's bounding box keeping cells whose centre passes `keep`; vertex heights
    follow groundH so bumps, bowls, tiers and ramps are real geometry */
-function gridGeometry(h, keep, lift = 0) {
+function gridGeometry(h, keep, lift = 0, shade = null) {
   const B = holeBounds(h), C = (B.x1 - B.x0) * (B.z1 - B.z0) > 60 ? 0.07 : 0.05;
   const nx = Math.ceil((B.x1 - B.x0) / C), nz = Math.ceil((B.z1 - B.z0) / C);
-  const pos = [], uv = [], idx = [];
+  const pos = [], uv = [], idx = [], col = [];
   for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) {
     const x = B.x0 + i * C, z = B.z0 + j * C;
     pos.push(x, groundH(h, x, z) + lift, z); uv.push(x * 1.5, z * 1.5);
+    if (shade) { const k = shade(x, z); col.push(k, k, k); }
   }
   for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
     if (!keep(B.x0 + (i + 0.5) * C, B.z0 + (j + 0.5) * C)) continue;
@@ -672,15 +934,38 @@ function gridGeometry(h, keep, lift = 0) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  if (shade) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.setIndex(idx); g.computeVertexNormals();
   return g;
+}
+/* the turf's baked light, per vertex: contact shadow where it meets a wall, a post or the foot of a
+   step, broad mowing stripes across the line of play, and a slow mottle so no two metres match */
+function floorShade(h) {
+  const dx = h.cup[0] - h.tee[0], dz = h.cup[1] - h.tee[1], dl = Math.hypot(dx, dz) || 1, px = -dz / dl, pz = dx / dl;
+  const mott = noiseField(97 + h.key.length, 64);
+  return (x, z) => {
+    let ao = 1;
+    for (let i = 0; i < h.segs.length; i++) {
+      const bb = h.segBox[i];
+      if (x < bb[0] - 0.1 || x > bb[1] + 0.1 || z < bb[2] - 0.1 || z > bb[3] + 0.1) continue;
+      const s = h.segs[i], p = closestOnSeg(s[0], s[1], s[2], s[3], x, z), d = Math.hypot(x - p[0], z - p[1]) - WALL_HALF;
+      ao = Math.min(ao, 1 - 0.34 * Math.exp(-Math.max(0, d) / 0.045));
+    }
+    for (const p of h.posts) { const d = Math.hypot(x - p.x, z - p.z) - p.r; if (d < 0.25) ao = Math.min(ao, 1 - 0.3 * Math.exp(-Math.max(0, d) / 0.035)); }
+    const y = groundH(h, x, z);
+    let rise = 0;
+    for (const [ox, oz] of [[0.05, 0], [-0.05, 0], [0, 0.05], [0, -0.05]]) rise = Math.max(rise, groundH(h, x + ox, z + oz) - y);
+    if (rise > 0.02) ao *= 1 - Math.min(0.28, (rise - 0.02) * 4);
+    const band = Math.sin((x * px + z * pz) / 0.75 * Math.PI), stripe = 1 + 0.15 * Math.tanh(band * 3);
+    return ao * stripe * (0.96 + 0.08 * mott(x / 9, z / 9));
+  };
 }
 /* walls stand from below their lowest ground to WALL_TOP over their highest, as the physics measures them */
 function wallGroup(h, m) {
   const g = new THREE.Group(); g.name = 'walls';
   h.segs.forEach(([ax, az, bx, bz], i) => {
     const len = Math.hypot(bx - ax, bz - az), top = h.segTop[i][0], lo = Math.min(0, h.segTop[i][1]) - 0.03;
-    const w = new THREE.Mesh(new THREE.BoxGeometry(WALL_HALF * 2, top - lo, len), m);
+    const w = new THREE.Mesh(scaleBoxUV(new THREE.BoxGeometry(WALL_HALF * 2, top - lo, len), len, top - lo, WALL_HALF * 2), m);
     w.position.set((ax + bx) / 2, (top + lo) / 2, (az + bz) / 2);
     w.rotation.y = Math.atan2(bx - ax, bz - az);
     w.castShadow = w.receiveShadow = true;
@@ -743,10 +1028,12 @@ function drainSpiral(h, dr) {
 const COLLAR_R = 0.26;
 function collarGeometry(h) {
   const [cx, cz] = h.cup, N = 96, rings = [CUP_R, CUP_R + 0.02, 0.06 + CUP_R, 0.17, COLLAR_R + 0.07], pos = [], uv = [], idx = [];
-  rings.forEach(r => { for (let i = 0; i <= N; i++) { const a = i / N * Math.PI * 2, x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r; pos.push(x, groundH(h, x, z) + 0.0015, z); uv.push(x * 1.5, z * 1.5); } });
+  const shade = floorShade(h), col = [];
+  rings.forEach(r => { for (let i = 0; i <= N; i++) { const a = i / N * Math.PI * 2, x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r, k = shade(x, z); pos.push(x, groundH(h, x, z) + 0.0015, z); uv.push(x * 1.5, z * 1.5); col.push(k, k, k); } });
   for (let k = 0; k + 1 < rings.length; k++) for (let i = 0; i < N; i++) { const a = k * (N + 1) + i, b = a + 1, c = a + N + 1, d = c + 1; idx.push(a, b, c, b, d, c); }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.setIndex(idx); g.computeVertexNormals(); return g;
 }
 function cupGroup(h, look) {
@@ -766,11 +1053,75 @@ function cupGroup(h, look) {
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.8, 12), mat('#fffdf7', { roughness: 0.35 })); pole.position.y = 0.3; pole.castShadow = true;
   const band = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.05, 12), mat(look.flag, { roughness: 0.4 })); band.position.y = 0.5;
   const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.quadraticCurveTo(0.12, -0.03, 0.22, -0.06); shape.lineTo(0.2, -0.1); shape.quadraticCurveTo(0.1, -0.12, 0, -0.14);
-  const flag = new THREE.Mesh(new THREE.ShapeGeometry(shape, 8), mat(look.flag, { side: THREE.DoubleSide, roughness: 0.7 })); flag.position.set(0.007, 0.69, 0); flag.castShadow = true;
+  /* a real course flag: the hole's number printed on it, the right way round on both faces */
+  const flagGeo = new THREE.ShapeGeometry(shape, 8), n = h.key.split('-')[1];
+  const face = flip => { const t = flagTexture(look.flag, n); t.repeat.set((flip ? -1 : 1) / 0.22, 1 / 0.14); t.offset.set(flip ? 1 : 0, 1); return t; };
+  const flag = new THREE.Mesh(flagGeo, mat('#ffffff', { map: face(false), side: THREE.FrontSide, roughness: 0.75 })), back = new THREE.Mesh(flagGeo, mat('#ffffff', { map: face(true), side: THREE.BackSide, roughness: 0.75 }));
+  for (const f of [flag, back]) { f.position.set(0.007, 0.69, 0); f.castShadow = true; }
   const ball = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), mat('#fffdf7', { roughness: 0.35 })); ball.position.y = 0.705;
-  flagGroup.add(pole, band, flag, ball);
-  g.add(soil, liner, lip, bottom, drain, shade, flagGroup);
+  flagGroup.add(pole, band, flag, back, ball);
+  /* the cup's brushed metal ferrule, the ring a real cup shows just below the turf */
+  const ferrule = new THREE.Mesh(new THREE.TorusGeometry(CUP_R - 0.003, 0.0035, 8, SEG), mat('#d8dde3', { roughness: 0.28, metalness: 0.9 }));
+  ferrule.rotation.x = Math.PI / 2; ferrule.position.y = -CUT + 0.002;
+  g.add(soil, liner, lip, ferrule, bottom, drain, shade, flagGroup);
   return g;
+}
+function flagTexture(hex, n) {
+  return canvasTex(128, 96, x => {
+    x.fillStyle = hex; x.fillRect(0, 0, 128, 96);
+    x.fillStyle = 'rgba(255,255,255,0.12)'; for (let i = 0; i < 128; i += 6) x.fillRect(i, 0, 2, 96);
+    x.fillStyle = '#fffdf7'; x.font = '900 62px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(n, 50, 52);
+  });
+}
+/* the tee: a rubber tee mat with its moulded tee spot, square to the line of play, cut to fit the
+   floor; and a ball-shaped hole marker on a short post just outside the border beside it */
+function teeGroup(h, look) {
+  const g = new THREE.Group(); g.name = 'tee';
+  const [tx, tz] = h.tee, a = (h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - tx, h.cup[1] - tz) * 180 / Math.PI) * Math.PI / 180;
+  const ux = Math.sin(a), uz = Math.cos(a), px = Math.cos(a), pz = -Math.sin(a), y = groundH(h, tx, tz);
+  const fits = (w, l) => [[-w, -l * 0.35], [w, -l * 0.35], [-w, l * 0.65], [w, l * 0.65]].every(([s, f]) => {
+    const x = tx + px * s + ux * f, z = tz + pz * s + uz * f;
+    return onFloor(h, x, z) && Math.abs(groundH(h, x, z) - y) < 0.004 && h.segs.every(sg => { const p = closestOnSeg(sg[0], sg[1], sg[2], sg[3], x, z); return hyp(x - p[0], z - p[1]) > WALL_HALF + 0.015; });
+  });
+  let w = 0.16, l = 0.42;
+  while (w > 0.06 && !fits(w, l)) { w *= 0.85; l *= 0.85; }
+  if (fits(w, l)) {
+    const mt = new THREE.Mesh(new THREE.PlaneGeometry(w * 2, l), mat('#ffffff', { map: teeMatTexture(), roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -2 }));
+    mt.rotation.x = -Math.PI / 2; mt.rotation.z = a; mt.position.set(tx + ux * l * 0.15, y + 0.0015, tz + uz * l * 0.15); mt.receiveShadow = true; mt.renderOrder = 1;
+    g.add(mt);
+  }
+  /* the marker: beside the tee, out past the nearest border, on open ground only */
+  if (look.ground && !look.night) {
+    for (const side of [1, -1]) {
+      let d = 0.25;
+      while (d < 1.6 && (onFloor(h, tx + px * side * d, tz + pz * side * d) || h.segs.some(sg => { const p = closestOnSeg(sg[0], sg[1], sg[2], sg[3], tx + px * side * d, tz + pz * side * d); return hyp(tx + px * side * d - p[0], tz + pz * side * d - p[1]) < 0.22; }))) d += 0.05;
+      const mx = tx + px * side * d - ux * 0.15, mz = tz + pz * side * d - uz * 0.15;
+      if (d >= 1.6 || h.floors.some(f => inPoly(f, mx, mz))) continue;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.22, 8), mat('#6b6f74', { roughness: 0.5, metalness: 0.6 })); post.position.set(mx, -0.03 + 0.11, mz); post.castShadow = true;
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.02, 32), [mat('#e9e4d8', { roughness: 0.5 }), mat('#ffffff', { map: markerTexture(h.key.split('-')[1], look.flag), roughness: 0.5 }), mat('#ffffff', { map: markerTexture(h.key.split('-')[1], look.flag), roughness: 0.5 })]);
+      disc.rotation.set(Math.PI / 2, 0, 0); disc.rotation.order = 'YXZ'; disc.rotation.y = a + Math.PI; disc.position.set(mx, -0.03 + 0.27, mz); disc.castShadow = true;
+      g.add(post, disc);
+      break;
+    }
+  }
+  return g;
+}
+function teeMatTexture() {
+  return canvasTex(64, 128, x => {
+    x.fillStyle = '#2b2f2c'; x.fillRect(0, 0, 64, 128);
+    const r = rng32(5); for (let i = 0; i < 500; i++) { x.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.15)'; x.fillRect(r() * 64, r() * 128, 1.5, 1.5); }
+    x.strokeStyle = 'rgba(255,255,255,0.22)'; x.lineWidth = 3; x.strokeRect(3, 3, 58, 122);
+    x.fillStyle = '#1b1e1c'; x.beginPath(); x.arc(32, 128 * 0.65, 7, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,0.35)'; x.lineWidth = 2; x.beginPath(); x.arc(32, 128 * 0.65, 9, 0, 7); x.stroke();
+  });
+}
+function markerTexture(n, hex) {
+  return canvasTex(128, 128, x => {
+    x.fillStyle = '#fffdf7'; x.beginPath(); x.arc(64, 64, 64, 0, 7); x.fill();
+    x.strokeStyle = hex; x.lineWidth = 10; x.beginPath(); x.arc(64, 64, 56, 0, 7); x.stroke();
+    x.fillStyle = '#3a3026'; x.font = '900 64px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(n, 64, 68);
+  });
 }
 function cupShadeTexture() {
   /* the ring's UVs are planar, so the fade is a radial gradient: dark at the rim, gone at LIP_PULL_R */
@@ -832,27 +1183,74 @@ function scatterProps(group, h, look) {
     const o = look.prop(r); o.position.set(x, 0, z); o.rotation.y = r() * Math.PI * 2; o.userData.prop = true; group.add(o); n++;
   }
 }
+const TEX_SLOTS = ['map', 'normalMap', 'roughnessMap', 'bumpMap', 'emissiveMap', 'alphaMap', 'aoMap', 'clearcoatNormalMap'];
 function disposeGroup(g) {
   g.traverse(o => {
     if (o.geometry) o.geometry.dispose();
     const ms = o.material ? [].concat(o.material) : [];
-    for (const m of ms) { if (m.map) m.map.dispose(); m.dispose(); }
+    for (const m of ms) { for (const k of TEX_SLOTS) if (m[k] && !(m[k].userData && m[k].userData.keep)) m[k].dispose(); m.dispose(); }
   });
 }
 const holeWorld = h => Number(h.key.split('-')[0]);
+/* the putting surface: a real-looking carpet of turf. Sheen gives it the soft velvet glow turf has
+   against the light; the baked shade rides in the vertex colours. Night keeps its flat black-light look. */
+function turfMaterial(hex, o = {}) {
+  const c = new THREE.Color(hex);
+  return new THREE.MeshPhysicalMaterial(Object.assign({ color: 0xffffff, map: texOf(turfCanvas(hex)), normalMap: texOf(turfNormal(), false), normalScale: new THREE.Vector2(0.55, 0.55),
+    roughness: 0.93, sheen: 0.55, sheenRoughness: 0.55, sheenColor: c.clone().lerp(new THREE.Color(0xfff6d8), 0.45), vertexColors: true }, o));
+}
+/* the world's border material: timber, stone, brick, painted steel, marble, or plain paint */
+const WALL_KIND_OF = { 1: 'steel', 2: 'stone', 3: 'stone', 4: 'wood', 5: 'wood', 6: 'stone', 7: 'brick', 8: 'steel', 9: 'paint', 10: 'marble' };
+function wallMaterial(look, w) {
+  const kind = look.night ? 'paint' : look.wallKind || WALL_KIND_OF[worldOf(w)] || 'wood';
+  const metal = kind === 'steel' ? 0.45 : 0, rough = { wood: 0.78, stone: 0.9, brick: 0.92, steel: 0.42, marble: 0.35, paint: 0.5 }[kind];
+  return new THREE.MeshStandardMaterial({ color: 0xffffff, map: texOf(wallCanvas(kind, look.wall)), normalMap: texOf(wallNormalCanvas(kind), false), normalScale: new THREE.Vector2(0.7, 0.7), roughness: rough, metalness: metal });
+}
 function zoneMaterial(zn, look) {
   if (zn.push) {
     const t = flowTexture(look.push); t.center.set(0.5, 0.5); t.rotation = -Math.atan2(zn.push[0], zn.push[1]);
     flowTex.push({ t, speed: Math.hypot(zn.push[0], zn.push[1]) });
-    return mat('#ffffff', { map: t, roughness: 0.7 });
+    return mat('#ffffff', { map: t, roughness: 0.6, normalMap: texOf(wallNormalCanvas('fine'), false) });
   }
   switch (zn.surf) {
-    case 'ice': return mat(look.ice, { roughness: 0.1, metalness: 0.05, transparent: true, opacity: 0.88 });
-    case 'water': { const t = waterTexture(look.water); flowTex.push({ t, speed: 0.25 }); return mat('#ffffff', { map: t, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.88 }); }
-    case 'fast': return mat(look.fast, { roughness: 0.35 });
-    case 'mud': return mat(look.mud, { roughness: 1 });
-    default: return mat(look.sand, { roughness: 1 });
+    case 'ice': return new THREE.MeshPhysicalMaterial({ color: look.ice, roughness: 0.06, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.05, transparent: true, opacity: 0.9, envMapIntensity: 1.4 });
+    case 'water': { const t = waterTexture(look.water); flowTex.push({ t, speed: 0.25 }); const n = texOf(normalCanvas('ripple', 128, fbm(83, 4, 3), 3), false); flowTex.push({ t: n, speed: 0.12 });
+      return new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: t, normalMap: n, normalScale: new THREE.Vector2(0.35, 0.35), roughness: 0.04, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.02, transparent: true, opacity: 0.9, envMapIntensity: 1.6 }); }
+    case 'fast': return turfMaterial(look.fast, { roughness: 0.6, sheen: 0.35, normalScale: new THREE.Vector2(0.25, 0.25), vertexColors: false });
+    case 'mud': return mat('#ffffff', { map: texOf(grainCanvas('mud', look.mud, { contrast: 0.3, speck: 0.08, seed: 9 })), normalMap: texOf(normalCanvas('mud', 128, fbm(87, 8, 3), 3), false), roughness: 0.75 });
+    default: return mat('#ffffff', { map: texOf(grainCanvas('sand', look.sand, { scale: 128, contrast: 0.18, speck: 0.22, seed: 7 })), normalMap: texOf(normalCanvas('sand', 128, noiseField(89, 64), 1.5), false), roughness: 1 });
   }
+}
+/* the ground beyond the course: lawn, desert, snow or rock in the world's colour, with grain */
+function groundMaterial(look) {
+  const t = texOf(grainCanvas('ground', look.ground, { scale: 96, contrast: 0.22, speck: 0.16, seed: 3 }), true, 48), n = texOf(normalCanvas('ground', 128, fbm(91, 8, 3), 2.5), false, 48);
+  return mat('#ffffff', { map: t, normalMap: n, roughness: 1, depthWrite: false, vertexColors: true });
+}
+/* landscaping: a bed of mulch or river rock round the course's outline, as real courses have */
+const EDGING_OF = { 1: ['rock', '#9a9086'], 2: ['rock', '#c08a5a'], 3: ['mulch', '#6b4a2e'], 4: ['rock', '#c9d6de'], 5: ['rock', '#d8c39a'], 6: ['rock', '#3a3236'], 7: ['mulch', '#4a3a3a'], 9: ['mulch', '#c98a5a'] };
+function edgingGroup(h, look) {
+  const e = look.edging || EDGING_OF[worldOf(holeWorld(h))];
+  if (!e || !look.ground || look.night) return null;
+  const W = 0.32, pos = [], uv = [], idx = [];
+  for (const f of h.floors) {
+    if (f.some(([x, z]) => Math.abs(groundH(h, x, z)) > 0.02)) continue;   /* only floors that meet the ground */
+    let area = 0;
+    for (let i = 0; i < f.length; i++) { const a = f[i], b = f[(i + 1) % f.length]; area += a[0] * b[1] - b[0] * a[1]; }
+    const sg = area > 0 ? -1 : 1;
+    for (let i = 0; i < f.length; i++) {
+      const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], L = Math.hypot(bx - ax, bz - az) || 1, nx = (bz - az) / L * sg * -1, nz = -(bx - ax) / L * sg * -1;
+      const v = pos.length / 3, o = WALL_HALF + 0.01;
+      for (const [x, z, d] of [[ax, az, o], [bx, bz, o], [ax, az, o + W], [bx, bz, o + W]]) { const px = x + nx * d, pz = z + nz * d; pos.push(px, -0.027, pz); uv.push(px * 1.2, pz * 1.2); }
+      idx.push(v, v + 2, v + 1, v + 1, v + 2, v + 3);
+    }
+  }
+  if (!pos.length) return null;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat('#ffffff', { map: texOf(edgingCanvas(e[0], e[1])), roughness: 1, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 }));
+  m.name = 'edging'; m.receiveShadow = true; m.renderOrder = -1;
+  return m;
 }
 function buildHoleScene(h) {
   if (holeGroup) { scene.remove(holeGroup); disposeGroup(holeGroup); }
@@ -860,22 +1258,26 @@ function buildHoleScene(h) {
   flowTex = [];
   const look = lookOf(holeWorld(h)), off = (x, z) => Math.hypot(x - h.cup[0], z - h.cup[1]) >= COLLAR_R && h.tubes.every(t => Math.hypot(x - t.a[0], z - t.a[1]) >= TUBE_R * 0.9);
   holeGroup = new THREE.Group(); moverMeshes = [];
-  const floor = new THREE.Mesh(gridGeometry(h, (x, z) => onFloor(h, x, z) && off(x, z)), mat('#ffffff', { map: feltTexture(look.felt), roughness: 0.95 }));
+  const floor = new THREE.Mesh(gridGeometry(h, (x, z) => onFloor(h, x, z) && off(x, z), 0, floorShade(h)), turfMaterial(look.felt));
   floor.name = 'floor'; floor.receiveShadow = true; holeGroup.add(floor);
   const collar = new THREE.Mesh(collarGeometry(h), floor.material); collar.name = 'collar'; collar.receiveShadow = true; holeGroup.add(collar);
   for (const zn of h.zones) {
     const z = new THREE.Mesh(gridGeometry(h, (x, zz) => zoneAt(h, x, zz) === zn && onFloor(h, x, zz) && off(x, zz), zn.surf === 'water' ? 0.002 : 0.004), zoneMaterial(zn, look));
     z.receiveShadow = true; holeGroup.add(z);
   }
-  const skirt = new THREE.Mesh(skirtGeometry(h, look.ground ? -0.03 : -0.5), mat(look.skirt, { roughness: 0.9, side: THREE.DoubleSide }));
+  const skirt = new THREE.Mesh(skirtGeometry(h, look.ground ? -0.03 : -0.5), mat('#ffffff', { map: texOf(wallCanvas('stone', look.skirt)), normalMap: texOf(wallNormalCanvas('stone'), false), roughness: 0.92, side: THREE.DoubleSide }));
   skirt.name = 'skirt'; holeGroup.add(skirt);
-  holeGroup.add(wallGroup(h, mat(look.wall, { roughness: 0.55 })), cupGroup(h, look), tubeGroup(h));
+  holeGroup.add(wallGroup(h, wallMaterial(look, holeWorld(h))), cupGroup(h, look), tubeGroup(h), teeGroup(h, look));
   for (const p of h.posts) { const o = (look.post || defaultPost)(p, look); o.position.set(p.x, groundH(h, p.x, p.z), p.z); holeGroup.add(o); }
   for (const mv of h.movers) { const o = (look.mover || defaultMover)(mv, look); o.userData.mover = mv; moverMeshes.push(o); holeGroup.add(o); }
   if (look.ground) {
     /* drawn first without depth, so bowls that dip below it still show: the ground is backdrop */
-    const gr = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), mat(look.ground, { roughness: 1, depthWrite: false }));
+    const gg = new THREE.PlaneGeometry(120, 120, 60, 60), gp = gg.attributes.position, gn = fbm(113, 4, 3), gc = [];
+    for (let i = 0; i < gp.count; i++) { const k = 0.82 + 0.3 * gn(gp.getX(i) / 60 + 0.5, gp.getY(i) / 60 + 0.5); gc.push(k, k, k); }
+    gg.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3));
+    const gr = new THREE.Mesh(gg, groundMaterial(look));
     gr.rotation.x = -Math.PI / 2; gr.position.y = -0.03; gr.receiveShadow = true; gr.renderOrder = -1; holeGroup.add(gr);
+    const ed = edgingGroup(h, look); if (ed) holeGroup.add(ed);
   }
   for (const dr of h.drains) holeGroup.add(drainSpiral(h, dr));
   if (look.prop) scatterProps(holeGroup, h, look);
@@ -883,11 +1285,16 @@ function buildHoleScene(h) {
   scene.background = skyTexture(look.sky[0], look.sky[1]);
   scene.fog = look.fog ? new THREE.Fog(look.sky[1], 16, 55) : null;
   /* night: moonlight, stars, and a warm lamp in the cup */
-  hemi.intensity = look.night ? 0.45 : 1.4; hemi.color.set(look.night ? 0x9a7cff : 0xfff4e0);
-  sun.intensity = look.night ? 0.7 : 2.4; sun.color.set(look.night ? 0xb89cff : 0xffe2b8);
+  /* daylight: a warm low sun for long soft shadows and real modelling of every slope, the sky itself as
+     image-based light (so turf, water, ice, the ball and the putter all reflect the world they are in) */
+  scene.environment = skyEnvironment(look);
+  scene.environmentIntensity = look.night ? 0.25 : 0.55;
+  hemi.intensity = look.night ? 0.4 : 0.85; hemi.color.set(look.night ? 0x9a7cff : 0xfff4e0);
+  sun.intensity = look.night ? 0.7 : 2.6; sun.color.set(look.night ? 0xb89cff : 0xffe6c4);
   if (look.night) nightDecor(holeGroup, h);
   const B = holeBounds(h), ext = B.ext + 1.5;
-  sun.position.set(B.cx + 3, 9, B.cz - 2.5); sun.target.position.set(B.cx, 0, B.cz);
+  /* a sun about 45 degrees up, off the tee's shoulder: long soft shadows off every wall and real light and shade on every slope */
+  sun.position.set(B.cx + 5, 6.5, B.cz - 4.5); sun.target.position.set(B.cx, 0, B.cz);
   Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 0.5, far: 30 });
   sun.shadow.camera.updateProjectionMatrix();
   scene.add(holeGroup);
@@ -903,10 +1310,17 @@ function updateMovers(t) {
 }
 const _axis = new THREE.Vector3(), _q = new THREE.Quaternion();
 /* the ball mesh follows the physics ball, rolling by the distance it covers; a skidding ball barely turns */
+/* the ball mesh turns by the physics ball's own spin over the sim time that passed, so a sliding
+   ball barely turns, backspin shows, and a ball off a rail visibly checks; balls without a spin
+   (the auto-sink, the replay's last glide) roll by the distance they cover */
+let syncT = 0;
 function syncBall(dt) {
   const b = play.ball, p = ballMesh.position, dx = b.x - p.x, dz = b.z - p.z, d = Math.hypot(dx, dz);
   ballMesh.visible = !b.tube && play.fx.ballHidden !== true;
-  if (d > 1e-6 && d < 0.5) { _axis.set(dz / d, 0, -dx / d); _q.setFromAxisAngle(_axis, d / BALL_R * (b.skid > 0 ? 0.35 : 1)); ballMesh.quaternion.premultiply(_q); }
+  const simDt = clamp(play.time - syncT, 0, 0.1), w = Math.hypot(b.wx || 0, b.wy || 0, b.wz || 0);
+  syncT = play.time;
+  if ((play.phase === 'roll' || play.phase === 'drift') && w > 1e-6) { _axis.set(b.wx / w, b.wy / w, b.wz / w); _q.setFromAxisAngle(_axis, w * simDt); ballMesh.quaternion.premultiply(_q); }
+  else if (d > 1e-6 && d < 0.5) { _axis.set(dz / d, 0, -dx / d); _q.setFromAxisAngle(_axis, d / BALL_R); ballMesh.quaternion.premultiply(_q); }
   p.set(b.x, b.y + BALL_R, b.z);
 }
 /* aiming: behind the ball along the aim, pitched to frame the ball and the ground ahead (the cup
@@ -1433,7 +1847,7 @@ function advance(dt) {
   if (play.phase === 'auto') {
     const t = (play.fx.autoT += dt) / 0.9, k = Math.min(1, t), e = k * k * (3 - 2 * k), [fx, fz] = play.fx.autoFrom;
     b.x = fx + (h.cup[0] - fx) * e; b.z = fz + (h.cup[1] - fz) * e; b.tube = null;
-    b.y = groundH(h, b.x, b.z) + Math.sin(k * Math.PI) * 0.12;
+    b.y = groundH(h, b.x, b.z) + Math.sin(k * Math.PI) * 0.12; b.vy = 0;
     if (k >= 1) { play.phase = 'sunk'; play.fx.sunkT = 0; play.fx.sinkFrom = [fx, fz]; const d = Math.hypot(h.cup[0] - fx, h.cup[1] - fz) || 1; startSink((h.cup[0] - fx) / d * 0.5, (h.cup[1] - fz) / d * 0.5); sfx('cup'); }
   } else if (play.phase === 'sunk') {
     const t = (play.fx.sunkT += dt);
@@ -1451,7 +1865,9 @@ function advance(dt) {
 function startSink(vx, vz) {
   const b = play.ball, h = play.hole, s = Math.hypot(vx, vz), cap = 1.4, k = s > cap ? cap / s : 1;
   /* from exactly where the cup caught it: no jump inward */
-  play.fx.sink = { x: b.x - h.cup[0], z: b.z - h.cup[1], y: 0, vx: vx * k, vz: vz * k, vy: 0, walls: 0, floor: false };
+  /* the physics hands over a ball already part way down: carry on from its height and fall speed */
+  const y = Math.min(0, b.y - groundH(h, h.cup[0], h.cup[1])), vy = play.phase === 'sunk' ? Math.min(0, b.vy || 0) : 0;
+  play.fx.sink = { x: b.x - h.cup[0], z: b.z - h.cup[1], y, vx: vx * k, vz: vz * k, vy, walls: 0, floor: false };
 }
 function stepSink(dt) {
   const k = play.fx.sink, lim = CUP_R - BALL_R - 0.003, floor = -(CUP_SINK - 0.004);
@@ -1606,7 +2022,7 @@ function stepGhost() {
   const g = play.ghost;
   if (!g || !g.live) return;
   const end = stepBall(play.hole, g.b, g.t); g.t += SIM_DT; g.b.hits.length = 0;
-  if (end) { g.live = false; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, g.b.x, g.b.z); }
+  if (end) { g.live = false; if (end === 'sunk') g.done = true; if (end === 'oob') g.b = newBall(play.hole, g.b.x, g.b.z); else if (end === 'stop') { const [x, z] = restSpot(play.hole, g.b.x, g.b.z); g.b = newBall(play.hole, x, z); } }
 }
 function syncGhost() {
   const g = play.ghost;

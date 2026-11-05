@@ -11,24 +11,24 @@ const C24_POOL = (cx, cz, rx, rz = rx, n = 10) => Array.from({ length: n }, (_, 
 });
 registerWorld(24, { holes: [
   /* 1. gondola deck: off the deck, over the ice past the snowball, up the ramp to the cup shelf */
-  { par: 3, sol: [[12,0.76,0]], tee: [0, 0.5], cup: [0.4, 6.7], shape: rect(-1, 0, 1, 7.6),
+  { par: 3, sol: [[12.75,0.81,0]], tee: [0, 0.5], cup: [0.4, 6.7], shape: rect(-1, 0, 1, 7.6),
     tiers: [{ poly: rect(-1, 0, 1, 1.6), h: 0.3 }, { poly: rect(-1, 5.0, 1, 7.6), h: 0.22 }],
     ramps: [{ x0: -1, z0: 4.2, x1: 1, z1: 5.0, axis: 'z', h0: 0, h1: 0.22 }],
     zones: [{ surf: 'fast', poly: rect(-1, 1.6, 1, 4.2) }], movers: [C24_BALL(-0.55, 3.0, 0.55, 3.0, 2.8)], posts: [C24_MAN(-0.3, 6.3)] },
   /* 2. switchback stair: up the first ramp through the fence, across, up the second ramp to the top terrace */
-  { par: 3, sol: [[50,1,0]], tee: [-0.6, 0.5], cup: [0.6, 5.8], aim0: 20, shape: rect(-1.4, 0, 1.4, 6.6),
+  { par: 3, sol: [[50,1,0],[292,1,0]], tee: [-0.6, 0.5], cup: [0.6, 5.8], aim0: 20, shape: rect(-1.4, 0, 1.4, 6.6),
     inner: [[[-1.4, 2.2], [0.6, 2.2]], [[-0.6, 4.4], [1.4, 4.4]]],
     tiers: [{ poly: rect(-1.4, 2.2, 1.4, 4.4), h: 0.2 }, { poly: rect(-1.4, 4.4, 1.4, 6.6), h: 0.4 }],
     ramps: [{ x0: 0.6, z0: 1.6, x1: 1.4, z1: 2.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.4, z0: 3.8, x1: -0.6, z1: 5.0, axis: 'z', h0: 0.2, h1: 0.4 }],
     bumps: [{ x: 0.6, z: 5.8, r: 0.5, h: 0.06 }], posts: [C24_MAN(0, 3.3)] },
   /* 3. cave relay: the first cave fires you across the middle chamber into the second; the lift bar decides */
-  { par: 3, sol: [[30,0.64,0]], tee: [0, 0.5], cup: [0.4, 6.3], aim0: 50, shape: rect(-1.6, 0, 1.6, 7.2), inner: [[[-1.6, 2.4], [1.6, 2.4]], [[-1.6, 4.8], [1.6, 4.8]]],
+  { par: 3, sol: [[30,0.64,0],[16,0.84,0]], tee: [0, 0.5], cup: [0.4, 6.3], aim0: 50, shape: rect(-1.6, 0, 1.6, 7.2), inner: [[[-1.6, 2.4], [1.6, 2.4]], [[-1.6, 4.8], [1.6, 4.8]]],
     tubes: [{ a: [0.9, 1.9], b: [-0.9, 3.0], dir: 90 }, { a: [0.9, 3.0], b: [-0.9, 5.4], dir: 45 }],
     movers: [C24_LIFT(0, 3.0, 0, 4.0, 0.3, 0, 2.8)], zones: [{ surf: 'ice', poly: rect(-1.6, 4.8, 1.6, 7.2) }],
     bumps: [{ x: 0.4, z: 6.3, r: 0.5, h: 0.08 }], posts: [C24_MAN(-0.2, 6.6), C24_MAN(-0.3, 1.4)] },
   /* 4. the summit green: a fourteen metre green that leans left all the way, a broad ridge across
      the middle and a swale behind it; lag over the ridge and let the tilt bring it home */
-  { par: 3, sol: [[6,1,0]], tee: [1.0, 0.5], cup: [-1.0, 12.8], shape: rect(-2, 0, 2, 14),
+  { par: 3, sol: [[6,1,0],[64,0.96,0]], tee: [1.0, 0.5], cup: [-1.0, 12.8], shape: rect(-2, 0, 2, 14),
     tiers: [{ poly: rect(-2, 0, 2, 14), h: 0.03, sx: 0.012, sz: 0.004 }],
     bumps: [{ x: 0.2, z: 6.0, r: 1.6, h: 0.16 }, { x: -1.6, z: 6.4, r: 1.2, h: 0.1 }, { x: -0.2, z: 9.4, r: 1.5, h: -0.12 }, { x: 1.2, z: 11.6, r: 1.0, h: 0.08 }] },
   /* 5. sinkhole lift: roll into the sinkhole and its cave lifts you to the high shelf; drop off the shelf to the cup */

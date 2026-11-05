@@ -116,7 +116,7 @@ registerWorld(23, { holes: [
     tubes: [{ a: [-0.9, 4.6], b: [1.2, 7.0], dir: 0, keep: 0, add: 0.45 }],
     zones: [J23_MUD(rect(0.6, 3.6, 1.4, 4.4))], posts: [J23_IDOL(2.2, 7.6), J23_IDOL(1.4, 8.1, 0.11)] },
   /* 17: the boulder terraces: three terraces, stairs on alternate sides, a boulder rolling on each of the top two */
-  { par: 4, crazy: true, sol: [[42,1,0],[288,0.52,1],[320,0.32,0]], tee: [0, 0.5], cup: [0.5, 8.5],
+  { par: 4, crazy: true, sol: [[166,1,0],[130,0.92,0]], tee: [0, 0.5], cup: [0.5, 8.5],
     shape: [[-1.2, 0], [1.2, 0], [1.2, 2.5], [1.2, 5], [1.2, 7], [1.2, 9.2], [-1.2, 9.2], [-1.2, 7], [-1.2, 5], [-1.2, 2.5]],
     ramps: [{ x0: 0.5, z0: 1.7, x1: 1.2, z1: 2.5, axis: 'z', h0: 0, h1: 0.15 }, { x0: -1.2, z0: 4.3, x1: -0.5, z1: 5, axis: 'z', h0: 0.15, h1: 0.3 },
       { x0: -0.25, z0: 6.4, x1: 0.25, z1: 7, axis: 'z', h0: 0.3, h1: 0.42 }],

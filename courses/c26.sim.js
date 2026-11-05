@@ -104,8 +104,8 @@ registerWorld(26, { holes: [
     inner: [[[-0.4, 0], [-0.4, 5.2]], [[-0.4, 4.2], [-3.7, 4.2]], [[-0.4, 2.8], [-3, 2.8]], [[-3.7, 3.4], [-2.9, 4.2]]],
     tiers: [{ poly: rect(-0.4, -0.1, 0.5, 1.6), h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 1.6, x1: 0.4, z1: 3.2, axis: 'z', h0: 0.3, h1: 0 }],
-    drains: [{ x: -2.3, z: 5.8, r: 1.5, depth: 0.3, flat: 0.11 }, { x: -1.9, z: 1.4, r: 1.2, depth: 0.3 }],
-    tubes: [{ a: [-2.3, 5.8], b: [-0.7, 3.5], dir: 270, keep: 0, add: 1 }],
+    drains: [{ x: -2.3, z: 5.8, r: 1.5, depth: 0.3, flat: 0.11 }, { x: -1.9, z: 1.4, r: 1.3, depth: 0.3 }],
+    tubes: [{ a: [-2.3, 5.8], b: [-0.7, 3.5], dir: 275, keep: 0, add: 1.8 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 1.6, 0.4, 3.2) }, { surf: 'fast', push: [-0.5, 0], poly: rect(-3, 2.85, -0.45, 4.15) }, { surf: 'fast', push: [0, -0.6], poly: rect(-3.65, 0.9, -3.05, 3.3) }] },
   /* 14: switchback with a gate on the top leg and lava on the hairpins (3 stages) */
   { par: 4, sol: [[320,1,2],[16,0.48,0]], tee: [0, 0.5], cup: [-1.2, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),

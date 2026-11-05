@@ -78,7 +78,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(-1.1, 1.8, 1.1, 1.8, 2.0), C22_WEED(1.1, 2.9, -1.1, 2.9, 2.4, 0.7), C22_WEED(-1.1, 4.0, 1.1, 4.0, 2.8, 1.4)],
     posts: [C22_CACTUS(-0.45, 7.4), C22_CACTUS(-1.25, 7.5), C22_ROCK(0.7, 7.8)] },
   /* 9. the two sluice gates: down deck by deck, a gate guarding each drop, then round the spur */
-  { par: 4, crazy: true, sol: [[4,0.5625,0],[299.25,0.875,2]], tee: [0, 0.5], cup: [0.8, 10.3], shape: rect(-1.6, 0, 1.6, 11),
+  { par: 4, crazy: true, sol: [[4,0.5625,0],[299.25,0.875,2],[344,0.68,2]], tee: [0, 0.5], cup: [0.8, 10.3], shape: rect(-1.6, 0, 1.6, 11),
     inner: [[[-1.6, 3.5], [0.125, 3.5]], [[0.875, 3.5], [1.6, 3.5]], [[-1.6, 7], [-0.875, 7]], [[-0.125, 7], [1.6, 7]], [[1.6, 9.4], [0.2, 9.4]]],
     tiers: [{ poly: rect(-1.7, -0.1, 1.7, 3.5), h: 0.4 }, { poly: rect(-1.7, 3.5, 1.7, 7), h: 0.2 }, { poly: rect(-1.7, 7, 1.7, 11.1), h: 0.03, sx: 0.015 }],
     bumps: [{ x: -0.6, z: 8.6, r: 0.45, h: 0.18 }],
@@ -87,7 +87,7 @@ registerWorld(22, { holes: [
     posts: [C22_CACTUS(-0.8, 2.2), C22_CACTUS(-0.2, 10.4)] },
   /* 10. long green: the three shelves. Up a broad step to a middle shelf with a big low dune, then a step back
      down to the cup shelf: the putt has to climb, crest and die */
-  { par: 3, sol: [[0,1,0]], tee: [0, 0.5], cup: [1.3, 10.8],
+  { par: 3, sol: [[0,0.99,0]], tee: [0, 0.5], cup: [1.3, 10.8],
     shape: [[-1.4, 0], [1.4, 0], [2.4, 3], [2.4, 12], [-2.4, 12], [-2.4, 3]],
     ramps: [{ x0: -2.5, z0: 4, x1: 2.5, z1: 5, axis: 'z', h0: 0.06, h1: 0.2 }, { x0: -2.5, z0: 8, x1: 2.5, z1: 9, axis: 'z', h0: 0.2, h1: 0.1 }],
     tiers: [{ poly: rect(-2.5, -0.1, 2.5, 4), h: 0, sz: 0.015 }, { poly: rect(-2.5, 5, 2.5, 8), h: 0.2 }, { poly: rect(-2.5, 9, 2.5, 12.1), h: 0.1, sx: -0.008 }],
@@ -95,7 +95,7 @@ registerWorld(22, { holes: [
     zones: [{ surf: 'sand', poly: rect(-2.4, 11.2, -1.2, 12) }],
     posts: [C22_CACTUS(2.0, 6.4), C22_ROCK(-2.0, 3.2, 0.12)] },
   /* 11. three rivers: the plank, the island shaft or kicker, the far plank, then the green */
-  { par: 4, sol: [[304,0.85,1],[56,0.45,0]], tee: [0, 0.5], cup: [-0.6, 10.2], shape: rect(-1.6, 0, 1.6, 11),
+  { par: 4, sol: [[304,0.85,1],[56,0.45,0],[296.25,0.4,1]], tee: [0, 0.5], cup: [-0.6, 10.2], shape: rect(-1.6, 0, 1.6, 11),
     ramps: [{ x0: -0.35, z0: 1.7, x1: 0.35, z1: 2.5, axis: 'z', h0: 0, h1: 0.2 }, { x0: -0.3, z0: 4.7, x1: 0.3, z1: 5.5, axis: 'z', h0: 0, h1: 0.2 }],
     tubes: [{ a: [1.0, 5.0], b: [1.0, 6.9], dir: 0, keep: 0.5, add: 0.3 }],
     zones: [{ surf: 'fast', poly: rect(-0.35, 1.7, 0.35, 2.5) }, { surf: 'fast', poly: rect(-0.3, 4.7, 0.3, 5.5) },
@@ -104,7 +104,7 @@ registerWorld(22, { holes: [
     movers: [C22_WEED(-1.1, 4.2, 0.7, 4.2, 2.2), C22_WEED(-1.1, 7.6, 0.4, 7.6, 2.4, 1)],
     posts: [C22_CACTUS(0.9, 1.4), C22_CACTUS(0.3, 10.0), C22_ROCK(-1.2, 4.9, 0.12)] },
   /* 12. twin dust devils spinning opposite ways down the canyon, then up the ramp to the mesa */
-  { par: 4, crazy: true, sol: [[340,0.9,0]], tee: [0, 0.5], cup: [0.6, 9.1], shape: rect(-1.4, 0, 1.4, 10),
+  { par: 4, crazy: true, sol: [[340,0.9,0],[10,0.44,0]], tee: [0, 0.5], cup: [0.6, 9.1], shape: rect(-1.4, 0, 1.4, 10),
     ramps: [{ x0: -1.5, z0: 7, x1: 0.2, z1: 7.8, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.5, 7.8, 1.5, 10.1), h: 0.25 }],
     zones: [...C22_DEVIL(0, 3.0, 0.85, 1.6), ...C22_DEVIL(0, 5.4, 0.85, -1.6), { surf: 'sand', poly: rect(0.5, 6.6, 1.4, 7.4) }],

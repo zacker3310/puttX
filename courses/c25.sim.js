@@ -132,15 +132,15 @@ registerWorld(25, (() => {
       zones: [lagoon(rect(-1.6, 8.6, -0.2, 9.4)), sand(rect(0.0, 8.0, 0.6, 8.6))], posts: [ANCHOR(1.3, 9.4)] },
     /* 17 the plank coaster: along the gun deck, round the corner, bump down the stairs, plunge into the whirlpool,
        down the cave at its eye, fired off the plank over the lagoon to treasure island, where the second whirlpool spins it into the cup */
-    { par: 4, auto: true, sol: [[0, 0.6, 0]], tee: [0, 0.5], cup: [-3.2, 1.2], aim0: 0,
+    { par: 4, auto: true, sol: [[0, 0.72, 0]], tee: [0, 0.5], cup: [-3.2, 1.2], aim0: 0,
       floors: [rect(-0.35, 0, 0.35, 6.2), rect(-1.85, 5.5, -0.35, 6.2), arc(-2.7, 5.85, 0.97, 0, 360, 24), rect(-4.6, 0, -1.2, 4.6)],
       walls: [[[-0.35, 0], [0.35, 0], [0.35, 5.4], [-0.45, 6.2], [-1.8, 6.2], ...arc(-2.7, 5.85, 0.966, 68.7, -248.7, 18), [-1.8, 5.5], [-0.35, 5.5], [-0.35, 0]],
         ring(rect(-4.6, 0, -1.2, 4.6)), [[-2.95, 3.3], [-2.95, 4.6]], [[-2.45, 3.3], [-2.45, 4.6]]],
       tiers: [{ poly: rect(-0.4, -0.1, 0.4, 6.25), h: 0.45 }, { poly: rect(-0.9, 5.45, -0.3, 6.25), h: 0.45 }, { poly: rect(-1.35, 5.45, -0.9, 6.25), h: 0.3 },
         { poly: rect(-1.8, 5.45, -1.35, 6.25), h: 0.15 }, { poly: rect(-2.95, 3.3, -2.45, 4.6), h: 0.3 }],
       zones: [{ push: [-0.8, 0], poly: rect(-1.8, 5.5, -0.35, 6.2) }, lagoon(rect(-4.6, 2.6, -1.2, 3.3)), lagoon(rect(-4.6, 3.3, -2.95, 4.6)), lagoon(rect(-2.45, 3.3, -1.2, 4.6))],
-      drains: [{ x: -2.7, z: 5.85, r: 1.1, depth: 0.35, flat: 0.13 }, { x: -3.2, z: 1.2, r: 1.1, depth: 0.35 }],
-      tubes: [{ a: [-2.7, 5.85], b: [-2.7, 4.3], dir: 176, keep: 0, add: 2.5 }] },
+      drains: [{ x: -2.7, z: 5.85, r: 0.94, depth: 0.35, flat: 0.13 }, { x: -3.2, z: 1.2, r: 1.25, depth: 0.35, flat: 0.12 }],
+      tubes: [{ a: [-2.7, 5.85], b: [-2.7, 4.3], dir: 176, keep: 0, add: 2.95 }] },
     /* 18 the galleon: gangplank, the main deck's wheel and cannon, the quarterdeck's drawbridge, then walk the plank or the cave to treasure island */
     { par: 5, crazy: true, sol: [[326,0.96,0],[46,1,0]], tee: [0, 0.5], cup: [-0.6, 12.0], aim0: -20, shape: rect(-2, 0, 2, 13),
       ramps: [{ x0: -2, z0: 2.4, x1: -1.3, z1: 3.6, axis: 'z', h0: 0, h1: 0.25 }, { x0: 1.3, z0: 6.4, x1: 2, z1: 7.6, axis: 'z', h0: 0.25, h1: 0.44 }],

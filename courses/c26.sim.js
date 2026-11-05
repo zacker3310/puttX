@@ -139,7 +139,7 @@ registerWorld(26, { holes: [
     tiers: [{ poly: rect(-1.7, -0.1, 1.7, 9.7), h: 0.15, sx: -0.035 }],
     bumps: [{ x: 0, z: 5, r: 1.2, h: 0.12 }, { x: 1, z: 7.5, r: 1, h: -0.05 }] },
   /* 18: the summit: boulder run, switchback up two decks, the gated vent, the summit crater, or the tube (crazy, 4 stages) */
-  { par: 5, crazy: true, sol: [[10,0.92,1],[6,0.52,0]], tee: [0, 0.5], cup: [2.2, 9.6], aim0: 0,
+  { par: 5, crazy: true, sol: [[10,0.92,1],[144,0.96,0]], tee: [0, 0.5], cup: [2.2, 9.6], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 3.6], [3.2, 3.6], [3.2, 10.8], [-0.8, 10.8]],
     inner: [[[-0.8, 6.8], [1.6, 6.8]], [[2.4, 6.8], [3.2, 6.8]]],
     ramps: [{ x0: -0.8, z0: 2.6, x1: 0.8, z1: 3.8, axis: 'z', h0: 0, h1: 0.18 }, { x0: 0.8, z0: 3.6, x1: 2, z1: 5.2, axis: 'x', h0: 0.18, h1: 0.32 }],

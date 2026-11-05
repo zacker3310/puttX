@@ -8,7 +8,7 @@ const C29_PIPE = (a, b, dir, keep, add) => ({ a, b, dir, keep, add, color: '#ef7
 const C29_MUD = (x0, z0, x1, z1) => ({ surf: 'mud', poly: rect(x0, z0, x1, z1) });
 registerWorld(29, { holes: [
   /* 1: a sideways belt, then the half ramp to the terrace */
-  { par: 3, sol: [[4,0.88,0]], tee: [0, 0.5], cup: [-0.3, 6.6], shape: rect(-0.9, 0, 0.9, 7.5),
+  { par: 3, sol: [[4.5,0.91,0]], tee: [0, 0.5], cup: [-0.3, 6.6], shape: rect(-0.9, 0, 0.9, 7.5),
     zones: [C29_BELT(rect(-0.9, 1.8, 0.9, 2.8), -1.4, 0)],
     ramps: [{ x0: 0, z0: 3.6, x1: 0.9, z1: 4.6, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-0.9, 4.6, 0.9, 7.5), h: 0.2 }],

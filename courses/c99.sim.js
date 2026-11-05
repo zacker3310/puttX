@@ -9,7 +9,7 @@ const C99_PEN = (cx, cz, r, n = 24) => C99_ARC(cx, cz, r, 0, 360, n).slice(0, n)
 registerWorld(99, { holes: [
   /* 1. gravity well: a huge funnel round the cup, ringed by an event horizon wall open only at the back;
      orbit the well and fall in through the gap */
-  { par: 3, sol: [[4,0.8,0]], tee: [0, 0.5], cup: [0, 5.4],
+  { par: 3, sol: [[6.75,0.8,0]], tee: [0, 0.5], cup: [0, 5.4],
     shape: [[-0.7, 0], [0.7, 0], ...C99_ARC(0, 5.4, 2.5, 163.7, -163.7, 20)],
     drains: [{ x: 0, z: 5.4, r: 2.3, depth: 0.35 }],
     inner: [C99_ARC(0, 5.4, 0.5, 20, 340, 12)] },

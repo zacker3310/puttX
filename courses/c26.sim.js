@@ -29,7 +29,7 @@ registerWorld(26, { holes: [
     ramps: [{ x0: -2, z0: 4, x1: 2, z1: 5.5, axis: 'z', h0: 0.3, h1: 0.1 }],
     bumps: [{ x: 1.1, z: 8, r: 2, h: 0.14 }, { x: -1.2, z: 10.5, r: 1.4, h: -0.09 }, { x: -0.6, z: 2, r: 1.2, h: 0.07 }] },
   /* 4: two lava rivers, two bridges, a boulder on the second (3 stages) */
-  { par: 3, sol: [[44,0.92,0.5],[4,0.12,0]], tee: [0, 0.5], cup: [0.6, 7.8], shape: rect(-1.5, 0, 1.5, 8.8),
+  { par: 3, sol: [[34,0.8,0],[298,0.92,0]], tee: [0, 0.5], cup: [0.6, 7.8], shape: rect(-1.5, 0, 1.5, 8.8),
     bumps: [{ x: -0.3, z: 4.2, r: 0.5, h: 0.26 }, ...V26_CRATER(0.6, 7.8, 0.85)],
     movers: [V26_ROCK(-1.15, 6, -0.25, 6, 2.2)],
     zones: [V26_LAVA(rect(-1.5, 2.6, 0.5, 3.1)), V26_LAVA(rect(-0.5, 5.2, 1.5, 5.7)), V26_MUD(rect(0.5, 3.1, 1.5, 3.5)), V26_LAVA(rect(-1.5, 8.5, 0, 8.8))] },
@@ -45,7 +45,7 @@ registerWorld(26, { holes: [
     tubes: [{ a: [2.3, 5.8], b: [1.4, 0.5], dir: 0, keep: 0, add: 1.45 }, { a: [2.3, 2], b: [6.4, 0.6], dir: 0, keep: 0, add: 1.6 }],
     zones: [{ surf: 'fast', poly: rect(-0.4, 1.6, 0.4, 3.2) }] },
   /* 6: switchback up the crater wall: three legs, two ramps, ash on the middle leg (3 stages) */
-  { par: 4, sol: [[30,0.92,0.5],[92,0.84,0]], tee: [0, 0.5], cup: [1.1, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
+  { par: 4, sol: [[30,0.92,0.5],[294,0.92,0]], tee: [0, 0.5], cup: [1.1, 7.3], shape: rect(-1.8, 0, 1.8, 8.2),
     inner: [[[-1.8, 2.7], [1, 2.7]], [[-1, 5.4], [1.8, 5.4]]],
     tiers: [{ poly: rect(-1.9, 2.7, 1.9, 5.4), h: 0.18 }, { poly: rect(-1.9, 5.4, 1.9, 8.3), h: 0.36 }],
     ramps: [{ x0: 1, z0: 2.2, x1: 1.8, z1: 3.2, axis: 'z', h0: 0, h1: 0.18 }, { x0: -1.8, z0: 4.9, x1: -1, z1: 5.9, axis: 'z', h0: 0.18, h1: 0.36 }],
@@ -53,7 +53,7 @@ registerWorld(26, { holes: [
     posts: [V26_COL(0.2, 6.6), V26_COL(-0.4, 7.3)],
     zones: [{ surf: 'sand', poly: rect(-0.6, 2.75, -0.2, 5.35) }, V26_LAVA(rect(-1.8, 0, -1.2, 1.2)), V26_LAVA(rect(0.3, 7.85, 1.8, 8.2))] },
   /* 7: the basalt windmill guards the ramp to the crater shelf (3 stages) */
-  { par: 3, sol: [[24,0.96,0]], tee: [0, 0.5], cup: [-0.4, 7.4], shape: rect(-1.4, 0, 1.4, 8.4),
+  { par: 3, sol: [[24,0.96,0],[66,0.88,0]], tee: [0, 0.5], cup: [-0.4, 7.4], shape: rect(-1.4, 0, 1.4, 8.4),
     movers: [{ kind: 'spin', x: 0, z: 3, len: 0.75, w: 1.1, phase: 0, blades: 2, look: 'basalt' }],
     ramps: [{ x0: -1.4, z0: 4.6, x1: 1.4, z1: 5.6, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.5, 5.6, 1.5, 8.5), h: 0.25 }],

@@ -30,7 +30,7 @@ registerWorld(25, (() => {
       tubes: [{ a: [1.0, 2.2], b: [1.0, 4.0], dir: 330 }], movers: [CANNON(-1.0, 4.6, 0.4, 4.6, 2.6)],
       zones: [lagoon(rect(0.4, 7.0, 1.6, 8.4))], bumps: [{ x: 0.2, z: 6.6, r: 0.45, h: 0.14 }], posts: [BARREL(-0.3, 1.8)] },
     /* 4 switchback: two gangplanks, a cannon between them, barrels round the cup */
-    { par: 3, sol: [[50,0.76,0.5],[0,0.08,0]], tee: [-0.6, 0.5], cup: [0.8, 7.8], aim0: 30, shape: rect(-1.6, 0, 1.6, 8.8),
+    { par: 3, sol: [[142,0.92,0.5],[163.75,0.99,0]], tee: [-0.6, 0.5], cup: [0.8, 7.8], aim0: 30, shape: rect(-1.6, 0, 1.6, 8.8),
       ramps: [{ x0: 0.9, z0: 1.6, x1: 1.6, z1: 2.8, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.6, z0: 4.4, x1: -0.9, z1: 5.6, axis: 'z', h0: 0.2, h1: 0.4 }],
       tiers: [{ poly: rect(-1.7, 2.8, 1.7, 8.9), h: 0.2 }, { poly: rect(-1.7, 5.6, 1.7, 8.9), h: 0.4 }],
       inner: [[[-1.6, 2.8], [0.9, 2.8]], [[-0.9, 5.6], [1.6, 5.6]]],
@@ -48,13 +48,13 @@ registerWorld(25, (() => {
       drains: [{ x: -1.85, z: 2.0, r: 1.1, depth: 0.35, flat: 0.13 }, { x: -4.5, z: 4.5, r: 1.3, depth: 0.35 }],
       tubes: [{ a: [-1.85, 2.0], b: [-4.5, 3.1], dir: 40, keep: 0, add: 1.4 }] },
     /* 6 gun deck: through the drawbridge off the deck, past the cannon on the green */
-    { par: 3, sol: [[210,0.84,0]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8),
+    { par: 3, sol: [[210,0.84,0],[30,0.76,0.5]], tee: [0, 0.5], cup: [0.6, 7.4], shape: rect(-1.4, 0, 1.4, 8),
       tiers: [{ poly: rect(-1.5, -0.1, 1.5, 3.4), h: 0.35 }],
       inner: [[[-1.4, 3.4], [-0.5, 3.4]], [[0.5, 3.4], [1.4, 3.4]]],
       movers: [BRIDGE(-0.25, 3.15, 0.25, 3.15, 0.25, 90, 2.8), CANNON(-0.9, 5.2, 0.9, 5.2, 2.6)],
       zones: [lagoon(rect(-1.4, 6.4, -0.3, 7.2)), sand(rect(0.5, 3.8, 1.4, 4.4))], posts: [BARREL(-0.7, 1.6), BARREL(0.7, 1.6)], bumps: [{ x: 0.0, z: 6.6, r: 0.4, h: 0.12 }] },
     /* 7 three islands: two rail-less planks with a drawbridge on the second, or the cave */
-    { par: 4, sol: [[0,0.76,0],[350,0.08,0]], tee: [0, 0.5], cup: [-0.6, 9.6], aim0: 0,
+    { par: 4, sol: [[0,0.76,0],[350,0.08,0],[50,1,0]], tee: [0, 0.5], cup: [-0.6, 9.6], aim0: 0,
       floors: [rect(-1.2, 0, 1.2, 2.6), rect(-0.3, 2.5, 0.3, 4.5), rect(-1.4, 4.4, 1.4, 6.8), rect(-1.2, 6.7, -0.6, 8.3), rect(-1.4, 8.2, 1.2, 10.4)],
       walls: [[[-0.3, 2.6], [-1.2, 2.6], [-1.2, 0], [1.2, 0], [1.2, 2.6], [0.3, 2.6]],
         [[-0.3, 4.4], [-1.4, 4.4], [-1.4, 6.8], [-1.2, 6.8]], [[-0.6, 6.8], [1.4, 6.8], [1.4, 4.4], [0.3, 4.4]],

@@ -43,12 +43,12 @@ registerWorld(24, { holes: [
     zones: [{ surf: 'water', poly: C24_POOL(0.5, 8.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 6.0, 1.4, 7.4) }],
     bumps: [{ x: -0.6, z: 8.6, r: 0.5, h: 0.08 }], posts: [C24_MAN(0.1, 9.0)] },
   /* 7. terraced switchback: up the first run, across the top, down the icy second run, across the bottom and up the third run past the snowball */
-  { par: 4, crazy: true, sol: [[345,1,0],[152,1,0]], tee: [0, 0.5], cup: [2.4, 5.7], aim0: 0, shape: rect(-0.6, 0, 3, 6.6), inner: [[[0.6, 0], [0.6, 5.4]], [[1.8, 6.6], [1.8, 1.2]]],
+  { par: 4, crazy: true, sol: [[340,1,0],[174,1,0],[20,0.8,0]], tee: [0, 0.5], cup: [2.4, 5.7], aim0: 0, shape: rect(-0.6, 0, 3, 6.6), inner: [[[0.6, 0], [0.6, 5.4]], [[1.8, 6.6], [1.8, 1.2]]],
     ramps: [{ x0: -0.6, z0: 1.4, x1: 0.6, z1: 4.0, axis: 'z', h0: 0, h1: 0.3 }, { x0: 0.6, z0: 1.2, x1: 1.8, z1: 4.0, axis: 'z', h0: 0.1, h1: 0.3 }, { x0: 1.8, z0: 1.2, x1: 3, z1: 2.0, axis: 'z', h0: 0.1, h1: 0.2 }],
     tiers: [{ poly: rect(-0.6, 4.0, 1.8, 6.6), h: 0.3 }, { poly: rect(0.6, 0, 3, 1.2), h: 0.1 }, { poly: rect(1.8, 2.0, 3, 6.6), h: 0.2 }],
     zones: [{ surf: 'ice', poly: rect(0.6, 1.2, 1.8, 4.0) }], movers: [C24_BALL(2.06, 3.6, 2.74, 3.6, 2.4, 0, 0.14)], bumps: [{ x: 2.4, z: 5.7, r: 0.5, h: 0.06 }] },
   /* 8. crevasse: cross one of the two ice bridges over the crevasse, then up the narrow ramp to the cup shelf */
-  { par: 3, sol: [[345,0.917,0]], tee: [0, 0.5], cup: [0.6, 7.0], aim0: 0,
+  { par: 3, sol: [[341,0.92,0]], tee: [0, 0.5], cup: [0.6, 7.0], aim0: 0,
     floors: [rect(-0.8, 0, 0.8, 3.0), rect(-0.8, 3.0, -0.4, 4.2), rect(0.4, 3.0, 0.8, 4.2), rect(-1.2, 4.2, 1.2, 7.8)],
     walls: [[[-0.8, 4.2], [-0.8, 0], [0.8, 0], [0.8, 4.2]], [[-0.8, 4.2], [-1.2, 4.2], [-1.2, 7.8], [1.2, 7.8], [1.2, 4.2], [0.8, 4.2]]],
     tiers: [{ poly: rect(-1.2, 6.2, 1.2, 7.8), h: 0.2 }], ramps: [{ x0: -0.3, z0: 5.6, x1: 0.3, z1: 6.2, axis: 'z', h0: 0, h1: 0.2 }],

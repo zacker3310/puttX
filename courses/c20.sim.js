@@ -65,7 +65,7 @@ registerWorld(20, { holes: [
       { kind: 'spin', x: -0.5, z: 4.85, len: 0.3, w: -2, phase: 0, blades: 2, look: 'windmill' }],
     tubes: [{ a: [-0.5, 5.6], b: [0.8, 7.05], dir: 335 }] },
   /* 8. ice palace: down onto a walled cloud-ice court swept by two gates, then up the narrow stair to the palace green */
-  { par: 3, sol: [[0,0.9,0.5]], tee: [0, 0.6], cup: [0.5, 8.6],
+  { par: 3, sol: [[1.5,0.86,0.5]], tee: [0, 0.6], cup: [0.5, 8.6],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.35, 2, 0.35, 3), rect(-1.6, 3, 1.6, 6.6), rect(-0.4, 6.6, 0.4, 7.4), rect(-1.2, 7.4, 1.2, 9.4)],
     walls: [[[-0.35, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.35, 2]], [[-1.6, 3], [-1.6, 6.6]], [[1.6, 3], [1.6, 6.6]], [[-1.2, 7.4], [-1.2, 9.4], [1.2, 9.4], [1.2, 7.4]]],
     tiers: [{ poly: C20_PAD(-0.7, 0, 0.7, 2), h: 0.35 }, { poly: C20_PAD(-1.2, 7.4, 1.2, 9.4), h: 0.3 }],

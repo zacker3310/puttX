@@ -12,7 +12,7 @@ registerWorld(20, { holes: [
     zones: [{ surf: 'fast', poly: rect(0.35, 2.2, 0.75, 3.8) }],
     bumps: [{ x: 0.45, z: 5.5, r: 0.6, h: 0.15 }, { x: 0.45, z: 5.5, r: 0.25, h: -0.06 }] },
   /* 2. gale rails: a windy rainbow to the windmill isle, then a ramp bridge up to the green */
-  { par: 3, sol: [[356,0.84,0.5],[0,0.56,0]], tee: [0, 0.6], cup: [-0.4, 8.6],
+  { par: 3, sol: [[356,0.84,0.5],[0,0.56,0],[27.5,0.97,0]], tee: [0, 0.6], cup: [-0.4, 8.6],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.25, 2, 0.25, 4.4), rect(-1.1, 4.4, 1.1, 6.2), rect(-0.3, 6.2, 0.3, 7.2), rect(-1.2, 7.2, 1.2, 9.4)],
     walls: [[[-0.25, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.25, 2]],
       [[-0.3, 6.2], [-1.1, 6.2], [-1.1, 4.4], [-0.25, 4.4]], [[0.3, 6.2], [1.1, 6.2], [1.1, 4.4], [0.25, 4.4]], [[-1.2, 8.4], [-1.2, 9.4], [1.2, 9.4], [1.2, 8.4]]],
@@ -21,7 +21,7 @@ registerWorld(20, { holes: [
     zones: [{ surf: 'fast', push: [1.0, 0], poly: rect(-0.25, 2.6, 0.25, 3.8) }, { surf: 'fast', poly: rect(-0.25, 2, 0.25, 2.6) }, { surf: 'fast', poly: rect(-0.25, 3.8, 0.25, 4.4) }],
     movers: [{ kind: 'spin', x: 0, z: 5.3, len: 0.35, w: 1.6, phase: 0, blades: 2, look: 'windmill' }] },
   /* 3. kicker or tube: jump off the high tee over the gap, or take the tube; a gate guards the bridge up to the green */
-  { par: 3, sol: [[358.01,0.82,0]], tee: [0, 0.6], cup: [0.4, 8.2],
+  { par: 3, sol: [[358.01,0.8,0]], tee: [0, 0.6], cup: [0.4, 8.2],
     floors: [rect(-0.7, 0, 0.7, 2.6), rect(-1, 3.6, 1, 6), rect(-0.3, 6, 0.3, 7), rect(-1.1, 7, 1.1, 9)],
     walls: [[[-0.7, 2.6], [-0.7, 0], [0.7, 0], [0.7, 2.6]], [[-0.3, 6], [-1, 6], [-1, 3.6]], [[0.3, 6], [1, 6], [1, 3.6]], [[-1.1, 8.2], [-1.1, 9], [1.1, 9], [1.1, 8.2]]],
     tiers: [{ poly: rect(-0.7, 0, 0.7, 2.6), h: 0.3 }, { poly: C20_PAD(-1.1, 7, 1.1, 9), h: 0.25 }],
@@ -31,7 +31,7 @@ registerWorld(20, { holes: [
     tubes: [{ a: [-0.42, 1.5], b: [-0.6, 3.95], dir: 10 }] },
   /* 4. sunset fairway (long green): a 10 m banana green that leans left, rises over its back
      half and hides a swale beside the cup; lag up the hill and let it feed down */
-  { par: 2, sol: [[0,0.92,0]], tee: [0, 0.6], cup: [-0.4, 9.2],
+  { par: 2, sol: [[0,0.93,0]], tee: [0, 0.6], cup: [-0.4, 9.2],
     shape: [[-0.9, 0], [0.9, 0], [1.6, 2], [1.6, 5], [1.0, 8], [0.6, 10.2], [-1.0, 10.6], [-2.4, 9.4], [-2.6, 7], [-1.8, 4.5], [-1.4, 2]],
     tiers: [{ poly: rect(-3, -1, 3, 5), h: 0, sx: 0.02 }, { poly: rect(-3, 5, 3, 12), h: -0.15, sx: 0.02, sz: 0.03 }],
     bumps: [{ x: -1.2, z: 7, r: 1.4, h: -0.1 }, { x: 1.0, z: 4, r: 1.0, h: 0.1 }] },
@@ -46,7 +46,7 @@ registerWorld(20, { holes: [
     movers: [{ kind: 'spin', x: 0, z: 2.8, len: 0.3, w: 1.7, phase: 0, blades: 1, look: 'windmill' },
       { kind: 'spin', x: 0, z: 6.9, len: 0.3, w: -1.9, phase: 0.6, blades: 1, look: 'windmill' }] },
   /* 6. cloud steps: four islands stepping down over gaps under a crosswind, or the tube from the second straight to the green */
-  { par: 3, sol: [[10,0.8,0]], tee: [0, 0.6], cup: [0.65, 8.05],
+  { par: 3, sol: [[10,0.8,0],[0,0.08,0]], tee: [0, 0.6], cup: [0.65, 8.05],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.9, 2.3, 0.9, 4), rect(-0.9, 4.3, 0.9, 6), rect(-1.2, 6.3, 1.2, 8.6)],
     walls: [[[-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2]], [[-1.2, 7.6], [-1.2, 8.6], [1.2, 8.6], [1.2, 7.3], [0, 7.3]]],
     tiers: [{ poly: C20_PAD(-0.7, 0, 0.7, 2), h: 0.6 }, { poly: rect(-0.9, 2.3, 0.9, 4), h: 0.4 }, { poly: rect(-0.9, 4.3, 0.9, 6), h: 0.2 }],

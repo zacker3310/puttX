@@ -25,13 +25,13 @@ registerWorld(19, { holes: [
     tiers: [{ poly: rect(-2, 0, 2, 12.5), h: 0.08, sx: -0.02 }],
     bumps: [{ x: 0.8, z: 5.5, r: 2.0, h: 0.14 }, { x: -1.2, z: 8.4, r: 1.5, h: -0.1 }, { x: 0.7, z: 10.6, r: 1.0, h: 0.07 }] },
   /* 4: up to the wafer deck, past the candy press, off the deck edge to the green below */
-  { par: 3, sol: [[30,0.96,0]], tee: [0, 0.5], cup: [0.4, 7.2], shape: rect(-1, 0, 1, 8),
+  { par: 3, sol: [[30,0.96,0],[60,0.76,0]], tee: [0, 0.5], cup: [0.4, 7.2], shape: rect(-1, 0, 1, 8),
     ramps: [{ x0: -1, z0: 1.5, x1: 1, z1: 2.7, axis: 'z', h0: 0, h1: 0.3 }],
     tiers: [{ poly: rect(-1, 2.7, 1, 5), h: 0.3 }],
     movers: [C19_PRESS(-0.55, 3.9, 0.55, 3.9, 0.55, 90, 3)],
     zones: [C19_MUD(-0.2, 6.6, 1, 6.75)] },
   /* 5: the chocolate river: two thin wafer bridges, a lollipop over the cup */
-  { par: 4, sol: [[349,0.916667,0]], tee: [0, 0.5], cup: [0, 6.9], shape: rect(-1.8, 0, 1.8, 8),
+  { par: 4, sol: [[347.75,0.93,0]], tee: [0, 0.5], cup: [0, 6.9], shape: rect(-1.8, 0, 1.8, 8),
     zones: [C19_BELT(rect(-1.8, 1.6, 1.8, 2.6), -1.0, 0), { surf: 'water', poly: rect(-1.8, 3.2, -1.0, 4.2) }, { surf: 'water', poly: rect(-0.6, 3.2, 1.0, 4.2) }, { surf: 'water', poly: rect(1.4, 3.2, 1.8, 4.2) }],
     movers: [C19_POP(0, 5.6, 0.5, 1.5, 0, 2)],
     posts: [C19_GUM(-1.1, 5.4), C19_GUM(1.2, 5.6)] },

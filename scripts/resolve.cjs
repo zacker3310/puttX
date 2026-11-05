@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* resolve: re-proves every hole after a physics change and writes the new `sol` arrays straight
    back into courses/cNN.sim.js, so nobody pastes 550 lines by hand.
-   For each hole: if the stored sol still sinks within par it is kept untouched; otherwise the
-   solver (scripts/solve.cjs) searches again and the k-th `sol: [...]` of the course file is
+   For each hole: if the stored sol still sinks within par it is kept untouched; otherwise the old
+   line is repaired (its last putt nudged in aim and pace, closest first); otherwise the solver
+   (scripts/solve.cjs) searches again and the k-th `sol: [...]` of the course file is
    replaced (holes appear in file order). Holes the solver cannot prove are listed, not touched.
    Courses run in parallel on child processes, one per core.
    Usage: node scripts/resolve.cjs [--course 3,13] [--jobs 4] [--force] [--report path.json]
@@ -41,10 +42,35 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
     for (const [a, p, t0] of sol) { last = S.simulatePutt(h, at, a, p, t0); if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
     return sol.length <= h.par && last && last.end === 'sunk';
   };
+  /* repair first: the old line, nudged. Keep its earlier putts, then search outward from its last putt
+     (closest aim and pace first) for one that sinks. An auto hole wants the middle of its ace window,
+     not its edge, so it scores each sinking candidate by how many of holes-check's neighbours ace too. */
+  const repair = (h, sol) => {
+    if (!sol || !sol.length) return null;
+    let at = h.tee;
+    for (const [a, p, t0] of sol.slice(0, -1)) { const r = S.simulatePutt(h, at, a, p, t0); if (r.end === 'stop') at = [r.x, r.z]; else if (r.end !== 'oob') return null; }
+    const [a0, p0, t0] = sol[sol.length - 1], cands = [];
+    for (let da = -6; da <= 6.0001; da += 0.25) for (let dp = -0.3; dp <= 0.3001; dp += 0.01) cands.push([da, dp]);
+    cands.sort((u, v) => (Math.abs(u[0]) / 6 + Math.abs(u[1]) / 0.3) - (Math.abs(v[0]) / 6 + Math.abs(v[1]) / 0.3));
+    let best = null, bestScore = -1;
+    for (const [da, dp] of cands) {
+      const a = +(a0 + da).toFixed(2), p = +Math.min(1, Math.max(0.01, p0 + dp)).toFixed(2);
+      if (S.simulatePutt(h, at, a, p, t0).end !== 'sunk') continue;
+      const out = sol.slice(0, -1).concat([[a, p, t0]]);
+      if (!h.auto) return out;
+      let near = 0;
+      for (const d of [-0.6, 0, 0.6]) for (let k = -3; k <= 3; k++) if (S.simulatePutt(h, h.tee, a + d, Math.min(1, Math.max(0.02, p + k * 0.012)), 0).end === 'sunk') near++;
+      if (near > bestScore) { bestScore = near; best = out; }
+      if (near >= 18) break;
+    }
+    return best && (!h.auto || bestScore >= 11) ? best : null;
+  };
   const rows = [];
   for (const h of S.WORLDS[c].holes) {
     const t = Date.now();
     if (!force && h.sol && replay(h, h.sol)) { rows.push({ key: h.key, kept: true }); continue; }
+    const fixed = !force && repair(h, h.sol);
+    if (fixed && replay(h, fixed)) { rows.push({ key: h.key, par: h.par, sol: fixed, putts: fixed.length, s: +((Date.now() - t) / 1000).toFixed(1), repaired: true }); process.stderr.write(`${h.key} repaired ${fixed.length}/${h.par} ${((Date.now() - t) / 1000).toFixed(1)}s\n`); continue; }
     const sol = solve(h);
     let out = null;
     if (sol && sol.length <= h.par) {
@@ -58,6 +84,7 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
   return;
 }
 
+if (require.main !== module) return;
 const all = fs.readdirSync(path.join(ROOT, 'courses')).filter(f => /^c\d\d\.sim\.js$/.test(f)).map(f => Number(f.slice(1, 3))).sort((a, b) => a - b);
 const courses = val('--course') ? val('--course').split(',').map(Number) : all;
 const jobs = Number(val('--jobs')) || Math.max(1, os.cpus().length);
@@ -82,8 +109,8 @@ function runOne(c) {
       for (const [[a, b], txt] of edits.sort((x, y) => y[0][0] - x[0][0])) src = src.slice(0, a) + txt + src.slice(b);
       if (edits.length) fs.writeFileSync(f, src);
       results[c] = rows;
-      const kept = rows.filter(r => r.kept).length, fixed = rows.filter(r => r.sol).length, missed = rows.filter(r => !r.kept && !r.sol);
-      console.log(`[c${c}] done: ${kept} kept, ${fixed} re-solved, ${missed.length} miss par${missed.length ? ': ' + missed.map(r => r.key).join(' ') : ''}`);
+      const kept = rows.filter(r => r.kept).length, rep = rows.filter(r => r.repaired).length, fixed = rows.filter(r => r.sol && !r.repaired).length, missed = rows.filter(r => !r.kept && !r.sol);
+      console.log(`[c${c}] done: ${kept} kept, ${rep} repaired, ${fixed} re-solved, ${missed.length} miss par${missed.length ? ': ' + missed.map(r => r.key).join(' ') : ''}`);
       res();
     });
   });

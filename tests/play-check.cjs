@@ -203,6 +203,13 @@ const { check, done, open, fresh, visibleLetters } = require('./lib.cjs');
   });
   check('the cap putt auto-rolls in and scores double par', cap.sawAuto && cap.phase === 'done' && cap.score === 6, JSON.stringify(cap));
 
+  /* the browser rolls exactly what Node (the solver) proves: the same putts, the same bits */
+  const BATTERY = `(() => { const out = []; for (const k of ['7-3', '10-5', '15-9', '4-12', '1-7']) { const h = holeAt(k); if (!h) continue;
+    for (let a = 0; a < 360; a += 30) for (const p of [0.35, 0.85]) { const r = simulatePutt(h, h.tee, a + 0.37, p, (a % 4) * 0.6); out.push([k, r.end, r.x, r.z, r.steps].join()); } } return out.join('|'); })()`;
+  const inBrowser = await page.evaluate(BATTERY);
+  const N = require('./sim.cjs').loadSim(), inNode = new Function(...Object.keys(N), 'return ' + BATTERY)(...Object.values(N));
+  check('the browser and Node roll the same putts to the bit', inBrowser.length > 100 && inBrowser === inNode, inBrowser === inNode ? '' : 'first difference at ' + [...inBrowser].findIndex((c, i) => c !== inNode[i]));
+
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

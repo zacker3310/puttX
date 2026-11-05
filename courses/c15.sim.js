@@ -13,7 +13,7 @@ registerWorld(15, (() => {
   const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + dsin(a) * r, cz + dcos(a) * r]; });
   return { holes: [
     /* 1 shore lane: round the corner, or the cave in the far corner */
-    { par: 2, sol: [[328,0.88,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
+    { par: 2, sol: [[328,1,0]], tee: [0, 0.5], cup: [1.9, 5.4], aim0: 0,
       shape: [[-0.8, 0], [0.8, 0], [0.8, 4.2], [2.6, 4.2], [2.6, 6.2], [-0.8, 6.2]],
       zones: [sand(rect(-0.8, 2.0, 0.1, 2.8))], bumps: [{ x: 0.9, z: 5.3, r: 0.45, h: 0.14 }],
       tubes: [{ a: [-0.45, 5.6], b: [2.25, 4.6], dir: 0 }], posts: [BARREL(1.3, 4.6)] },

@@ -9,7 +9,7 @@ const C17_GARG = (x, z) => ({ x, z, r: 0.12, top: 0.3, look: 'gargoyle' });
 const C17_MOAT = poly => ({ surf: 'water', poly });
 registerWorld(17, { holes: [
   /* 1: two drawbridges over the moat: the narrow middle one or the wide one by the wall */
-  { par: 2, sol: [[2,0.72,0]], tee: [0, 0.5], cup: [-0.35, 5.5], shape: rect(-1, 0, 1, 6.4),
+  { par: 2, sol: [[-2.25,0.72,0]], tee: [0, 0.5], cup: [-0.35, 5.5], shape: rect(-1, 0, 1, 6.4),
     zones: [C17_MOAT(rect(-1, 2.6, -0.2, 3.3)), C17_MOAT(rect(0.2, 2.6, 0.55, 3.3))],
     posts: [C17_GARG(0, 4.5), C17_GARG(0.5, 4.9)] },
   /* 2: a windmill on the ramp, a terrace, then the portcullis before the cup */

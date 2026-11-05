@@ -68,13 +68,13 @@ registerWorld(27, { holes: [
     tubes: [{ a: [-0.4, 0.35], b: [-1.65, 1.7], dir: 0, keep: 0, add: 1.3 }, { a: [-2.6, 3.3], b: [-4.65, 1.7], dir: 0, keep: 0, add: 1.3 },
       { a: [-5.6, 3.3], b: [-7.65, 1.7], dir: 0, keep: 0, add: 1.3 }] },
   /* 9: the grand switchback: three flights of the stair, then the portcullis on the top landing */
-  { par: 4, sol: [[82,0.96,1.5],[8,0.8,0]], tee: [-1.5, 0.6], cup: [1.4, 3.0], aim0: 90, shape: rect(-2, 0, 2, 3.6),
+  { par: 4, sol: [[82,0.96,1.5],[281.75,0.92,1.5]], tee: [-1.5, 0.6], cup: [1.4, 3.0], aim0: 90, shape: rect(-2, 0, 2, 3.6),
     inner: [[[-2, 1.2], [0.8, 1.2]], [[-0.8, 2.4], [2, 2.4]], [[0.5, 2.4], [0.5, 2.7]]],
     tiers: [{ poly: rect(0.8, 0, 2, 2.4), h: 0.15 }, { poly: [[-2, 1.2], [-0.8, 1.2], [-0.8, 2.4], [2, 2.4], [2, 3.6], [-2, 3.6]], h: 0.3 }],
     ramps: [{ x0: -0.4, z0: 0, x1: 0.8, z1: 1.2, axis: 'x', h0: 0, h1: 0.15 }, { x0: -0.8, z0: 1.2, x1: 0.8, z1: 2.4, axis: 'x', h0: 0.3, h1: 0.15 }],
     movers: [C27_GHOST(-1.4, 1.6, -1.4, 3.2, 2.6, 0), C27_GATE(0.5, 3.0, 0.5, 3.6, 0.3, 0, 2.6, 0)] },
   /* 10: the gatehouse leap: three floating floors; a portcullis guards each drop, a passage skips one */
-  { par: 4, sol: [[4,0.9375,0],[64,0.875,0]], tee: [0, 0.5], cup: [-0.4, 9.4], floors: [rect(-0.9, 0, 0.9, 3.0), rect(-1.5, 3.6, 1.5, 6.6), rect(-1.2, 7.2, 1.2, 10.2)],
+  { par: 4, sol: [[357,0.96,1]], tee: [0, 0.5], cup: [-0.4, 9.4], floors: [rect(-0.9, 0, 0.9, 3.0), rect(-1.5, 3.6, 1.5, 6.6), rect(-1.2, 7.2, 1.2, 10.2)],
     tiers: [{ poly: rect(-0.9, 0, 0.9, 3.0), h: 0.45 }, { poly: rect(-1.5, 3.6, 1.5, 6.6), h: 0.25 }],
     walls: [[[-0.25, 3], [-0.9, 3], [-0.9, 0], [0.9, 0], [0.9, 3], [0.25, 3]],
       [[-0.5, 3.6], [-1.5, 3.6], [-1.5, 6.6], [0.5, 6.6]], [[0.5, 3.6], [1.5, 3.6], [1.5, 6.6], [1.0, 6.6]],
@@ -84,7 +84,7 @@ registerWorld(27, { holes: [
     movers: [C27_GATE(0, 3, -0.49, 3, 0.25, 90, 2.8, 0), C27_GHOST(-1.0, 5.0, 1.0, 5.0, 2.8, 0), C27_GATE(0.75, 6.6, 0.25, 6.6, 0.25, 90, 2.6, 0.6),
       C27_MILL(-0.1, 8.4, 0.45, 1.5, 0)] },
   /* 11: the throne stage: the polished floor and its dancers, the stage ramps, the portcullis, the dais */
-  { par: 4, crazy: true, sol: [[44,1,2]], tee: [0, 0.5], cup: [0, 8.4], shape: rect(-1.4, 0, 1.4, 9),
+  { par: 4, crazy: true, sol: [[44,1,2],[118,0.92,0.5]], tee: [0, 0.5], cup: [0, 8.4], shape: rect(-1.4, 0, 1.4, 9),
     zones: [{ surf: 'fast', poly: rect(-1.4, 1.4, 1.4, 5.0) }],
     tiers: [{ poly: rect(-1.4, 5.6, 1.4, 9), h: 0.2 }, { poly: rect(-0.6, 7.6, 0.6, 9), h: 0.32 }],
     ramps: [{ x0: -1.4, z0: 5.0, x1: -0.8, z1: 5.6, axis: 'z', h0: 0, h1: 0.2 }, { x0: 0.8, z0: 5.0, x1: 1.4, z1: 5.6, axis: 'z', h0: 0, h1: 0.2 },

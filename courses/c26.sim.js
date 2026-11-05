@@ -60,25 +60,25 @@ registerWorld(26, { holes: [
     bumps: [...V26_CRATER(-0.4, 7.4, 0.85)],
     zones: [V26_LAVA(rect(-1.4, 4.6, -0.7, 5.6)), V26_MUD(rect(0.3, 6.2, 1.4, 6.7)), V26_LAVA(rect(-1.4, 8.1, 0.4, 8.4))] },
   /* 8: lava falls: four decks stepping down through offset gaps, a gate on the first (crazy, 4 stages) */
-  { par: 4, crazy: true, sol: [[238,1,1.5],[192,0.72,0]], tee: [0, 0.5], cup: [-0.6, 10.4], shape: rect(-1.2, 0, 1.2, 11.2),
+  { par: 4, crazy: true, sol: [[176,0.84,1.5],[190,0.97,0]], tee: [0, 0.5], cup: [-0.6, 10.4], shape: rect(-1.2, 0, 1.2, 11.2),
     inner: [[[-1.2, 2.8], [-0.35, 2.8]], [[0.35, 2.8], [1.2, 2.8]], [[-1.2, 5.6], [0.3, 5.6]], [[-0.3, 8.4], [1.2, 8.4]]],
     tiers: [{ poly: rect(-1.4, -0.2, 1.4, 2.8), h: 0.42 }, { poly: rect(-1.4, 2.8, 1.4, 5.6), h: 0.28 }, { poly: rect(-1.4, 5.6, 1.4, 8.4), h: 0.14 }],
     movers: [V26_GATE(-0.55, 2.4, 0.55, 2.4, 0.3, 90, 3)],
     posts: [V26_COL(-0.2, 9.8), V26_COL(-1.0, 9.8)],
     zones: [V26_LAVA(rect(0.4, 4, 1.2, 4.6)), V26_LAVA(rect(-1.2, 6.8, -0.4, 7.4)), V26_LAVA(rect(0.2, 10.8, 1.2, 11.2)), V26_MUD(rect(-1.2, 3.8, -0.6, 4.4))] },
   /* 9: long green: the caldera floor, 13 m across a big shoulder, a hollow and a last knoll */
-  { par: 3, sol: [[24,1,0]], tee: [0, 0.5], cup: [-1.2, 12.8], shape: rect(-2.5, 0, 2.5, 13.8),
+  { par: 3, sol: [[26,0.97,0]], tee: [0, 0.5], cup: [-1.2, 12.8], shape: rect(-2.5, 0, 2.5, 13.8),
     tiers: [{ poly: rect(-2.6, -0.1, 2.6, 13.9), h: 0.2, sx: 0.02, sz: 0.004 }],
     bumps: [{ x: 1.4, z: 4.5, r: 2.5, h: 0.18 }, { x: -1.5, z: 8, r: 2, h: -0.12 }, { x: 1, z: 11, r: 1.5, h: 0.1 }] },
   /* 10: the gated drop: a basalt gate slides across the gap off the deck, then the boulder lane (3 stages) */
-  { par: 4, sol: [[315,0.92,0]], tee: [0, 0.5], cup: [-0.7, 8.2], shape: rect(-1.4, 0, 1.4, 9.2),
+  { par: 4, sol: [[315,0.92,0],[10,0.48,0]], tee: [0, 0.5], cup: [-0.7, 8.2], shape: rect(-1.4, 0, 1.4, 9.2),
     tiers: [{ poly: rect(-1.5, -0.1, 1.5, 3.8), h: 0.36 }],
     inner: [[[-1.4, 3.8], [-0.4, 3.8]], [[0.4, 3.8], [1.4, 3.8]]],
     movers: [V26_GATE(-0.84, 3.4, 0.84, 3.4, 0.3, 90, 3.2), V26_ROCK(-0.9, 6, 0.9, 6, 2.6, 0.5)],
     bumps: [{ x: 0.6, z: 4.8, r: 0.45, h: 0.2 }, ...V26_CRATER(-0.7, 8.2, 0.85)],
     zones: [V26_LAVA(rect(0.3, 7, 1.4, 7.5)), V26_MUD(rect(-1.4, 4.4, -0.7, 5)), V26_LAVA(rect(-1.4, 8.9, 0.2, 9.2))] },
   /* 11: two crater mouths on the shelf: one tube drops beside the cup, the other back to the tee (3 stages) */
-  { par: 4, sol: [[335.5,1,0]], tee: [0, 0.5], cup: [0.8, 8.4], aim0: 0, shape: rect(-1.5, 0, 1.5, 9.2),
+  { par: 4, sol: [[331.25,1,0]], tee: [0, 0.5], cup: [0.8, 8.4], aim0: 0, shape: rect(-1.5, 0, 1.5, 9.2),
     ramps: [{ x0: -1.5, z0: 1.6, x1: 1.5, z1: 2.6, axis: 'z', h0: 0, h1: 0.24 }],
     tiers: [{ poly: rect(-1.6, 2.6, 1.6, 5.4), h: 0.24 }],
     inner: [[[-1.5, 5.4], [-0.6, 5.4]], [[0.1, 5.4], [1.5, 5.4]]],
@@ -87,7 +87,7 @@ registerWorld(26, { holes: [
     tubes: [{ a: [-0.8, 4], b: [-0.9, 6.6], dir: 30 }, { a: [0.8, 4], b: [1, 0.6], dir: 340 }],
     zones: [V26_LAVA(rect(0.4, 6.6, 1.5, 7.1)), V26_LAVA(rect(-1.5, 8.9, 0, 9.2)), V26_MUD(rect(-1.5, 7.2, -0.9, 7.8))] },
   /* 12: chained tubes: crater to the upper deck, crater to the cup green, or the ramps the long way (crazy, 4 stages) */
-  { par: 4, crazy: true, sol: [[26.6,0.92,0],[194.2,0.7,0]], tee: [0, 0.5], cup: [-2.6, 1.2], aim0: 0,
+  { par: 4, crazy: true, sol: [[26.6,0.92,0],[320,0.88,0]], tee: [0, 0.5], cup: [-2.6, 1.2], aim0: 0,
     shape: [[-0.8, 0], [0.8, 0], [0.8, 7], [-3.4, 7], [-3.4, 0], [-1.8, 0], [-1.8, 4.4], [-0.8, 4.4]],
     tiers: [{ poly: rect(-3.5, 4.4, 0.9, 7.1), h: 0.34 }],
     ramps: [{ x0: -0.8, z0: 3.2, x1: 0.8, z1: 4.4, axis: 'z', h0: 0, h1: 0.34 }, { x0: -3.4, z0: 3.4, x1: -1.8, z1: 4.4, axis: 'z', h0: 0, h1: 0.34 }],

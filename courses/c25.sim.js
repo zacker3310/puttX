@@ -63,7 +63,7 @@ registerWorld(25, (() => {
       tubes: [{ a: [1.0, 5.6], b: [0.8, 9.0], dir: 270 }],
       bumps: [{ x: -0.2, z: 5.4, r: 0.45, h: 0.15 }], zones: [sand(rect(0.2, 9.6, 1.2, 10.4))], posts: [BARREL(0.6, 1.4)] },
     /* 8 the fort: two gangplanks to the battlements, then the cave or the guarded drop to the cellar green */
-    { par: 4, sol: [[46,0.84,0],[36,0.88,0]], tee: [-0.6, 0.5], cup: [-0.8, 9.4], aim0: 30, shape: rect(-1.6, 0, 1.6, 10.2),
+    { par: 4, sol: [[46,1,0],[62,0.76,0]], tee: [-0.6, 0.5], cup: [-0.8, 9.4], aim0: 30, shape: rect(-1.6, 0, 1.6, 10.2),
       ramps: [{ x0: 0.9, z0: 1.8, x1: 1.6, z1: 3, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.6, z0: 4.4, x1: -0.9, z1: 5.6, axis: 'z', h0: 0.2, h1: 0.4 }],
       tiers: [{ poly: rect(-1.7, 3, 1.7, 8.2), h: 0.2 }, { poly: rect(-1.7, 5.6, 1.7, 8.2), h: 0.4 }],
       inner: [[[-1.6, 3], [0.9, 3]], [[-0.9, 5.6], [1.6, 5.6]], [[-1.6, 8.2], [0.4, 8.2]], [[1.2, 8.2], [1.6, 8.2]]],
@@ -71,13 +71,13 @@ registerWorld(25, (() => {
       tubes: [{ a: [-1.2, 7.4], b: [0.9, 9.3], dir: 270, keep: 0.5 }],
       posts: [BARREL(-0.2, 4.2), BARREL(0.3, 6.6)], zones: [lagoon(rect(-0.2, 9.8, 0.6, 10.2)), sand(rect(-1.6, 1.4, -0.8, 2.2))], bumps: [{ x: 0.0, z: 9.0, r: 0.35, h: 0.1 }] },
     /* 9 the three-tier green: 12 m, up a step and up another, the top shelf falling away toward the moat */
-    { par: 3, sol: [[336,0.96,0]], tee: [0, 0.5], cup: [1.0, 11.0], shape: rect(-2, 0, 2, 12),
+    { par: 3, sol: [[335.75,1,0]], tee: [0, 0.5], cup: [1.0, 11.0], shape: rect(-2, 0, 2, 12),
       tiers: [{ poly: rect(-2.1, 4.2, 2.1, 7.6), h: 0.1 }, { poly: rect(-2.1, 8.6, 2.1, 12.1), h: 0.286, sz: -0.01 }],
       ramps: [{ x0: -2, z0: 3.2, x1: 2, z1: 4.2, axis: 'z', h0: 0, h1: 0.1 }, { x0: -2, z0: 7.6, x1: 2, z1: 8.6, axis: 'z', h0: 0.1, h1: 0.2 }],
       bumps: [{ x: -0.7, z: 1.9, r: 1.2, h: 0.1 }, { x: 0.8, z: 6.0, r: 1.0, h: -0.07 }, { x: -1.1, z: 10.6, r: 1.0, h: 0.1 }],
       zones: [lagoon(rect(-2, 8.0, -1.5, 9.4)), sand(rect(1.3, 5.0, 2, 6.0))] },
     /* 10 smugglers' relay: four chambers, three caves, every gap guarded */
-    { par: 4, crazy: true, sol: [[32,0.84,2],[2,0.52,0]], tee: [0, 0.5], cup: [0.9, 8.8], aim0: 30, shape: rect(-1.8, 0, 1.8, 9.6),
+    { par: 4, crazy: true, sol: [[32,0.84,2],[2,0.52,0],[18,0.52,0]], tee: [0, 0.5], cup: [0.9, 8.8], aim0: 30, shape: rect(-1.8, 0, 1.8, 9.6),
       inner: [[[-1.8, 2.4], [1.1, 2.4]], [[-1.1, 4.8], [1.8, 4.8]], [[-1.8, 7.2], [1.1, 7.2]]],
       tubes: [{ a: [-1.2, 1.7], b: [-1.2, 3.2], dir: 90 }, { a: [1.2, 4.1], b: [1.2, 5.6], dir: 270 }, { a: [-1.2, 6.5], b: [-1.2, 8.0], dir: 90 }],
       movers: [CANNON(1.45, 2.0, 1.45, 3.0, 2.4), CANNON(-1.45, 4.4, -1.45, 5.3, 2.8, 1)],

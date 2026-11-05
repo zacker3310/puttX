@@ -182,7 +182,19 @@ function wallTops(h) {
     return [hi + WALL_TOP, lo];
   });
 }
+/* a polygon's bounding box, kept on the array (not enumerable, so iteration and JSON never see it) */
+function polyBox(poly) {
+  let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+  for (const [px, pz] of poly) { x0 = Math.min(x0, px); x1 = Math.max(x1, px); z0 = Math.min(z0, pz); z1 = Math.max(z1, pz); }
+  const bb = [x0 - 1e-6, x1 + 1e-6, z0, z1];
+  Object.defineProperty(poly, 'bb', { value: bb, enumerable: false });
+  return bb;
+}
 function inPoly(poly, x, z) {
+  /* outside the box the answer is no for certain: above or below it no edge straddles z; left or right
+     of it every straddling edge (an even number round a closed loop) counts alike */
+  const bb = poly.bb || polyBox(poly);
+  if (z < bb[2] || z > bb[3] || x < bb[0] || x > bb[1]) return false;
   let inside = false;
   for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
     const xi = poly[i][0], zi = poly[i][1], xj = poly[j][0], zj = poly[j][1];
@@ -225,11 +237,15 @@ function dishY(d) {
   const u = d / DISH_R, w = 1 - u * u;
   return [-DISH_D * w * w, 4 * DISH_D * u * w / DISH_R];
 }
+/* `within(dx, dz, r)` is a broad phase that skips a square root: when it is false the distance is at
+   least r for certain (sqrt(dx^2 + dz^2) >= |dx| holds exactly in floating point), and every caller
+   then adds exactly what the far case would have added, so results are the same to the bit */
+const within = (dx, dz, r) => dx < r && dx > -r && dz < r && dz > -r;
 function groundH(h, x, z) {
   let y = baseAt(h, x, z)[0];
   for (const b of h.bumps) { const dx = x - b.x, dz = z - b.z; y += b.h * dexp(-(dx * dx + dz * dz) / (b.r * b.r)); }
-  for (const dr of h.drains) y += drainY(hyp(x - dr.x, z - dr.z), dr)[0];
-  if (h.cup) y += dishY(hyp(x - h.cup[0], z - h.cup[1]))[0];
+  for (const dr of h.drains) { const dx = x - dr.x, dz = z - dr.z; y += within(dx, dz, dr.r) ? drainY(hyp(dx, dz), dr)[0] : 0; }
+  if (h.cup) { const dx = x - h.cup[0], dz = z - h.cup[1]; y += within(dx, dz, DISH_R) ? dishY(hyp(dx, dz))[0] : 0; }
   return y;
 }
 function groundGrad(h, x, z) {
@@ -240,12 +256,14 @@ function groundGrad(h, x, z) {
     gx += k * dx; gz += k * dz;
   }
   for (const dr of h.drains) {
-    const dx = x - dr.x, dz = z - dr.z, d = hyp(dx, dz), s = d > 1e-9 ? drainY(d, dr)[1] / d : 0;
+    const dx = x - dr.x, dz = z - dr.z;
+    if (!within(dx, dz, dr.r)) { gx += 0 * dx; gz += 0 * dz; continue; }
+    const d = hyp(dx, dz), s = d > 1e-9 ? drainY(d, dr)[1] / d : 0;
     gx += s * dx; gz += s * dz;
   }
   if (h.cup) {
-    const dx = x - h.cup[0], dz = z - h.cup[1], d = hyp(dx, dz);
-    if (d < DISH_R && d > 1e-9) { const s = dishY(d)[1] / d; gx += s * dx; gz += s * dz; }
+    const dx = x - h.cup[0], dz = z - h.cup[1];
+    if (within(dx, dz, DISH_R)) { const d = hyp(dx, dz); if (d < DISH_R && d > 1e-9) { const s = dishY(d)[1] / d; gx += s * dx; gz += s * dz; } }
   }
   return [gx, gz];
 }
@@ -290,6 +308,7 @@ function hitSeg(b, ax, az, bx, bz, e, svx = 0, svz = 0) {
 }
 function hitCircle(b, cx, cz, cr, e, svx = 0, svz = 0) {
   let nx = b.x - cx, nz = b.z - cz;
+  if (!within(nx, nz, cr + BALL_R)) return 0;
   const d = hyp(nx, nz), R = cr + BALL_R;
   if (d >= R || d < 1e-9) return 0;
   nx /= d; nz /= d;
@@ -411,7 +430,7 @@ function cupContact(h, b) {
   return v;
 }
 /* the ball's centre is over the hole (inside the lip's rounding): no flat turf under it */
-const overHole = (h, b) => cupDist(h, b) < CUP_R + RIM_RHO;
+const overHole = (h, b) => within(b.x - h.cup[0], b.z - h.cup[1], CUP_R + RIM_RHO) && cupDist(h, b) < CUP_R + RIM_RHO;
 /* in the air: gravity, walls, the cup's rim and liner, and the landing. Near the cup the step is
    split so a fast ball cannot pass through the rim edge between two steps. */
 function stepAir(h, b, t, dt, g) {
@@ -500,7 +519,7 @@ function stepBall(h, b, t) {
 
   const zw = zoneAt(h, b.x, b.z);
   if (zw && zw.surf === 'water') { b.hits.push(['splash', 1]); return 'oob'; }
-  for (const tb of h.tubes) if (hyp(b.x - tb.a[0], b.z - tb.a[1]) < TUBE_R) {
+  for (const tb of h.tubes) if (within(b.x - tb.a[0], b.z - tb.a[1], TUBE_R) && hyp(b.x - tb.a[0], b.z - tb.a[1]) < TUBE_R) {
     b.tube = { def: tb, t: TUBE_T, v: hyp(b.vx, b.vz) };
     b.x = tb.a[0]; b.z = tb.a[1]; b.vx = b.vz = 0; b.hits.push(['tubeIn', 1]);
     return null;

@@ -7,20 +7,20 @@ function c21Box(x0, z0, x1, z1, cuts) {
 }
 registerWorld(21, { holes: [
   /* 1: gate drop. A boom barrier slides across the only gap off the scaffold deck */
-  { par: 2, sol: [[204,0.84,0.5]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.4),
+  { par: 2, sol: [[204,0.84,0.5],[22,0.64,0]], tee: [0, 0.5], cup: [0.4, 6.4], shape: rect(-1, 0, 1, 7.4),
     tiers: [{ poly: rect(-1, 0, 1, 3.5), h: 0.3 }],
     inner: [[[-1, 3.5], [-0.25, 3.5]], [[0.25, 3.5], [1, 3.5]]],
     movers: [{ kind: 'gate', ax: 0.5, az: 3.5, bx: 0, bz: 3.5, len: 0.26, ang: 90, period: 3, look: 'boom' }],
     zones: [{ surf: 'sand', poly: rect(-1, 6.6, -0.2, 7.4) }],
     bumps: [{ x: -0.4, z: 5.2, r: 0.35, h: 0.12 }] },
   /* 2: pipe skip (3 parts). Two girder walls with gaps on opposite sides, or one pipe over both */
-  { par: 3, sol: [[338,1,0],[30,0.88,0]], tee: [0, 0.5], cup: [-0.4, 8.2], shape: rect(-1.2, 0, 1.2, 9),
+  { par: 3, sol: [[338,1,0],[30.25,0.88,0]], tee: [0, 0.5], cup: [-0.4, 8.2], shape: rect(-1.2, 0, 1.2, 9),
     inner: [[[-1.2, 3], [0.6, 3]], [[-0.6, 6], [1.2, 6]]],
     tubes: [{ a: [-0.7, 2.3], b: [0.6, 6.7], dir: 0 }],
     zones: [{ push: [1.2, 0], poly: rect(-1.2, 3.6, 1.2, 4.6) }, { surf: 'sand', poly: rect(0.4, 8.4, 1.2, 9) }],
     bumps: [{ x: 0.2, z: 7.5, r: 0.35, h: 0.12 }] },
   /* 3: stacked decks (3 parts). Right ramp, round the jib, left ramp, across the top belt */
-  { par: 3, sol: [[32,0.96,0]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.2, 0, 1.2, 9.4),
+  { par: 3, sol: [[32,0.96,0],[166,0.8,0.5]], tee: [0, 0.5], cup: [0.6, 8.7], shape: rect(-1.2, 0, 1.2, 9.4),
     tiers: [{ poly: rect(-1.2, 3.2, 1.2, 6.2), h: 0.2 }, { poly: rect(-1.2, 6.2, 1.2, 9.4), h: 0.4 }],
     ramps: [{ x0: 0.5, z0: 2, x1: 1.2, z1: 3.2, axis: 'z', h0: 0, h1: 0.2 },
             { x0: -1.2, z0: 5, x1: -0.6, z1: 6.2, axis: 'z', h0: 0.2, h1: 0.4 }],

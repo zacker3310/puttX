@@ -143,7 +143,7 @@ registerWorld(20, { holes: [
     tiers: [{ poly: rect(-3, -1, 4, 13), h: 0, sx: 0.015 }],
     bumps: [{ x: 0.4, z: 8.6, r: 1.8, h: -0.12 }, { x: 0, z: 4.5, r: 1.6, h: 0.15 }, { x: -1.4, z: 9.4, r: 1.2, h: 0.08 }] },
   /* 16. rainbow relay: three bare rainbows between tiny islands, each with its own crosswind, onto a gated green */
-  { par: 4, crazy: true, sol: [[2,0.56,0],[278,0.32,0],[0,0.64,0]], tee: [0, 0.6], cup: [-3.3, 8.4],
+  { par: 4, crazy: true, sol: [[176,0.72,0],[84,0.72,0],[4,1,0]], tee: [0, 0.6], cup: [-3.3, 8.4],
     floors: [rect(-0.7, 0, 0.7, 1.8), rect(-0.25, 1.8, 0.25, 3.6), rect(-0.6, 3.6, 0.6, 4.6), rect(-2.6, 3.85, -0.6, 4.35), rect(-3.6, 3.4, -2.6, 5.2),
       rect(-3.35, 5.2, -2.85, 7.2), rect(-4.4, 7.2, -2.0, 9)],
     walls: [[[-0.25, 1.8], [-0.7, 1.8], [-0.7, 0], [0.7, 0], [0.7, 1.8], [0.25, 1.8]], [[-0.6, 4.6], [0.6, 4.6], [0.6, 3.6]],
@@ -169,7 +169,7 @@ registerWorld(20, { holes: [
     tubes: [{ a: [-0.9, 5.7], b: [-0.6, 7.8], dir: 0 }] },
   /* 18. the sunset crown: tube or windy rainbow to the windmill isle, the kicker onto the walled ice court past two gates,
      then up the royal ramp to the crater cup on the crown, ringed by cloud bumpers */
-  { par: 5, crazy: true, sol: [[335,0.3,0],[359,1,2.1]], tee: [0, 0.6], cup: [-0.3, 11.9],
+  { par: 5, crazy: true, sol: [[335,0.3,0],[358.25,0.88,2.1]], tee: [0, 0.6], cup: [-0.3, 11.9],
     floors: [rect(-0.8, 0, 0.8, 2.2), rect(-0.22, 2.2, 0.22, 4.6), rect(-1.4, 4.6, 1.4, 6.6), rect(-1.6, 7.0, 1.6, 10), rect(-0.35, 10, 0.35, 11), rect(-1, 11, 1, 12.6)],
     walls: [[[-0.26, 2.2], [-0.8, 2.2], [-0.8, 0], [0.8, 0], [0.8, 2.2], [0.26, 2.2]],
       [[-0.26, 2.2], [-0.26, 4.6], [-1.4, 4.6], [-1.4, 6.6], [-0.5, 6.6]], [[0.26, 2.2], [0.26, 4.6], [1.4, 4.6], [1.4, 6.6], [0.5, 6.6]],

@@ -14,14 +14,14 @@ registerWorld(19, { holes: [
     tiers: [{ poly: rect(-0.9, 5, 0.9, 7), h: 0.2 }],
     posts: [C19_GUM(-0.3, 5.8)] },
   /* 2: belt deck, candy-cane pipe, taffy green */
-  { par: 3, sol: [[44,0.68,0],[0,0.24,0]], tee: [0, 0.5], cup: [-0.1, 7.1], aim0: 0,
+  { par: 3, sol: [[50,0.64,0],[50,1,0]], tee: [0, 0.5], cup: [-0.1, 7.1], aim0: 0,
     floors: [[[-0.6, 0], [0.6, 0], [0.6, 2.6], [2.8, 2.6], [2.8, 3.8], [-0.6, 3.8]], rect(-0.6, 4.8, 2.0, 7.8)],
     walls: [ring([[-0.6, 0], [0.6, 0], [0.6, 2.6], [2.8, 2.6], [2.8, 3.8], [-0.6, 3.8]]), ring(rect(-0.6, 4.8, 2.0, 7.8))],
     zones: [C19_BELT(rect(-0.6, 2.6, 2.8, 3.8), 1.4, 0), C19_MUD(-0.6, 6.5, -0.45, 7.8), C19_MUD(0.25, 6.5, 0.6, 7.8)],
     posts: [C19_GUM(0.9, 6.2)],
     tubes: [C19_PIPE([2.3, 3.2], [1.5, 5.3], 330)] },
   /* 3: long green: the grape green, a broad slab falling right, over a low frosting ridge and round a swale */
-  { par: 2, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [-0.8, 11.4], shape: rect(-2, 0, 2, 12.5),
+  { par: 2, sol: [[0,0.82,0]], tee: [0, 0.5], cup: [-0.8, 11.4], shape: rect(-2, 0, 2, 12.5),
     tiers: [{ poly: rect(-2, 0, 2, 12.5), h: 0.08, sx: -0.02 }],
     bumps: [{ x: 0.8, z: 5.5, r: 2.0, h: 0.14 }, { x: -1.2, z: 8.4, r: 1.5, h: -0.1 }, { x: 0.7, z: 10.6, r: 1.0, h: 0.07 }] },
   /* 4: up to the wafer deck, past the candy press, off the deck edge to the green below */

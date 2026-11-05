@@ -13,20 +13,20 @@ registerWorld(17, { holes: [
     zones: [C17_MOAT(rect(-1, 2.6, -0.2, 3.3)), C17_MOAT(rect(0.2, 2.6, 0.55, 3.3))],
     posts: [C17_GARG(0, 4.5), C17_GARG(0.5, 4.9)] },
   /* 2: a windmill on the ramp, a terrace, then the portcullis before the cup */
-  { par: 3, sol: [[34,0.92,0]], tee: [0, 0.5], cup: [0.35, 7.2], shape: rect(-0.9, 0, 0.9, 8),
+  { par: 3, sol: [[34,0.92,0],[54,0.52,1]], tee: [0, 0.5], cup: [0.35, 7.2], shape: rect(-0.9, 0, 0.9, 8),
     ramps: [{ x0: -0.9, z0: 2.6, x1: 0.9, z1: 3.4, axis: 'z', h0: 0, h1: 0.2 }],
     tiers: [{ poly: rect(-0.9, 3.4, 0.9, 8), h: 0.2 }],
     inner: [[[-0.9, 5.4], [-0.25, 5.4]], [[0.25, 5.4], [0.9, 5.4]]],
     bumps: [{ x: -0.4, z: 6.7, r: 0.4, h: 0.1 }],
     movers: [C17_MILL(0, 1.8, 0.55, 1.6, 0), C17_GATE(0, 5.4, 0.48, 5.4, 0.25, 3, 0)] },
   /* 3: two secret passages under the hall wall, or the long way through the side door past a ghost */
-  { par: 3, sol: [[14,0.64,0]], tee: [0, 0.5], cup: [0.5, 6.2], aim0: 10, shape: rect(-1.3, 0, 1.3, 7),
+  { par: 3, sol: [[14,0.75,0]], tee: [0, 0.5], cup: [0.5, 6.2], aim0: 10, shape: rect(-1.3, 0, 1.3, 7),
     inner: [[[-0.7, 3.2], [1.3, 3.2]]],
     tubes: [{ a: [0.9, 2.5], b: [0.6, 4.0], dir: 0 }, { a: [0.2, 2.5], b: [-0.8, 0.5], dir: 0 }],
     movers: [C17_GHOST(-0.9, 4.7, 0.6, 4.7, 2.6, 0)] },
   /* 4: the terrace green: a long green in three broad tiers like the grand staircase, a swale on
      the bottom terrace, a ridge on the middle one, and a knob by the cup to read */
-  { par: 3, sol: [[338,0.92,0],[0,0.28,0]], tee: [0, 0.5], cup: [-0.8, 12.4], shape: rect(-1.9, 0, 1.9, 13.4),
+  { par: 3, sol: [[338,0.92,0],[0,0.28,0],[16,0.48,0]], tee: [0, 0.5], cup: [-0.8, 12.4], shape: rect(-1.9, 0, 1.9, 13.4),
     ramps: [{ x0: -1.9, z0: 4.0, x1: 1.9, z1: 5.0, axis: 'z', h0: 0, h1: 0.1 }, { x0: -1.9, z0: 9.0, x1: 1.9, z1: 10.0, axis: 'z', h0: 0.1, h1: 0.2 }],
     tiers: [{ poly: rect(-1.9, 5.0, 1.9, 13.4), h: 0.1 }, { poly: rect(-1.9, 10.0, 1.9, 13.4), h: 0.2 }],
     bumps: [{ x: 1.0, z: 2.4, r: 1.4, h: -0.08 }, { x: -0.9, z: 7.4, r: 1.2, h: 0.1 }, { x: 0.8, z: 11.4, r: 0.9, h: 0.06 }] },

@@ -132,11 +132,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #cardRow .sc.par { color: var(--v-ink-soft); }
 #cardRow .sc.sub { background: #f6efd9; font-size: 30px; }
 #cardRow .sc.hd.sub { font-size: 20px; }
-#cardRow .mk { display: grid; place-items: center; width: 38px; height: 38px; color: #2f5d8a; }
+#cardRow .mk { display: grid; place-items: center; width: 38px; height: 38px; box-sizing: border-box; color: #2f5d8a; }
 #cardRow .mk.b { border: 3px solid #2f5d8a; border-radius: 50%; }
-#cardRow .mk.e { border: 3px solid #2f5d8a; border-radius: 50%; box-shadow: 0 0 0 3px #fffdf3, 0 0 0 6px #2f5d8a; }
+#cardRow .mk.e { border: 5px double #2f5d8a; border-radius: 50%; }
 #cardRow .mk.o { border: 3px solid #2f5d8a; border-radius: 4px; }
-#cardRow .mk.d { border: 3px solid #2f5d8a; border-radius: 4px; box-shadow: 0 0 0 3px #fffdf3, 0 0 0 6px #2f5d8a; }
+#cardRow .mk.d { border: 5px double #2f5d8a; border-radius: 4px; }
 #cardSum { position: absolute; left: 0; right: 0; top: 352px; display: flex; justify-content: center; align-items: center; gap: 40px; font: 800 80px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
 #cardDiff { font-size: 60px; color: var(--v-ink-soft); }
 #cardStars { display: flex; align-items: center; gap: 8px; font-size: 60px; }
@@ -212,7 +212,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #partyNextBtn { right: 60px; bottom: 34px; width: 140px; }
 #cardPanel.party #cardRow .sc { height: 30px; font-size: 22px; }
 #cardPanel.party #cardRow .nine { background-image: repeating-linear-gradient(#fffdf3 0 28px, #c9dbe8 28px 30px); }
-#cardPanel.party #cardRow .sc.lb svg, #cardPanel.party #cardRow .mk { width: 26px; height: 26px; }
+#cardPanel.party #cardRow .sc.lb svg { width: 26px; height: 26px; }
+#cardPanel.party #cardRow .mk { width: 30px; height: 26px; font-size: 17px; border-width: 2px; }
+#cardPanel.party #cardRow .mk.e, #cardPanel.party #cardRow .mk.d { border-width: 4px; }
 #cardPanel.party #cardRow .sc .pball { width: 26px; height: 26px; border-width: 3px; }
 #cardPanel.party #cardRow .sc .pball b { font-size: 14px; }
 #cardPanel.party #cardSum { top: 404px; font-size: 64px; }

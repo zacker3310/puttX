@@ -11,7 +11,7 @@ function fit() {
   stage.style.transform = `translate(-50%,-50%) scale(${stageScale})`;
 }
 function showScene(id) {
-  if (updateReady && id !== 'hole') { location.reload(); return; }   /* an update waiting: take it between holes, never mid-putt */
+  if (updateReady && id !== 'hole' && id !== 'card' && !party.on) { location.reload(); return; }   /* an update waiting: take it between holes, never mid-putt, never over a scorecard or a party */
   currentScene = id;
   for (const s of document.querySelectorAll('.scene')) s.classList.toggle('active', s.id === id);
 }
@@ -1765,7 +1765,7 @@ function renderFrame(dt) {
   if (hs.dataset.intro !== intro) hs.dataset.intro = intro;
   /* the 2D scenes cover the whole stage: no point drawing a hole behind them */
   tickAmbience(dt);
-  if (!play.hole || ['map', 'shop', 'title', 'worlds', 'world'].includes(currentScene)) return;
+  if (!play.hole || ['map', 'shop', 'title', 'worlds', 'world', 'profiles'].includes(currentScene)) return;
   updateMovers(play.time);
   for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
   if (!reducedMotion()) FX_TIME.value += dt;
@@ -2116,6 +2116,8 @@ function goHole(key, opts) {
   holeBannerN.textContent = key.split('-')[1]; holeBannerPar.textContent = play.hole.par;
   holeBannerMap.innerHTML = holeMapSvg(play.hole, play.aim);
   holeBanner.classList.remove('show'); void holeBanner.offsetWidth; holeBanner.classList.add('show');
+  /* with no intro flight (reduced motion) the banner still steps aside after a moment */
+  clearTimeout(holeBanner._t); if (!play.intro) holeBanner._t = setTimeout(() => holeBanner.classList.remove('show'), 1600);
 }
 /* the tee sign's picture of the hole: its outline seen from the tee (the line of play points up), the
    walls, water and sand, the tee and the flag. Like the layout drawing on a real course's tee sign. */
@@ -2138,7 +2140,7 @@ function skipIntro() { if (play.intro) { play.intro = null; holeBanner.classList
 function beginPutt(angle, power, clean = true) {
   if (play.phase !== 'aim') return false;
   const b = play.ball;
-  skipIntro();
+  skipIntro(); holeBanner.classList.remove('show');
   const g = play.ghost;
   play.undo = { strokes: play.round.strokes, at: [b.x, b.z], aim: play.aim, touched: play.touched,
     ghost: g ? { b: Object.assign({}, g.b, { hits: [] }), k: g.k, done: !!g.done, live: g.live, t: g.t } : null };
@@ -3110,6 +3112,7 @@ function slotSummary(n) {
 }
 function useSlot(n) {
   slot = n; SAVE_KEY = slotKey(n);
+  practiceMode = false; endParty();
   try { localStorage.setItem(SLOT_KEY, String(n)); } catch (e) {}
   progress = loadProgress();
   repairExtras(progress); shopRepair(progress); saveProgress();
@@ -3206,6 +3209,7 @@ function renderMap() {
   soundBtn.classList.toggle('off', !progress.sound);
   map.classList.toggle('night', !!progress.neon); map.classList.toggle('practice', practiceMode);
   practiceBtn.classList.toggle('on', practiceMode);
+  partyBtn.style.display = progress.worlds.includes(mapWorld) || isExtra(mapWorld) ? '' : 'none';
   mapLostN.textContent = holes.filter(h => progress.lost[h.key]).length + '/' + holes.length;
   renderWallet();
 }
@@ -3243,9 +3247,8 @@ function showCard(w) {
   }
   total = Math.min(...sums);
   if (inParty) {
-    const win = sums.indexOf(total);
     const diff = total - par;
-    cardTotal.innerHTML = partyBall(win, 72) + total;
+    cardTotal.innerHTML = sums.map((v, p) => v === total ? partyBall(p, 72) : '').join('') + total;
     cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
     cardStars.innerHTML = sums.filter(v => v === total).length > 1 ? '' : CROWN_SVG;
     cardNext.style.display = 'none';
@@ -3397,15 +3400,16 @@ function boot() {
   setClose.addEventListener('click', () => { sfx('tap'); settings.classList.remove('show'); });
   setHand(progress.hand);
   neonSet.classList.toggle('on', !!progress.neon);
-  homeBtn.addEventListener('click', () => { sfx('tap'); endParty(); showMap(Number(play.key.split('-')[0])); });
+  const backToMap = () => { const w = Number(play.key.split('-')[0]); if (progress.worlds.includes(w) || isExtra(w)) showMap(w); else showTitle(); };
+  homeBtn.addEventListener('click', () => { sfx('tap'); endParty(); backToMap(); });
   partyBtn.addEventListener('click', () => { sfx('tap'); partyPick.classList.add('show'); });
   partyPickClose.addEventListener('click', () => { sfx('tap'); partyPick.classList.remove('show'); });
-  [2, 3, 4].forEach(n => document.getElementById('partyN' + n).addEventListener('click', () => { sfx('tap'); startParty(n, mapWorld); }));
+  [2, 3, 4].forEach(n => document.getElementById('partyN' + n).addEventListener('click', () => { if (progress.worlds.includes(mapWorld) || isExtra(mapWorld)) { sfx('tap'); startParty(n, mapWorld); } else sfx('boink'); }));
   partyPass.addEventListener('click', () => { sfx('tap'); partyGo(); });
   partyNextBtn.addEventListener('click', () => { sfx('tap'); partyNext(); });
   guideBtn.addEventListener('click', () => showGuide());
   partyMap.addEventListener('click', () => { sfx('tap'); const w = party.course; endParty(); showMap(w); });
-  doneMap.addEventListener('click', () => { sfx('tap'); showMap(Number(play.key.split('-')[0])); });
+  doneMap.addEventListener('click', () => { sfx('tap'); backToMap(); });
   titleGo.addEventListener('click', () => { sfx('tap'); showProfiles(); });
   profilesBack.addEventListener('click', () => { sfx('tap'); showTitle(); });
   worldsHome.addEventListener('click', () => { sfx('tap'); showProfiles(); });

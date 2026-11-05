@@ -35,18 +35,18 @@ registerWorld(15, (() => {
       movers: [CANNON(-0.8, 4.5, 0.8, 4.5, 2.6)], zones: [lagoon(rect(0.5, 7.6, 1.2, 8.6))],
       bumps: [{ x: 0.3, z: 7.0, r: 0.4, h: 0.12 }], posts: [BARREL(-0.8, 1.4)] },
     /* 5 wheel bay: through the ship's wheel onto the listing green, or the cave round it */
-    { par: 3, sol: [[2,0.76,0]], tee: [0, 0.5], cup: [0.6, 6.0], shape: rect(-1.4, 0, 1.4, 6.8),
+    { par: 3, sol: [[3.25,0.98,0]], tee: [0, 0.5], cup: [0.6, 6.0], shape: rect(-1.4, 0, 1.4, 6.8),
       tiers: [{ poly: rect(-1.5, -0.1, 1.5, 6.9), h: 0.2, sx: 0.06 }],
       inner: [[[-1.4, 3.2], [-0.8, 3.2]], [[0.8, 3.2], [1.4, 3.2]]], movers: [WHEEL(0, 3.2, 0.55, 1.5)],
       tubes: [{ a: [-1.0, 1.7], b: [1.0, 4.1], dir: 0 }],
       zones: [sand(rect(-1.4, 4.6, -0.3, 5.4))], posts: [BARREL(-0.2, 6.2)] },
     /* 6 the long shore green: 11 m up a green that climbs gently and leans toward the lagoon, across a ridge and a swale */
-    { par: 3, sol: [[0,0.92,0]], tee: [0, 0.5], cup: [1.0, 10.4], shape: rect(-2, 0, 2, 11.4),
+    { par: 3, sol: [[0,0.91,0]], tee: [0, 0.5], cup: [1.0, 10.4], shape: rect(-2, 0, 2, 11.4),
       tiers: [{ poly: rect(-2.1, -0.1, 2.1, 11.5), h: 0, sx: -0.02, sz: 0.01 }],
       bumps: [{ x: 0.9, z: 3.8, r: 1.4, h: 0.12 }, { x: -0.6, z: 6.2, r: 1.8, h: 0.15 }, { x: 1.2, z: 8.2, r: 1.1, h: -0.1 }, { x: -1.2, z: 10.2, r: 0.9, h: 0.07 }],
       zones: [sand(rect(-2, 1.6, -1.3, 2.8)), lagoon(rect(1.5, 5.0, 2, 6.8))], posts: [ANCHOR(-1.6, 8.4)] },
     /* 7 fort switchback: up one gangplank, across, up the other; or the cave to the battlements */
-    { par: 4, sol: [[242,0.76,0],[210,0.92,0]], tee: [-0.6, 0.5], cup: [0.8, 7.6], aim0: 30, shape: rect(-1.6, 0, 1.6, 8.4),
+    { par: 4, sol: [[48,0.8,0],[328,0.76,0]], tee: [-0.6, 0.5], cup: [0.8, 7.6], aim0: 30, shape: rect(-1.6, 0, 1.6, 8.4),
       ramps: [{ x0: 0.9, z0: 1.8, x1: 1.6, z1: 3, axis: 'z', h0: 0, h1: 0.2 }, { x0: -1.6, z0: 4.4, x1: -0.9, z1: 5.6, axis: 'z', h0: 0.2, h1: 0.4 }],
       tiers: [{ poly: rect(-1.7, 3, 1.7, 8.5), h: 0.2 }, { poly: rect(-1.7, 5.6, 1.7, 8.5), h: 0.4 }],
       inner: [[[-1.6, 3], [0.9, 3]], [[-0.9, 5.6], [1.6, 5.6]]],

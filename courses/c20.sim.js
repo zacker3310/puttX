@@ -93,7 +93,7 @@ registerWorld(20, { holes: [
       { a: [3.5, 1.1], b: [1.37, 7.6], dir: 30, keep: 0, add: 1.8, color: '#6fc0df' },
       { a: [2.5, 7.6], b: [0.53, 8.6], dir: 240, keep: 0, add: 2.4, color: '#ef7d6d' }] },
   /* 10. switchback: up the rainbow rail, swing round the high deck, up the second rail the other way, then along the railed ridge to the crown green */
-  { par: 5, crazy: true, sol: [[350,0.84,0],[18,1,0],[165,1,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
+  { par: 5, crazy: true, sol: [[348,0.84,0],[116,1,0],[156,0.96,0]], tee: [-1.0, 0.6], cup: [1.8, 5.2], aim0: 0,
     floors: [rect(-1.5, 0, -0.5, 1.5), rect(-1.3, 1.5, -0.7, 4), rect(-1.5, 4, 0.9, 5.3), rect(0.3, 1.6, 0.9, 4), rect(0.1, 0.2, 2.3, 1.6), rect(1.5, 1.6, 2.1, 3.6), rect(1.2, 3.6, 2.6, 6)],
     walls: [[[-0.7, 1.5], [-0.5, 1.5], [-0.5, 0], [-1.5, 0], [-1.5, 1.5], [-1.3, 1.5]], [[-1.3, 1.5], [-1.3, 4]], [[-0.7, 1.5], [-0.7, 4]],
       [[-1.3, 4], [-1.5, 4], [-1.5, 5.3], [0.9, 5.3], [0.9, 4]], [[0.3, 4], [0.3, 1.6]], [[0.9, 4], [0.9, 1.6]],
@@ -102,7 +102,7 @@ registerWorld(20, { holes: [
     tiers: [{ poly: C20_PAD(-1.5, 4, 0.9, 5.3), h: 0.3 }, { poly: C20_PAD(0.1, 0.2, 2.3, 1.6), h: 0.6 }, { poly: rect(1.4, 1.6, 2.2, 3.6), h: 0.6 }, { poly: C20_PAD(1.2, 3.6, 2.6, 6), h: 0.6 }],
     bumps: [{ x: 1.8, z: 2.6, r: 0.25, h: 0.05 }, { x: 1.8, z: 5.2, r: 0.5, h: 0.12 }, { x: 1.8, z: 5.2, r: 0.22, h: -0.05 }] },
   /* 11. tube relay: the walled high tee has two tubes; gold to the bridge isle, blue to the isle whose tube drops you by the windmill green */
-  { par: 3, crazy: true, sol: [[300,1,0],[337,0.79,0]], tee: [0, 0.5], cup: [0.5, 6.8], aim0: 20,
+  { par: 3, crazy: true, sol: [[300,1,0],[337,0.79,0],[10,0.76,0]], tee: [0, 0.5], cup: [0.5, 6.8], aim0: 20,
     floors: [rect(-1, 0, 1, 1.8), rect(1.6, 2.4, 3, 5), rect(1.2, 4.4, 1.6, 4.9), rect(-3, 1.5, -1.6, 4), rect(-1.2, 4.2, 1.2, 7.6)],
     walls: [ring(rect(-1, 0, 1, 1.8)), [[1.6, 4.4], [1.6, 2.4], [3, 2.4], [3, 5], [1.6, 5], [1.6, 4.9]], ring(rect(-3, 1.5, -1.6, 4)), [[-1.2, 4.2], [-1.2, 7.6], [1.2, 7.6], [1.2, 4.9]]],
     tiers: [{ poly: C20_PAD(-1, 0, 1, 1.8), h: 0.4 }, { poly: C20_PAD(1.6, 2.4, 3, 5), h: 0.25 }, { poly: C20_PAD(-3, 1.5, -1.6, 4), h: 0.25 }],
@@ -113,12 +113,12 @@ registerWorld(20, { holes: [
       { a: [-2.3, 3.55], b: [-0.7, 4.65], dir: 20 }] },
   /* 12. twilight double (long green): a 13 m two-tier green; the front creeps uphill, a broad bank
      climbs to the top tier, which falls gently away toward the back past a big right-hand ridge */
-  { par: 3, sol: [[0,1,0]], tee: [0, 0.6], cup: [-0.8, 11.5],
+  { par: 3, sol: [[0.75,1,0]], tee: [0, 0.6], cup: [-0.8, 11.5],
     shape: [[-1.2, 0], [1.2, 0], [2.2, 3], [2.6, 7], [2.8, 11], [2, 13.2], [0, 13.6], [-2, 13], [-2.6, 10], [-2.2, 6], [-2, 2.5]],
     tiers: [{ poly: rect(-3, -1, 3, 5), h: 0, sz: 0.01 }, { poly: rect(-3, 5, 3, 6.5), h: -0.3, sz: 0.07 }, { poly: rect(-3, 6.5, 3, 15), h: 0.2525, sz: -0.015 }],
     bumps: [{ x: 1.5, z: 9.5, r: 2, h: 0.15 }, { x: -1, z: 2.5, r: 1.5, h: -0.08 }] },
   /* 13. bumper stair: a tilted island of springy cloud bumpers, a bridge up, and a gate sweeping in front of the cup */
-  { par: 3, sol: [[0,0.96,0],[274,0.61,0]], tee: [0, 0.6], cup: [-0.5, 9.7],
+  { par: 3, sol: [[0,0.96,0],[278,0.83,0]], tee: [0, 0.6], cup: [-0.5, 9.7],
     floors: [rect(-0.7, 0, 0.7, 2), rect(-0.3, 2, 0.3, 3), rect(-1.6, 3, 1.6, 7.6), rect(-0.3, 7.6, 0.3, 8.4), rect(-1.1, 8.4, 1.1, 10.2)],
     walls: [[[-0.3, 2], [-0.7, 2], [-0.7, 0], [0.7, 0], [0.7, 2], [0.3, 2]], [[-1.6, 7.6], [-0.3, 7.6]], [[0.3, 7.6], [1.6, 7.6]], [[-1.1, 8.4], [-1.1, 10.2], [1.1, 10.2], [1.1, 8.4]]],
     tiers: [{ poly: C20_PAD(-1.6, 3, 1.6, 7.6), h: -0.21, sz: 0.07 }, { poly: C20_PAD(-1.1, 8.4, 1.1, 10.2), h: 0.5 }],

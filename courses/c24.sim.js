@@ -32,12 +32,12 @@ registerWorld(24, { holes: [
     tiers: [{ poly: rect(-2, 0, 2, 14), h: 0.03, sx: 0.012, sz: 0.004 }],
     bumps: [{ x: 0.2, z: 6.0, r: 1.6, h: 0.16 }, { x: -1.6, z: 6.4, r: 1.2, h: 0.1 }, { x: -0.2, z: 9.4, r: 1.5, h: -0.12 }, { x: 1.2, z: 11.6, r: 1.0, h: 0.08 }] },
   /* 5. sinkhole lift: roll into the sinkhole and its cave lifts you to the high shelf; drop off the shelf to the cup */
-  { par: 3, sol: [[335,1,0],[100,1,0]], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
+  { par: 3, sol: [[330,1,0],[110,1,0]], tee: [0, 0.5], cup: [0.9, 2.0], aim0: 0, shape: rect(-1.4, 0, 1.4, 6.6), inner: [[[0.2, 0], [0.2, 3.4]]],
     tiers: [{ poly: rect(-1.4, 4.6, 1.4, 6.6), h: 0.3 }], ramps: [{ x0: -1.4, z0: 3.8, x1: -0.4, z1: 4.6, axis: 'z', h0: 0, h1: 0.3 }],
     bumps: [{ x: -0.6, z: 2.6, r: 0.6, h: -0.25 }, { x: 0.9, z: 2.0, r: 0.5, h: 0.06 }], tubes: [{ a: [-0.6, 2.6], b: [-0.4, 5.6], dir: 90 }],
     zones: [{ surf: 'ice', poly: rect(-1.4, 4.6, 1.4, 6.6) }], posts: [C24_MAN(0.9, 5.6)] },
   /* 6. lift tower: up the lift ramp past the first bar or the cave onto the deck, then through the fence gap past the second bar, down to the lake */
-  { par: 4, sol: [[359.76,1,0.5]], tee: [0, 0.5], cup: [-0.6, 8.6], shape: rect(-1.4, 0, 1.4, 9.4), inner: [[[-1.4, 6.0], [-0.3, 6.0]], [[0.3, 6.0], [1.4, 6.0]]],
+  { par: 4, sol: [[364.76,0.98,0.5]], tee: [0, 0.5], cup: [-0.6, 8.6], shape: rect(-1.4, 0, 1.4, 9.4), inner: [[[-1.4, 6.0], [-0.3, 6.0]], [[0.3, 6.0], [1.4, 6.0]]],
     ramps: [{ x0: -0.45, z0: 2.0, x1: 0.45, z1: 3.6, axis: 'z', h0: 0, h1: 0.3 }], tiers: [{ poly: rect(-1.4, 3.6, 1.4, 6.0), h: 0.3 }],
     movers: [C24_LIFT(-0.8, 4.0, 0.8, 4.0, 0.35, 90, 3.2), C24_LIFT(-0.5, 5.75, 0.5, 5.75, 0.25, 90, 2.6, 1)], tubes: [{ a: [1.0, 1.4], b: [0.9, 4.9], dir: 330 }],
     zones: [{ surf: 'water', poly: C24_POOL(0.5, 8.0, 0.4, 0.35) }, { surf: 'ice', poly: rect(-1.4, 6.0, 1.4, 7.4) }],

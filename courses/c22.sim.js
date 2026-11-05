@@ -95,7 +95,7 @@ registerWorld(22, { holes: [
     zones: [{ surf: 'sand', poly: rect(-2.4, 11.2, -1.2, 12) }],
     posts: [C22_CACTUS(2.0, 6.4), C22_ROCK(-2.0, 3.2, 0.12)] },
   /* 11. three rivers: the plank, the island shaft or kicker, the far plank, then the green */
-  { par: 4, sol: [[304,0.85,1],[56,0.45,0],[296.25,0.4,1]], tee: [0, 0.5], cup: [-0.6, 10.2], shape: rect(-1.6, 0, 1.6, 11),
+  { par: 4, sol: [[56,0.45,0],[296.25,0.4,1]], tee: [0, 0.5], cup: [-0.6, 10.2], shape: rect(-1.6, 0, 1.6, 11),
     ramps: [{ x0: -0.35, z0: 1.7, x1: 0.35, z1: 2.5, axis: 'z', h0: 0, h1: 0.2 }, { x0: -0.3, z0: 4.7, x1: 0.3, z1: 5.5, axis: 'z', h0: 0, h1: 0.2 }],
     tubes: [{ a: [1.0, 5.0], b: [1.0, 6.9], dir: 0, keep: 0.5, add: 0.3 }],
     zones: [{ surf: 'fast', poly: rect(-0.35, 1.7, 0.35, 2.5) }, { surf: 'fast', poly: rect(-0.3, 4.7, 0.3, 5.5) },

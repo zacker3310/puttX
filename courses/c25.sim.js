@@ -13,7 +13,7 @@ registerWorld(25, (() => {
   const arc = (cx, cz, r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + dsin(a) * r, cz + dcos(a) * r]; });
   return { holes: [
     /* 1 the moonlit dock green: 9 m, up a long gentle swell and down to a cup on a quiet shelf */
-    { par: 2, sol: [[28,0.92,0]], tee: [0.5, 0.5], cup: [-0.7, 9.0], shape: rect(-1.8, 0, 1.8, 9.8),
+    { par: 2, sol: [[32.25,1,0]], tee: [0.5, 0.5], cup: [-0.7, 9.0], shape: rect(-1.8, 0, 1.8, 9.8),
       tiers: [{ poly: rect(-1.9, -0.1, 1.9, 9.9), h: 0, sx: 0.015 }],
       bumps: [{ x: 0.2, z: 4.4, r: 1.6, h: 0.12 }, { x: 1.0, z: 7.4, r: 1.0, h: -0.08 }],
       zones: [sand(rect(1.2, 8.4, 1.8, 9.8))] },

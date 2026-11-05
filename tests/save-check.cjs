@@ -55,6 +55,27 @@ const { check, done, open, URL } = require('./lib.cjs');
     return { n0, armed, gone: slotSummary(1) === null, other: slotSummary(2) !== null, n1: bins().length, active: slot };
   });
   check('erasing a profile takes two taps and leaves the others alone', bin.n0 === 2 && bin.armed && bin.gone && bin.other && bin.n1 === 1 && bin.active === 2, JSON.stringify(bin));
+  /* a tampered save: a best no round can score is pulled back to double par, huge tallies are capped,
+     and fields the game never writes are dropped */
+  const tamper = await page.evaluate(() => {
+    const k = 'puttx.tamper', h = WORLDS[playable()[0]].holes[0];
+    localStorage.setItem(k, JSON.stringify({ v: 2, phys: 3, holes: { [h.key]: { best: 1e21, stars: 3 } }, worlds: [playable()[0]], tally: { birdie: 1e21 }, junk: 'x'.repeat(1000) }));
+    const p = loadProgress(k); repairExtras(p); localStorage.removeItem(k);
+    return { best: p.holes[h.key].best, cap: capOf(h), birdie: p.tally.birdie, junk: 'junk' in p };
+  });
+  check('a tampered save is clamped to what play can make, and stray fields go', tamper.best === tamper.cap && tamper.birdie <= 99999 && !tamper.junk, JSON.stringify(tamper));
+  /* home mid-roll abandons the putt: nothing finishes behind the map, nothing is credited */
+  const left = await page.evaluate(() => {
+    const k = WORLDS[playable()[0]].holes[0].key, before = JSON.stringify(progress);
+    goHole(k); play.intro = null; loopPaused = true;
+    const [a, pw, t0] = play.hole.sol[0]; play.time = t0; beginPutt(a, pw);
+    for (let i = 0; i < 6; i++) advance(1 / 60);
+    const rolling = play.phase === 'roll';
+    homeBtn.click();
+    for (let i = 0; i < 1200; i++) advance(1 / 60);
+    return { rolling, scene: currentScene, phase: play.phase, same: JSON.stringify(progress) === before };
+  });
+  check('leaving a hole mid-roll abandons the putt: no result is written behind the map', left.rolling && left.scene !== 'hole' && left.phase === 'idle' && left.same, JSON.stringify(left));
   check('no console errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   done();

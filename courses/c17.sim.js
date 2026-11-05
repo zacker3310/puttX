@@ -78,7 +78,7 @@ registerWorld(17, { holes: [
     bumps: [{ x: -1.1, z: 4.1, r: 0.35, h: 0.12 }],
     movers: [C17_GHOST(-0.3, 4.0, 0.3, 4.0, 2.2, 0), C17_GATE(1.125, 1.2, 1.375, 1.2, 0.25, 2.4, 0)] },
   /* 12: graveyard switchbacks: hills in the turns, a ghost in the aisle, a passage from the first corner */
-  { par: 4, sol: [[344,0.76,1],[0,0.44,0]], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
+  { par: 4, sol: [[344,0.76,1],[49,0.8,0]], tee: [-1.4, 0.5], cup: [1.4, 6.3], shape: rect(-2.1, 0, 2.1, 7),
     inner: [[[-0.7, 0], [-0.7, 5.6]], [[0.7, 7], [0.7, 1.4]]],
     bumps: [{ x: -0.7, z: 6.4, r: 0.45, h: 0.25 }, { x: 0.7, z: 0.6, r: 0.45, h: 0.25 }, { x: 1.4, z: 4.6, r: 0.45, h: -0.22 }],
     tubes: [{ a: [-1.85, 3.0], b: [0, 4.4], dir: 180 }],
@@ -86,7 +86,7 @@ registerWorld(17, { holes: [
     movers: [C17_GHOST(-0.35, 2.6, 0.35, 2.6, 2.0, 0)] },
   /* 13: the rampart run: up the windmill ramp onto the battlement and weave the gargoyles, or sneak
      the narrow bridge over the moat below; both meet in the courtyard where a ghost guards the cup */
-  { par: 4, crazy: true, sol: [[26,0.94,2]], tee: [0, 0.5], cup: [0.3, 9.1], shape: rect(-1.4, 0, 1.4, 10),
+  { par: 4, crazy: true, sol: [[158.5,1,1]], tee: [0, 0.5], cup: [0.3, 9.1], shape: rect(-1.4, 0, 1.4, 10),
     ramps: [{ x0: -1.4, z0: 1.8, x1: -0.6, z1: 2.8, axis: 'z', h0: 0, h1: 0.35 }],
     tiers: [{ poly: rect(-1.4, 2.8, -0.6, 7.0), h: 0.35 }],
     inner: [[[-0.6, 1.8], [-0.6, 7.0]]],

@@ -12,6 +12,7 @@ function fit() {
 }
 function showScene(id) {
   if (updateReady && id !== 'hole' && id !== 'card' && !party.on) { location.reload(); return; }   /* an update waiting: take it between holes, never mid-putt, never over a scorecard or a party */
+  if (currentScene === 'hole' && id !== 'hole') leaveHole();
   currentScene = id;
   for (const s of document.querySelectorAll('.scene')) s.classList.toggle('active', s.id === id);
 }
@@ -609,6 +610,8 @@ const allCourses = () => WORLD_ORDER.flatMap(coursesOf).concat(EXTRAS.filter(c =
 const worldOf = c => ((c % 100) - 1) % COURSE_STEP + 1;
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
+/* the save's fields besides v, holes, worlds, sound and hand: loadProgress keeps these and drops anything else */
+const SAVE_FIELDS = ['phys', 'mulligans', 'lost', 'obj', 'tally', 'daily', 'ghosts', 'neon', 'coins', 'owned', 'equipped', 'firsts'];
 function freshProgress() { return { v: 2, holes: {}, worlds: [playable()[0] || WORLD_ORDER[0]], sound: true, hand: 'R', mulligans: 5, lost: {}, obj: {}, daily: null, neon: false }; }
 function recordHole(p, key, score, par, maxStars = 3) {
   const prev = p.holes[key];
@@ -649,10 +652,15 @@ function loadProgress(key = SAVE_KEY) {
     if (!worlds.includes(freshProgress().worlds[0])) return freshProgress();
     const holes = {};
     for (const [k, r] of Object.entries(p.holes)) {
-      if (/^\d+-\d+$/.test(k) && r && Number.isInteger(r.best) && r.best >= 1 && [1, 2, 3].includes(r.stars)) holes[k] = { best: r.best, stars: r.stars };
+      /* play never scores worse than double par, so a bigger best (a tampered save) is pulled back to it */
+      const h = /^\d+-\d+$/.test(k) && holeAt(k), cap = h ? capOf(h) : 99;
+      if (/^\d+-\d+$/.test(k) && r && Number.isInteger(r.best) && r.best >= 1 && [1, 2, 3].includes(r.stars)) holes[k] = { best: Math.min(r.best, cap), stars: r.stars };
     }
     if (Object.keys(holes).length !== Object.keys(p.holes).length) return freshProgress();
-    return Object.assign({}, p, { v: 2, holes, worlds, sound: p.sound !== false, hand: p.hand === 'L' ? 'L' : 'R' });
+    /* only the fields the game writes come back: a foreign or tampered save's extra keys are dropped */
+    const keep = {};
+    for (const f of SAVE_FIELDS) if (f in p && f !== '__proto__') keep[f] = p[f];
+    return Object.assign(keep, { v: 2, holes, worlds, sound: p.sound !== false, hand: p.hand === 'L' ? 'L' : 'R' });
   } catch (e) { return freshProgress(); }
 }
 function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {} }
@@ -883,7 +891,9 @@ function fbm(seed, base, oct) {
   const fs = Array.from({ length: oct }, (_, k) => noiseField(seed + k * 101, base << k));
   return (u, v) => { let s = 0, a = 0.5, n = 0; for (const f of fs) { s += f(u, v) * a; n += a; a *= 0.5; } return s / n; };
 }
-const hexRGB = hex => { const c = new THREE.Color(hex); return [c.r * 255, c.g * 255, c.b * 255]; };
+/* a hex colour as sRGB bytes for painting a canvas. THREE.Color holds linear values, and a canvas texture
+   is decoded as sRGB, so reading c.r straight would paint every texture about four times too dark */
+const hexRGB = hex => { const c = new THREE.Color(hex).getRGB({}, THREE.SRGBColorSpace); return [c.r * 255, c.g * 255, c.b * 255]; };
 /* fills a canvas pixel by pixel: fn(u, v) -> [r, g, b] (0..255) */
 function paint(x, w, h, fn) {
   const img = x.createImageData(w, h), d = img.data;
@@ -910,7 +920,8 @@ function normalCanvas(key, size, height, strength) {
 const TURF_PX = 512;
 function turfCanvas(hex) {
   return cachedCanvas('turf:' + hex, TURF_PX, TURF_PX, (x, w, h) => {
-    const [r0, g0, b0] = hexRGB(hex), m = fbm(17, 4, 4), f = fbm(29, 32, 2);
+    /* painted a shade under the course's felt colour: sun, sky and sheen lift it back, and the white ball keeps 3:1 on it */
+    const [r0, g0, b0] = hexRGB(hex).map(c => c * 0.76), m = fbm(17, 4, 4), f = fbm(29, 32, 2);
     paint(x, w, h, (u, v) => { const k = 0.98 + 0.16 * m(u, v) + 0.1 * (f(u, v) - 0.5); return [Math.min(255, r0 * k), Math.min(255, g0 * k), Math.min(255, b0 * k)]; });
     const r = rng32(7);
     x.lineCap = 'round';
@@ -998,7 +1009,12 @@ function wallNormalCanvas(kind) {
 /* UVs for a wall box in metres along its length and height, so one texture tiles at real scale */
 function scaleBoxUV(geo, len, hgt, wid, tile = 0.5) {
   const uv = geo.attributes.uv, dims = [[len, hgt], [len, hgt], [wid, len], [wid, len], [wid, hgt], [wid, hgt]];
-  for (let f = 0; f < 6; f++) for (let k = 0; k < 4; k++) { const i = f * 4 + k; uv.setXY(i, uv.getX(i) * dims[f][0] / tile, uv.getY(i) * dims[f][1] / tile); }
+  for (let f = 0; f < 6; f++) for (let k = 0; k < 4; k++) {
+    const i = f * 4 + k, u = uv.getX(i), v = uv.getY(i);
+    /* the top and bottom: the board's grain runs along its length */
+    if (f === 2 || f === 3) uv.setXY(i, v * len / tile, u * wid / tile);
+    else uv.setXY(i, u * dims[f][0] / tile, v * dims[f][1] / tile);
+  }
   uv.needsUpdate = true;
   return geo;
 }
@@ -1027,10 +1043,10 @@ function initSky() {
   envScene = new THREE.Scene(); envScene.add(new THREE.Mesh(g, m));
 }
 function setSky(look) {
-  SKY.top.value.set(look.sky[0]); SKY.horizon.value.set(look.sky[1]); SKY.ground.value.set(look.ground || '#55603f');
+  SKY.top.value.set(look.sky[0]); SKY.horizon.value.set(look.sky[1]); SKY.ground.value.set(look.ground || look.sky[1]);
   SKY.sunDir.value.copy(sun.position).sub(sun.target.position).normalize();
   SKY.sunCol.value.set(look.night ? 0x9a8cff : 0xfff0d8);
-  const key = look.sky.join() + (look.ground || '') + (look.night ? 'n' : '');
+  const key = look.sky.join() + (look.ground || 'void') + (look.night ? 'n' : '');
   if (key !== envKey) {
     /* once per look, never per frame; the disc stays out of the light (the sun lamp gives its highlight) */
     SKY.disc.value = 0;
@@ -1295,7 +1311,9 @@ function flagTexture(hex, n) {
    floor; and a ball-shaped hole marker on a short post just outside the border beside it */
 function teeGroup(h, look) {
   const g = new THREE.Group(); g.name = 'tee';
-  const [tx, tz] = h.tee, a = (h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - tx, h.cup[1] - tz) * 180 / Math.PI) * Math.PI / 180;
+  const [tx, tz] = h.tee, a0 = h.aim0 !== undefined ? h.aim0 : Math.atan2(h.cup[0] - tx, h.cup[1] - tz) * 180 / Math.PI;
+  /* real tee mats are laid square to the lane; a line within 30 degrees of the lane's axis gets the axis */
+  const ax0 = Math.round(a0 / 90) * 90, a = (Math.abs(a0 - ax0) <= 30 ? ax0 : a0) * Math.PI / 180;
   const ux = Math.sin(a), uz = Math.cos(a), px = Math.cos(a), pz = -Math.sin(a), y = groundH(h, tx, tz);
   const fits = (w, l) => [[-w, -l * 0.35], [w, -l * 0.35], [-w, l * 0.65], [w, l * 0.65]].every(([s, f]) => {
     const x = tx + px * s + ux * f, z = tz + pz * s + uz * f;
@@ -1311,13 +1329,21 @@ function teeGroup(h, look) {
   /* the marker: beside the tee, out past the nearest border, on open ground only */
   if (look.ground && !look.night) {
     for (const side of [1, -1]) {
+      /* a step ahead of the tee, so the HUD along the screen's foot does not cover it */
+      const bx = tx + ux * 0.3, bz = tz + uz * 0.3;
       let d = 0.25;
-      while (d < 1.6 && (onFloor(h, tx + px * side * d, tz + pz * side * d) || h.segs.some(sg => { const p = closestOnSeg(sg[0], sg[1], sg[2], sg[3], tx + px * side * d, tz + pz * side * d); return hyp(tx + px * side * d - p[0], tz + pz * side * d - p[1]) < 0.22; }))) d += 0.05;
-      const mx = tx + px * side * d - ux * 0.15, mz = tz + pz * side * d - uz * 0.15;
+      while (d < 1.6 && (onFloor(h, bx + px * side * d, bz + pz * side * d) || h.segs.some(sg => { const p = closestOnSeg(sg[0], sg[1], sg[2], sg[3], bx + px * side * d, bz + pz * side * d); return hyp(bx + px * side * d - p[0], bz + pz * side * d - p[1]) < 0.22; }))) d += 0.05;
+      const mx = bx + px * side * d, mz = bz + pz * side * d;
       if (d >= 1.6 || h.floors.some(f => inPoly(f, mx, mz))) continue;
       const post = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.22, 8), mat('#6b6f74', { roughness: 0.5, metalness: 0.6 })); post.position.set(mx, -0.03 + 0.11, mz); post.castShadow = true;
-      const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.02, 32), [mat('#e9e4d8', { roughness: 0.5 }), mat('#ffffff', { map: markerTexture(h.key.split('-')[1], look.flag), roughness: 0.5 }), mat('#ffffff', { map: markerTexture(h.key.split('-')[1], look.flag), roughness: 0.5 })]);
-      disc.rotation.set(Math.PI / 2, 0, 0); disc.rotation.order = 'YXZ'; disc.rotation.y = a + Math.PI; disc.position.set(mx, -0.03 + 0.27, mz); disc.castShadow = true;
+      /* a disc stood on edge, its numbered faces planar-mapped so the numeral stands upright both sides */
+      const disc = new THREE.Group(), face = mat('#ffffff', { map: markerTexture(h.key.split('-')[1], look.flag), roughness: 0.5 });
+      const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.02, 32, 1, true), mat('#e9e4d8', { roughness: 0.5 })); rim.rotation.x = Math.PI / 2;
+      const front = new THREE.Mesh(new THREE.CircleGeometry(0.075, 32), face); front.position.z = 0.01;
+      const back = new THREE.Mesh(new THREE.CircleGeometry(0.075, 32), face); back.position.z = -0.01; back.rotation.y = Math.PI;
+      disc.add(rim, front, back); disc.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      /* facing back down the line of play, toward the camera at the tee */
+      disc.rotation.y = a + Math.PI; disc.position.set(mx, -0.03 + 0.27, mz);
       g.add(post, disc);
       break;
     }
@@ -1372,11 +1398,12 @@ function tubeGroup(h) {
   return g;
 }
 function tubeGlyph(i) {
-  const s = new THREE.Shape(), r = 0.035, k = i % 4;
+  const s = new THREE.Shape(), r = 0.035, k = i % 5;
   if (k === 0) s.absarc(0, 0, r * 0.8, 0, Math.PI * 2);
   else if (k === 1) { s.moveTo(0, r); s.lineTo(r * 0.95, -r * 0.7); s.lineTo(-r * 0.95, -r * 0.7); s.closePath(); }
   else if (k === 2) { s.moveTo(-r * 0.75, -r * 0.75); s.lineTo(r * 0.75, -r * 0.75); s.lineTo(r * 0.75, r * 0.75); s.lineTo(-r * 0.75, r * 0.75); s.closePath(); }
-  else for (let j = 0; j < 10; j++) { const a = j * Math.PI / 5 + Math.PI / 2, rr = j % 2 ? r * 0.45 : r; j ? s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  else if (k === 3) for (let j = 0; j < 10; j++) { const a = j * Math.PI / 5 + Math.PI / 2, rr = j % 2 ? r * 0.45 : r; j ? s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  else { s.moveTo(0, r); s.lineTo(r * 0.8, 0); s.lineTo(0, -r); s.lineTo(-r * 0.8, 0); s.closePath(); }   /* a diamond */
   return s;
 }
 function defaultPost(p, look) {
@@ -1408,7 +1435,7 @@ function scatterProps(group, h, look) {
     const x = x0 + r() * (x1 - x0), z = z0 + r() * (z1 - z0);
     if (h.floors.some(f => inPoly(f, x, z)) || h.segs.some(s => { const p = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - p[0], z - p[1]) < 0.5; })
       || h.floors.some(f => f.some((p, i) => { const q = f[(i + 1) % f.length], c = closestOnSeg(p[0], p[1], q[0], q[1], x, z); return Math.hypot(x - c[0], z - c[1]) < 0.5; }))) continue;
-    const o = look.prop(r); o.position.set(x, 0, z); o.rotation.y = r() * Math.PI * 2; o.userData.prop = true; group.add(o); n++;
+    const o = look.prop(r); o.position.set(x, look.ground ? -0.03 : 0, z); o.rotation.y = r() * Math.PI * 2; o.userData.prop = true; group.add(o); n++;
   }
 }
 const TEX_SLOTS = ['map', 'normalMap', 'roughnessMap', 'bumpMap', 'emissiveMap', 'alphaMap', 'aoMap', 'clearcoatNormalMap'];
@@ -1426,7 +1453,7 @@ const holeWorld = h => Number(h.key.split('-')[0]);
    against the light; the baked shade rides in the vertex colours. Night keeps its flat black-light look. */
 function turfMaterial(hex, o = {}) {
   const c = new THREE.Color(hex), m = new THREE.MeshPhysicalMaterial(Object.assign({ color: 0xffffff, map: texOf(turfCanvas(hex)), normalMap: texOf(turfNormal(), false), normalScale: new THREE.Vector2(0.55, 0.55),
-    roughness: 0.93, sheen: 0.42, sheenRoughness: 0.42, sheenColor: c.clone().lerp(new THREE.Color(0xcfe39a), 0.6), vertexColors: true }, o));
+    roughness: 0.93, sheen: 0.3, sheenRoughness: 0.42, sheenColor: c.clone().lerp(new THREE.Color(0xcfe39a), 0.4), vertexColors: true }, o));
   patchTurf(m);
   return m;
 }
@@ -1531,10 +1558,9 @@ function landscape(h, look) {
   const g = new THREE.Group(), r = rng32([...h.key].reduce((a, c) => a * 31 + c.charCodeAt(0), 11)), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), col = new THREE.Color();
   const edges = [];
   for (const f of h.floors) {
-    if (f.some(([x, z]) => Math.abs(groundH(h, x, z)) > 0.02)) continue;
     let area = 0;
     for (let i = 0; i < f.length; i++) { const a = f[i], b = f[(i + 1) % f.length]; area += a[0] * b[1] - b[0] * a[1]; }
-    for (let i = 0; i < f.length; i++) { const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], L = Math.hypot(bx - ax, bz - az); if (L > 0.05) edges.push([ax, az, bx, bz, L, area > 0 ? 1 : -1]); }
+    for (let i = 0; i < f.length; i++) { const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], L = Math.hypot(bx - ax, bz - az); if (L > 0.05 && atGround(h, ax, az, bx, bz)) edges.push([ax, az, bx, bz, L, area > 0 ? 1 : -1]); }
   }
   if (!edges.length) return null;
   const total = edges.reduce((a, e) => a + e[4], 0), clear = (x, z, d) => !h.floors.some(f => inPoly(f, x, z)) && h.segs.every(s => { const c = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - c[0], z - c[1]) > d; });
@@ -1587,22 +1613,38 @@ function landscape(h, look) {
   g.name = 'landscape';
   return g.children.length ? g : null;
 }
+/* an edge of a floor that sits on the ground (both ends level with it), not a raised deck or a sunken bowl */
+const atGround = (h, ax, az, bx, bz) => Math.abs(groundH(h, ax, az)) <= 0.02 && Math.abs(groundH(h, bx, bz)) <= 0.02 && Math.abs(groundH(h, (ax + bx) / 2, (az + bz) / 2)) <= 0.02;
 /* landscaping: a bed of mulch or river rock round the course's outline, as real courses have */
-const EDGING_OF = { 1: ['rock', '#9a9086'], 2: ['rock', '#c08a5a'], 3: ['mulch', '#6b4a2e'], 4: ['rock', '#c9d6de'], 5: ['rock', '#d8c39a'], 6: ['rock', '#3a3236'], 7: ['mulch', '#4a3a3a'], 9: ['mulch', '#c98a5a'] };
+const EDGING_OF = { 1: ['rock', '#9a9086'], 2: ['rock', '#c08a5a'], 3: ['mulch', '#6b4a2e'], 4: ['rock', '#c9d6de'], 5: ['rock', '#d8c39a'], 6: ['rock', '#3a3236'], 7: ['mulch', '#4a3a3a'] };
 function edgingGroup(h, look) {
   const e = look.edging || EDGING_OF[worldOf(holeWorld(h))];
   if (!e || !look.ground || look.night) return null;
-  const W = 0.32, pos = [], uv = [], idx = [];
+  const W = 0.32, o = WALL_HALF + 0.01, pos = [], uv = [], idx = [];
+  const put = (x, z) => { pos.push(x, -0.027, z); uv.push(x * 1.2, z * 1.2); return pos.length / 3 - 1; };
   for (const f of h.floors) {
-    if (f.some(([x, z]) => Math.abs(groundH(h, x, z)) > 0.02)) continue;   /* only floors that meet the ground */
     let area = 0;
     for (let i = 0; i < f.length; i++) { const a = f[i], b = f[(i + 1) % f.length]; area += a[0] * b[1] - b[0] * a[1]; }
-    const sg = area > 0 ? -1 : 1;
-    for (let i = 0; i < f.length; i++) {
-      const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], L = Math.hypot(bx - ax, bz - az) || 1, nx = (bz - az) / L * sg * -1, nz = -(bx - ax) / L * sg * -1;
-      const v = pos.length / 3, o = WALL_HALF + 0.01;
-      for (const [x, z, d] of [[ax, az, o], [bx, bz, o], [ax, az, o + W], [bx, bz, o + W]]) { const px = x + nx * d, pz = z + nz * d; pos.push(px, -0.027, pz); uv.push(px * 1.2, pz * 1.2); }
-      idx.push(v, v + 2, v + 1, v + 1, v + 2, v + 3);
+    const sg = area > 0 ? 1 : -1, n = f.length;
+    /* each edge's outward normal; an edge is bedded only where it meets the ground (not a raised deck) */
+    const nrm = f.map((a, i) => { const b = f[(i + 1) % n], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[1] - a[1]) / L * sg, -(b[0] - a[0]) / L * sg]; });
+    const bed = f.map((a, i) => atGround(h, a[0], a[1], f[(i + 1) % n][0], f[(i + 1) % n][1]));
+    for (let i = 0; i < n; i++) {
+      if (!bed[i]) continue;
+      const [ax, az] = f[i], [bx, bz] = f[(i + 1) % n], [nx, nz] = nrm[i];
+      const v = [[ax, az, o], [bx, bz, o], [ax, az, o + W], [bx, bz, o + W]].map(([x, z, d]) => put(x + nx * d, z + nz * d));
+      idx.push(v[0], v[2], v[1], v[1], v[2], v[3]);
+      /* the outside corner at the edge's end: a fan round the vertex from this edge's normal to the next's */
+      const j = (i + 1) % n;
+      if (!bed[j]) continue;
+      const [mx, mz] = nrm[j], a0 = Math.atan2(nz, nx), turn = Math.atan2(nx * mz - nz * mx, nx * mx + nz * mz);
+      if (turn * sg <= 0.01) continue;   /* an inside corner (or none): the two strips already overlap */
+      const steps = Math.max(2, Math.ceil(Math.abs(turn) / 0.3));
+      for (let k = 0; k < steps; k++) {
+        const t0 = a0 + turn * k / steps, t1 = a0 + turn * (k + 1) / steps;
+        const q = [[t0, o], [t1, o], [t0, o + W], [t1, o + W]].map(([t, d]) => put(bx + Math.cos(t) * d, bz + Math.sin(t) * d));
+        idx.push(q[0], q[2], q[1], q[1], q[2], q[3]);
+      }
     }
   }
   if (!pos.length) return null;
@@ -1623,7 +1665,7 @@ function buildHoleScene(h) {
   const collar = new THREE.Mesh(collarGeometry(h), floor.material); collar.name = 'collar'; collar.receiveShadow = true; holeGroup.add(collar);
   for (const zn of h.zones) {
     const z = new THREE.Mesh(gridGeometry(h, (x, zz) => zoneAt(h, x, zz) === zn && onFloor(h, x, zz) && off(x, zz), zn.surf === 'water' ? 0.002 : 0.004), zoneMaterial(zn, look));
-    z.receiveShadow = true; holeGroup.add(z);
+    z.receiveShadow = true; z.userData.zoneColor = zn.push ? look.push : look[zn.surf]; holeGroup.add(z);
   }
   const skirt = new THREE.Mesh(skirtGeometry(h, look.ground ? -0.03 : -0.5), mat('#ffffff', { map: texOf(wallCanvas('stone', look.skirt)), normalMap: texOf(wallNormalCanvas('stone'), false), roughness: 0.92, side: THREE.DoubleSide }));
   skirt.name = 'skirt'; holeGroup.add(skirt);
@@ -1767,7 +1809,7 @@ function renderFrame(dt) {
   tickAmbience(dt);
   if (!play.hole || ['map', 'shop', 'title', 'worlds', 'world', 'profiles'].includes(currentScene)) return;
   updateMovers(play.time);
-  for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
+  if (!reducedMotion()) for (const f of flowTex) f.t.offset.y -= dt * 0.4 * Math.min(3, f.speed);
   if (!reducedMotion()) FX_TIME.value += dt;
   const lk = lookOf(holeWorld(play.hole)); if (lk.tick) lk.tick(holeGroup, dt, play.time);
   syncLost(dt); tickNight(dt, play.time); updateSinkRing(dt);
@@ -2392,7 +2434,15 @@ function updateHud() {
   const [, n] = play.key.split('-');
   hudHoleN.textContent = n; hudParN.textContent = play.hole.par; hudStrokesN.textContent = Math.min(play.round.strokes, capOf(play.hole));
 }
-function finishHole() {
+/* leaving a hole: a ball already in the cup keeps its result, written now (before any profile can
+   change, and with no fanfare over the next scene); a ball still rolling is abandoned, as if never
+   struck. Either way nothing plays on behind the map. */
+function leaveHole() {
+  if (play.phase === 'sunk' || play.phase === 'replay') { replayTag.classList.remove('show'); finishHole(true); }
+  if (play.phase !== 'title') play.phase = 'idle';
+  setRoll(0);
+}
+function finishHole(quiet = false) {
   play.phase = 'done';
   const { key, round, hole } = play;
   if (party.on) { updateMulligan(); partyFinish(round.score); return; }
@@ -2410,7 +2460,7 @@ function finishHole() {
   if (!play.practice) won += finishGoals(key, round, hole, counts);
   if (play.daily && !play.practice) won += finishDaily(round.score);
   if (!play.practice) tallyHole(round.score, hole.par); else doneBadge.className = '';
-  if (won) showCoinPop(won);
+  if (won && !quiet) showCoinPop(won);
   saveProgress();
   updateMulligan();
   holeDone.classList.toggle('practice', play.practice);
@@ -2418,7 +2468,7 @@ function finishHole() {
   holeDone.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < stars));
   doneStrokes.textContent = round.score; donePar.textContent = hole.par;
   holeDone.classList.add('show');
-  for (let i = 0; i < stars; i++) setTimeout(() => sfx('star', i), 250 + i * 150);
+  if (!quiet) for (let i = 0; i < stars; i++) setTimeout(() => sfx('star', i), 250 + i * 150);
 }
 /* one animation frame: dt is clamped so a backgrounded tab never jumps */
 function stepFrame(now) {
@@ -2609,6 +2659,7 @@ function startParty(n, course) {
   goHole(course + '-1');
 }
 function endParty() {
+  if (party.on && currentScene === 'hole' && play.phase !== 'title') { play.phase = 'idle'; replayTag.classList.remove('show'); }
   party.on = false;
   if (ballMesh) ballMesh.material.color.set('#ffffff');
   partyChip.classList.remove('show'); partyPass.classList.remove('show'); partyDone.classList.remove('show');
@@ -2667,9 +2718,9 @@ function repairExtras(p) {
   p.lost = keyed(p.lost, v => v === 1);
   p.obj = keyed(p.obj, v => Number.isInteger(v) && v >= 1 && v <= 7);
   const t = p.tally || {};
-  p.tally = Object.fromEntries(['birdie', 'eagle', 'alb', 'ace'].map(k => [k, Number.isInteger(t[k]) && t[k] >= 0 ? t[k] : 0]));
+  p.tally = Object.fromEntries(['birdie', 'eagle', 'alb', 'ace'].map(k => [k, Number.isInteger(t[k]) && t[k] >= 0 ? Math.min(t[k], 99999) : 0]));
   const d = p.daily;
-  p.daily = d && typeof d.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(d.d) && Number.isInteger(d.best) && d.best >= 1 && Number.isInteger(d.streak) && d.streak >= 1
+  p.daily = d && typeof d.d === 'string' && /^\d{4}-\d\d-\d\d$/.test(d.d) && Number.isInteger(d.best) && d.best >= 1 && d.best <= 99 && Number.isInteger(d.streak) && d.streak >= 1 && d.streak <= 99999
     ? { d: d.d, best: d.best, streak: d.streak } : null;
   /* ghosts are putt inputs, replayed through the physics: ones recorded under older physics would
      roll somewhere else now, so they go (bests and stars stay, they only ever go up) */
@@ -2882,7 +2933,13 @@ function nightDecor(group, h) {
   /* the grid to the horizon */
   group.children.forEach(c => { if (c.isMesh && c.geometry.type === 'PlaneGeometry' && c.renderOrder === -1) { const t = neonGrid(); c.material.map = t; c.material.emissiveMap = t; c.material.emissive.set('#ffffff'); c.material.emissiveIntensity = 0.9; c.material.color.set('#ffffff'); } });
   /* zones glow in their own colour */
-  group.children.forEach(c => { if (c.isMesh && c.material && c.material.emissive && c.name === '' && c.geometry.type === 'BufferGeometry' && c.material.color) { c.material.emissive.copy(c.material.color); c.material.emissiveIntensity = Math.max(c.material.emissiveIntensity || 0, 0.35); } });
+  group.children.forEach(c => {
+    if (!(c.isMesh && c.material && c.material.emissive && c.name === '' && c.geometry.type === 'BufferGeometry' && c.material.color)) return;
+    /* a zone keeps its pattern (the belt's chevrons, the sand's grain) and glows in its own neon colour */
+    const zc = c.userData.zoneColor;
+    if (zc) { c.material.color.set(zc); c.material.emissive.set(zc); c.material.emissiveMap = c.material.map || null; c.material.emissiveIntensity = 0.55; c.material.needsUpdate = true; }
+    else { c.material.emissive.copy(c.material.color); c.material.emissiveIntensity = Math.max(c.material.emissiveIntensity || 0, 0.35); }
+  });
   for (let i = 0; i < 420; i++) {
     const th = r() * Math.PI * 2, ph = 0.12 + r() * 1.3, R = 70;
     pos.push(B.cx + Math.cos(th) * Math.cos(ph) * R, Math.sin(ph) * R, B.cz + Math.sin(th) * Math.cos(ph) * R);
@@ -3361,13 +3418,18 @@ function checkUpdate() {
     const m = t.match(/const BUILD_ID = '([0-9a-f]{12})'/);
     if (!m || m[1] === BUILD_ID || !/^[0-9a-f]{12}$/.test(BUILD_ID)) return;
     updateReady = true;
-    if (currentScene === 'hole') updateBtn.classList.add('show'); else location.reload();
+    /* mid-hole a button offers it; over a scorecard or a party it waits for showScene to take it between rounds */
+    if (currentScene === 'hole') updateBtn.classList.add('show'); else if (currentScene !== 'card' && !party.on) location.reload();
   }).catch(() => {});
 }
 function initUpdates() {
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   updateBtn.addEventListener('click', () => location.reload());
-  addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
+  addEventListener('visibilitychange', () => {
+    /* hidden, the frame loop stops: silence the roll and the soundscape until the player is back */
+    if (document.visibilityState === 'hidden') { setRoll(0); if (actx && actx.state === 'running') actx.suspend().catch(() => {}); }
+    else { wakeAudio(); checkUpdate(); }
+  });
   setInterval(checkUpdate, 10 * 60 * 1000);
   setTimeout(checkUpdate, 3000);
 }

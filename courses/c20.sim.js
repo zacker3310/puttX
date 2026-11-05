@@ -127,7 +127,7 @@ registerWorld(20, { holes: [
       { x: 1.0, z: 6.5, r: 0.14, e: 1.15, look: 'cloud' }, { x: -1.0, z: 6.9, r: 0.14, e: 1.15, look: 'cloud' }],
     movers: [{ kind: 'gate', ax: -0.65, az: 9.1, bx: 0.65, bz: 9.1, len: 0.25, ang: 90, period: 2.6, look: 'gate' }] },
   /* 14. thunder kicker: up a windy railed diagonal rainbow, past the windmill (or its tube), off the kicker onto the green and up to the crown */
-  { par: 4, crazy: true, sol: [[26,0.88,0],[80,0.8,0]], tee: [-0.66, 0.95], cup: [0.1, 9.0], aim0: 34,
+  { par: 4, crazy: true, sol: [[30,0.96,0],[76,0.96,0]], tee: [-0.66, 0.95], cup: [0.1, 9.0], aim0: 34,
     floors: [rect(-0.8, 0, 0.8, 2), [[-0.25, 2], [0.25, 2], [1.85, 4.4], [1.35, 4.4]], rect(0.6, 4.4, 2.6, 6.2), rect(-0.6, 7, 2.8, 9.4)],
     walls: [[[1.35, 4.4], [-0.25, 2], [-0.8, 2], [-0.8, 0], [0.8, 0], [0.8, 2], [0.25, 2], [1.85, 4.4]], [[-0.6, 9.4], [2.8, 9.4], [2.8, 8.4]]],
     ramps: [{ x0: -0.25, z0: 2, x1: 1.85, z1: 4.4, axis: 'z', h0: 0, h1: 0.3 }, { x0: 1.2, z0: 5.7, x1: 2, z1: 6.2, axis: 'z', h0: 0.3, h1: 0.42 },
@@ -138,7 +138,7 @@ registerWorld(20, { holes: [
     tubes: [{ a: [2.3, 4.75], b: [2.3, 7.4], dir: 345 }] },
   /* 15. ember punchbowl (long green): an 11 m green over a front ridge into a soft punchbowl round
      the cup; the whole bowl leans left, so the pace and the line both matter */
-  { par: 2, sol: [[0,0.68,0]], tee: [0, 0.6], cup: [0.4, 8.6],
+  { par: 2, sol: [[0,0.67,0]], tee: [0, 0.6], cup: [0.4, 8.6],
     shape: [[-1, 0], [1, 0], [2, 2.5], [3, 6], [3, 9], [1.8, 11.4], [-0.6, 11.8], [-2.4, 10.4], [-2.8, 7], [-2, 3.5]],
     tiers: [{ poly: rect(-3, -1, 4, 13), h: 0, sx: 0.015 }],
     bumps: [{ x: 0.4, z: 8.6, r: 1.8, h: -0.12 }, { x: 0, z: 4.5, r: 1.6, h: 0.15 }, { x: -1.4, z: 9.4, r: 1.2, h: 0.08 }] },

@@ -64,7 +64,7 @@ registerWorld(24, { holes: [
     drains: [{ x: 4.7, z: 5.3, r: 0.8, depth: 0.22, flat: 0.12 }, { x: 2.1, z: 2.2, r: 1.15, depth: 0.3, flat: 0.12 }, { x: 4.6, z: 2.0, r: 1.0, depth: 0.25, flat: 0.12 }],
     tubes: [{ a: [4.7, 5.3], b: [0.85, 2.2], dir: 40, keep: 0, add: 1.0 }, { a: [2.1, 2.2], b: [4.6, 0.85], dir: 40, keep: 0, add: 1.0 }] },
   /* 10. gate terraces: four terraces, each snow fence open at one gap; lift bars slide across the top two */
-  { par: 4, sol: [[218,1,0],[14,0.92,0]], tee: [0, 0.5], cup: [0.4, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
+  { par: 4, sol: [[358,0.72,2],[306,0.56,0]], tee: [0, 0.5], cup: [0.4, 8.8], shape: rect(-1.4, 0, 1.4, 9.6),
     inner: [[[-1.4, 2.6], [-0.3, 2.6]], [[0.3, 2.6], [1.4, 2.6]], [[-1.4, 5.2], [0.5, 5.2]], [[1.1, 5.2], [1.4, 5.2]], [[-1.4, 7.6], [-1.1, 7.6]], [[-0.5, 7.6], [1.4, 7.6]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 2.6), h: 0.42 }, { poly: rect(-1.4, 2.6, 1.4, 5.2), h: 0.28 }, { poly: rect(-1.4, 5.2, 1.4, 7.6), h: 0.14 }],
     movers: [C24_LIFT(-0.5, 2.35, 0.5, 2.35, 0.3, 90, 2.8), C24_LIFT(0.2, 4.95, 0.8, 4.95, 0.3, 90, 2.4, 1)],
@@ -72,11 +72,11 @@ registerWorld(24, { holes: [
     bumps: [{ x: 0.6, z: 6.6, r: 0.3, h: 0.1 }, { x: 0.4, z: 8.8, r: 0.5, h: 0.06 }], posts: [C24_MAN(-0.4, 8.9)] },
   /* 11. the cornice: a long green with a snow spine down the middle; tee off the right of it, and
      the cup sits on the left behind it, so the lag has to ride the spine or swing round its end */
-  { par: 3, sol: [[36,1,0]], tee: [1.4, 0.5], cup: [-1.1, 9.6], shape: rect(-2.2, 0, 2.2, 10.6),
+  { par: 3, sol: [[36,1,0],[44,0.84,0]], tee: [1.4, 0.5], cup: [-1.1, 9.6], shape: rect(-2.2, 0, 2.2, 10.6),
     tiers: [{ poly: rect(-2.2, 0, 2.2, 10.6), h: 0.04, sx: -0.01, sz: 0.004 }],
     bumps: [{ x: 0, z: 3.4, r: 1.1, h: 0.16 }, { x: -0.1, z: 5.4, r: 1.2, h: 0.18 }, { x: 0.1, z: 7.4, r: 1.0, h: 0.14 }, { x: -1.2, z: 7.6, r: 1.0, h: -0.07 }] },
   /* 12. twin chutes: the icy chute past the open water or the mogul chute, onto the terrace, then through the gated fence to the cup */
-  { par: 4, sol: [[4,0.8,0]], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
+  { par: 4, sol: [[5,0.74,0]], tee: [0, 0.5], cup: [-0.5, 8.4], shape: rect(-1.4, 0, 1.4, 9.2),
     inner: [[[0, 1.6], [0, 5.6]], [[-1.4, 7.0], [-0.3, 7.0]], [[0.3, 7.0], [1.4, 7.0]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.4), h: 0.42 }, { poly: rect(-1.4, 5.6, 1.4, 7.0), h: 0.14 }],
     ramps: [{ x0: -1.4, z0: 1.4, x1: 1.4, z1: 5.6, axis: 'z', h0: 0.42, h1: 0.14 }],
@@ -84,7 +84,7 @@ registerWorld(24, { holes: [
     bumps: [{ x: 0.5, z: 2.6, r: 0.3, h: 0.12 }, { x: 0.9, z: 3.6, r: 0.3, h: 0.12 }, { x: 0.4, z: 4.6, r: 0.3, h: 0.12 }],
     movers: [C24_LIFT(-0.5, 6.75, 0.5, 6.75, 0.25, 90, 2.6)], posts: [C24_MAN(0.4, 8.6)] },
   /* 13. avalanche chain: four terraces, a fence on each edge; or the summit cave that skips straight to the third */
-  { par: 4, crazy: true, sol: [[299.95,0.833,0],[9.98,0.98,0]], tee: [0, 0.5], cup: [0.5, 8.2], shape: rect(-1.4, 0, 1.4, 9),
+  { par: 4, crazy: true, sol: [[299.95,0.833,0],[8.23,0.97,0]], tee: [0, 0.5], cup: [0.5, 8.2], shape: rect(-1.4, 0, 1.4, 9),
     inner: [[[-1.4, 1.8], [0.6, 1.8]], [[-0.6, 4.0], [1.4, 4.0]], [[-1.4, 6.2], [-0.3, 6.2]], [[0.3, 6.2], [1.4, 6.2]]],
     tiers: [{ poly: rect(-1.4, 0, 1.4, 1.8), h: 0.42 }, { poly: rect(-1.4, 1.8, 1.4, 4.0), h: 0.28 }, { poly: rect(-1.4, 4.0, 1.4, 6.2), h: 0.14 }],
     tubes: [{ a: [-1.0, 1.2], b: [-1.0, 4.6], dir: 60 }],
@@ -92,14 +92,14 @@ registerWorld(24, { holes: [
     bumps: [{ x: -0.1, z: 5.2, r: 0.3, h: 0.1 }, { x: 0.8, z: 5.3, r: 0.3, h: 0.12 }, { x: 0.5, z: 8.2, r: 0.5, h: 0.06 }],
     movers: [C24_BALL(-0.8, 7.2, 0.8, 7.2, 2.8), C24_LIFT(0.75, 1.55, 1.0, 1.55, 0.2, 90, 2.2)] },
   /* 14. sinkholes: three icy sinkholes with a cave at the bottom of each; one to the cup shelf, two back up the hill */
-  { par: 4, sol: [[16,0.88,0]], tee: [0, 0.5], cup: [0.6, 7.6], shape: rect(-1.6, 0, 1.6, 8.4),
+  { par: 4, sol: [[17,0.78,0]], tee: [0, 0.5], cup: [0.6, 7.6], shape: rect(-1.6, 0, 1.6, 8.4),
     tiers: [{ poly: rect(-1.6, 0, 1.6, 1.6), h: 0.25 }, { poly: rect(-1.6, 6.4, 1.6, 8.4), h: 0.2 }],
     ramps: [{ x0: 0.9, z0: 5.8, x1: 1.6, z1: 6.4, axis: 'z', h0: 0, h1: 0.2 }],
     bumps: [{ x: -0.8, z: 3.0, r: 0.6, h: -0.25 }, { x: 0.7, z: 3.4, r: 0.6, h: -0.25 }, { x: -0.3, z: 4.9, r: 0.6, h: -0.25 }],
     tubes: [{ a: [-0.3, 4.9], b: [-1.0, 7.0], dir: 90 }, { a: [-0.8, 3.0], b: [-1.2, 1.0], dir: 90 }, { a: [0.7, 3.4], b: [1.2, 1.0], dir: 270 }],
     zones: [{ surf: 'fast', poly: rect(-1.6, 1.6, 1.6, 5.8) }], posts: [C24_MAN(1.1, 8.0)] },
   /* 15. lift chain: three decks up the mountain, a lift bar at the top of every ramp, then off the summit deck to the lake */
-  { par: 5, crazy: true, sol: [[10,0.833,2],[144,0.88,2]], tee: [0, 0.5], cup: [0.5, 11.0], shape: rect(-1.4, 0, 1.4, 11.8),
+  { par: 5, crazy: true, sol: [[10,0.833,2],[144,0.88,2],[276,0.96,0]], tee: [0, 0.5], cup: [0.5, 11.0], shape: rect(-1.4, 0, 1.4, 11.8),
     ramps: [{ x0: -0.45, z0: 1.4, x1: 0.45, z1: 2.6, axis: 'z', h0: 0, h1: 0.14 }, { x0: 0.5, z0: 4.4, x1: 1.4, z1: 5.4, axis: 'z', h0: 0.14, h1: 0.28 },
       { x0: -1.4, z0: 7.0, x1: -0.5, z1: 8.0, axis: 'z', h0: 0.28, h1: 0.42 }],
     tiers: [{ poly: rect(-1.4, 2.6, 1.4, 5.4), h: 0.14 }, { poly: rect(-1.4, 5.4, 1.4, 8.0), h: 0.28 }, { poly: rect(-1.4, 8.0, 1.4, 9.4), h: 0.42 }],

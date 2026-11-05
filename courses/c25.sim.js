@@ -84,7 +84,7 @@ registerWorld(25, (() => {
       bumps: [{ x: 0.2, z: 1.4, r: 0.5, h: 0.18 }, { x: 0, z: 3.6, r: 0.5, h: 0.2 }, { x: 0.2, z: 6.0, r: 0.5, h: 0.2 }],
       zones: [lagoon(rect(1.1, 6.6, 1.8, 7.8)), sand(rect(-1.8, 8.6, -0.8, 9.6))], posts: [BARREL(0.0, 8.6)] },
     /* 11 zig-zag rigging: three gangplanks up three decks to the crow's nest */
-    { par: 4, sol: [[38,0.92,1.5],[28,0.96,0]], tee: [0, 0.5], cup: [0.8, 9.8], aim0: 25, shape: rect(-1.6, 0, 1.6, 10.6),
+    { par: 4, sol: [[36,0.76,0.5],[312,0.72,0]], tee: [0, 0.5], cup: [0.8, 9.8], aim0: 25, shape: rect(-1.6, 0, 1.6, 10.6),
       ramps: [{ x0: 0.9, z0: 1.6, x1: 1.6, z1: 2.8, axis: 'z', h0: 0, h1: 0.14 }, { x0: -1.6, z0: 4.2, x1: -0.9, z1: 5.4, axis: 'z', h0: 0.14, h1: 0.28 },
         { x0: 0.9, z0: 6.8, x1: 1.6, z1: 8.0, axis: 'z', h0: 0.28, h1: 0.42 }],
       tiers: [{ poly: rect(-1.7, 2.8, 1.7, 10.7), h: 0.14 }, { poly: rect(-1.7, 5.4, 1.7, 10.7), h: 0.28 }, { poly: rect(-1.7, 8.0, 1.7, 10.7), h: 0.42 }],
@@ -92,7 +92,7 @@ registerWorld(25, (() => {
       movers: [CANNON(-0.9, 3.9, 0.6, 3.9, 2.4), CANNON(0.9, 6.4, -0.6, 6.4, 2.8, 1)],
       posts: [BARREL(-0.4, 9.4), ANCHOR(1.2, 1.0)], zones: [sand(rect(-1.6, 9.8, -0.6, 10.6))], bumps: [{ x: 0.2, z: 9.2, r: 0.35, h: 0.08 }] },
     /* 12 the listing wreck: up the plank, round the wheel, then the hull cave or the guarded stern */
-    { par: 4, sol: [[358,1,0]], tee: [0.8, 0.5], cup: [-1.0, 9.2], aim0: 0, shape: rect(-1.8, 0, 1.8, 10),
+    { par: 4, sol: [[361.5,0.99,0]], tee: [0.8, 0.5], cup: [-1.0, 9.2], aim0: 0, shape: rect(-1.8, 0, 1.8, 10),
       ramps: [{ x0: 0.4, z0: 2.0, x1: 1.0, z1: 3.2, axis: 'z', h0: 0, h1: 0.34 }],
       tiers: [{ poly: rect(-1.9, 3.2, 1.9, 7), h: 0.3, sx: 0.06 }],
       inner: [[[-1.8, 3.2], [0.4, 3.2]], [[1.0, 3.2], [1.8, 3.2]], [[-1.8, 7], [-0.5, 7]], [[0.5, 7], [1.8, 7]]],
@@ -101,7 +101,7 @@ registerWorld(25, (() => {
       posts: [BARREL(-1.2, 4.2), BARREL(1.0, 6.2), BARREL(-1.2, 6.2)],
       zones: [lagoon(rect(-0.4, 8.6, 0.4, 10)), sand(rect(0.6, 1.2, 1.8, 2.0))], bumps: [{ x: -0.2, z: 7.9, r: 0.4, h: 0.14 }] },
     /* 13 the kraken's deck: up the long plank or the cave, between two wheels, through the drawbridge and down */
-    { par: 4, crazy: true, sol: [[18,0.84,0],[23,0.32,0]], tee: [0.4, 0.5], cup: [0.3, 8.4], aim0: 0, shape: rect(-1.8, 0, 1.8, 9.2),
+    { par: 4, crazy: true, sol: [[18,0.84,0],[27.25,0.5,0]], tee: [0.4, 0.5], cup: [0.3, 8.4], aim0: 0, shape: rect(-1.8, 0, 1.8, 9.2),
       ramps: [{ x0: -1.8, z0: 1.4, x1: -1.2, z1: 5.0, axis: 'z', h0: 0, h1: 0.4 }],
       tiers: [{ poly: rect(-1.2, 3.4, 1.9, 7.0), h: 0.4 }, { poly: rect(-1.9, 5.0, -1.2, 7.0), h: 0.4 }],
       inner: [[[-1.2, 1.4], [-1.2, 3.4], [1.8, 3.4]], [[-1.8, 7.0], [-0.2, 7.0]], [[0.8, 7.0], [1.8, 7.0]]],
@@ -110,12 +110,12 @@ registerWorld(25, (() => {
       zones: [lagoon(rect(-1.8, 8.4, -0.6, 9.2)), sand(rect(0.6, 0.9, 1.8, 1.5))],
       bumps: [{ x: -0.5, z: 1.6, r: 0.45, h: 0.18 }, { x: 1.2, z: 8.2, r: 0.4, h: 0.12 }], posts: [BARREL(1.5, 6.5)] },
     /* 14 the long galleon green: 14 m bow to stern, a long diagonal ridge, a hollow and a cup on the high side */
-    { par: 3, sol: [[10,0.96,0]], tee: [-1.2, 0.5], cup: [1.2, 13.2], shape: rect(-2.4, 0, 2.4, 14.2),
+    { par: 3, sol: [[10.5,0.96,0]], tee: [-1.2, 0.5], cup: [1.2, 13.2], shape: rect(-2.4, 0, 2.4, 14.2),
       tiers: [{ poly: rect(-2.5, -0.1, 2.5, 14.3), h: 0, sx: 0.018, sz: 0.006 }],
       bumps: [{ x: -0.2, z: 4.0, r: 2.4, h: 0.16 }, { x: 1.2, z: 7.6, r: 1.6, h: -0.12 }, { x: -1.2, z: 9.6, r: 1.8, h: 0.14 }, { x: 0.2, z: 12.0, r: 1.0, h: -0.06 }],
       zones: [sand(rect(-2.4, 6.6, -1.6, 7.8)), lagoon(rect(1.8, 10.0, 2.4, 11.8))], posts: [ANCHOR(2.0, 2.0), BARREL(-2.0, 12.6)] },
     /* 15 the rigging: floating decks joined by rail-less planks; the cave skips the middle */
-    { par: 4, crazy: true, sol: [[12,0.4,0],[6,0.4,0]], tee: [0, 0.5], cup: [1.0, 9.6], aim0: 0,
+    { par: 4, crazy: true, sol: [[12,0.4,0],[9,0.46,0]], tee: [0, 0.5], cup: [1.0, 9.6], aim0: 0,
       floors: [rect(-1.0, 0, 1.0, 2.4), rect(-0.95, 2.3, -0.45, 4.1), rect(-1.6, 4.0, 0.4, 5.8), rect(0.3, 5.0, 1.6, 5.6), rect(1.0, 5.5, 1.6, 7.6), rect(-0.4, 7.5, 1.8, 10.4)],
       walls: [[[-0.45, 2.4], [1.0, 2.4], [1.0, 0], [-1.0, 0], [-1.0, 2.4], [-0.95, 2.4]],
         [[-0.95, 4.0], [-1.6, 4.0], [-1.6, 5.8], [0.4, 5.8], [0.4, 5.6]], [[0.4, 5.0], [0.4, 4.0], [-0.45, 4.0]],

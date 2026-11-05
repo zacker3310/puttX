@@ -27,12 +27,12 @@ registerWorld(29, { holes: [
     movers: [C29_POP(0, 3.8, 0.55, 1.5, 0, 2)],
     zones: [C29_MUD(-1.1, 7.3, 0.2, 7.45), C29_MUD(0.2, 7.3, 0.35, 9)] },
   /* 4: long green: the caramel terraces, three broad leaning tiers stepping down to a back swale */
-  { par: 3, sol: [[344,0.92,0]], tee: [0, 0.5], cup: [-1.2, 12.8], shape: rect(-2.6, 0, 2.6, 14),
+  { par: 3, sol: [[342.75,0.92,0]], tee: [0, 0.5], cup: [-1.2, 12.8], shape: rect(-2.6, 0, 2.6, 14),
     tiers: [{ poly: rect(-2.6, 0, 2.6, 4.5), h: 0.3, sx: 0.01 }, { poly: rect(-2.6, 6, 2.6, 9), h: 0.15, sx: -0.01 }, { poly: rect(-2.6, 10.5, 2.6, 14), h: 0 }],
     ramps: [{ x0: -2.6, z0: 4.5, x1: 2.6, z1: 6, axis: 'z', h0: 0.3, h1: 0.15 }, { x0: -2.6, z0: 9, x1: 2.6, z1: 10.5, axis: 'z', h0: 0.15, h1: 0 }],
     bumps: [{ x: 1.0, z: 7.5, r: 1.5, h: 0.1 }, { x: -1.0, z: 11.2, r: 1.2, h: -0.07 }] },
   /* 5: the chocolate river: a belt bridge shoves you sideways, or the pipe under; then up to the green */
-  { par: 4, crazy: true, sol: [[5.25,0.96,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: rect(-1.6, 0, 1.6, 9.2),
+  { par: 4, crazy: true, sol: [[5,0.96,0]], tee: [0, 0.5], cup: [0.5, 8.4], shape: rect(-1.6, 0, 1.6, 9.2),
     zones: [C29_BELT(rect(-0.3, 2.8, 0.3, 4.2), -0.8, 0), { surf: 'water', poly: rect(-1.6, 2.8, 1.6, 4.2) }, C29_MUD(-0.4, 7.7, 1.6, 7.85)],
     ramps: [{ x0: -1.6, z0: 5.2, x1: 1.6, z1: 6.2, axis: 'z', h0: 0, h1: 0.25 }],
     tiers: [{ poly: rect(-1.6, 6.2, 1.6, 9.2), h: 0.25 }],

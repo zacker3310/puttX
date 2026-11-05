@@ -95,7 +95,7 @@ registerWorld(17, { holes: [
     posts: [C17_GARG(-1.15, 3.8), C17_GARG(-0.85, 5.3)],
     movers: [C17_MILL(0.4, 2.6, 0.55, 1.5, 0), C17_GHOST(-0.8, 8.0, 0.8, 8.0, 2.6, 0)] },
   /* 14: the secret library: four rooms, eight passages, only four of them go forward */
-  { par: 4, crazy: true, sol: [[22,0.92,0],[0,0.96,0]], tee: [0.8, 0.5], cup: [-0.5, 0.7], aim0: 0, shape: rect(-1.6, 0, 1.6, 7.2),
+  { par: 4, crazy: true, sol: [[8,0.88,0],[194,0.88,0],[4,1,0]], tee: [0.8, 0.5], cup: [-0.5, 0.7], aim0: 0, shape: rect(-1.6, 0, 1.6, 7.2),
     inner: [[[0, 0], [0, 7.2]], [[-1.6, 3.6], [1.6, 3.6]]],
     tubes: [{ a: [1.2, 3.0], b: [0.8, 4.0], dir: 0 }, { a: [0.35, 3.0], b: [0.35, 0.5], dir: 0 },
       { a: [0.35, 6.7], b: [-0.4, 6.6], dir: 270 }, { a: [1.2, 6.7], b: [1.2, 1.5], dir: 0 },
@@ -104,7 +104,7 @@ registerWorld(17, { holes: [
     posts: [C17_GARG(-0.9, 0.9)],
     movers: [C17_GHOST(0.35, 5.4, 1.25, 5.4, 2.4, 0)] },
   /* 15: down the castle steps: each drop guarded by a portcullis or a narrow side door */
-  { par: 4, sol: [[22,1,0]], tee: [0, 0.5], cup: [-0.4, 8.4], shape: rect(-1.3, 0, 1.3, 9.5),
+  { par: 4, sol: [[25.75,0.97,0]], tee: [0, 0.5], cup: [-0.4, 8.4], shape: rect(-1.3, 0, 1.3, 9.5),
     tiers: [{ poly: rect(-1.3, 0, 1.3, 3), h: 0.45 }, { poly: rect(-1.3, 3, 1.3, 6), h: 0.25, sx: 0.03 }],
     inner: [[[-1.3, 3], [-0.3, 3]], [[0.3, 3], [0.75, 3]], [[-0.75, 6], [0.25, 6]], [[0.75, 6], [1.3, 6]]],
     bumps: [{ x: 0.5, z: 7.6, r: 0.5, h: 0.25 }],
@@ -112,7 +112,7 @@ registerWorld(17, { holes: [
     movers: [C17_GATE(0, 3, -0.6, 3, 0.3, 3, 0), C17_MILL(-0.2, 4.5, 0.5, 1.5, 0), C17_GATE(0.5, 6, 0.89, 6, 0.25, 2.6, 0.5)] },
   /* 16: the long gallery: fourteen metres of green climbing gently away, leaning left then right
      over a run of low ridges, the cup tucked behind the last one */
-  { par: 3, sol: [[0,0.96,0]], tee: [0, 0.5], cup: [0.6, 13.2], shape: rect(-1.5, 0, 1.5, 14),
+  { par: 3, sol: [[0,0.97,0]], tee: [0, 0.5], cup: [0.6, 13.2], shape: rect(-1.5, 0, 1.5, 14),
     tiers: [{ poly: rect(-1.5, 0, 1.5, 14), h: 0.1, sz: 0.008 }],
     bumps: [{ x: -1.2, z: 3.5, r: 1.6, h: 0.12 }, { x: 1.3, z: 7.5, r: 1.6, h: 0.14 }, { x: -0.6, z: 11.0, r: 1.2, h: 0.1 }, { x: 0.4, z: 5.5, r: 1.0, h: -0.06 }] },
   /* 17: the crypt descent: three floating floors; leap through the portcullis, over the windmill

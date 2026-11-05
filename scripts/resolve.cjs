@@ -4,7 +4,8 @@
    For each hole: if the stored sol still sinks within par it is kept untouched; otherwise the old
    line is repaired (its last putt nudged in aim and pace, closest first); otherwise the solver
    (scripts/solve.cjs) searches again and the k-th `sol: [...]` of the course file is
-   replaced (holes appear in file order). Holes the solver cannot prove are listed, not touched.
+   replaced (holes appear in file order). An auto hole is held to holes-check's rule (one ace on a
+   line where at least 11 of 21 neighbouring putts ace) and searched for such a line from the tee. Holes the solver cannot prove are listed, not touched.
    Courses run in parallel on child processes, one per core.
    Usage: node scripts/resolve.cjs [--course 3,13] [--jobs 4] [--force] [--report path.json]
    --force re-solves even holes whose sol still works (to tidy lines after a big change). */
@@ -43,11 +44,47 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
     for (const [a, p, t0] of sol) { last = S.simulatePutt(h, at, a, p, t0); if (last.end === 'stop') at = [last.x, last.z]; else if (last.end !== 'oob') break; }
     return sol.length <= h.par && last && last.end === 'sunk';
   };
+  /* an auto hole's line, as holes-check measures it: of 21 putts round (a, p) from the tee (aim
+     +-0.6 deg, pace in 0.012 steps, start time 0), how many ace. It needs at least AUTO_MIN. */
+  const AUTO_MIN = 11;
+  const autoNear = (h, a, p) => {
+    let n = 0;
+    for (const d of [-0.6, 0, 0.6]) for (let k = -3; k <= 3; k++) if (S.simulatePutt(h, h.tee, a + d, Math.min(1, Math.max(0.02, p + k * 0.012)), 0).end === 'sunk') n++;
+    return n;
+  };
+  /* a proof holes-check accepts: sinks within par, and on an auto hole is one ace on a line that nearly always aces */
+  const good = (h, sol) => !!sol && replay(h, sol) && (!h.auto || (sol.length === 1 && autoNear(h, sol[0][0], sol[0][1]) >= AUTO_MIN));
+  /* an auto hole from scratch: every putt from the tee on a 1 deg x 0.02 grid; the aces whose grid
+     neighbours ace too are scored by autoNear, then the best is tuned on a finer grid round it */
+  const solveAuto = h => {
+    const A = 360, P = 50, ace = new Uint8Array(A * P);
+    for (let a = 0; a < A; a++) for (let p = 1; p <= P; p++) if (S.simulatePutt(h, h.tee, a, +(p / P).toFixed(2), 0).end === 'sunk') ace[a * P + p - 1] = 1;
+    const dense = [];
+    for (let a = 0; a < A; a++) for (let p = 0; p < P; p++) {
+      if (!ace[a * P + p]) continue;
+      let n = 0;
+      for (const da of [-1, 0, 1]) for (const dp of [-1, 0, 1]) { const q = p + dp; if (q >= 0 && q < P && ace[((a + da + A) % A) * P + q]) n++; }
+      dense.push([n, a, +((p + 1) / P).toFixed(2)]);
+    }
+    dense.sort((u, v) => v[0] - u[0]);
+    let best = null, bestN = -1;
+    for (const [, a, p] of dense.slice(0, 24)) { const n = autoNear(h, a, p); if (n > bestN) { bestN = n; best = [a, p]; } if (n >= 19) break; }
+    if (!best) return null;
+    for (let da = -0.5; da <= 0.5001; da += 0.25) for (let dp = -0.02; dp <= 0.0201; dp += 0.01) {
+      const a = +(best[0] + da).toFixed(2), p = +Math.min(1, Math.max(0.02, best[1] + dp)).toFixed(2);
+      if (S.simulatePutt(h, h.tee, a, p, 0).end !== 'sunk') continue;
+      const n = autoNear(h, a, p);
+      if (n > bestN) { bestN = n; best = [a, p]; }
+    }
+    process.stderr.write(`${h.key} auto line ${best} aces ${bestN}/21\n`);
+    return bestN >= AUTO_MIN ? [[best[0], best[1], 0]] : null;
+  };
   /* repair first: the old line, nudged. Keep its earlier putts, then search outward from its last putt
      (closest aim and pace first) for one that sinks. An auto hole wants the middle of its ace window,
      not its edge, so it scores each sinking candidate by how many of holes-check's neighbours ace too. */
   const repair = (h, sol) => {
     if (!sol || !sol.length) return null;
+    if (h.auto) sol = [[sol[0][0], sol[0][1], 0]];   /* an auto hole is one ace from the tee */
     let at = h.tee;
     for (const [a, p, t0] of sol.slice(0, -1)) { const r = S.simulatePutt(h, at, a, p, t0); if (r.end === 'stop') at = [r.x, r.z]; else if (r.end !== 'oob') return null; }
     const [a0, p0, t0] = sol[sol.length - 1], cands = [];
@@ -59,12 +96,11 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
       if (S.simulatePutt(h, at, a, p, t0).end !== 'sunk') continue;
       const out = sol.slice(0, -1).concat([[a, p, t0]]);
       if (!h.auto) return out;
-      let near = 0;
-      for (const d of [-0.6, 0, 0.6]) for (let k = -3; k <= 3; k++) if (S.simulatePutt(h, h.tee, a + d, Math.min(1, Math.max(0.02, p + k * 0.012)), 0).end === 'sunk') near++;
+      const near = autoNear(h, a, p);
       if (near > bestScore) { bestScore = near; best = out; }
       if (near >= 18) break;
     }
-    return best && (!h.auto || bestScore >= 11) ? best : null;
+    return best && (!h.auto || bestScore >= AUTO_MIN) ? best : null;
   };
   /* extend: play the old line until it stops short, then one full sweep from that spot for a putt
      that sinks (and, failing that, from the spot before its last putt). One solver node, not a beam. */
@@ -93,15 +129,15 @@ if (process.env.PUTTX_RESOLVE_CHILD) {
   const rows = [];
   for (const [k, h] of S.WORLDS[c].holes.entries()) {
     const t = Date.now();
-    if (!force && h.sol && replay(h, h.sol)) { rows.push({ key: h.key, kept: true }); continue; }
+    if (!force && good(h, h.sol)) { rows.push({ key: h.key, kept: true }); continue; }
     let fixed = !force && repair(h, h.sol);
-    if (!(fixed && replay(h, fixed)) && !force) { fixed = extend(h, h.sol); if (fixed && replay(h, fixed)) process.stderr.write(`${h.key} extended `); else fixed = null; }
-    if (fixed && replay(h, fixed)) { save(k, fixed); rows.push({ key: h.key, par: h.par, sol: fixed, putts: fixed.length, s: +((Date.now() - t) / 1000).toFixed(1), repaired: true }); process.stderr.write(`${h.key} repaired ${fixed.length}/${h.par} ${((Date.now() - t) / 1000).toFixed(1)}s\n`); continue; }
-    const sol = solve(h);
+    if (!good(h, fixed) && !force) { fixed = extend(h, h.sol); if (good(h, fixed)) process.stderr.write(`${h.key} extended `); else fixed = null; }
+    if (good(h, fixed)) { save(k, fixed); rows.push({ key: h.key, par: h.par, sol: fixed, putts: fixed.length, s: +((Date.now() - t) / 1000).toFixed(1), repaired: true }); process.stderr.write(`${h.key} repaired ${fixed.length}/${h.par} ${((Date.now() - t) / 1000).toFixed(1)}s\n`); continue; }
+    const sol = h.auto ? solveAuto(h) : solve(h);
     let out = null;
     if (sol && sol.length <= h.par) {
       const rounded = JSON.parse(fmt(sol));
-      out = replay(h, rounded) ? rounded : (replay(h, sol) ? sol : null);
+      out = good(h, rounded) ? rounded : (good(h, sol) ? sol : null);
     }
     if (out) save(k, out);
     rows.push({ key: h.key, par: h.par, sol: out, putts: sol ? sol.length : null, s: +((Date.now() - t) / 1000).toFixed(1) });

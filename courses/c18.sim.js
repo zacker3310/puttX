@@ -75,7 +75,7 @@
       movers: [LOCK(0, 5.1, 2.05, 5.1, 1, 90, 3.4)] },
     /* 7. the black hole run: up the chute and off the ramp, land in the gravity well, teleport onto
        the booster rail, then the black hole spins it round and round down into the cup */
-    { par: 3, auto: true, crazy: true, sol: [[0,0.8,0]], tee: [0, 0.5], cup: [3.4, 6.4],
+    { par: 3, auto: true, crazy: true, sol: [[0,0.77,0]], tee: [0, 0.5], cup: [3.4, 6.4],
       floors: [rect(-0.35, 0, 0.35, 3), rect(-1.1, 3.8, 1.1, 6.8),
         [[2, 0.4], [2.8, 0.4], [2.8, 5], [4, 5], [4.8, 5.8], [4.8, 7], [4, 7.8], [2.8, 7.8], [2, 7]]],
       walls: [...box(-0.35, 0, 0.35, 3, 'n'), ...box(-1.1, 3.8, 1.1, 6.8, 's'),

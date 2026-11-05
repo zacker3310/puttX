@@ -9,14 +9,14 @@ const C27_GARG = (x, z) => ({ x, z, r: 0.12, top: 0.3, look: 'gargoyle' });
 const C27_MOAT = poly => ({ surf: 'water', poly });
 registerWorld(27, { holes: [
   /* 1: the barbican: the portcullis in the middle or the narrow postern door by the wall */
-  { par: 2, sol: [[0,0.6,0]], tee: [0, 0.5], cup: [-0.3, 5.3], shape: rect(-1.1, 0, 1.1, 6.2),
+  { par: 2, sol: [[-1.25,0.6,0]], tee: [0, 0.5], cup: [-0.3, 5.3], shape: rect(-1.1, 0, 1.1, 6.2),
     inner: [[[-1.1, 3], [-0.3, 3]], [[0.3, 3], [0.7, 3]]],
     bumps: [{ x: 0, z: 1.8, r: 0.4, h: 0.1 }],
     posts: [C27_GARG(0.35, 4.6)],
     movers: [C27_GATE(0, 3, -0.6, 3, 0.3, 90, 3, 0)] },
   /* 2: the keep green: a long lower lawn with a swale, a step up to a top tier that falls back
      toward you, a ridge across it and the cup on the flat behind */
-  { par: 3, sol: [[6,0.92,0]], tee: [0, 0.5], cup: [0.7, 11.8], shape: rect(-1.8, 0, 1.8, 12.8),
+  { par: 3, sol: [[5.5,0.92,0]], tee: [0, 0.5], cup: [0.7, 11.8], shape: rect(-1.8, 0, 1.8, 12.8),
     ramps: [{ x0: -1.8, z0: 5.0, x1: 1.8, z1: 6.0, axis: 'z', h0: 0, h1: 0.14 }],
     tiers: [{ poly: rect(-1.8, 6.0, 1.8, 12.8), h: 0.2, sz: -0.01 }],
     bumps: [{ x: -0.6, z: 2.8, r: 1.3, h: -0.09 }, { x: 0.9, z: 1.8, r: 0.9, h: 0.06 }, { x: -0.3, z: 9.0, r: 1.5, h: 0.13 }] },

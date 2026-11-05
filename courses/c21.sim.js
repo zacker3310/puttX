@@ -151,7 +151,7 @@ registerWorld(21, { holes: [
     bumps: [{ x: 3.6, z: 8.2, r: 0.4, h: -0.06 }] },
   /* 18: topping out the tower (4 parts). Belt, the ground pipe or the switchback deck, the boom over the corner ramp,
      then the guarded drop or the pipe into the pocket past the slider */
-  { par: 5, crazy: true, sol: [[345,0.67,0],[176,0.6,1],[0,0.1,0]], tee: [-1.6, 0.5], cup: [-1.2, 10.2], aim0: 0, shape: c21Box(-2.4, 0, 2.4, 11, [3, 6, 8.6]),
+  { par: 5, crazy: true, sol: [[190,0.64,0],[224,0.72,1.5],[46,0.8,0]], tee: [-1.6, 0.5], cup: [-1.2, 10.2], aim0: 0, shape: c21Box(-2.4, 0, 2.4, 11, [3, 6, 8.6]),
     tiers: [{ poly: rect(-2.4, 3, 2.4, 6), h: 0.22 }, { poly: rect(-2.4, 6, 2.4, 8.6), h: 0.44 }, { poly: rect(-2.4, 8.6, 2.4, 11), h: 0.18 }],
     ramps: [{ x0: 1.4, z0: 1.8, x1: 2.4, z1: 3, axis: 'z', h0: 0, h1: 0.22 }, { x0: -2.2, z0: 4.8, x1: -1.6, z1: 6, axis: 'z', h0: 0.22, h1: 0.44 }],
     inner: [[[-2.4, 3], [1.4, 3]], [[-1.2, 4.5], [2.4, 4.5]], [[-2.4, 6], [-2.2, 6]], [[-1.6, 6], [2.4, 6]],

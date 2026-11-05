@@ -63,6 +63,12 @@ putting game on an iPad. v1 (27 gentle holes for a 3-5 year old) is superseded.
 | 9 | Candy Factory | conveyors, bumpers, hard candy, taffy, chocolate river |
 | 10 | Sky Kingdom | everything, floating islands, the finale |
 
+Two extra courses sit outside the worlds, always open, and unlock nothing:
+- **The Classic (98):** the original Putt-Putt kind of course. Flat green carpet, aluminium
+  bumpboards, simple geometric blockers, hills and pipes, every hole a par 2 with an ace possible
+  but rare.
+- **The bonus nine (99):** nine unhinged stunt holes.
+
 Each course has 18 holes, par 2 to 5, at least five 3-4 part holes, and difficulty climbing
 through the course and across courses. At most 2% of tee shots ace any hole. Finishing hole 18
 unlocks the next course in the same world. The next world opens only when every hole of all three

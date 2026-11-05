@@ -134,11 +134,11 @@ function checkHole(S, h) {
   const S = require('./sim.cjs').loadSim();
   const STRICT = process.env.PUTTX_ALL_WORLDS === '1';
   const worlds = S.allCourses();
-  if (STRICT) check('all thirty courses are registered (plus the bonus nine)', worlds.filter(w => w !== S.BONUS).length === 30, worlds.join());
+  if (STRICT) check('all thirty courses are registered (plus the extras: the classic and the bonus nine)', worlds.filter(w => !S.isExtra(w)).length === 30, worlds.join());
   for (const w of worlds) check(`course ${w}: ${S.HOLES_PER} holes`, S.WORLDS[w].holes.length === (w === S.BONUS ? 9 : S.HOLES_PER) || !STRICT, 'has ' + S.WORLDS[w].holes.length);
   for (const w of worlds) {
     const hs = S.WORLDS[w].holes, auto = hs.filter(h => h.auto).length, crazy = hs.filter(h => h.crazy).length;
-    check(`course ${w}: at most 2 auto holes, 3 to 6 crazy holes`, auto <= 2 && ((crazy >= 3 && crazy <= 6) || w === S.BONUS || !STRICT), `auto ${auto}, crazy ${crazy}`);
+    check(`course ${w}: at most 2 auto holes, 3 to 6 crazy holes`, auto <= 2 && ((crazy >= 3 && crazy <= 6) || S.isExtra(w) || !STRICT), `auto ${auto}, crazy ${crazy}`);
   }
   check('at least one course registered', worlds.length > 0);
   const keys = worlds.flatMap(w => S.WORLDS[w].holes.map(h => h.key));

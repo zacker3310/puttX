@@ -514,7 +514,11 @@ const COURSE_STEP = 10, COURSES_PER = 3;
 const coursesOf = w => Array.from({ length: COURSES_PER }, (_, k) => w + k * COURSE_STEP).filter(c => WORLDS[c]);
 /* the bonus nine: a practice course of its own, always open, every hole playable from the start */
 const BONUS = 99;
-const allCourses = () => WORLD_ORDER.flatMap(coursesOf).concat(WORLDS[BONUS] ? [BONUS] : []);
+/* the Putt-Putt classic: the original kind of course (flat carpet, aluminium bumpboards, every hole a
+   par 2), also always open. Extra courses sit outside the worlds and unlock nothing. */
+const CLASSIC = 98, EXTRAS = [CLASSIC, BONUS];
+const isExtra = w => EXTRAS.includes(Number(w));
+const allCourses = () => WORLD_ORDER.flatMap(coursesOf).concat(EXTRAS.filter(c => WORLDS[c]));
 const worldOf = c => ((c % 100) - 1) % COURSE_STEP + 1;
 
 /* ---- 2g. progress (pure; section 3 stores it) ---- */
@@ -529,12 +533,12 @@ function recordHole(p, key, score, par, maxStars = 3) {
   if (WORLDS[w] && n === WORLDS[w].holes.length && w + COURSE_STEP <= worldOf(w) + (COURSES_PER - 1) * COURSE_STEP) open(w + COURSE_STEP);
   /* the next world opens only once every hole of every course in this world is finished */
   const home = worldOf(w), j = list.indexOf(home);
-  if (w !== BONUS && j >= 0 && j + 1 < list.length && coursesOf(home).every(c => WORLDS[c].holes.every(hd => p.holes[hd.key]))) open(list[j + 1]);
+  if (!isExtra(w) && j >= 0 && j + 1 < list.length && coursesOf(home).every(c => WORLDS[c].holes.every(hd => p.holes[hd.key]))) open(list[j + 1]);
   return rec;
 }
 function holeUnlocked(p, key) {
   const [w, n] = key.split('-').map(Number);
-  if (w === BONUS) return !!WORLDS[BONUS];
+  if (isExtra(w)) return !!WORLDS[w];
   return p.worlds.includes(w) && (n === 1 || !!p.holes[w + '-' + (n - 1)]);
 }
 /* ---- 2h. course packs ---- */
@@ -662,6 +666,8 @@ function setAmbience(look, h) {
   amb.bed = { src, g };
 }
 function tickAmbience(dt) {
+  /* the audio wakes on the first touch, often mid-hole: start this hole's bed then */
+  if (actx && master && !amb.key && play.hole) setAmbience(lookOf(holeWorld(play.hole)), play.hole);
   if (!actx || !master || currentScene !== 'hole') { if (amb.bed && actx) amb.bed.g.gain.setTargetAtTime(0, actx.currentTime, 0.3); return; }
   if (amb.bed) amb.bed.g.gain.setTargetAtTime(amb.key.startsWith('true') ? 0.05 : 0.07, actx.currentTime, 0.6);
   if ((amb.next -= dt) > 0) return;
@@ -704,7 +710,7 @@ const NIGHT_SKY = ['#05020f', '#2a0b4d'];
 const NEON = ['#ff3df2', '#2ef2ff', '#b6ff2e', '#ffb02e', '#8b5cff'];
 const lookOf = w => {
   /* a world's later courses inherit its first course's look and override what they like */
-  const day = Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[worldOf(w)], w !== worldOf(w) ? WORLD_LOOK[w] : null);
+  const day = w === CLASSIC ? Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[w]) : Object.assign({}, DEFAULT_LOOK, WORLD_LOOK[worldOf(w)], w !== worldOf(w) ? WORLD_LOOK[w] : null);
   if (!progress.neon) return day;
   /* night is cosmic bowling: black-light carpet, neon tube walls, a glowing ball, a grid to the horizon */
   return Object.assign(day, { night: true, sky: NIGHT_SKY.slice(), fog: true, felt: '#120b2e', ground: '#06030f', skirt: '#1a0f3d', wall: '#1d1240',
@@ -1153,7 +1159,8 @@ function cupGroup(h, look) {
   const g = new THREE.Group(), y = groundH(h, h.cup[0], h.cup[1]);
   g.name = 'cup'; g.position.set(h.cup[0], y, h.cup[1]);
   const SEG = 64, CUT = 0.018;
-  const soil = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUT, SEG, 1, true), mat('#4a3626', { roughness: 1, side: THREE.BackSide })); soil.position.y = -CUT / 2 + 0.001;
+  /* the cut band above the liner is painted white, as on a tournament green */
+  const soil = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R, CUP_R, CUT, SEG, 1, true), mat(look.night ? '#2b2620' : '#eeeae0', { roughness: 0.9, side: THREE.BackSide })); soil.position.y = -CUT / 2 + 0.001;
   const liner = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R - 0.002, CUP_R - 0.002, CUP_SINK - CUT, SEG, 1, true), mat('#f4f1ea', { roughness: 0.55, side: THREE.BackSide })); liner.position.y = -CUT - (CUP_SINK - CUT) / 2;
   const lip = new THREE.Mesh(new THREE.RingGeometry(CUP_R - 0.006, CUP_R - 0.001, SEG), mat('#ffffff', { roughness: 0.4 })); lip.rotation.x = -Math.PI / 2; lip.position.y = -CUT;
   const bottom = new THREE.Mesh(new THREE.CircleGeometry(CUP_R, SEG), mat('#2b2620', { roughness: 1 })); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_SINK;
@@ -1165,12 +1172,12 @@ function cupGroup(h, look) {
   flagGroup = new THREE.Group(); flagGroup.name = 'flag';
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.8, 12), mat('#fffdf7', { roughness: 0.35 })); pole.position.y = 0.3; pole.castShadow = true;
   const band = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.05, 12), mat(look.flag, { roughness: 0.4 })); band.position.y = 0.5;
-  const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.quadraticCurveTo(0.12, -0.03, 0.22, -0.06); shape.lineTo(0.2, -0.1); shape.quadraticCurveTo(0.1, -0.12, 0, -0.14);
-  /* a real course flag: the hole's number printed on it, the right way round on both faces */
-  const flagGeo = new THREE.ShapeGeometry(shape, 8), n = h.key.split('-')[1];
-  const face = flip => { const t = flagTexture(look.flag, n); t.repeat.set((flip ? -1 : 1) / 0.22, 1 / 0.14); t.offset.set(flip ? 1 : 0, 1); return t; };
-  const flag = new THREE.Mesh(flagGeo, mat('#ffffff', { map: face(false), side: THREE.FrontSide, roughness: 0.75 })), back = new THREE.Mesh(flagGeo, mat('#ffffff', { map: face(true), side: THREE.BackSide, roughness: 0.75 }));
-  for (const f of [flag, back]) { f.position.set(0.007, 0.69, 0); f.castShadow = true; }
+  /* a real course flag: the hole's number printed on it, the right way round on both faces, waving
+     in the breeze (a vertex wave that grows toward the fly end; its shadow waves too) */
+  const flagGeo = new THREE.PlaneGeometry(0.22, 0.14, 12, 4).translate(0.11, -0.07, 0), n = h.key.split('-')[1];
+  const face = flip => { const t = flagTexture(look.flag, n); t.repeat.set(flip ? -1 : 1, 1); t.offset.set(flip ? 1 : 0, 0); return t; };
+  const flag = new THREE.Mesh(flagGeo, waveMat(mat('#ffffff', { map: face(false), side: THREE.FrontSide, roughness: 0.75 }))), back = new THREE.Mesh(flagGeo, waveMat(mat('#ffffff', { map: face(true), side: THREE.BackSide, roughness: 0.75 })));
+  for (const f of [flag, back]) { f.position.set(0.007, 0.69, 0); f.castShadow = true; f.customDepthMaterial = waveMat(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking })); }
   const ball = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), mat('#fffdf7', { roughness: 0.35 })); ball.position.y = 0.705;
   flagGroup.add(pole, band, flag, back, ball);
   /* the cup's brushed metal ferrule, the ring a real cup shows just below the turf */
@@ -1178,6 +1185,16 @@ function cupGroup(h, look) {
   ferrule.rotation.x = Math.PI / 2; ferrule.position.y = -CUT + 0.002;
   g.add(soil, liner, lip, ferrule, bottom, drain, shade, flagGroup);
   return g;
+}
+function waveMat(m) {
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uT = FX_TIME;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uT;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        float k = position.x / 0.22; transformed.z += sin( position.x * 28.0 - uT * 6.0 ) * 0.012 * k; transformed.y -= 0.01 * k * k;`);
+  };
+  m.customProgramCacheKey = () => 'flag-wave-' + m.type;
+  return m;
 }
 function flagTexture(hex, n) {
   return canvasTex(128, 96, x => {
@@ -1310,6 +1327,8 @@ function scatterProps(group, h, look) {
 const TEX_SLOTS = ['map', 'normalMap', 'roughnessMap', 'bumpMap', 'emissiveMap', 'alphaMap', 'aoMap', 'clearcoatNormalMap'];
 function disposeGroup(g) {
   g.traverse(o => {
+    if (o.isInstancedMesh) o.dispose();   /* frees its per-instance buffers */
+    if (o.customDepthMaterial) o.customDepthMaterial.dispose();
     if (o.geometry) o.geometry.dispose();
     const ms = o.material ? [].concat(o.material) : [];
     for (const m of ms) { for (const k of TEX_SLOTS) if (m[k] && !(m[k].userData && m[k].userData.keep)) m[k].dispose(); m.dispose(); }
@@ -1395,6 +1414,92 @@ function groundMaterial(look) {
   const t = texOf(grainCanvas('ground', look.ground, { scale: 96, contrast: 0.22, speck: 0.16, seed: 3 }), true, 48), n = texOf(normalCanvas('ground', 128, fbm(91, 8, 3), 2.5), false, 48);
   return mat('#ffffff', { map: t, normalMap: n, roughness: 1, depthWrite: false, vertexColors: true });
 }
+/* the border's cap rail: one merged mesh of slightly wider boards along every wall's top, so each
+   border reads as a built thing (a timber cap, a stone coping, a steel rail top) */
+const CAP_COL = { wood: 0.72, stone: 1.12, brick: 1.08, steel: 1.18, marble: 1.06, paint: 0.9 };
+function wallCaps(h, look) {
+  if (look.night) return null;
+  const kind = look.wallKind || WALL_KIND_OF[worldOf(holeWorld(h))] || 'wood', pos = [], nor = [], uv = [], idx = [], m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+  h.segs.forEach(([ax, az, bx, bz], i) => {
+    const len = Math.hypot(bx - ax, bz - az), g = scaleBoxUV(new THREE.BoxGeometry(WALL_HALF * 2 + 0.014, 0.016, len + 0.008), len, 0.016, WALL_HALF * 2);
+    m4.compose(new THREE.Vector3((ax + bx) / 2, h.segTop[i][0] - 0.0075, (az + bz) / 2), q.setFromAxisAngle(up, Math.atan2(bx - ax, bz - az)), new THREE.Vector3(1, 1, 1));
+    g.applyMatrix4(m4);
+    const base = pos.length / 3, P = g.attributes.position, N = g.attributes.normal, U = g.attributes.uv;
+    for (let k = 0; k < P.count; k++) { pos.push(P.getX(k), P.getY(k), P.getZ(k)); nor.push(N.getX(k), N.getY(k), N.getZ(k)); uv.push(U.getX(k), U.getY(k)); }
+    for (let k = 0; k < g.index.count; k++) idx.push(base + g.index.getX(k));
+    g.dispose();
+  });
+  if (!pos.length) return null;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  const c = new THREE.Color(look.wall).multiplyScalar(CAP_COL[kind] || 1);
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0xffffff, map: texOf(wallCanvas(kind, '#' + c.getHexString())), normalMap: texOf(wallNormalCanvas(kind), false), roughness: kind === 'steel' ? 0.38 : 0.8, metalness: kind === 'steel' ? 0.45 : 0 }));
+  m.name = 'wallCaps'; m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+/* landscaping close round the course: river rock scattered on the edging bed, and grass tufts on a
+   grassy lawn. Instanced, seeded by the hole's key, never on a floor or against a wall. */
+function landscape(h, look) {
+  if (!look.ground || look.night) return null;
+  const g = new THREE.Group(), r = rng32([...h.key].reduce((a, c) => a * 31 + c.charCodeAt(0), 11)), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), col = new THREE.Color();
+  const edges = [];
+  for (const f of h.floors) {
+    if (f.some(([x, z]) => Math.abs(groundH(h, x, z)) > 0.02)) continue;
+    let area = 0;
+    for (let i = 0; i < f.length; i++) { const a = f[i], b = f[(i + 1) % f.length]; area += a[0] * b[1] - b[0] * a[1]; }
+    for (let i = 0; i < f.length; i++) { const [ax, az] = f[i], [bx, bz] = f[(i + 1) % f.length], L = Math.hypot(bx - ax, bz - az); if (L > 0.05) edges.push([ax, az, bx, bz, L, area > 0 ? 1 : -1]); }
+  }
+  if (!edges.length) return null;
+  const total = edges.reduce((a, e) => a + e[4], 0), clear = (x, z, d) => !h.floors.some(f => inPoly(f, x, z)) && h.segs.every(s => { const c = closestOnSeg(s[0], s[1], s[2], s[3], x, z); return Math.hypot(x - c[0], z - c[1]) > d; });
+  const pick = (o0, o1) => {
+    let u = r() * total;
+    for (const [ax, az, bx, bz, L, sg] of edges) {
+      if ((u -= L) > 0) continue;
+      const t = r(), nx = (bz - az) / L * sg, nz = -(bx - ax) / L * sg, o = o0 + r() * (o1 - o0);
+      return [ax + (bx - ax) * t + nx * o, az + (bz - az) * t + nz * o];
+    }
+    return null;
+  };
+  const e = look.edging || EDGING_OF[worldOf(holeWorld(h))];
+  if (e) {
+    /* river rock: flattened little dodecahedra, grey to warm, on the bed */
+    const n = Math.min(260, Math.round(total * 9)), rocks = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 0), new THREE.MeshStandardMaterial({ roughness: 0.85 }), n);
+    let k = 0;
+    for (let tries = 0; k < n && tries < n * 6; tries++) {
+      const at = pick(WALL_HALF + 0.05, WALL_HALF + 0.3);
+      if (!at || !clear(at[0], at[1], WALL_HALF + 0.04)) continue;
+      const s = 0.012 + r() * 0.022;
+      m4.compose(p.set(at[0], -0.03 + s * 0.35, at[1]), q.setFromAxisAngle(sc.set(r(), r(), r()).normalize(), r() * 6.28), sc.set(s * (1 + r() * 0.5), s * 0.55, s));
+      rocks.setMatrixAt(k, m4); rocks.setColorAt(k++, col.set(e[1]).multiplyScalar(0.75 + r() * 0.5));
+    }
+    rocks.count = k; rocks.receiveShadow = true; rocks.instanceMatrix.needsUpdate = true; if (rocks.instanceColor) rocks.instanceColor.needsUpdate = true;
+    if (k) g.add(rocks); else rocks.geometry.dispose();
+  }
+  const hsl = {}; new THREE.Color(look.ground).getHSL(hsl);
+  if (hsl.h > 0.15 && hsl.h < 0.45 && hsl.l > 0.12 && hsl.l < 0.6) {
+    /* grass tufts: a few lean blades each, solid (no alpha test), lit like the ground they stand on */
+    const pos = [], cl = [], nor = [], tr = rng32(5);
+    for (let b = 0; b < 7; b++) {
+      const a = b / 7 * Math.PI * 2 + tr() * 0.5, lean = 0.25 + tr() * 0.35, hgt = 0.05 + tr() * 0.05, w = 0.004, cx = Math.cos(a), cz = Math.sin(a);
+      pos.push(-cz * w, 0, cx * w, cz * w, 0, -cx * w, cx * hgt * lean, hgt, cz * hgt * lean);
+      cl.push(0.3, 0.4, 0.16, 0.3, 0.4, 0.16, 0.72, 0.82, 0.42); nor.push(0, 1, 0, 0, 1, 0, 0, 1, 0);
+    }
+    const tg = new THREE.BufferGeometry();
+    tg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); tg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); tg.setAttribute('color', new THREE.Float32BufferAttribute(cl, 3));
+    const n = Math.min(500, Math.round(total * 18)), tufts = new THREE.InstancedMesh(tg, new THREE.MeshStandardMaterial({ vertexColors: true, side: THREE.DoubleSide, roughness: 0.9 }), n);
+    let k = 0;
+    for (let tries = 0; k < n && tries < n * 6; tries++) {
+      const at = pick(WALL_HALF + 0.36, WALL_HALF + 1.2);
+      if (!at || !clear(at[0], at[1], WALL_HALF + 0.3)) continue;
+      m4.compose(p.set(at[0], -0.03, at[1]), q.setFromAxisAngle(sc.set(0, 1, 0), r() * 6.28), sc.setScalar(0.7 + r() * 0.8));
+      tufts.setMatrixAt(k, m4); tufts.setColorAt(k++, col.setHSL(hsl.h + (r() - 0.5) * 0.05, 0.45, 0.42 + r() * 0.12));
+    }
+    tufts.count = k; tufts.receiveShadow = true; tufts.instanceMatrix.needsUpdate = true; if (tufts.instanceColor) tufts.instanceColor.needsUpdate = true;
+    if (k) g.add(tufts); else tufts.geometry.dispose();
+  }
+  g.name = 'landscape';
+  return g.children.length ? g : null;
+}
 /* landscaping: a bed of mulch or river rock round the course's outline, as real courses have */
 const EDGING_OF = { 1: ['rock', '#9a9086'], 2: ['rock', '#c08a5a'], 3: ['mulch', '#6b4a2e'], 4: ['rock', '#c9d6de'], 5: ['rock', '#d8c39a'], 6: ['rock', '#3a3236'], 7: ['mulch', '#4a3a3a'], 9: ['mulch', '#c98a5a'] };
 function edgingGroup(h, look) {
@@ -1436,6 +1541,7 @@ function buildHoleScene(h) {
   const skirt = new THREE.Mesh(skirtGeometry(h, look.ground ? -0.03 : -0.5), mat('#ffffff', { map: texOf(wallCanvas('stone', look.skirt)), normalMap: texOf(wallNormalCanvas('stone'), false), roughness: 0.92, side: THREE.DoubleSide }));
   skirt.name = 'skirt'; holeGroup.add(skirt);
   holeGroup.add(wallGroup(h, wallMaterial(look, holeWorld(h))), cupGroup(h, look), tubeGroup(h), teeGroup(h, look));
+  const caps = wallCaps(h, look); if (caps) holeGroup.add(caps);
   for (const p of h.posts) { const o = (look.post || defaultPost)(p, look); o.position.set(p.x, groundH(h, p.x, p.z), p.z); holeGroup.add(o); }
   for (const mv of h.movers) { const o = (look.mover || defaultMover)(mv, look); o.userData.mover = mv; moverMeshes.push(o); holeGroup.add(o); }
   if (look.ground) {
@@ -1446,6 +1552,7 @@ function buildHoleScene(h) {
     const gr = new THREE.Mesh(gg, groundMaterial(look));
     gr.rotation.x = -Math.PI / 2; gr.position.y = -0.03; gr.receiveShadow = true; gr.renderOrder = -1; holeGroup.add(gr);
     const ed = edgingGroup(h, look); if (ed) holeGroup.add(ed);
+    const ls = landscape(h, look); if (ls) holeGroup.add(ls);
   }
   for (const dr of h.drains) holeGroup.add(drainSpiral(h, dr));
   if (look.prop) scatterProps(holeGroup, h, look);
@@ -2082,7 +2189,8 @@ function startSink(vx, vz) {
   /* from exactly where the cup caught it: no jump inward */
   /* the physics hands over a ball already part way down: carry on from its height and fall speed */
   const y = Math.min(0, b.y - groundH(h, h.cup[0], h.cup[1])), vy = play.phase === 'sunk' ? Math.min(0, b.vy || 0) : 0;
-  play.fx.sink = { x: b.x - h.cup[0], z: b.z - h.cup[1], y, vx: vx * k, vz: vz * k, vy, walls: 0, floor: false };
+  /* a ball the physics already dropped below the lip skips the tip-over-the-lip part */
+  play.fx.sink = { x: b.x - h.cup[0], z: b.z - h.cup[1], y, vx: vx * k, vz: vz * k, vy, walls: 0, floor: false, below: y < -BALL_R * 0.5 };
 }
 function stepSink(dt) {
   const k = play.fx.sink, lim = CUP_R - BALL_R - 0.003, floor = -(CUP_SINK - 0.004);
@@ -2093,7 +2201,7 @@ function stepSink(dt) {
     /* over the lip: until the whole ball is inside the rim it rests on the rim's edge, so it tips
        over it (sinking as it goes, and pulled inward by the tilt) instead of dropping like a stone */
     const e = CUP_R - r;
-    if (e < BALL_R && r > 1e-6) {
+    if (e < BALL_R && r > 1e-6 && !k.below) {
       const lipY = -(BALL_R - Math.sqrt(Math.max(0, BALL_R * BALL_R - Math.max(0, e) ** 2)));
       if (k.y < lipY) { k.y = lipY; k.vy = Math.max(k.vy, 0) * 0.5 + (lipY - k.y); }
       const pull = G * 0.6 * Math.min(1, Math.max(0, e) / BALL_R + 0.25);
@@ -2771,6 +2879,8 @@ function initExtras() {
 /* ============ 7. SCENES ============ */
 const STAR_SVG = '<svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg>';
 const BONUS_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 L40 22 L61 24 L45 38 L50 59 L32 48 L14 59 L19 38 L3 24 L24 22 Z" fill="#ff3df2" stroke="#2ef2ff" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="34" r="9" fill="#fffdf7"/></svg>';
+/* the classic: a straight carpet lane between silver rails, the cup and its flag */
+const CLASSIC_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="12" y="6" width="40" height="54" rx="4" fill="#2e8a46" stroke="#c9ced6" stroke-width="5"/><circle cx="32" cy="18" r="5" fill="#1d150e"/><path d="M32 18 V4" stroke="#fffdf7" stroke-width="3"/><path d="M33 4 L44 8 L33 12 Z" fill="#ef7d6d"/><circle cx="32" cy="50" r="4" fill="#fffdf7"/></svg>';
 const CRAZY_SVG = '<svg class="crazy" viewBox="0 0 64 64" aria-hidden="true"><path d="M36 2 L12 36 H30 L24 62 L52 24 H34 Z" fill="#ffd66e" stroke="#c95a4c" stroke-width="4" stroke-linejoin="round"/></svg>';
 const LOCK_SVG = '<svg class="lock" viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#a3916d"/><path d="M20 28 V20 A12 12 0 0 1 44 20 V28" fill="none" stroke="#a3916d" stroke-width="7"/></svg>';
 /* 18 holes in a snake: left to right along the top row, back along the bottom */
@@ -2815,7 +2925,7 @@ function showWorlds() {
     worldGrid.append(b);
   });
   soundBtn.classList.toggle('off', !progress.sound);
-  bonusBtn.classList.toggle('locked', !WORLDS[BONUS]);
+  bonusBtn.classList.toggle('locked', !WORLDS[BONUS]); classicBtn.classList.toggle('locked', !WORLDS[CLASSIC]);
   renderWallet();
 }
 /* a world's map, Mario style: its three courses along one winding road, left to right. Gold when
@@ -2873,7 +2983,7 @@ function slotSummary(n) {
   if (!holes.length) return null;
   shopRepair(p);
   const b = SHOP_ITEMS[p.equipped.ball];
-  return { stars: holes.reduce((a, r) => a + r.stars, 0), coins: p.coins, world: Math.max(...p.worlds.filter(c => c !== BONUS).map(worldOf)), ball: b };
+  return { stars: holes.reduce((a, r) => a + r.stars, 0), coins: p.coins, world: Math.max(...p.worlds.filter(c => !isExtra(c)).map(worldOf)), ball: b };
 }
 function useSlot(n) {
   slot = n; SAVE_KEY = slotKey(n);
@@ -2950,8 +3060,8 @@ function showMap(w) {
   renderMap();
 }
 function renderMap() {
-  const w = worldOf(mapWorld), k = coursesOf(w).indexOf(mapWorld) + 1, bonus = mapWorld === BONUS;
-  mapBadge.querySelector('.ic').innerHTML = bonus ? BONUS_SVG : lookOf(w).icon || ''; mapBadgeN.textContent = bonus ? WORLDS[BONUS].holes.length : k;
+  const w = worldOf(mapWorld), k = coursesOf(w).indexOf(mapWorld) + 1, bonus = mapWorld === BONUS, classic = mapWorld === CLASSIC;
+  mapBadge.querySelector('.ic').innerHTML = bonus ? BONUS_SVG : classic ? CLASSIC_SVG : lookOf(w).icon || ''; mapBadgeN.textContent = bonus || classic ? WORLDS[mapWorld].holes.length : k;
   mapBadge.classList.toggle('night', !!progress.neon);
   const sky = lookOf(mapWorld).sky;
   map.style.background = progress.neon ? 'linear-gradient(#05020f, #2a0b4d)' : `linear-gradient(${sky[0]}, ${sky[1]})`;
@@ -3025,7 +3135,7 @@ function showCard(w) {
   cardTotal.textContent = total;
   cardDiff.textContent = (diff > 0 ? '+' : '') + diff;
   cardStars.innerHTML = STAR_SVG + `<span>${stars}</span>`;
-  const list = playable(), d = w, nd = w === BONUS ? null : WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd;
+  const list = playable(), d = w, nd = isExtra(w) ? null : WORLDS[d + COURSE_STEP] && worldOf(d + COURSE_STEP) === worldOf(d) ? d + COURSE_STEP : list[list.indexOf(worldOf(d)) + 1], next = nd;
   cardNext.style.display = next && progress.worlds.includes(next) ? '' : 'none';
   cardNext.onclick = () => { sfx('tap'); showWorld(worldOf((next))); };
   showScene('card');
@@ -3176,9 +3286,10 @@ function boot() {
   profilesBack.addEventListener('click', () => { sfx('tap'); showTitle(); });
   worldsHome.addEventListener('click', () => { sfx('tap'); showProfiles(); });
   worldBack.addEventListener('click', () => { sfx('tap'); showWorlds(); });
-  mapBack.addEventListener('click', () => { sfx('tap'); if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
+  mapBack.addEventListener('click', () => { sfx('tap'); if (isExtra(mapWorld)) showWorlds(); else showWorld(worldOf(mapWorld)); });
   bonusBtn.addEventListener('click', () => { if (WORLDS[BONUS]) { sfx('tap'); showMap(BONUS); } else sfx('boink'); });
-  cardMap.addEventListener('click', () => { sfx('tap'); const was = party.on; endParty(); if (was) showMap(mapWorld); else if (mapWorld === BONUS) showWorlds(); else showWorld(worldOf(mapWorld)); });
+  classicBtn.addEventListener('click', () => { if (WORLDS[CLASSIC]) { sfx('tap'); showMap(CLASSIC); } else sfx('boink'); });
+  cardMap.addEventListener('click', () => { sfx('tap'); const was = party.on; endParty(); if (was) showMap(mapWorld); else if (isExtra(mapWorld)) showWorlds(); else showWorld(worldOf(mapWorld)); });
   soundBtn.addEventListener('click', () => { setSound(!progress.sound); soundBtn.classList.toggle('off', !progress.sound); sfx('tap'); });
   doneRetry.addEventListener('click', () => goHole(play.key, { daily: play.daily, friend: play.friend }));
   initExtras();

@@ -26,15 +26,45 @@ function c2Boulder(r, seed, color = '#c8693e') {
   const m = new THREE.Mesh(geo, mat(color, { roughness: 1, flatShading: true })); m.position.y = r * 0.6; m.castShadow = true;
   const g = new THREE.Group(); g.add(m); return g;
 }
+/* a tumbleweed: a loose, see-through tangle of thin, curving, tapering twigs, straw to weathered grey,
+   as wide as the mover's collision circle. One merged mesh (three-sided tubes) so it stays cheap. */
 function c2Tumbleweed(m) {
-  const g = new THREE.Group(), inner = new THREE.Group(), rr = rng32(Math.round(m.ax * 97 + m.az * 13) + 5);
-  const twig = mat('#b8935a', { roughness: 1 });
-  for (let i = 0; i < 7; i++) {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(m.r * (0.75 + rr() * 0.25), 0.012, 4, 14), twig);
-    ring.rotation.set(rr() * Math.PI, rr() * Math.PI, rr() * Math.PI); ring.castShadow = true; inner.add(ring);
+  const g = new THREE.Group(), inner = new THREE.Group(), rr = rng32(Math.round(m.ax * 97 + m.az * 13) + 5), R = m.r;
+  const pos = [], col = [], idx = [], straw = new THREE.Color('#d6bf8f'), dry = new THREE.Color('#8a7556'), c = new THREE.Color();
+  const p = new THREE.Vector3(), d = new THREE.Vector3(), n = new THREE.Vector3(), b = new THREE.Vector3(), q = new THREE.Vector3(), axis = new THREE.Vector3();
+  const rand3 = v => { do v.set(rr() * 2 - 1, rr() * 2 - 1, rr() * 2 - 1); while (v.lengthSq() > 1 || v.lengthSq() < 1e-4); return v.normalize(); };
+  for (let t = 0; t < 115; t++) {
+    const S = 5, len = R * (0.7 + rr() * 0.8), w0 = R * (0.018 + rr() * 0.016);
+    rand3(p).multiplyScalar(R * (0.3 + 0.7 * Math.sqrt(rr())));
+    /* mostly tangent to the ball, so the twigs wrap round it the way a real one grows */
+    rand3(d); q.copy(p).normalize(); d.addScaledVector(q, -0.75 * d.dot(q)).normalize();
+    c.copy(straw).lerp(dry, rr()).multiplyScalar(0.8 + rr() * 0.35);
+    const base = pos.length / 3;
+    for (let k = 0; k <= S; k++) {
+      if (k) {
+        p.addScaledVector(d, len / S);
+        if (p.length() > R * 0.97) { p.setLength(R * 0.97); q.copy(p).normalize(); d.addScaledVector(q, -1.6 * d.dot(q)).normalize(); }
+        d.applyAxisAngle(rand3(axis), (rr() - 0.5) * 1.1).normalize();
+      }
+      n.set(0, 1, 0).cross(d); if (n.lengthSq() < 1e-6) n.set(1, 0, 0).cross(d); n.normalize(); b.copy(d).cross(n);
+      const w = w0 * (1 - 0.6 * k / S);
+      for (let j = 0; j < 3; j++) {
+        const a = j * 2.0944;
+        pos.push(p.x + (n.x * Math.cos(a) + b.x * Math.sin(a)) * w, p.y + (n.y * Math.cos(a) + b.y * Math.sin(a)) * w, p.z + (n.z * Math.cos(a) + b.z * Math.sin(a)) * w);
+        col.push(c.r, c.g, c.b);
+      }
+      if (k) for (let j = 0; j < 3; j++) {
+        const i0 = base + (k - 1) * 3 + j, i1 = base + (k - 1) * 3 + (j + 1) % 3, i2 = base + k * 3 + j, i3 = base + k * 3 + (j + 1) % 3;
+        idx.push(i0, i2, i1, i1, i2, i3);
+      }
+    }
   }
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(m.r * 0.55, 0), mat('#a07a46', { roughness: 1, flatShading: true }));
-  inner.add(core); g.add(inner); g.userData.weed = inner; return g;
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  geo.setIndex(idx); geo.computeVertexNormals();
+  const tangle = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, side: THREE.DoubleSide }));
+  tangle.castShadow = true; inner.add(tangle); g.add(inner); g.userData.weed = inner;
+  return g;
 }
 function c2Butte(r, w, hgt) {
   /* a flat-topped sandstone tower in strata, rising from the canyon floor */
@@ -117,6 +147,9 @@ WORLD_LOOK[2] = {
       /* roll about the axis across the direction of travel, undoing the parent's slow yaw */
       const ax = new THREE.Vector3(s.vz / v, 0, -s.vx / v).applyAxisAngle(new THREE.Vector3(0, 1, 0), -o.rotation.y);
       inner.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(ax, v * dt / m.r));
+      /* a tumbleweed skips as it rolls: a small hop each half turn */
+      inner.userData.roll = (inner.userData.roll || 0) + v * dt / m.r;
+      inner.position.y = m.r * 0.12 * Math.abs(Math.sin(inner.userData.roll * 0.5));
     });
   },
 };

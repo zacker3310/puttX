@@ -24,4 +24,7 @@ Spec: [[SPEC]]. v1 (T1-T4) shipped 27 holes for a 3-5 year old; v2 retargets 12 
 
 ## Next
 
+- **UI overhaul (paused):** multiplayer into the options, a polished UI for older players, a new app
+  icon and favicon. The design round is done (Clubhouse won); see `docs/UI_OVERHAUL.md` to pick it up.
+
 The ranked 20 in `docs/RESEARCH.md`: ghost ball, shot readout extensions, intentional spin, three-objective stars, lost balls, night remixes, and more.

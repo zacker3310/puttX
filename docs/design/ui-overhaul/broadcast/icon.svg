@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>PuttX</title>
+  <defs>
+    <radialGradient id="pxBg" cx=".32" cy=".24" r="1.02">
+      <stop offset="0" stop-color="#30363F"/>
+      <stop offset=".52" stop-color="#15181D"/>
+      <stop offset="1" stop-color="#060708"/>
+    </radialGradient>
+    <linearGradient id="pxHole" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000"/>
+      <stop offset=".55" stop-color="#030405"/>
+      <stop offset="1" stop-color="#232A33"/>
+    </linearGradient>
+    <linearGradient id="pxRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E2FF6A"/>
+      <stop offset="1" stop-color="#C4F21F"/>
+    </linearGradient>
+    <radialGradient id="pxBall" cx=".34" cy=".28" r=".8">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset=".5" stop-color="#EEF1F4"/>
+      <stop offset="1" stop-color="#A9B1BC"/>
+    </radialGradient>
+    <filter id="pxSh" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="20"/></filter>
+    <clipPath id="pxBc"><circle cx="668" cy="420" r="152"/></clipPath>
+  </defs>
+  <!-- the plate: graphite, lit from the top left -->
+  <rect width="1024" height="1024" rx="228" fill="url(#pxBg)"/>
+  <rect x="2" y="2" width="1020" height="1020" rx="226" fill="none" stroke="#fff" stroke-opacity=".06" stroke-width="4"/>
+  <!-- the cup from above: a black hole inside a volt rim -->
+  <circle cx="486" cy="598" r="200" fill="url(#pxHole)"/>
+  <circle cx="486" cy="598" r="236" fill="none" stroke="url(#pxRim)" stroke-width="72"/>
+  <!-- the ball on the lip, about to drop -->
+  <ellipse cx="648" cy="474" rx="140" ry="118" fill="#000" opacity=".5" filter="url(#pxSh)"/>
+  <circle cx="668" cy="420" r="152" fill="url(#pxBall)"/>
+  <g clip-path="url(#pxBc)" fill="#0B0D10" opacity=".06">
+    <circle cx="612" cy="344" r="15"/><circle cx="662" cy="332" r="15"/><circle cx="712" cy="344" r="15"/>
+    <circle cx="588" cy="388" r="15"/><circle cx="638" cy="380" r="15"/><circle cx="688" cy="380" r="15"/><circle cx="738" cy="388" r="15"/>
+    <circle cx="604" cy="432" r="15"/><circle cx="654" cy="426" r="15"/><circle cx="704" cy="426" r="15"/><circle cx="754" cy="432" r="15"/>
+    <circle cx="622" cy="476" r="15"/><circle cx="672" cy="472" r="15"/><circle cx="722" cy="476" r="15"/>
+    <circle cx="652" cy="516" r="15"/><circle cx="702" cy="516" r="15"/>
+  </g>
+</svg>

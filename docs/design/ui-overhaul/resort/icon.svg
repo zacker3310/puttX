@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>PuttX</title>
+  <defs>
+    <radialGradient id="ink" cx=".5" cy=".3" r=".85">
+      <stop offset="0" stop-color="#2B3B3B"/>
+      <stop offset="1" stop-color="#162022"/>
+    </radialGradient>
+    <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="150" x2="0" y2="900">
+      <stop offset="0" stop-color="#F7D9B6"/>
+      <stop offset=".5" stop-color="#EFAA80"/>
+      <stop offset="1" stop-color="#D0653D"/>
+    </linearGradient>
+    <linearGradient id="hill" gradientUnits="userSpaceOnUse" x1="0" y1="700" x2="0" y2="1024">
+      <stop offset="0" stop-color="#9DB495"/>
+      <stop offset="1" stop-color="#7F9A7F"/>
+    </linearGradient>
+    <linearGradient id="green" gradientUnits="userSpaceOnUse" x1="0" y1="800" x2="0" y2="1024">
+      <stop offset="0" stop-color="#55745A"/>
+      <stop offset="1" stop-color="#3F5C47"/>
+    </linearGradient>
+    <clipPath id="arch"><path d="M160 1024 V512 A352 352 0 0 1 864 512 V1024 Z"/></clipPath>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#ink)"/>
+  <!-- the arch: a mid-century doorway onto a sunset green -->
+  <g clip-path="url(#arch)">
+    <rect x="160" y="150" width="704" height="874" fill="url(#sky)"/>
+    <circle cx="484" cy="610" r="214" fill="#FCF0DE"/>
+    <!-- sunset stripes through the lower sun -->
+    <rect x="270" y="652" width="460" height="18" fill="url(#sky)"/>
+    <rect x="270" y="694" width="460" height="26" fill="url(#sky)"/>
+    <rect x="270" y="744" width="460" height="34" fill="url(#sky)"/>
+    <path d="M160 780 C 320 712, 450 712, 566 752 S 780 800, 864 760 V1024 H160 Z" fill="url(#hill)"/>
+    <path d="M160 872 C 360 812, 650 806, 864 858 V1024 H160 Z" fill="url(#green)"/>
+    <!-- the cup, the pin and its pennant, the ball -->
+    <ellipse cx="626" cy="880" rx="52" ry="15" fill="#18211F"/>
+    <rect x="610" y="318" width="32" height="566" rx="16" fill="#1E2A2C"/>
+    <path d="M636 326 L812 384 L636 442 Z" fill="#C55E3C" stroke="#C55E3C" stroke-width="10" stroke-linejoin="round"/>
+    <ellipse cx="408" cy="944" rx="54" ry="12" fill="#2F4636" opacity=".55"/>
+    <circle cx="414" cy="900" r="46" fill="#FCF8F1"/>
+    <path d="M384 882 A34 34 0 0 1 420 866" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+  </g>
+  <!-- a hairline frame round the arch, the poster's border -->
+  <path d="M120 1024 V512 A392 392 0 0 1 904 512 V1024" fill="none" stroke="#E3A83B" stroke-width="8" opacity=".55"/>
+</svg>

@@ -68,21 +68,24 @@ struct ProfilesView: View {
             HStack(alignment: .top, spacing: st.s(48)) {
                 ForEach(1...AppModel.slots, id: \.self) { n in profile(n).popIn(Double(n - 1) * 0.07) }
             }
-            .frame(maxHeight: .infinity)
+            .padding(.top, st.s(130))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }
 
     @ViewBuilder private func profile(_ n: Int) -> some View {
         let p = app.load(n), used = !(p?.holes.isEmpty ?? true)
+        // the card fills what the stage has under the top bar, above its buttons; the ball takes what is left
+        let cardH = min(420, st.h - 130 - 88 - 22 - 30), ball = max(56, min(120, cardH - 230))
         VStack(spacing: st.s(22)) {
             Button {
                 app.useSlot(n)
                 if used { app.go(.worlds) } else { app.go(.hole(app.catalog.allCourses[0].description + "-1")) }
             } label: {
                 VStack(spacing: st.s(14)) {
-                    Text("\(n)").font(Toy.font(56, st)).foregroundStyle(Toy.inkSoft)
+                    Text("\(n)").font(Toy.font(cardH < 300 ? 40 : 56, st)).foregroundStyle(Toy.inkSoft)
                     if let p, used {
-                        BallIcon().frame(width: st.s(120), height: st.s(120))
+                        BallIcon().frame(width: st.s(ball), height: st.s(ball))
                         HStack(spacing: st.s(10)) {
                             Tally(value: "\(p.holes.values.reduce(0) { $0 + $1.stars })") { StarView() }
                             Tally(value: "\(p.coins)") { Glyph.coin.image.resizable().scaledToFit() }
@@ -93,7 +96,8 @@ struct ProfilesView: View {
                             .frame(width: st.s(150), height: st.s(150)).background(Circle().fill(Toy.green))
                     }
                 }
-                .frame(width: st.s(300), height: st.s(min(420, st.h - 260)))
+                .padding(.vertical, st.s(14))
+                .frame(width: st.s(300), height: st.s(cardH))
                 .toyCard(st, radius: Toy.rXl, fill: n == app.slot && used ? Toy.surface : Toy.surface.opacity(0.96))
             }
             .buttonStyle(.plain)
@@ -161,7 +165,7 @@ struct WorldsView: View {
                 LinearGradient(colors: look.skyColors, startPoint: .top, endPoint: .bottom)
                 look.iconImage?.resizable().scaledToFit().padding(st.s(34)).opacity(open ? 1 : 0.45)
                 VStack {
-                    HStack { Text("\(w)").font(Toy.font(40, st)).foregroundStyle(Toy.inkStrong).padding(st.s(10)); Spacer() }
+                    HStack { Text("\(w)").font(Toy.font(34, st)).foregroundStyle(Toy.inkStrong).padding(.leading, st.s(16)).padding(.top, st.s(8)); Spacer() }
                     Spacer()
                     if open { Tally(value: "\(stars)") { StarView() }.padding(.bottom, st.s(10)) }
                     else { Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(48)).padding(.bottom, st.s(10)) }
@@ -202,8 +206,9 @@ struct WorldView: View {
     var body: some View {
         let look = app.look(world), cs = app.catalog.courses(ofWorld: world)
         // the web's WORLD_POS, with y as a share of a 700 px stage
-        let pos: [CGPoint] = [CGPoint(x: 230, y: 470 / 700), CGPoint(x: 600, y: 330 / 700), CGPoint(x: 970, y: 470 / 700)]
-            .map { CGPoint(x: $0.x / 1200 * st.w, y: $0.y * st.h) }
+        // (written as Doubles: CGPoint has an Int initializer, and 470 / 700 would be 0)
+        let pos: [CGPoint] = [(230.0, 470.0), (600.0, 330.0), (970.0, 470.0)]
+            .map { CGPoint(x: $0.0 / 1200 * st.w, y: $0.1 / 700 * st.h) }
         ZStack(alignment: .topLeading) {
             LinearGradient(stops: [.init(color: look.skyColors[0], location: 0), .init(color: look.skyColors[1], location: 0.62),
                                    .init(color: look.color(look.felt), location: 0.62), .init(color: look.color(look.felt), location: 1)],

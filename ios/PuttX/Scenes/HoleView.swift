@@ -13,10 +13,13 @@ struct HoleView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let view = TopView(hole: play.hole, size: geo.size)
+            let lefty = app.progress.hand == "L"
+            // the course fits the room the controls leave: the top bar above, the pad's column on the
+            // player's side, the aim buttons below
+            let pad = st.s(18 + 120 + 22), view = TopView(hole: play.hole, size: geo.size, top: st.s(130), bottom: st.s(124),
+                                                         left: lefty ? pad : st.s(24), right: lefty ? st.s(24) : pad)
             // read in body, so every sim step redraws the canvas
             let now = Snapshot(time: play.time, ball: play.ball, phase: play.phase, aim: play.aim)
-            let lefty = app.progress.hand == "L"
             ZStack(alignment: .topLeading) {
                 Color(hex: play.look.ground ?? play.look.skirt).ignoresSafeArea()
                 Canvas { ctx, _ in draw(ctx, view, now) }
@@ -159,13 +162,12 @@ struct HoleView: View {
 struct TopView {
     let size: CGSize, k: CGFloat, rot: Bool, x0: Double, z0: Double, z1: Double, ox: CGFloat, oy: CGFloat
 
-    init(hole: Hole, size: CGSize) {
+    init(hole: Hole, size: CGSize, top: CGFloat, bottom: CGFloat, left: CGFloat, right: CGFloat) {
         var xa = Double.infinity, xb = -Double.infinity, za = Double.infinity, zb = -Double.infinity
         for f in hole.data.floors { for p in f.pts { xa = min(xa, p.x); xb = max(xb, p.x); za = min(za, p.z); zb = max(zb, p.z) } }
         let pad = 0.35
         xa -= pad; xb += pad; za -= pad; zb += pad
-        let top: CGFloat = 130, bottom: CGFloat = 24, side: CGFloat = 24
-        let w = max(1, size.width - 2 * side), h = max(1, size.height - top - bottom)
+        let w = max(1, size.width - left - right), h = max(1, size.height - top - bottom)
         // across: z runs left to right (tee left, cup right), x down the screen
         let kUp = min(w / (xb - xa), h / (zb - za)), kAcross = min(w / (zb - za), h / (xb - xa))
         rot = kAcross > kUp
@@ -173,7 +175,7 @@ struct TopView {
         x0 = xa; z0 = za; z1 = zb
         self.size = size
         let cw = (rot ? zb - za : xb - xa) * k, ch = (rot ? xb - xa : zb - za) * k
-        ox = side + (w - cw) / 2; oy = top + (h - ch) / 2
+        ox = left + (w - cw) / 2; oy = top + (h - ch) / 2
     }
     func pt(_ p: Vec2) -> CGPoint {
         rot ? CGPoint(x: ox + (p.z - z0) * k, y: oy + (p.x - x0) * k) : CGPoint(x: ox + (p.x - x0) * k, y: oy + (z1 - p.z) * k)

@@ -28,8 +28,17 @@ for spec in "ipad|iPad Pro 13" "iphone|iPhone 1[6-9] Pro\$"; do
     lim 20 xcrun simctl terminate "$dev" "$BUNDLE" 2>/dev/null || true
     say "$tag: $r"
     lim 60 xcrun simctl launch "$dev" "$BUNDLE" -demo -route "$r" >/dev/null || { say "$tag: launch $r failed"; fails=$((fails+1)); continue; }
-    sleep 4
-    lim 30 xcrun simctl io "$dev" screenshot "$OUT/$tag-${r//:/-}.png" >/dev/null || { say "$tag: screenshot $r failed"; fails=$((fails+1)); }
+    # a cold launch on CI can take a while: retake until the frame is not the plain launch screen
+    f="$OUT/$tag-${r//:/-}.png"
+    for wait in 4 4 6; do
+      sleep $wait
+      lim 30 xcrun simctl io "$dev" screenshot "$f" >/dev/null || { say "$tag: screenshot $r failed"; break; }
+      python3 -c "
+import sys,zlib
+d=open(sys.argv[1],'rb').read()
+sys.exit(0 if len(d) > 150000 else 1)" "$f" && break
+      say "$tag: $r still launching"
+    done
   done
   lim 60 xcrun simctl shutdown "$dev" || true
 done

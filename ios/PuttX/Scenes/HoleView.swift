@@ -237,6 +237,7 @@ struct DoneCard: View {
             Toy.scrim.ignoresSafeArea()
             VStack(spacing: st.s(22)) {
                 HStack(spacing: st.s(8)) { ForEach(0..<3) { k in StarView(on: k < stars).frame(width: st.s(96)).popIn(0.1 + Double(k) * 0.12) } }
+                    .onAppear { for k in 0..<stars { DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 + Double(k) * 0.12) { SFX.star(k) } } }
                 HStack(spacing: st.s(18)) {
                     Text("\(score)").font(Toy.font(96, st)).foregroundStyle(Toy.inkStrong)
                     Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }
@@ -297,8 +298,8 @@ struct SwingPad: View {
         }
         guard !struck else { return }
         samples.append(sample(v, at: v.location))
-        let s0 = samples[0], last = samples[samples.count - 1]
-        play.swing = (back: max(0, last.y - s0.y), side: last.x - s0.x)
+        let s0 = samples[0], now = samples[samples.count - 1]
+        play.swing = (back: max(0, now.y - s0.y), side: now.x - s0.x)
         if let s = Stroke.from(samples, feel: feel) {
             struck = true
             last = (samples, s.clean)

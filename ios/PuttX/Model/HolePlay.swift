@@ -45,6 +45,18 @@ final class HolePlay {
     @ObservationIgnored private var acc = 0.0
     @ObservationIgnored private var link: DisplayLink?
     @ObservationIgnored var onFinish: ((Int) -> Void)?
+    /// what the borders are made of (steel rails ring, timber tocks, stone clacks)
+    @ObservationIgnored var wallKind = "wood"
+    /// the last hole of a course rings the clubhouse bell
+    @ObservationIgnored var lastOfCourse = false
+    /// game feel (pacing only; the putt's start time is fixed, so results are the same to the bit):
+    /// the hit-stop at contact, slow motion as a slow ball closes on the cup
+    @ObservationIgnored private var hold = 0.0
+    @ObservationIgnored private var slow = 1.0
+    @ObservationIgnored private var hitsHeard = 0
+    @ObservationIgnored private var lastHitSound: [HitKind: Double] = [:]
+    @ObservationIgnored private var ambientNext = 1.0
+    @ObservationIgnored var reduceMotion = false
 
     init(hole: Hole, look: CourseLook) {
         self.hole = hole; self.look = look
@@ -65,6 +77,9 @@ final class HolePlay {
         struckAt = CACurrentMediaTime()
         swing = nil
         overview = false
+        if !reduceMotion { hold = s.clean ? 0.045 + 0.04 * s.power : 0.03 }
+        SFX.putt(s.power, clean: s.clean)
+        Haptics.strike(s.power, clean: s.clean)
         putt(angle: aim + s.turn, power: s.power)
     }
 
@@ -96,17 +111,27 @@ final class HolePlay {
         from = round.at
         log.append([a, p, time])
         run = PuttRun(hole, from: from, angle: a, power: p, t0: time)
+        hitsHeard = 0
         phase = .roll
     }
 
-    private func tick(_ dt: Double) {
-        acc += min(dt, 0.1)   // a long hitch never fast-forwards a putt
+    private func tick(_ dt0: Double) {
+        var dt = min(dt0, 0.1)
+        ambience(dt)
+        // the hit-stop: the world holds for a beat at contact
+        if hold > 0 { hold -= dt; return }
+        // a slow ball closing on the cup plays in slow motion
+        let near = (phase == .roll || phase == .drift) && ball.tube == nil && hypot(ball.x - hole.cup.x, ball.z - hole.cup.z) < 0.35 && hypot(ball.vx, ball.vz) < 1.2
+        slow += ((near && !reduceMotion ? 0.7 : 1) - slow) * min(1, dt * 8)
+        dt *= slow
+        acc += dt   // a long hitch never fast-forwards a putt
         var steps = 0
         while acc >= Sim.SIM_DT && steps < 64 {
             acc -= Sim.SIM_DT; steps += 1
             if var r = run {
                 let end = r.step()
                 run = r; time = r.t; ball = r.ball
+                hear(r.ball.hits)
                 if end != nil { finish(r); return }
             } else {
                 if phase == .aim && !hole.data.movers.isEmpty && hole.moverTouch(ball, time) {
@@ -118,12 +143,59 @@ final class HolePlay {
                 time += Sim.SIM_DT
             }
         }
+        // the roll, heard: it follows the ball's speed and what it rolls on
+        if phase == .roll || phase == .drift {
+            Synth.shared.roll(speed: ball.air || ball.tube != nil ? 0 : hypot(ball.vx, ball.vz), surface: hole.zoneAt(ball.x, ball.z)?.surf?.rawValue ?? "felt")
+        }
+    }
+
+    /// sounds (and touches) for what the ball hit since the last step. A ball riding a wall logs a hit
+    /// every step, so grazes stay silent and each kind sounds at most every 60 ms (src/game.js drainHits)
+    private func hear(_ hits: [Hit]) {
+        guard hitsHeard < hits.count else { return }
+        for h in hits[hitsHeard...] {
+            func once(_ kind: HitKind, _ play: () -> Void) {
+                guard h.v >= 0.3, time - (lastHitSound[kind] ?? -1) >= 0.06 else { return }
+                lastHitSound[kind] = time; play()
+            }
+            switch h.kind {
+            case .wall, .post: once(.wall) { SFX.clonk(h.v, wall: wallKind); Haptics.knock(h.v) }
+            case .bump, .mover: once(.bump) { SFX.boing(h.v); Haptics.knock(h.v) }
+            case .lip: SFX.lip(); Haptics.knock(1)
+            case .rattle: once(.rattle) { SFX.rattle(min(1, h.v)) }
+            case .land: once(.land) { SFX.land(h.v) }
+            case .splash: SFX.splash()
+            case .tubeIn: SFX.tube()
+            case .tubeOut: SFX.tubeOut()
+            }
+        }
+        hitsHeard = hits.count
+    }
+
+    /// the course's quiet soundscape: birds by day, crickets by night, now and then
+    @ObservationIgnored var birds = 0.6, crickets = 0.0
+    private func ambience(_ dt: Double) {
+        ambientNext -= dt
+        guard ambientNext <= 0 else { return }
+        ambientNext = 0.6 + Double.random(in: 0..<2.4)
+        SFX.ambientCall(birds: birds, crickets: crickets)
     }
 
     private func finish(_ r: PuttRun) {
         guard let res = r.raw else { return }
         lastOutcome = phase == .drift ? round.resolveDrift(res, from: from) : round.resolvePutt(res, from: from)
         run = nil
+        Synth.shared.roll(speed: 0, surface: "felt")
+        switch lastOutcome {
+        case .sunk?:
+            SFX.cup(); Haptics.cup()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { SFX.plunk() }
+            if round.score == 1 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { SFX.fanfare() } }
+            let ace = round.score == 1
+            if lastOfCourse { DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { SFX.bell(ace: ace) } }
+        case .oob?: SFX.boink()
+        default: break
+        }
         if round.done {
             phase = .done
             ball = Ball(hole, hole.cup.x, hole.cup.z)

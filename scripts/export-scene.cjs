@@ -140,19 +140,8 @@ function grabHole(key) {
 }
 
 const hash = buf => crypto.createHash('sha256').update(buf).digest('hex').slice(0, 20);
-function geoBin(g) {
-  /* PXG1 | vcount u32 | icount u32 | flags u32 (1 uv, 2 colour, 4 grey colour) | ngroups u32 | pos f32*3 | nor f32*3 | uv f32*2 | col f32*3 | idx u32 | groups u32*3 */
-  const v = g.pos.length / 3, grey = g.col && g.col.length === v;
-  const flags = (g.uv ? 1 : 0) | (g.col ? 2 : 0) | (grey ? 4 : 0);
-  const n = 20 + v * 24 + (g.uv ? v * 8 : 0) + (g.col ? (grey ? v * 4 : v * 12) : 0) + g.idx.length * 4 + g.groups.length * 12;
-  const b = Buffer.alloc(n);
-  let o = b.write('PXG1', 0, 'ascii');
-  o = b.writeUInt32LE(v, o); o = b.writeUInt32LE(g.idx.length, o); o = b.writeUInt32LE(flags, o); o = b.writeUInt32LE(g.groups.length, o);
-  for (const a of [g.pos, g.nor, g.uv, g.col]) if (a) for (const x of a) o = b.writeFloatLE(x, o);
-  for (const i of g.idx) o = b.writeUInt32LE(i, o);
-  for (const gr of g.groups) for (const x of gr) o = b.writeUInt32LE(Number.isFinite(x) ? Math.min(x, 0xffffffff) : 0xffffffff, o);
-  return b;
-}
+/* meshes are written in the compact PXG2 format (scripts/scene-format.cjs) */
+const { encode: geoBin } = require('./scene-format.cjs');
 
 srv.listen(0, '127.0.0.1', async () => {
   const pw = require('playwright-core');

@@ -38,6 +38,7 @@ final class AppModel {
         progress = PlayerProgress(catalog: Catalog.shared)
         progress = load(slot) ?? PlayerProgress(catalog: catalog)
         applyLaunchArguments()
+        applySound()
     }
 
     // MARK: saves
@@ -51,6 +52,7 @@ final class AppModel {
         slot = n; store.set(n, forKey: "puttx.slot")
         progress = load(n) ?? PlayerProgress(catalog: catalog)
         save()
+        applySound()
     }
     func erase(_ n: Int) {
         store.removeObject(forKey: AppModel.key(n))
@@ -60,8 +62,18 @@ final class AppModel {
     // MARK: navigation
     func go(_ r: Route) {
         if case .hole(let key) = r, let h = catalog.hole(key) {
-            play = HolePlay(hole: h, look: look(Catalog.course(of: key)))
-        } else if case .hole = route { play?.stop(); play = nil }
+            let c = Catalog.course(of: key), lk = look(c), p = HolePlay(hole: h, look: lk)
+            // the hole's sound: its borders, its world's birds and crickets, water or wind, the bell at the end
+            let w = catalog.world(of: c), night = progress.neon
+            p.wallKind = night ? "paint" : (try? SceneStore.shared.hole(key).env.wallKind) ?? AppModel.wallKind[w] ?? "wood"
+            p.lastOfCourse = catalog.nextKey(key) == nil
+            p.birds = night || w == 8 ? 0 : w == 3 ? 1.6 : 0.6
+            p.crickets = night || w == 7 ? 1 : 0
+            p.reduceMotion = UIAccessibility.isReduceMotionEnabled
+            Synth.shared.bed(water: h.data.zones.contains { $0.surf == .water }, wind: [2, 4, 10].contains(w))
+            SFX.jingle(lk.jingle)
+            play = p
+        } else if case .hole = route { play?.stop(); play = nil; Synth.shared.bed(water: false, wind: false); Synth.shared.roll(speed: 0, surface: "felt") }
         withAnimation(.easeInOut(duration: 0.25)) { route = r }
     }
     func look(_ course: Int) -> CourseLook { progress.neon ? looks[course].night() : looks[course] }
@@ -79,7 +91,11 @@ final class AppModel {
     }
     func unlocked(_ key: String) -> Bool { progress.unlocked(key, catalog: catalog) }
     func open(course c: Int) -> Bool { catalog.isExtra(c) ? catalog.has(course: c) : progress.worlds.contains(c) && catalog.has(course: c) }
-    func toggleSound() { progress.sound.toggle(); save() }
+    func toggleSound() { progress.sound.toggle(); save(); applySound() }
+    /// quiet mode silences the synth and the haptics alike
+    func applySound() { Synth.shared.enabled = progress.sound; Haptics.enabled = progress.sound }
+    /// each world's border material, as the web's WALL_KIND_OF
+    static let wallKind: [Int: String] = [1: "steel", 2: "stone", 3: "stone", 4: "wood", 5: "wood", 6: "stone", 7: "brick", 8: "steel", 9: "paint", 10: "marble"]
     func toggleNeon() { progress.neon.toggle(); save() }
 
     /// `-route map:5` / `-route hole:5-3` / `-route card:1`, and `-demo` for a profile with every course

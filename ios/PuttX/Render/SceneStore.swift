@@ -52,6 +52,7 @@ struct SceneEnv: Decodable {
     let fog: Fog?
     let sun: Sun
     let night: Bool
+    let wallKind: String?
 }
 struct SceneHole: Decodable {
     struct Native: Decodable {
@@ -96,19 +97,54 @@ final class SceneStore {
         let d = try Data(contentsOf: root!.appendingPathComponent("geo/\(hash).bin"))
         let g: SceneGeo = d.withUnsafeBytes { raw in
             func u32(_ o: Int) -> Int { Int(raw.loadUnaligned(fromByteOffset: o, as: UInt32.self)) }
+            func f32(_ o: Int) -> Float { raw.loadUnaligned(fromByteOffset: o, as: Float.self) }
+            let packed = raw[3] == UInt8(ascii: "2")
+            // IEEE half to float, by hand (Float16 is not on every simulator architecture)
+            func half(_ h: UInt16) -> Float {
+                let s: Float = h & 0x8000 != 0 ? -1 : 1, e = Int((h >> 10) & 0x1f), m = Float(h & 0x3ff)
+                if e == 0 { return s * m * powf(2, -24) }
+                if e == 31 { return m != 0 ? .nan : s * .infinity }
+                return s * (1 + m / 1024) * powf(2, Float(e - 15))
+            }
             let v = u32(4), ni = u32(8), flags = u32(12), ng = u32(16)
             var o = 20
-            func floats(_ n: Int) -> [Float] { let a = (0..<n).map { raw.loadUnaligned(fromByteOffset: o + $0 * 4, as: Float.self) }; o += n * 4; return a }
-            let p = floats(v * 3), n = floats(v * 3)
-            let uv = flags & 1 != 0 ? floats(v * 2) : nil
-            if flags & 2 != 0 { _ = floats(flags & 4 != 0 ? v : v * 3) }   // vertex colours: not drawn on iOS (yet)
-            let idx = (0..<ni).map { UInt32(u32(o + $0 * 4)) }; o += ni * 4
-            var groups: [(Int, Int, Int)] = []
+            var pos: [SIMD3<Float>] = [], nor: [SIMD3<Float>] = [], uvs: [SIMD2<Float>]? = nil, idx: [UInt32] = []
+            pos.reserveCapacity(v); nor.reserveCapacity(v)
+            if packed {
+                // PXG2 (scripts/scene-format.cjs): positions quantised to the box, i8 normals, f16 or f32 uvs
+                let lo = SIMD3(f32(20), f32(24), f32(28)), size = SIMD3(f32(32), f32(36), f32(40))
+                o = 44
+                for _ in 0..<v {
+                    let q = SIMD3(Float(raw.loadUnaligned(fromByteOffset: o, as: UInt16.self)), Float(raw.loadUnaligned(fromByteOffset: o + 2, as: UInt16.self)), Float(raw.loadUnaligned(fromByteOffset: o + 4, as: UInt16.self)))
+                    pos.append(lo + q / 65535 * size); o += 6
+                }
+                for _ in 0..<v {
+                    let n = SIMD3(Float(Int8(bitPattern: raw[o])), Float(Int8(bitPattern: raw[o + 1])), Float(Int8(bitPattern: raw[o + 2])))
+                    nor.append(simd_length(n) > 0 ? simd_normalize(n) : SIMD3(0, 1, 0)); o += 4
+                }
+                if flags & 1 != 0 {
+                    var u: [SIMD2<Float>] = []; u.reserveCapacity(v)
+                    for _ in 0..<v {
+                        if flags & 16 != 0 {
+                            u.append(SIMD2(half(raw.loadUnaligned(fromByteOffset: o, as: UInt16.self)), half(raw.loadUnaligned(fromByteOffset: o + 2, as: UInt16.self)))); o += 4
+                        } else { u.append(SIMD2(f32(o), f32(o + 4))); o += 8 }
+                    }
+                    uvs = u
+                }
+                if flags & 2 != 0 { o += flags & 4 != 0 ? v : v * 3 }   // vertex colours: not drawn on iOS (yet)
+                for _ in 0..<ni {
+                    if flags & 8 != 0 { idx.append(UInt32(raw.loadUnaligned(fromByteOffset: o, as: UInt16.self))); o += 2 } else { idx.append(UInt32(u32(o))); o += 4 }
+                }
+            } else {
+                for i in 0..<v { pos.append(SIMD3(f32(o + i * 12), f32(o + i * 12 + 4), f32(o + i * 12 + 8))) }; o += v * 12
+                for i in 0..<v { nor.append(SIMD3(f32(o + i * 12), f32(o + i * 12 + 4), f32(o + i * 12 + 8))) }; o += v * 12
+                if flags & 1 != 0 { uvs = (0..<v).map { SIMD2(f32(o + $0 * 8), f32(o + $0 * 8 + 4)) }; o += v * 8 }
+                if flags & 2 != 0 { o += (flags & 4 != 0 ? v : v * 3) * 4 }
+                for i in 0..<ni { idx.append(UInt32(u32(o + i * 4))) }; o += ni * 4
+            }
+            var groups: [(start: Int, count: Int, material: Int)] = []
             for _ in 0..<ng { let s = u32(o), c = u32(o + 4), m = u32(o + 8); o += 12; groups.append((s, c == 0xffff_ffff ? ni - s : c, m)) }
-            return SceneGeo(positions: (0..<v).map { SIMD3(p[$0 * 3], p[$0 * 3 + 1], p[$0 * 3 + 2]) },
-                            normals: (0..<v).map { SIMD3(n[$0 * 3], n[$0 * 3 + 1], n[$0 * 3 + 2]) },
-                            uvs: uv.map { u in (0..<v).map { SIMD2(u[$0 * 2], u[$0 * 2 + 1]) } },
-                            indices: idx, groups: groups.map { (start: $0.0, count: $0.1, material: $0.2) })
+            return SceneGeo(positions: pos, normals: nor, uvs: uvs, indices: idx, groups: groups)
         }
         geos[hash] = g
         return g

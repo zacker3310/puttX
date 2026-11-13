@@ -17,10 +17,23 @@ if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
 fs.mkdirSync(path.join(ROOT, 'preview'), { recursive: true });
 const page = `preview/check-c${course}-${process.pid}.html`;
 fs.writeFileSync(path.join(ROOT, page), build([...new Set([((course - 1) % 10) + 1, course])]));
+/* the page reads plain floats (PXG1); whatever is on disk is decoded here and served that way */
+const { decode } = require('./scene-format.cjs');
+function asPXG1(buf) {
+  const g = decode(buf), v = g.pos.length / 3, flags = (g.uv ? 1 : 0) | (g.col ? 2 : 0) | (g.col && g.col.length === v ? 4 : 0);
+  const out = Buffer.alloc(20 + 4 * (g.pos.length + g.nor.length + (g.uv ? g.uv.length : 0) + (g.col ? g.col.length : 0) + g.idx.length) + g.groups.length * 12);
+  let o = out.write('PXG1', 0, 'ascii');
+  for (const x of [v, g.idx.length, flags, g.groups.length]) o = out.writeUInt32LE(x, o);
+  for (const a of [g.pos, g.nor, g.uv, g.col]) if (a) for (const x of a) o = out.writeFloatLE(x, o);
+  for (const i of g.idx) o = out.writeUInt32LE(i, o);
+  for (const gr of g.groups) for (const x of gr) o = out.writeUInt32LE(Number.isFinite(x) ? x : 0xffffffff, o);
+  return out;
+}
 const srv = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
   const p = u.startsWith('/scene/') ? path.join(DIR, u.slice(7)) : path.normalize(path.join(ROOT, u));
   if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
+  if (u.startsWith('/scene/geo/')) { res.writeHead(200, { 'Content-Type': 'application/octet-stream' }); return res.end(asPXG1(fs.readFileSync(p))); }
   res.writeHead(200, { 'Content-Type': p.endsWith('.html') ? 'text/html; charset=utf-8' : 'application/octet-stream' });
   fs.createReadStream(p).pipe(res);
 });

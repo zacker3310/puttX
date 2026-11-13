@@ -55,6 +55,8 @@ struct ToyButtonStyle: ButtonStyle {
             .offset(y: pressed ? lift - st.s(2) : 0)
             .animation(reduceMotion ? nil : .spring(response: 0.16, dampingFraction: 0.6), value: pressed)
             .contentShape(shape)
+            // every touch answers at once, with a sound and a tick
+            .onChange(of: pressed) { _, down in if down { SFX.tap(); Haptics.tap() } }
     }
 }
 

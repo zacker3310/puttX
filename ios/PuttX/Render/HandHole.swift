@@ -36,7 +36,7 @@ enum HandHole {
                 m.textureCoordinateTransform = .init(offset: .zero, scale: [1, 1], rotation: -Float(atan2(push.x, push.z)))
             } else {
                 m.baseColor = .init(tint: .white, texture: .init(try texture(paintGrain(UIColor(red: 0.54, green: 0.38, blue: 0.21, alpha: 1), &rng), srgb: true)))
-                m.roughness = 1
+                m.roughness = 1.0
             }
             let e = ModelEntity(mesh: try CourseBuilder.lowMesh(Terrain.zone(h, i)), materials: [m])
             if z.push != nil { rig.flows.append((e, 0, hypot(z.push!.x, z.push!.z))) }
@@ -47,7 +47,7 @@ enum HandHole {
         var ground = PhysicallyBasedMaterial()
         ground.baseColor = .init(tint: .white, texture: .init(try texture(paintGrain(UIColor(red: 0.79, green: 0.64, blue: 0.46, alpha: 1), &rng), srgb: true)))
         ground.textureCoordinateTransform = .init(offset: .zero, scale: [48, 48], rotation: 0)
-        ground.roughness = 1
+        ground.roughness = 1.0
         root.addChild(ModelEntity(mesh: try CourseBuilder.lowMesh(Terrain.ground()), materials: [ground]))
 
         // the borders: yellow steel rails on posts, with a cap rail
@@ -100,7 +100,7 @@ enum HandHole {
         // the cup: a white liner, a dark floor, a flag on its pin
         let cy = Float(h.groundH(h.cup.x, h.cup.z))
         var white = PhysicallyBasedMaterial(); white.baseColor = .init(tint: UIColor(white: 0.95, alpha: 1)); white.roughness = 0.55; white.faceCulling = .front
-        var dark = PhysicallyBasedMaterial(); dark.baseColor = .init(tint: UIColor(red: 0.17, green: 0.15, blue: 0.13, alpha: 1)); dark.roughness = 1
+        var dark = PhysicallyBasedMaterial(); dark.baseColor = .init(tint: UIColor(red: 0.17, green: 0.15, blue: 0.13, alpha: 1)); dark.roughness = 1.0
         let liner = ModelEntity(mesh: .generateCylinder(height: Float(Sim.CUP_SINK), radius: Float(Sim.CUP_R)), materials: [white])
         liner.position = [Float(h.cup.x), cy - Float(Sim.CUP_SINK) / 2, Float(h.cup.z)]
         let floorDisc = ModelEntity(mesh: .generateCylinder(height: 0.002, radius: Float(Sim.CUP_R) - 0.002), materials: [dark])

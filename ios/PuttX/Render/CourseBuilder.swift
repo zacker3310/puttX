@@ -41,20 +41,20 @@ enum CourseBuilder {
                     buckets[q, default: []].append(x * matrix(Array(e.prefix(16))))
                 }
                 for (tint, ms) in buckets {
-                    let e = ModelEntity(mesh: try S.mesh(g, transforms: ms), materials: n.m.list.map { S.material(hole.mats[$0], tint: tint) })
+                    let e = ModelEntity(mesh: try S.mesh(g, materials: n.m.list.count, transforms: ms), materials: n.m.list.map { S.material(hole.mats[$0], tint: tint) })
                     rig.root.addChild(e)
                 }
                 continue
             }
             let lift = Float(hole.mats[n.m.list[0]].polygonOffset != nil ? 0.002 : 0)   // RealityKit has no polygon offset
-            let e = ModelEntity(mesh: try S.mesh(g, lift: lift), materials: n.m.list.map { mats[$0] })
+            let e = ModelEntity(mesh: try S.mesh(g, materials: n.m.list.count, lift: lift), materials: n.m.list.map { mats[$0] })
             e.transform = Transform(matrix: x)
             rig.root.addChild(e)
         }
         for (i, parts) in hole.movers.enumerated() where i < h.data.movers.count {
             let m = Entity()
             for n in parts {
-                let e = ModelEntity(mesh: try S.mesh(try S.geo(n.g)), materials: n.m.list.map { mats[$0] })
+                let e = ModelEntity(mesh: try S.mesh(try S.geo(n.g), materials: n.m.list.count), materials: n.m.list.map { mats[$0] })
                 e.transform = Transform(matrix: matrix(n.x))
                 m.addChild(e)
             }

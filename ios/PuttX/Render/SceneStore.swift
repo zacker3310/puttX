@@ -156,7 +156,7 @@ final class SceneStore {
         }
         var p = PhysicallyBasedMaterial()
         p.baseColor = .init(tint: SceneStore.color(base), texture: m.map.flatMap { try? param($0) })
-        if let t = m.map, t.rep != [1, 1] || t.off != [0, 0] {
+        if let t = m.map, t.rep != [1, 1] || t.off != [0, 0] || t.rot != 0 {
             p.textureCoordinateTransform = .init(offset: SIMD2(Float(t.off[0]), Float(t.off[1])), scale: SIMD2(Float(t.rep[0]), Float(t.rep[1])), rotation: Float(t.rot))
         }
         p.roughness = .init(floatLiteral: Float(m.roughness ?? 1))
@@ -176,8 +176,10 @@ final class SceneStore {
 
     // MARK: meshes
     /// a mesh resource with one part per material group, transformed (instances) when asked
-    func mesh(_ g: SceneGeo, lift: Float = 0, transforms: [simd_float4x4] = [matrix_identity_float4x4]) throws -> MeshResource {
-        let groups = g.groups.isEmpty ? [(start: 0, count: g.indices.count, material: 0)] : g.groups
+    /// three keeps a geometry's groups (a box has six, one per face) but draws them all with a lone
+    /// material; only a mesh with a material list draws group by group. `materials` is that count.
+    func mesh(_ g: SceneGeo, materials: Int = 1, lift: Float = 0, transforms: [simd_float4x4] = [matrix_identity_float4x4]) throws -> MeshResource {
+        let groups = g.groups.isEmpty || materials < 2 ? [(start: 0, count: g.indices.count, material: 0)] : g.groups.map { (start: $0.start, count: $0.count, material: min($0.material, materials - 1)) }
         var descs: [MeshDescriptor] = []
         for gr in groups {
             var pos: [SIMD3<Float>] = [], nor: [SIMD3<Float>] = [], uv: [SIMD2<Float>] = [], idx: [UInt32] = []

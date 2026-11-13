@@ -22,9 +22,17 @@ struct HoleView: View {
             let now = Snapshot(time: play.time, ball: play.ball, phase: play.phase, aim: play.aim)
             ZStack(alignment: .topLeading) {
                 Color(hex: play.look.ground ?? play.look.skirt).ignoresSafeArea()
-                Canvas { ctx, _ in draw(ctx, view, now) }
-                    .contentShape(Rectangle())
-                    .gesture(aimDrag)
+                if app.renderer == .top || (app.renderer == .exported && !SceneStore.shared.has(play.hole.key)) {
+                    // from above, straight from the sim: for holes whose scenery is not exported yet
+                    Canvas { ctx, _ in draw(ctx, view, now) }
+                        .contentShape(Rectangle())
+                        .gesture(aimDrag)
+                } else {
+                    CourseView(play: play, renderer: app.renderer == .hand ? .hand : .exported)
+                        .ignoresSafeArea()
+                        .contentShape(Rectangle())
+                        .gesture(aimDrag)
+                }
                 // the swing pad on the player's side, the aim buttons on the other
                 SwingPad(play: play, feel: Feel())
                     .frame(width: st.s(120), height: st.s(360))

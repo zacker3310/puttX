@@ -6,7 +6,8 @@
 set -uo pipefail
 APP="$1"; OUT="$2"; mkdir -p "$OUT"
 BUNDLE=com.puttx.app
-ROUTES=("title" "profiles" "worlds" "world:5" "map:5" "hole:5-3" "hole:1-1" "card:1" "map:99")
+# a route, then any extra launch arguments after a bar
+ROUTES=("title" "profiles" "worlds" "world:5" "map:5" "hole:1-1|-render exported" "hole:1-1|-render hand" "hole:1-9|-render exported" "hole:5-3" "card:1")
 lim() { local s=$1; shift; perl -e 'alarm shift; exec @ARGV' "$s" "$@"; }
 say() { echo "[$(date +%H:%M:%S)] $*"; }
 pick() { xcrun simctl list devices available -j | python3 -c "
@@ -24,13 +25,15 @@ for spec in "ipad|iPad Pro 13" "iphone|iPhone 1[6-9] Pro\$"; do
   lim 300 xcrun simctl bootstatus "$dev" -b >/dev/null || { say "$tag: boot timed out"; fails=$((fails+1)); continue; }
   say "$tag: installing"
   lim 120 xcrun simctl install "$dev" "$APP" || { say "$tag: install failed"; fails=$((fails+1)); continue; }
-  for r in "${ROUTES[@]}"; do
+  for spec in "${ROUTES[@]}"; do
+    r="${spec%%|*}"; extra=""; [ "$spec" != "$r" ] && extra="${spec#*|}"
     lim 20 xcrun simctl terminate "$dev" "$BUNDLE" 2>/dev/null || true
-    say "$tag: $r"
-    lim 60 xcrun simctl launch "$dev" "$BUNDLE" -demo -route "$r" >/dev/null || { say "$tag: launch $r failed"; fails=$((fails+1)); continue; }
+    say "$tag: $r $extra"
+    # shellcheck disable=SC2086
+    lim 60 xcrun simctl launch "$dev" "$BUNDLE" -demo -route "$r" $extra >/dev/null || { say "$tag: launch $r failed"; fails=$((fails+1)); continue; }
     # a cold launch on CI can take a while: retake until the frame is not the plain launch screen
-    f="$OUT/$tag-${r//:/-}.png"
-    for wait in 4 4 6; do
+    f="$OUT/$tag-${r//:/-}${extra:+-${extra##* }}.png"
+    for wait in 6 5 8; do
       sleep $wait
       lim 30 xcrun simctl io "$dev" screenshot "$f" >/dev/null || { say "$tag: screenshot $r failed"; break; }
       python3 -c "

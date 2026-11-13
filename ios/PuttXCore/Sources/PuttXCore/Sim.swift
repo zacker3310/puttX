@@ -59,7 +59,7 @@ public enum Sim {
 // MARK: 2b. hole geometry
 extension Hole {
     @inline(__always) public func onFloor(_ x: Double, _ z: Double) -> Bool { data.floors.contains { $0.contains(x, z) } }
-    @inline(__always) func zoneAt(_ x: Double, _ z: Double) -> Zone? { data.zones.first { $0.poly.contains(x, z) } }
+    @inline(__always) public func zoneAt(_ x: Double, _ z: Double) -> Zone? { data.zones.first { $0.poly.contains(x, z) } }
 
     /// the plateau under (x, z) and its slope, before bumps
     func baseAt(_ x: Double, _ z: Double) -> (Double, Double, Double) {
@@ -110,7 +110,7 @@ extension Hole {
 }
 
 // MARK: 2c. collisions
-@inline(__always) func closestOnSeg(_ ax: Double, _ az: Double, _ bx: Double, _ bz: Double, _ x: Double, _ z: Double) -> (Double, Double) {
+@inline(__always) public func closestOnSeg(_ ax: Double, _ az: Double, _ bx: Double, _ bz: Double, _ x: Double, _ z: Double) -> (Double, Double) {
     let ex = bx - ax, ez = bz - az, L2 = ex * ex + ez * ez
     let t = L2 != 0 ? clamp(((x - ax) * ex + (z - az) * ez) / L2, 0, 1) : 0
     return (ax + ex * t, az + ez * t)

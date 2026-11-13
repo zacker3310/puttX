@@ -21,6 +21,12 @@ targets:
     platform: iOS
     sources:
       - path: PuttX
+        excludes:
+          - "Scene/**"
+      # the exported course scenery, kept as a folder in the bundle (Scene/geo, Scene/tex, Scene/holes)
+      - path: PuttX/Scene
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: PuttXCore
     settings:

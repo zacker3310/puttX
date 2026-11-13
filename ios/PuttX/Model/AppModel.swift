@@ -25,6 +25,9 @@ final class AppModel {
     var progress: PlayerProgress
     /// the hole being played
     private(set) var play: HolePlay?
+    /// how a hole is drawn: the exported course (the default), the hand-built 1-1, or the sim from above
+    enum Renderer: String { case exported, hand, top }
+    private(set) var renderer: Renderer = .exported
 
     @ObservationIgnored private let store = UserDefaults.standard
     private static func key(_ n: Int) -> String { "puttx.save.\(n)" }
@@ -83,6 +86,7 @@ final class AppModel {
     /// played: how CI takes a screenshot of every scene (the web's ?hole= and ?map)
     private func applyLaunchArguments() {
         let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-render"), i + 1 < args.count, let r = Renderer(rawValue: args[i + 1]) { renderer = r }
         if args.contains("-demo") {
             var p = PlayerProgress(catalog: catalog)
             for c in catalog.allCourses where c != 30 {

@@ -85,7 +85,7 @@ public struct Seg: Sendable { public let ax, az, bx, bz: Double }
 public final class Hole: Sendable {
     public let data: HoleData
     public let segs: [Seg]
-    let segBox: [(x0: Double, x1: Double, z0: Double, z1: Double)]
+    public let segBox: [(x0: Double, x1: Double, z0: Double, z1: Double)]
     public var key: String { data.key }
     public var par: Int { data.par }
     public var tee: Vec2 { data.tee }

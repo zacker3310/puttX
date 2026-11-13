@@ -8,7 +8,9 @@ import PuttXCore
 
 @MainActor @Observable
 final class HolePlay {
-    enum Phase: Equatable { case aim, roll, drift, done }
+    /// aim, then the putt (roll, or drift when a mover shoves a resting ball); a holed ball sinks (a
+    /// ball at the stroke cap is rolled in first), then the hole is done
+    enum Phase: Equatable { case aim, roll, drift, auto, sinking, done }
 
     let hole: Hole
     let look: CourseLook
@@ -57,6 +59,13 @@ final class HolePlay {
     @ObservationIgnored private var lastHitSound: [HitKind: Double] = [:]
     @ObservationIgnored private var ambientNext = 1.0
     @ObservationIgnored var reduceMotion = false
+    /// the drop into the cup (src/game.js startSink and stepSink): a few centimetres of its own physics,
+    /// relative to the cup, after the result is already settled
+    private struct Sink { var x, z, y, vx, vz, vy: Double; var walls = 0; var floor = false; var below: Bool; var swallowT = 0.0; var gone = false }
+    @ObservationIgnored private var sink: Sink?
+    @ObservationIgnored private var sinkT = 0.0
+    @ObservationIgnored private var autoFrom: Vec2?
+    @ObservationIgnored private var autoT = 0.0
 
     init(hole: Hole, look: CourseLook) {
         self.hole = hole; self.look = look
@@ -65,7 +74,16 @@ final class HolePlay {
         aim = hole.data.aim0 ?? atan2(hole.cup.x - hole.tee.x, hole.cup.z - hole.tee.z) * 180 / .pi
     }
 
+    /// the hole introduces itself: seconds into the flight from over the cup back to the tee, or nil
+    private(set) var intro: Double?
+    static let introLength = 2.4
+    /// the tee sign (hole, par, map) shows while the hole introduces itself
+    private(set) var banner = true
+    func skipIntro() { intro = nil; banner = false }
+
     func start() {
+        if !reduceMotion && intro == nil && round.strokes == 0 { intro = 0 }
+        if reduceMotion { DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in self?.banner = false } }
         guard link == nil else { return }
         link = DisplayLink { [weak self] dt in self?.tick(dt) }
     }
@@ -73,6 +91,7 @@ final class HolePlay {
 
     /// the putter meets the ball: the stroke turns the aim and sets the power
     func strike(_ s: Stroke) {
+        skipIntro()
         lastStroke = s
         struckAt = CACurrentMediaTime()
         swing = nil
@@ -118,6 +137,12 @@ final class HolePlay {
     private func tick(_ dt0: Double) {
         var dt = min(dt0, 0.1)
         ambience(dt)
+        if let t = intro { intro = t + dt < HolePlay.introLength ? t + dt : nil; if intro == nil { banner = false } }
+        if phase == .auto || phase == .sinking {
+            time += dt   // the movers keep turning
+            if phase == .auto { stepAuto(dt) } else { stepSink(dt) }
+            return
+        }
         // the hit-stop: the world holds for a beat at contact
         if hold > 0 { hold -= dt; return }
         // a slow ball closing on the cup plays in slow motion
@@ -173,7 +198,8 @@ final class HolePlay {
     }
 
     /// the course's quiet soundscape: birds by day, crickets by night, now and then
-    @ObservationIgnored var birds = 0.6, crickets = 0.0
+    @ObservationIgnored var birds = 0.6
+    @ObservationIgnored var crickets = 0.0
     private func ambience(_ dt: Double) {
         ambientNext -= dt
         guard ambientNext <= 0 else { return }
@@ -189,10 +215,16 @@ final class HolePlay {
         switch lastOutcome {
         case .sunk?:
             SFX.cup(); Haptics.cup()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { SFX.plunk() }
             if round.score == 1 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { SFX.fanfare() } }
-            let ace = round.score == 1
-            if lastOfCourse { DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { SFX.bell(ace: ace) } }
+            if lastOfCourse { let ace = round.score == 1; DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: ace) } }
+            startSink(vx: r.ball.vx, vz: r.ball.vz)
+            return
+        case .auto?:
+            // the stroke cap: the ball rolls itself in, from where it stopped (or where it was struck from)
+            autoFrom = res.end == .oob ? from : Vec2(res.x, res.z)
+            autoT = 0
+            phase = .auto
+            return
         case .oob?: SFX.boink()
         default: break
         }
@@ -203,6 +235,92 @@ final class HolePlay {
         } else {
             phase = .aim
             ball = Ball(hole, round.at.x, round.at.z)
+        }
+    }
+
+    // MARK: into the cup
+    /// where the ball came into the cup from, for the drop camera
+    private(set) var sinkFrom: Vec2?
+    private func startSink(vx: Double, vz: Double) {
+        sinkFrom = Vec2(ball.x - vx, ball.z - vz)
+        let cy = hole.groundH(hole.cup.x, hole.cup.z), s = hypot(vx, vz), k = s > 1.4 ? 1.4 / s : 1
+        let y = min(0, ball.y - cy), vy = phase == .roll || phase == .drift ? min(0, ball.vy) : 0
+        sink = Sink(x: ball.x - hole.cup.x, z: ball.z - hole.cup.z, y: y, vx: vx * k, vz: vz * k, vy: vy, below: y < -Sim.BALL_R * 0.5)
+        sinkT = 0
+        phase = .sinking
+    }
+    private func stepSink(_ dt: Double) {
+        guard var k = sink else { return }
+        let lim = Sim.CUP_R - Sim.BALL_R - 0.003, floorY = -(Sim.CUP_SINK - 0.004), R = Sim.BALL_R
+        let n = max(1, Int((dt / Sim.SIM_DT).rounded())), d = dt / Double(n)
+        for _ in 0..<n {
+            k.vy -= Sim.G * d; k.x += k.vx * d; k.z += k.vz * d; k.y += k.vy * d
+            var r = hypot(k.x, k.z)
+            // over the lip: it rides the rim's edge and tips in, pulled inward by the tilt
+            let e = Sim.CUP_R - r
+            if e < R && r > 1e-6 && !k.below {
+                let lipY = -(R - max(0, R * R - pow(max(0, e), 2)).squareRoot())
+                if k.y < lipY { k.y = lipY; k.vy = max(k.vy, 0) * 0.5 + (lipY - k.y) }
+                let pull = Sim.G * 0.6 * min(1, max(0, e) / R + 0.25)
+                k.vx -= k.x / r * pull * d; k.vz -= k.z / r * pull * d
+                if k.y <= lipY + 1e-6 { k.vy = min(k.vy, -0.05) }
+            }
+            r = hypot(k.x, k.z)
+            // below the rim the liner holds it; at the rim it can ride to the far lip but never back out
+            let wall = k.y < -R * 0.9 ? lim : Sim.CUP_R - 0.004
+            if r > wall {
+                let nx = k.x / r, nz = k.z / r, vn = k.vx * nx + k.vz * nz
+                if vn > 0 {
+                    k.vx -= 1.5 * vn * nx; k.vz -= 1.5 * vn * nz; k.vx *= 0.9; k.vz *= 0.9
+                    if vn > 0.15 && k.walls < 3 { k.walls += 1; SFX.rattle(min(1, vn)) }
+                }
+                k.x = nx * wall; k.z = nz * wall
+            }
+            // the last hole keeps your ball: down the drain and away to the clubhouse
+            if lastOfCourse && k.floor {
+                k.swallowT += d
+                if k.swallowT > 0.35 {
+                    if !k.gone { k.gone = true; SFX.tube() }
+                    k.vy -= Sim.G * d * 0.5; k.y += k.vy * d * 0.5
+                    continue
+                }
+            }
+            if k.y < floorY {
+                k.y = floorY
+                if k.vy < -0.3 {
+                    if !k.floor { k.floor = true; SFX.plunk(); Haptics.knock(2) }
+                    k.vy = -k.vy * 0.32
+                } else { k.vy = 0 }
+                k.vx *= 1 - min(1, 4 * d); k.vz *= 1 - min(1, 4 * d)
+            }
+        }
+        sink = k
+        let cy = hole.groundH(hole.cup.x, hole.cup.z)
+        var b = Ball(hole, hole.cup.x + k.x, hole.cup.z + k.z)
+        b.y = cy + k.y; b.vx = k.vx; b.vz = k.vz; b.vy = k.vy
+        ball = b
+        sinkT += dt
+        if sinkT > 1.45 || (k.gone && k.y < floorY - 0.12) {
+            sink = nil
+            phase = .done
+            onFinish?(round.score ?? Scoring.cap(hole))
+        }
+    }
+    /// the stroke cap: an eased glide with a little hop into the cup
+    private func stepAuto(_ dt: Double) {
+        guard let f = autoFrom else { return }
+        autoT += dt
+        let t = min(1, autoT / 0.9), e = t * t * (3 - 2 * t)
+        let x = f.x + (hole.cup.x - f.x) * e, z = f.z + (hole.cup.z - f.z) * e
+        var b = Ball(hole, x, z)
+        b.y = hole.groundH(x, z) + sin(t * .pi) * 0.12
+        ball = b
+        if t >= 1 {
+            SFX.cup()
+            let d = max(1e-9, hypot(hole.cup.x - f.x, hole.cup.z - f.z))
+            if lastOfCourse { DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: false) } }
+            phase = .roll   // so the sink carries the ball's fall in
+            startSink(vx: (hole.cup.x - f.x) / d * 0.5, vz: (hole.cup.z - f.z) / d * 0.5)
         }
     }
 }

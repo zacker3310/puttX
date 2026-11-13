@@ -49,7 +49,8 @@ jobs:
             CODE_SIGNING_ALLOWED=NO build > build.log 2>&1
           code=$?
           # every diagnostic, once, with its source line: one CI round trip shows all of them
-          grep -E -A3 "^/.*: (error|warning): " build.log | grep -v "^--$" | awk '!seen[$0]++' | head -n 400
+          grep -E -A3 "^/.*: error: " build.log | grep -v "^--$" | awk '!seen[$0]++' | head -n 300
+          echo "$(grep -cE '^/.*: warning: ' build.log) warnings"
           [ $code -eq 0 ] || tail -n 30 build.log
           exit $code
       - name: screenshots of every scene

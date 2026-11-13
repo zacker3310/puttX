@@ -101,7 +101,7 @@ struct CourseView: UIViewRepresentable {
             let goal = cameraGoal()
             if snap || camPos == nil { camPos = goal.pos; camLook = goal.look }
             else {
-                let k = Float(1 - exp(-4 * dt))
+                let k = Float(1 - exp(-(play.intro != nil ? 12 : 4) * dt))
                 camPos = camPos! + (goal.pos - camPos!) * k
                 camLook = camLook! + (goal.look - camLook!) * k
             }
@@ -134,10 +134,35 @@ struct CourseView: UIViewRepresentable {
         /// src/game.js cameraGoal, aiming and rolling
         private func cameraGoal() -> (pos: SIMD3<Float>, look: SIMD3<Float>) {
             let h = play.hole, b = play.ball
+            // the introduction: from high over the cup, through the overview, down to the aim view
+            if let t = play.intro {
+                let u = min(1, t / HolePlay.introLength), e = u * u * (3 - 2 * u), B = Terrain.bounds(h), ext = max(B.x1 - B.x0, B.z1 - B.z0) / 2
+                let cy = Float(h.groundH(h.cup.x, h.cup.z))
+                let from = (SIMD3(Float(h.cup.x + 1.2), cy + Float(2.6 + ext * 0.35), Float(h.cup.z + 1.6)), SIMD3(Float(h.cup.x), cy, Float(h.cup.z)))
+                let mid = overviewGoal(h)
+                let aim = aimGoal(), to = (aim.pos, aim.look)
+                let (a, c, k) = e < 0.5 ? (from, mid, e * 2) : (mid, to, e * 2 - 1)
+                let kk = Float(k * k * (3 - 2 * k))
+                return (a.0 + (c.0 - a.0) * kk, a.1 + (c.1 - a.1) * kk)
+            }
+            if play.overview { return overviewGoal(h) }
+            return aimGoal()
+        }
+        private func overviewGoal(_ h: Hole) -> (SIMD3<Float>, SIMD3<Float>) {
+            let B = Terrain.bounds(h), hi = max(B.x1 - B.x0, (B.z1 - B.z0) * 1.7) * 0.75 + 2
+            return (SIMD3(Float(B.cx), Float(hi), Float(B.cz - hi * 0.3)), SIMD3(Float(B.cx), 0, Float(B.cz)))
+        }
+        private func aimGoal() -> (pos: SIMD3<Float>, look: SIMD3<Float>) {
+            let h = play.hole, b = play.ball
             if play.overview {
                 // the whole hole from above, a little behind the tee
                 let B = Terrain.bounds(h), hi = max(B.x1 - B.x0, (B.z1 - B.z0) * 1.7) * 0.75 + 2
                 return (SIMD3(Float(B.cx), Float(hi), Float(B.cz - hi * 0.3)), SIMD3(Float(B.cx), 0, Float(B.cz)))
+            }
+            // the drop: swoop in low over the lip and look down into the cup
+            if play.phase == .sinking && !play.reduceMotion, let f = play.sinkFrom {
+                let dx = h.cup.x - f.x, dz = h.cup.z - f.z, d = max(1e-6, hypot(dx, dz)), cy = h.groundH(h.cup.x, h.cup.z)
+                return (SIMD3(Float(h.cup.x - dx / d * 0.42), Float(cy + 0.36), Float(h.cup.z - dz / d * 0.42)), SIMD3(Float(h.cup.x), Float(cy - 0.08), Float(h.cup.z)))
             }
             let aiming = play.phase == .aim || play.phase == .done
             if aiming { yaw = play.aim * .pi / 180 }

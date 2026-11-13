@@ -83,6 +83,13 @@ struct HoleView: View {
                 HudChip(icon: .strokes, value: "\(min(play.round.strokes, Scoring.cap(play.hole)))").fixedSize()
                     .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
                     .accessibilityLabel("\(play.round.strokes) strokes")
+                // the tee sign: the hole, its par and its layout, while the hole introduces itself
+                if play.banner {
+                    TeeSign(hole: play.hole, aim: play.aim)
+                        .position(x: geo.size.width / 2, y: st.s(200))
+                        .transition(.scale.combined(with: .opacity))
+                        .onTapGesture { withAnimation { play.skipIntro() } }
+                }
                 if play.phase == .done, let rec = play.record { DoneCard(play: play, rec: rec).frame(width: geo.size.width, height: geo.size.height) }
             }
         }
@@ -112,6 +119,7 @@ struct HoleView: View {
     private var aimDrag: some Gesture {
         DragGesture(minimumDistance: 6)
             .onChanged { g in
+                if play.intro != nil { withAnimation { play.skipIntro() } }
                 guard play.phase == .aim else { return }
                 let from = aimFrom ?? play.aim
                 aimFrom = from
@@ -348,5 +356,49 @@ struct ShotReadout: View {
         let t = abs(stroke.turn), dot = t < 0.75 ? Toy.green : t < 2.5 ? Toy.yellow : Toy.red
         Tally(value: "\(Int((stroke.power * 100).rounded()))") { Circle().fill(dot).overlay(Circle().strokeBorder(Toy.shadow.opacity(0.3), lineWidth: st.s(3))) }
             .accessibilityLabel("power \(Int((stroke.power * 100).rounded()))")
+    }
+}
+
+/// the sign on a real course's tee (src/game.js holeMapSvg): the hole's number and par over a little
+/// drawing of its layout seen from the tee, the line of play pointing up
+struct TeeSign: View {
+    @Environment(\.stage) private var st
+    let hole: Hole
+    let aim: Double
+    var body: some View {
+        HStack(spacing: st.s(18)) {
+            Canvas { ctx, size in draw(ctx, size) }.frame(width: st.s(150), height: st.s(150))
+            VStack(spacing: st.s(4)) {
+                Text("\(Catalog.number(of: hole.key))").font(Toy.font(96, st)).foregroundStyle(.white)
+                HStack(spacing: st.s(6)) {
+                    HudIconView(icon: .par).frame(width: st.s(40), height: st.s(40))
+                    Text("\(hole.par)").font(Toy.font(48, st)).foregroundStyle(.white)
+                }
+            }
+        }
+        .padding(st.s(22))
+        .background(RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous).fill(Color(hex: "#3f7a3a")))
+        .overlay(RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous).strokeBorder(Color(hex: "#fffdf7"), lineWidth: st.s(6)))
+        .background(RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous).fill(Toy.shadow.opacity(0.25)).offset(y: st.s(8)))
+        .accessibilityLabel("hole \(Catalog.number(of: hole.key)), par \(hole.par)")
+    }
+    private func draw(_ ctx: GraphicsContext, _ size: CGSize) {
+        let a = aim * .pi / 180, fx = sin(a), fz = cos(a), rx = -cos(a), rz = sin(a)
+        func P(_ p: Vec2) -> CGPoint { CGPoint(x: p.x * rx + p.z * rz, y: -(p.x * fx + p.z * fz)) }
+        let pts = hole.data.floors.flatMap { $0.pts.map(P) }
+        guard let x0 = pts.map(\.x).min(), let x1 = pts.map(\.x).max(), let y0 = pts.map(\.y).min(), let y1 = pts.map(\.y).max() else { return }
+        let k = size.width * 0.875 / max(x1 - x0, y1 - y0, 0.5), ox = size.width / 2 - (x0 + x1) / 2 * k, oy = size.height / 2 - (y0 + y1) / 2 * k
+        func S(_ p: Vec2) -> CGPoint { let q = P(p); return CGPoint(x: q.x * k + ox, y: q.y * k + oy) }
+        func poly(_ ring: [Vec2]) -> Path { Path { $0.addLines(ring.map(S)); $0.closeSubpath() } }
+        let s = size.width / 96
+        for f in hole.data.floors { ctx.fill(poly(f.pts), with: .color(Toy.green)); ctx.stroke(poly(f.pts), with: .color(Color(hex: "#fffdf7")), lineWidth: 3 * s) }
+        let zf: [Surface: Color] = [.water: Toy.blue, .sand: Color(hex: "#e9cf9a"), .ice: Color(hex: "#cfeaf5"), .mud: Color(hex: "#8a6a4a"), .fast: Color(hex: "#5f8fc4")]
+        for z in hole.data.zones { if let s = z.surf, let c = zf[s] { ctx.fill(poly(z.poly.pts), with: .color(c)) } }
+        for w in hole.data.walls { ctx.stroke(Path { $0.addLines(w.map(S)) }, with: .color(Color(hex: "#fffdf7")), style: StrokeStyle(lineWidth: 2.5 * s, lineCap: .round, lineJoin: .round)) }
+        let t = S(hole.tee), c = S(hole.cup)
+        ctx.fill(Path(ellipseIn: CGRect(x: t.x - 4.5 * s, y: t.y - 4.5 * s, width: 9 * s, height: 9 * s)), with: .color(Color(hex: "#fffdf7")))
+        ctx.stroke(Path { $0.move(to: c); $0.addLine(to: CGPoint(x: c.x, y: c.y - 14 * s)) }, with: .color(Color(hex: "#fffdf7")), lineWidth: 2 * s)
+        ctx.fill(Path { $0.move(to: CGPoint(x: c.x, y: c.y - 14 * s)); $0.addLine(to: CGPoint(x: c.x + 9 * s, y: c.y - 10.5 * s)); $0.addLine(to: CGPoint(x: c.x, y: c.y - 7 * s)); $0.closeSubpath() }, with: .color(Toy.red))
+        ctx.fill(Path(ellipseIn: CGRect(x: c.x - 3 * s, y: c.y - 3 * s, width: 6 * s, height: 6 * s)), with: .color(Color(hex: "#2f241a")))
     }
 }

@@ -120,6 +120,8 @@ final class AppModel {
     /// each world's border material, as the web's WALL_KIND_OF
     static let wallKind: [Int: String] = [1: "steel", 2: "stone", 3: "stone", 4: "wood", 5: "wood", 6: "stone", 7: "brick", 8: "steel", 9: "paint", 10: "marble"]
     func toggleNeon() { progress.neon.toggle(); save() }
+    /// which hand putts: the swing pad and the aim buttons swap sides
+    func setHand(_ h: String) { progress.hand = h == "L" ? "L" : "R"; save() }
 
     /// `-route map:5` / `-route hole:5-3` / `-route card:1`, and `-demo` for a profile with every course
     /// played: how CI takes a screenshot of every scene (the web's ?hole= and ?map)

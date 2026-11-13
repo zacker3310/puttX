@@ -128,6 +128,7 @@ struct ProfilesView: View {
 struct WorldsView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.stage) private var st
+    @State private var settings = false
     var body: some View {
         // two rows of 248 px cards under the top bar; a short phone stage scales the grid to fit
         let f = min(1, (st.h - 136 - 24) / (248 * 2 + 24))
@@ -148,9 +149,10 @@ struct WorldsView: View {
                 extraChip(Catalog.classic, .classic, face: Color(hex: "#e9efe6"), rim: Color(hex: "#9aa3ad"), down: Color(hex: "#6f7881"), ink: Color(hex: "#2e5a3a"), glow: false, label: "classic")
                 Spacer()
                 Wallet()
-                SoundButton()
+                IconButton(symbol: "gearshape.fill", label: "settings") { withAnimation(.spring(response: 0.3)) { settings = true } }
             }
             .padding(.horizontal, st.s(24)).padding(.top, st.s(24))
+            if settings { SettingsPanel { withAnimation(.spring(response: 0.3)) { settings = false } }.transition(.opacity) }
         }
     }
 
@@ -383,5 +385,30 @@ struct MapView: View {
         }
         .buttonStyle(PressDown())
         .accessibilityLabel("hole \(i + 1)")
+    }
+}
+
+/// settings (src/shell.html #settings): sound, neon night, and which hand putts, over a scrim
+struct SettingsPanel: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.stage) private var st
+    let close: () -> Void
+    var body: some View {
+        ZStack {
+            Toy.scrim.ignoresSafeArea().onTapGesture(perform: close)
+            HStack(spacing: st.s(24)) {
+                SoundButton()
+                IconButton(symbol: "moon.stars.fill", kind: app.progress.neon ? .blue : .plain, label: "neon night") { app.toggleNeon() }
+                IconButton(symbol: "hand.raised.fill", kind: app.progress.hand == "R" ? .yellow : .plain, label: "right handed") { app.setHand("R") }
+                Button { app.setHand("L") } label: { Image(systemName: "hand.raised.fill").font(.system(size: st.s(38), weight: .black)).scaleEffect(x: -1, y: 1) }
+                    .buttonStyle(ToyButtonStyle(kind: app.progress.hand == "L" ? .yellow : .plain))
+                    .accessibilityLabel("left handed")
+                IconButton(symbol: "xmark", kind: .go, label: "close", action: close)
+            }
+            .padding(st.s(36))
+            .background(Dots())
+            .toyCard(st, radius: Toy.rXl)
+            .popIn()
+        }
     }
 }

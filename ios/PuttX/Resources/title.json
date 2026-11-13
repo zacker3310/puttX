@@ -1,0 +1,446 @@
+{
+ "v": 1,
+ "layers": [
+  {
+   "name": "bg",
+   "rect": [
+    0,
+    0,
+    1200,
+    700
+   ]
+  },
+  {
+   "name": "sun",
+   "rect": [
+    30,
+    16,
+    160,
+    160
+   ],
+   "anim": "spin",
+   "dur": 30,
+   "delay": 0,
+   "origin": [
+    110,
+    96
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "stars",
+   "rect": [
+    836,
+    24,
+    360,
+    218
+   ],
+   "anim": "twinkle",
+   "dur": 2.4,
+   "delay": 0,
+   "origin": [
+    1016,
+    133
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "cloud1",
+   "rect": [
+    226,
+    64,
+    156,
+    92
+   ],
+   "anim": "drift",
+   "dur": 40,
+   "delay": 0,
+   "origin": [
+    304,
+    110
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "cloud2",
+   "rect": [
+    556,
+    24,
+    133,
+    78
+   ],
+   "anim": "drift",
+   "dur": 55,
+   "delay": -20,
+   "origin": [
+    622.5,
+    63
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "smoke0",
+   "rect": [
+    794,
+    274,
+    52,
+    52
+   ],
+   "anim": "smoke",
+   "dur": 3,
+   "delay": 0,
+   "origin": [
+    820,
+    300
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "smoke1",
+   "rect": [
+    800,
+    248,
+    60,
+    60
+   ],
+   "anim": "smoke",
+   "dur": 3,
+   "delay": -1,
+   "origin": [
+    830,
+    278
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "smoke2",
+   "rect": [
+    782,
+    218,
+    68,
+    68
+   ],
+   "anim": "smoke",
+   "dur": 3,
+   "delay": -2,
+   "origin": [
+    816,
+    252
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "island",
+   "rect": [
+    1064,
+    226,
+    136,
+    200
+   ],
+   "anim": "float",
+   "dur": 5,
+   "delay": 0,
+   "origin": [
+    1132,
+    326
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "planet",
+   "rect": [
+    942,
+    252,
+    155,
+    96
+   ],
+   "anim": "float",
+   "dur": 7,
+   "delay": 0,
+   "origin": [
+    1019.5,
+    300
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "bat",
+   "rect": [
+    906,
+    262,
+    56,
+    40
+   ],
+   "anim": "bat",
+   "dur": 3,
+   "delay": 0,
+   "origin": [
+    934,
+    282
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "hook",
+   "rect": [
+    124,
+    304,
+    52,
+    44
+   ],
+   "anim": "float",
+   "dur": 3,
+   "delay": 0,
+   "origin": [
+    150,
+    326
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "palm",
+   "rect": [
+    586,
+    282,
+    128,
+    62
+   ],
+   "anim": "sway",
+   "dur": 3,
+   "delay": 0,
+   "origin": [
+    650,
+    319.8
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "flag",
+   "rect": [
+    807,
+    406,
+    117,
+    82
+   ],
+   "anim": "wave",
+   "dur": 1.1,
+   "delay": 0,
+   "origin": [
+    821,
+    447
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "putter",
+   "rect": [
+    232,
+    298,
+    108,
+    318
+   ],
+   "anim": "swing",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    250,
+    330
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "ballLines",
+   "rect": [
+    236,
+    558,
+    86,
+    68
+   ],
+   "anim": "lines",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    279,
+    592
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "ballSpin",
+   "rect": [
+    325,
+    535,
+    84,
+    89
+   ],
+   "anim": "rollspin",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    370,
+    586
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "ball",
+   "rect": [
+    236,
+    532,
+    189,
+    118
+   ],
+   "anim": "putt",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    330.5,
+    591
+   ],
+   "dx": 0,
+   "dy": 0
+  },
+  {
+   "name": "confetti0",
+   "rect": [
+    782,
+    576,
+    38,
+    44
+   ],
+   "anim": "pop",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    801,
+    598
+   ],
+   "dx": -80,
+   "dy": -140
+  },
+  {
+   "name": "confetti1",
+   "rect": [
+    776,
+    576,
+    38,
+    44
+   ],
+   "anim": "pop",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    795,
+    598
+   ],
+   "dx": 60,
+   "dy": -170
+  },
+  {
+   "name": "confetti2",
+   "rect": [
+    790,
+    576,
+    38,
+    44
+   ],
+   "anim": "pop",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    809,
+    598
+   ],
+   "dx": -30,
+   "dy": -200
+  },
+  {
+   "name": "confetti3",
+   "rect": [
+    784,
+    576,
+    38,
+    44
+   ],
+   "anim": "pop",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    803,
+    598
+   ],
+   "dx": 110,
+   "dy": -110
+  },
+  {
+   "name": "confetti4",
+   "rect": [
+    778,
+    576,
+    38,
+    44
+   ],
+   "anim": "pop",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    797,
+    598
+   ],
+   "dx": -120,
+   "dy": -90
+  },
+  {
+   "name": "confetti5",
+   "rect": [
+    786,
+    576,
+    38,
+    44
+   ],
+   "anim": "pop",
+   "dur": 6,
+   "delay": 0,
+   "origin": [
+    805,
+    598
+   ],
+   "dx": 20,
+   "dy": -150
+  },
+  {
+   "name": "sign",
+   "rect": [
+    326,
+    0,
+    548,
+    288
+   ],
+   "anim": "sign",
+   "dur": 4,
+   "delay": 0,
+   "origin": [
+    600,
+    0
+   ],
+   "dx": 0,
+   "dy": 0
+  }
+ ]
+}

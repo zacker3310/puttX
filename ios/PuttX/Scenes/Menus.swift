@@ -4,36 +4,30 @@ import SwiftUI
 import PuttXCore
 
 // MARK: title
+/// the web's title: its illustration, alive, and the big green play pill on the green (src/shell.html #titleGo)
 struct TitleView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.stage) private var st
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulse = false
     var body: some View {
-        let look = app.looks[1]
-        ZStack {
-            SkyBackground(colors: look.skyColors)
-            // rolling hills and the green, as on the web's title art
-            Canvas { ctx, size in
-                let w = size.width, h = size.height
-                var hill = Path(); hill.move(to: CGPoint(x: 0, y: h * 0.62))
-                hill.addCurve(to: CGPoint(x: w, y: h * 0.58), control1: CGPoint(x: w * 0.3, y: h * 0.48), control2: CGPoint(x: w * 0.7, y: h * 0.7))
-                hill.addLine(to: CGPoint(x: w, y: h)); hill.addLine(to: CGPoint(x: 0, y: h)); hill.closeSubpath()
-                ctx.fill(hill, with: .linearGradient(Gradient(colors: [Color(hex: "#8fd16f"), Color(hex: "#3f6a5a")]), startPoint: .zero, endPoint: CGPoint(x: w, y: 0)))
-                var green = Path(); green.move(to: CGPoint(x: 0, y: h * 0.8))
-                green.addCurve(to: CGPoint(x: w, y: h * 0.76), control1: CGPoint(x: w * 0.35, y: h * 0.7), control2: CGPoint(x: w * 0.65, y: h * 0.86))
-                green.addLine(to: CGPoint(x: w, y: h)); green.addLine(to: CGPoint(x: 0, y: h)); green.closeSubpath()
-                ctx.fill(green, with: .color(Color(hex: "#4fae4a")))
-            }
-            .ignoresSafeArea()
-            VStack(spacing: st.s(40)) {
-                LogoSign().popIn()
+        GeometryReader { g in
+            let k = max(g.size.width / 1200, g.size.height / 700)
+            ZStack {
+                TitleArt()
+                // the pill sits on the art's green (art x 440...760, y 396...540)
                 Button { app.go(.profiles) } label: {
-                    Image(systemName: "play.fill").font(.system(size: st.s(64), weight: .black))
+                    Image(systemName: "play.fill").font(.system(size: st.s(60), weight: .black))
                 }
-                .buttonStyle(ToyButtonStyle(kind: .go, radius: Toy.rXl, size: CGSize(width: 220, height: 120)))
+                .buttonStyle(ToyButtonStyle(kind: .go, radius: 72, size: CGSize(width: 320, height: 144)))
+                .scaleEffect(pulse ? 1.04 : 1)
+                .position(x: g.size.width / 2 + (600 - 600) * k, y: g.size.height / 2 + (468 - 350) * k)
                 .accessibilityLabel("play")
-                .popIn(0.15)
+                .popIn(0.3)
+                .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.9).repeatForever().delay(1.2)) { pulse = true } } }
             }
         }
+        .ignoresSafeArea()
     }
 }
 

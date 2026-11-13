@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "title-palm.png",
+      "idiom": "universal",
+      "scale": "3x"
+    }
+  ],
+  "info": {
+    "author": "export-ui",
+    "version": 1
+  }
+}

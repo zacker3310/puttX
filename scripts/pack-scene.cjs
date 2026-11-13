@@ -28,4 +28,16 @@ for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
   hole.static.forEach(fix); hole.movers.forEach(m => m.forEach(fix));
   fs.writeFileSync(p, JSON.stringify(hole) + '\n'); holes++;
 }
+/* sweep: meshes and textures no hole uses any more (left behind by a re-export) */
+const usedGeo = new Set(), usedTex = new Set();
+for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
+  const hole = JSON.parse(fs.readFileSync(path.join(DIR, 'holes', f), 'utf8'));
+  for (const n of hole.static.concat(...hole.movers)) usedGeo.add(n.g);
+  for (const m of hole.mats) for (const v of Object.values(m)) if (v && typeof v === 'object' && 't' in v) usedTex.add(v.t);
+}
+let swept = 0;
+for (const [dir, used, ext] of [['geo', usedGeo, '.bin'], ['tex', usedTex, '.png']]) {
+  for (const f of fs.readdirSync(path.join(DIR, dir))) if (!used.has(f.slice(0, -ext.length))) { fs.rmSync(path.join(DIR, dir, f)); swept++; }
+}
+console.log(`${swept} unused files swept`);
 console.log(`${Object.keys(rename).length} meshes packed, ${(before / 1048576).toFixed(1)} MB -> ${(after / 1048576).toFixed(1)} MB, ${holes} holes updated`);

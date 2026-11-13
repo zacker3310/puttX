@@ -69,7 +69,9 @@ private func diff(_ r: PuttResult, _ g: GPutt) -> String? {
                 var round = Round(h), last: PuttOutcome?
                 for s in h.data.sol where !round.done {
                     let from = round.at
-                    last = round.resolvePutt(h.simulatePutt(from: from, angle: s[0], power: s[1], t0: s.count > 2 ? s[2] : 0), from: from)
+                    var run = PuttRun(h, from: from, angle: s[0], power: s[1], t0: s.count > 2 ? s[2] : 0)
+                    while run.step() == nil {}
+                    last = round.resolvePutt(run.raw!, from: from)
                 }
                 #expect(last == .sunk && round.score! <= h.par, "\(h.key)")
             }

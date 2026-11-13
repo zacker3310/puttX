@@ -5,21 +5,52 @@ public struct PuttResult: Sendable {
     public let x: Double, z: Double, t: Double
     public let steps: Int
     public let hits: [Hit]
+    public init(end: PuttEnd, x: Double, z: Double, t: Double, steps: Int, hits: [Hit]) {
+        self.end = end; self.x = x; self.z = z; self.t = t; self.steps = steps; self.hits = hits
+    }
+}
+
+/// A putt in flight, one fixed step at a time. The live loop and `simulatePutt` both run this, so
+/// what the player sees is exactly what the solver proved.
+public struct PuttRun: Sendable {
+    public let hole: Hole
+    public private(set) var ball: Ball
+    /// hole time of the next step (movers are where they are at this time)
+    public private(set) var t: Double
+    public private(set) var steps = 0
+    public private(set) var result: PuttResult?
+
+    /// a putt struck at (angle, power) from `from` at hole time t0
+    public init(_ h: Hole, from: Vec2, angle: Double, power: Double, t0: Double) {
+        hole = h; ball = Ball(h, from.x, from.z); ball.launch(angle, power); t = t0
+    }
+    /// a resting ball a mover is pushing: no strike, it just runs until it settles again
+    public init(drift h: Hole, at: Vec2, t0: Double) { hole = h; ball = Ball(h, at.x, at.z); t = t0 }
+
+    /// one step; the result once the putt has ended
+    @discardableResult
+    public mutating func step() -> PuttResult? {
+        if let r = result { return r }
+        var end = hole.step(&ball, t)
+        t += Sim.SIM_DT
+        if end == nil { steps += 1; if Double(steps) * Sim.SIM_DT > Sim.MAX_SIM_T { end = .timeout } }
+        guard let e = end else { return nil }
+        let p = e == .stop ? hole.restSpot(ball.x, ball.z) : Vec2(ball.x, ball.z)
+        result = PuttResult(end: e, x: p.x, z: p.z, t: t, steps: steps, hits: ball.hits)
+        return result
+    }
+    /// the ended putt where the ball actually stopped, before the border rule: what `Round.resolvePutt`
+    /// and `resolveDrift` take (they apply the rule themselves, once), as the web's live loop does
+    public var raw: PuttResult? {
+        result.map { PuttResult(end: $0.end, x: ball.x, z: ball.z, t: $0.t, steps: $0.steps, hits: $0.hits) }
+    }
 }
 
 extension Hole {
     /// a putt from `from` at hole time t0, run to the end
     public func simulatePutt(from: Vec2, angle: Double, power: Double, t0: Double = 0) -> PuttResult {
-        var b = Ball(self, from.x, from.z)
-        b.launch(angle, power)
-        var t = t0, n = 0, end: PuttEnd? = nil
-        while end == nil {
-            end = step(&b, t)
-            t += Sim.SIM_DT
-            if end == nil { n += 1; if Double(n) * Sim.SIM_DT > Sim.MAX_SIM_T { end = .timeout } }
-        }
-        let p = end == .stop ? restSpot(b.x, b.z) : Vec2(b.x, b.z)
-        return PuttResult(end: end!, x: p.x, z: p.z, t: t, steps: n, hits: b.hits)
+        var run = PuttRun(self, from: from, angle: angle, power: power, t0: t0)
+        while true { if let r = run.step() { return r } }
     }
 
     /// the real rule for a ball against the border (WMF, PPA, BMGA): placed out from the wall, square to it

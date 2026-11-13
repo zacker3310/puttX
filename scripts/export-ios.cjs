@@ -3,6 +3,9 @@
    ios/PuttXCore/Sources/PuttXCore/Resources/holes.json, and writes golden putts (every hole's `sol`
    replay plus a fixed fan of extra shots, with every contact) to
    ios/PuttXCore/Tests/PuttXCoreTests/Resources/golden.json. The Swift sim must match them to the bit.
+   It also writes each course's look palette (resolved as lookOf resolves it, by day) to
+   ios/PuttX/Resources/looks.json, and the course icons and UI glyphs, as the same SVGs the web draws,
+   into ios/PuttX/Assets.xcassets/Art.
 
    node scripts/export-ios.cjs          write both
    node scripts/export-ios.cjs --check  fail if either file is stale (CI) */
@@ -14,7 +17,51 @@ const { loadSim } = require('../tests/sim.cjs');
 const ROOT = path.join(__dirname, '..');
 const HOLES_OUT = path.join(ROOT, 'ios/PuttXCore/Sources/PuttXCore/Resources/holes.json');
 const GOLDEN_OUT = path.join(ROOT, 'ios/PuttXCore/Tests/PuttXCoreTests/Resources/golden.json');
+const LOOKS_OUT = path.join(ROOT, 'ios/PuttX/Resources/looks.json');
+const ART_DIR = path.join(ROOT, 'ios/PuttX/Assets.xcassets/Art');
 const S = loadSim();
+
+/* course looks: run courses/cNN.look.js in a sandbox where THREE and every other name is an inert
+   stub, and keep only plain data (colors, the jingle, the icon); the 3D builders are ported by hand */
+function readLooks() {
+  const vm = require('vm');
+  const stub = new Proxy(function () {}, { get: (t, k) => (k === Symbol.toPrimitive ? () => 0 : stub), apply: () => stub, construct: () => stub });
+  const base = { WORLD_LOOK: {}, Math, Array, Object, String, Number, JSON };
+  const ctx = vm.createContext(new Proxy(base, { has: () => true, get: (t, k) => (k in t ? t[k] : k === Symbol.unscopables ? undefined : stub), set: (t, k, v) => ((t[k] = v), true) }));
+  const dir = path.join(ROOT, 'courses');
+  for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.look.js')).sort()) vm.runInContext(fs.readFileSync(path.join(dir, f), 'utf8'), ctx, { filename: f });
+  const plain = o => Object.fromEntries(Object.entries(o || {}).filter(([, v]) => ['string', 'number', 'boolean'].includes(typeof v) || (Array.isArray(v) && v.every(x => typeof x !== 'object'))));
+  const src = fs.readFileSync(path.join(ROOT, 'src/game.js'), 'utf8');
+  const DEFAULT = Function('return ' + src.match(/const DEFAULT_LOOK = (\{[\s\S]*?\});/)[1])();
+  const L = base.WORLD_LOOK;
+  /* lookOf, by day: the classic stands alone; a later course inherits its world's first course */
+  return S.allCourses().map(c => {
+    const w = S.worldOf(c);
+    const look = c === S.CLASSIC ? Object.assign({}, DEFAULT, plain(L[c])) : Object.assign({}, DEFAULT, plain(L[w]), c !== w ? plain(L[c]) : null);
+    return { course: c, ...look };
+  });
+}
+/* the UI glyphs the web inlines as SVG strings */
+function readGlyphs() {
+  const src = ['src/game.js', 'src/shop.js'].map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const out = {};
+  for (const n of ['STAR', 'LOCK', 'COIN', 'CROWN', 'FLAG', 'BIN', 'CRAZY', 'CLASSIC', 'BONUS']) {
+    let svg = src.match(new RegExp(`^const ${n}_SVG = '(<svg[^\\n]*</svg>)';$`, 'm'))[1];
+    if (n === 'STAR') svg = svg.replace('<path ', '<path fill="#000" ');   /* the page fills it from CSS: a template here */
+    out[n.toLowerCase()] = svg;
+  }
+  return out;
+}
+/* an asset catalog image set holding one SVG, kept as vectors */
+function imageSet(name, svg, template) {
+  let xml = svg.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+  /* Xcode sizes a vector from width and height; the web's SVGs only carry a viewBox */
+  const root = xml.slice(0, xml.indexOf('>')), vb = root.match(/viewBox="[\d.-]+ [\d.-]+ ([\d.]+) ([\d.]+)"/);
+  if (vb && !/\swidth=/.test(root)) xml = xml.replace('<svg ', `<svg width="${vb[1]}" height="${vb[2]}" `);
+  const contents = { images: [{ filename: name + '.svg', idiom: 'universal' }], info: { author: 'export-ios', version: 1 },
+    properties: Object.assign({ 'preserves-vector-representation': true }, template ? { 'template-rendering-intent': 'template' } : {}) };
+  return { [`${name}.imageset/${name}.svg`]: xml + '\n', [`${name}.imageset/Contents.json`]: JSON.stringify(contents, null, 2) + '\n' };
+}
 
 /* defaults are resolved here, with the sim's own `||` and `!== undefined` rules, so Swift never
    has to know them; render-only keys (look, color) ride along */
@@ -63,11 +110,19 @@ const courses = S.allCourses().map(c => ({ id: c, world: S.worldOf(c), g: S.WORL
 const holesJson = JSON.stringify({ v: 1, worldOrder: S.WORLD_ORDER, courseStep: S.COURSE_STEP, extras: S.EXTRAS, courses, holes }) + '\n';
 const goldenJson = JSON.stringify({ v: 1, putts: gold }) + '\n';
 
+const looks = readLooks();
+const looksJson = JSON.stringify({ v: 1, looks: looks.map(({ icon, ...l }) => ({ ...l, icon: icon ? 'course' + l.course : null })) }, null, 1) + '\n';
+const art = { 'Contents.json': JSON.stringify({ info: { author: 'export-ios', version: 1 }, properties: { 'provides-namespace': false } }, null, 2) + '\n' };
+for (const l of looks) if (l.icon) Object.assign(art, imageSet('course' + l.course, l.icon, false));
+for (const [n, svg] of Object.entries(readGlyphs())) Object.assign(art, imageSet('glyph-' + n, svg, n === 'star'));
+
+const files = [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
 if (process.argv.includes('--check')) {
-  const stale = [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson]].filter(([f, s]) => !fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== s);
+  const stale = files.filter(([f, s]) => !fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== s);
   for (const [f] of stale) console.error('stale: ' + path.relative(ROOT, f) + ' (run node scripts/export-ios.cjs)');
   process.exit(stale.length ? 1 : 0);
 }
-for (const [f, s] of [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson]]) { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, s); }
+fs.rmSync(ART_DIR, { recursive: true, force: true });
+for (const [f, s] of files) { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, s); }
 const n = gold.reduce((s, g) => s + g.sol.length + g.fan.length, 0);
-console.log(`${holes.length} holes, ${n} golden putts (${(holesJson.length / 1024) | 0} KB + ${(goldenJson.length / 1024) | 0} KB)`);
+console.log(`${holes.length} holes, ${n} golden putts, ${looks.length} looks, ${Object.keys(art).length >> 1} art sets`);

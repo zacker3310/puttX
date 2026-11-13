@@ -30,3 +30,29 @@ jobs:
         run: |
           swift test
           swift test -c release
+
+  app:
+    needs: core
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - name: generate the Xcode project
+        working-directory: ios
+        run: xcodegen
+      - name: build for the simulator
+        working-directory: ios
+        run: |
+          xcodebuild -project PuttX.xcodeproj -scheme PuttX -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO build | tail -n 60
+          test "${PIPESTATUS[0]}" -eq 0
+      - name: screenshots of every scene
+        run: ios/scripts/shots.sh ios/build/Build/Products/Debug-iphonesimulator/PuttX.app shots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shots
+          path: shots
+          if-no-files-found: ignore

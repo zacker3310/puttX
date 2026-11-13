@@ -1,0 +1,912 @@
+{
+ "v": 1,
+ "looks": [
+  {
+   "course": 1,
+   "felt": "#36803a",
+   "wall": "#ffd66e",
+   "ground": "#c9a476",
+   "sky": [
+    "#9fd8ef",
+    "#fff1d6"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#5a4634",
+   "skirt": "#a8804e",
+   "tube": "#ef7d6d",
+   "flag": "#ef7d6d",
+   "jingle": [
+    523,
+    659,
+    784,
+    659,
+    1047
+   ],
+   "icon": "course1"
+  },
+  {
+   "course": 11,
+   "felt": "#2f7a4a",
+   "wall": "#ffd66e",
+   "ground": "#c99a6b",
+   "sky": [
+    "#f4a76f",
+    "#ffe9c7"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#5a4634",
+   "skirt": "#9c7446",
+   "tube": "#ef7d6d",
+   "flag": "#ffd66e",
+   "jingle": [
+    587,
+    698,
+    880,
+    698,
+    1175
+   ],
+   "icon": "course11"
+  },
+  {
+   "course": 21,
+   "felt": "#2c6a7a",
+   "wall": "#ffd66e",
+   "ground": "#a98c72",
+   "sky": [
+    "#5d5aa8",
+    "#f6c4b0"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#5a4634",
+   "skirt": "#8a6a4c",
+   "tube": "#ef7d6d",
+   "flag": "#ffd66e",
+   "jingle": [
+    523,
+    622,
+    784,
+    932,
+    1047
+   ],
+   "icon": "course21"
+  },
+  {
+   "course": 2,
+   "felt": "#4b7a3a",
+   "wall": "#f0b878",
+   "ground": "#c9a476",
+   "sky": [
+    "#e8763c",
+    "#ffd49a"
+   ],
+   "fog": true,
+   "sand": "#a86d38",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#8a5a32",
+   "water": "#2f86c8",
+   "push": "#e9a23b",
+   "skirt": "#c8693e",
+   "tube": "#6e5233",
+   "flag": "#6fc0df",
+   "jingle": [
+    440,
+    554,
+    659,
+    831,
+    880
+   ],
+   "icon": "course2"
+  },
+  {
+   "course": 12,
+   "felt": "#3f6f45",
+   "wall": "#f2c08a",
+   "ground": "#c9a476",
+   "sky": [
+    "#6d4c8e",
+    "#f6a65e"
+   ],
+   "fog": true,
+   "sand": "#a86d38",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#8a5a32",
+   "water": "#2f86c8",
+   "push": "#e9a23b",
+   "skirt": "#b75c3c",
+   "tube": "#6e5233",
+   "flag": "#ffd66e",
+   "jingle": [
+    392,
+    494,
+    587,
+    740,
+    784
+   ],
+   "icon": "course12"
+  },
+  {
+   "course": 22,
+   "felt": "#56703a",
+   "wall": "#ffd8a8",
+   "ground": "#c9a476",
+   "sky": [
+    "#3f8fd0",
+    "#ffd9a0"
+   ],
+   "fog": true,
+   "sand": "#a86d38",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#8a5a32",
+   "water": "#2f86c8",
+   "push": "#e9a23b",
+   "skirt": "#a8482f",
+   "tube": "#5a3f26",
+   "flag": "#ef7d6d",
+   "jingle": [
+    523,
+    659,
+    784,
+    988,
+    1047
+   ],
+   "icon": "course22"
+  },
+  {
+   "course": 3,
+   "felt": "#2f6e3a",
+   "wall": "#9aa089",
+   "ground": "#4a5e2e",
+   "sky": [
+    "#8fcfc2",
+    "#f4f0cc"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#e9a23b",
+   "skirt": "#6f6f5c",
+   "tube": "#ffd66e",
+   "flag": "#ffd66e",
+   "jingle": [
+    392,
+    523,
+    659,
+    587,
+    784
+   ],
+   "icon": "course3"
+  },
+  {
+   "course": 13,
+   "felt": "#2a6540",
+   "wall": "#9aa089",
+   "ground": "#4f5a2c",
+   "sky": [
+    "#f0a77c",
+    "#ffe6b8"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#e9a23b",
+   "skirt": "#6f6f5c",
+   "tube": "#ffb35c",
+   "flag": "#ef7d6d",
+   "jingle": [
+    349,
+    440,
+    523,
+    698,
+    659
+   ],
+   "icon": "course13"
+  },
+  {
+   "course": 23,
+   "felt": "#2e6a4c",
+   "wall": "#b8aa80",
+   "ground": "#4a5e2e",
+   "sky": [
+    "#9fd8c4",
+    "#fff4d6"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#e9a23b",
+   "skirt": "#7c7458",
+   "tube": "#ffc94a",
+   "flag": "#ffd66e",
+   "jingle": [
+    440,
+    554,
+    659,
+    880,
+    784
+   ],
+   "icon": "course23"
+  },
+  {
+   "course": 4,
+   "felt": "#3c7f35",
+   "wall": "#6fc0df",
+   "ground": "#fffdf7",
+   "sky": [
+    "#9fcde6",
+    "#f4f8fa"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#4a94b5",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#24507e",
+   "push": "#e9a23b",
+   "skirt": "#d5e6ef",
+   "tube": "#ef7d6d",
+   "flag": "#ef7d6d",
+   "jingle": [
+    659,
+    784,
+    988,
+    1175,
+    1319
+   ],
+   "icon": "course4"
+  },
+  {
+   "course": 14,
+   "felt": "#2f6f55",
+   "wall": "#6fc0df",
+   "ground": "#fffdf7",
+   "sky": [
+    "#f2b98a",
+    "#fdeedd"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#4a94b5",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#24507e",
+   "push": "#e9a23b",
+   "skirt": "#e6dccf",
+   "tube": "#ef7d6d",
+   "flag": "#ffd66e",
+   "jingle": [
+    587,
+    740,
+    880,
+    1175,
+    1480
+   ],
+   "icon": "course14"
+  },
+  {
+   "course": 24,
+   "felt": "#2c5f3a",
+   "wall": "#6fc0df",
+   "ground": "#fffdf7",
+   "sky": [
+    "#7d74c9",
+    "#f7c9c3"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#3f86a8",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#24507e",
+   "push": "#e9a23b",
+   "skirt": "#d9d3ea",
+   "tube": "#ef7d6d",
+   "flag": "#6fc0df",
+   "jingle": [
+    523,
+    659,
+    784,
+    1047,
+    1319,
+    1568
+   ],
+   "icon": "course24"
+  },
+  {
+   "course": 5,
+   "felt": "#2e7a5c",
+   "wall": "#c9a476",
+   "ground": "#55c3c6",
+   "sky": [
+    "#7fd0e6",
+    "#fff1d6"
+   ],
+   "fog": true,
+   "sand": "#a37440",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2aa7b8",
+   "push": "#e9a23b",
+   "skirt": "#8a6538",
+   "tube": "#ef7d6d",
+   "flag": "#4a3826",
+   "jingle": [
+    392,
+    523,
+    659,
+    523,
+    784
+   ],
+   "icon": "course5"
+  },
+  {
+   "course": 15,
+   "felt": "#286b58",
+   "wall": "#c9a476",
+   "ground": "#4fb3b8",
+   "sky": [
+    "#f39a7b",
+    "#ffe3b8"
+   ],
+   "fog": true,
+   "sand": "#a37440",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2797a8",
+   "push": "#e9a23b",
+   "skirt": "#7d5a33",
+   "tube": "#ef7d6d",
+   "flag": "#ffd66e",
+   "jingle": [
+    440,
+    587,
+    698,
+    587,
+    880
+   ],
+   "icon": "course15"
+  },
+  {
+   "course": 25,
+   "felt": "#235a66",
+   "wall": "#b8935f",
+   "ground": "#2f7f95",
+   "sky": [
+    "#27306a",
+    "#a99ad6"
+   ],
+   "fog": true,
+   "sand": "#8d6438",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#1f6f8f",
+   "push": "#e9a23b",
+   "skirt": "#6e4f2c",
+   "tube": "#ef7d6d",
+   "flag": "#ffcc4d",
+   "jingle": [
+    349,
+    440,
+    523,
+    440,
+    659
+   ],
+   "icon": "course25"
+  },
+  {
+   "course": 6,
+   "felt": "#4f7254",
+   "wall": "#625c68",
+   "ground": "#2f2729",
+   "sky": [
+    "#5c2a2a",
+    "#f0a066"
+   ],
+   "fog": true,
+   "sand": "#7a6a5c",
+   "ice": "#6fa8c0",
+   "mud": "#4e3426",
+   "fast": "#5d5560",
+   "water": "#f0642c",
+   "push": "#f08a3c",
+   "skirt": "#2c282d",
+   "tube": "#f0642c",
+   "flag": "#ffd66e",
+   "jingle": [
+    392,
+    494,
+    587,
+    740,
+    988
+   ],
+   "icon": "course6"
+  },
+  {
+   "course": 16,
+   "felt": "#3d6858",
+   "wall": "#58506a",
+   "ground": "#261f2a",
+   "sky": [
+    "#2e1d44",
+    "#e0785a"
+   ],
+   "fog": true,
+   "sand": "#7a6a5c",
+   "ice": "#6fa8c0",
+   "mud": "#4e3426",
+   "fast": "#5d5560",
+   "water": "#f0642c",
+   "push": "#f08a3c",
+   "skirt": "#241f2a",
+   "tube": "#f0642c",
+   "flag": "#ffd66e",
+   "jingle": [
+    349,
+    440,
+    523,
+    698,
+    880
+   ],
+   "icon": "course16"
+  },
+  {
+   "course": 26,
+   "felt": "#56603a",
+   "wall": "#4a4552",
+   "ground": "#1c1618",
+   "sky": [
+    "#160c1e",
+    "#b8402a"
+   ],
+   "fog": true,
+   "sand": "#7a6a5c",
+   "ice": "#6fa8c0",
+   "mud": "#4e3426",
+   "fast": "#5d5560",
+   "water": "#f0642c",
+   "push": "#f08a3c",
+   "skirt": "#1f1b20",
+   "tube": "#f0642c",
+   "flag": "#ffe08a",
+   "jingle": [
+    330,
+    415,
+    494,
+    659,
+    831
+   ],
+   "icon": "course26"
+  },
+  {
+   "course": 7,
+   "felt": "#3f7350",
+   "wall": "#a39cb5",
+   "ground": "#3b3556",
+   "sky": [
+    "#1a1747",
+    "#5a3486"
+   ],
+   "fog": true,
+   "sand": "#8a6a4a",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#6a4f8f",
+   "water": "#2d6f8f",
+   "push": "#e9a23b",
+   "skirt": "#5e5670",
+   "tube": "#ef7d6d",
+   "flag": "#f28c38",
+   "jingle": [
+    392,
+    466,
+    587,
+    698,
+    784
+   ],
+   "icon": "course7"
+  },
+  {
+   "course": 17,
+   "felt": "#3d6e55",
+   "wall": "#a39cb5",
+   "ground": "#463a5e",
+   "sky": [
+    "#2c2366",
+    "#d9785f"
+   ],
+   "fog": true,
+   "sand": "#8a6a4a",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#6c4f92",
+   "water": "#2d6f8f",
+   "push": "#e9a23b",
+   "skirt": "#665c78",
+   "tube": "#ef7d6d",
+   "flag": "#f28c38",
+   "jingle": [
+    440,
+    523,
+    659,
+    784,
+    880
+   ],
+   "icon": "course17"
+  },
+  {
+   "course": 27,
+   "felt": "#356a4c",
+   "wall": "#a39cb5",
+   "ground": "#2c2744",
+   "sky": [
+    "#0e0b2e",
+    "#3a2466"
+   ],
+   "fog": true,
+   "sand": "#8a6a4a",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#5e4585",
+   "water": "#24607e",
+   "push": "#e9a23b",
+   "skirt": "#544b68",
+   "tube": "#ef7d6d",
+   "flag": "#f28c38",
+   "jingle": [
+    349,
+    440,
+    523,
+    698,
+    880
+   ],
+   "icon": "course27"
+  },
+  {
+   "course": 8,
+   "felt": "#5e5394",
+   "wall": "#ef7d6d",
+   "ground": "#c9a476",
+   "sky": [
+    "#0b0820",
+    "#2a1f4a"
+   ],
+   "fog": false,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#2f86c8",
+   "push": "#4f8fb8",
+   "skirt": "#3b3366",
+   "tube": "#6fc0df",
+   "flag": "#ffd66e",
+   "jingle": [
+    392,
+    587,
+    784,
+    587,
+    1175
+   ],
+   "icon": "course8"
+  },
+  {
+   "course": 18,
+   "felt": "#2f6f68",
+   "wall": "#ef7d6d",
+   "ground": "#c9a476",
+   "sky": [
+    "#04140f",
+    "#1d3f38"
+   ],
+   "fog": false,
+   "sand": "#8a6a3a",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#26305f",
+   "water": "#2f86c8",
+   "push": "#4f8fb8",
+   "skirt": "#1f4a46",
+   "tube": "#6fc0df",
+   "flag": "#9be36b",
+   "jingle": [
+    440,
+    659,
+    880,
+    659,
+    1319
+   ],
+   "icon": "course18"
+  },
+  {
+   "course": 28,
+   "felt": "#6a3570",
+   "wall": "#ef7d6d",
+   "ground": "#c9a476",
+   "sky": [
+    "#1a0412",
+    "#4a1638"
+   ],
+   "fog": false,
+   "sand": "#8a6a3a",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#1f2452",
+   "water": "#2f86c8",
+   "push": "#b5651d",
+   "skirt": "#40204a",
+   "tube": "#ffd66e",
+   "flag": "#ff9a3d",
+   "jingle": [
+    330,
+    494,
+    659,
+    988,
+    1319
+   ],
+   "icon": "course28"
+  },
+  {
+   "course": 9,
+   "felt": "#a8487a",
+   "wall": "#8fe0c8",
+   "ground": "#ffd9e8",
+   "sky": [
+    "#ffb8d6",
+    "#fff4e0"
+   ],
+   "fog": true,
+   "sand": "#c98a4a",
+   "ice": "#2f7ea6",
+   "mud": "#9a5e2c",
+   "fast": "#3d6fc4",
+   "water": "#5a3420",
+   "push": "#7a5aa8",
+   "skirt": "#d87aa8",
+   "tube": "#ef7d6d",
+   "flag": "#6fc0df",
+   "jingle": [
+    784,
+    988,
+    1175,
+    1568,
+    1319,
+    1568
+   ],
+   "icon": "course9"
+  },
+  {
+   "course": 19,
+   "felt": "#7a3f8f",
+   "wall": "#ffd66e",
+   "ground": "#e9c6e0",
+   "sky": [
+    "#6b5aa8",
+    "#f6bcd8"
+   ],
+   "fog": true,
+   "sand": "#c98a4a",
+   "ice": "#2f7ea6",
+   "mud": "#9a5e2c",
+   "fast": "#3d6fc4",
+   "water": "#5a3420",
+   "push": "#4f8fb0",
+   "skirt": "#a774c4",
+   "tube": "#ef7d6d",
+   "flag": "#ffd66e",
+   "jingle": [
+    784,
+    988,
+    1175,
+    1568,
+    1319,
+    1568
+   ],
+   "icon": "course19"
+  },
+  {
+   "course": 29,
+   "felt": "#2f7f86",
+   "wall": "#f29ac0",
+   "ground": "#fff0d4",
+   "sky": [
+    "#ffbf7a",
+    "#fff4e0"
+   ],
+   "fog": true,
+   "sand": "#c98a4a",
+   "ice": "#2f7ea6",
+   "mud": "#9a5e2c",
+   "fast": "#3d6fc4",
+   "water": "#5a3420",
+   "push": "#b0569a",
+   "skirt": "#5fb0a8",
+   "tube": "#ef7d6d",
+   "flag": "#ef7d6d",
+   "jingle": [
+    784,
+    988,
+    1175,
+    1568,
+    1319,
+    1568
+   ],
+   "icon": "course29"
+  },
+  {
+   "course": 10,
+   "felt": "#317a3b",
+   "wall": "#fffdf7",
+   "ground": "#c9a476",
+   "sky": [
+    "#4fa8ec",
+    "#f4fbff"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#3f8fbf",
+   "mud": "#5b4630",
+   "fast": "#c0569e",
+   "water": "#2f86c8",
+   "push": "#5b7fd6",
+   "skirt": "#8a6538",
+   "tube": "#ef7d6d",
+   "flag": "#ffd66e",
+   "jingle": [
+    784,
+    988,
+    1175,
+    1568,
+    1976
+   ],
+   "icon": "course10"
+  },
+  {
+   "course": 20,
+   "felt": "#2e6a3c",
+   "wall": "#fffdf7",
+   "ground": "#c9a476",
+   "sky": [
+    "#e8735a",
+    "#ffd9a8"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#3f8fbf",
+   "mud": "#5b4630",
+   "fast": "#c0569e",
+   "water": "#2f86c8",
+   "push": "#c86a8a",
+   "skirt": "#8a6538",
+   "tube": "#ef7d6d",
+   "flag": "#ef7d6d",
+   "jingle": [
+    659,
+    880,
+    988,
+    1319,
+    1760
+   ],
+   "icon": "course20"
+  },
+  {
+   "course": 30,
+   "felt": "#25606a",
+   "wall": "#fffdf7",
+   "ground": "#c9a476",
+   "sky": [
+    "#2c2f7a",
+    "#d68ad0"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#3f8fbf",
+   "mud": "#5b4630",
+   "fast": "#c0569e",
+   "water": "#2f86c8",
+   "push": "#5b7fd6",
+   "skirt": "#7a5a3a",
+   "tube": "#ef7d6d",
+   "flag": "#7ee0b5",
+   "jingle": [
+    523,
+    784,
+    1047,
+    1319,
+    1568,
+    2093
+   ],
+   "icon": "course30"
+  },
+  {
+   "course": 98,
+   "felt": "#2e7d43",
+   "wall": "#c9ced6",
+   "ground": "#8fa36b",
+   "sky": [
+    "#6fa3d4",
+    "#ffd6a0"
+   ],
+   "fog": true,
+   "sand": "#8a6236",
+   "ice": "#2f7ea6",
+   "mud": "#5b4630",
+   "fast": "#3f5f86",
+   "water": "#3a8fc8",
+   "push": "#e9a23b",
+   "skirt": "#b9b2a4",
+   "tube": "#d9dde3",
+   "flag": "#ef7d6d",
+   "jingle": [
+    392,
+    523,
+    659,
+    784,
+    659,
+    1047
+   ],
+   "wallKind": "steel",
+   "edging": [
+    "rock",
+    "#b9b2a4"
+   ],
+   "icon": "course98"
+  },
+  {
+   "course": 99,
+   "felt": "#3d2f8f",
+   "wall": "#ff5fa2",
+   "ground": "#1d1440",
+   "sky": [
+    "#2a1660",
+    "#ff9a6b"
+   ],
+   "fog": true,
+   "sand": "#b86a2a",
+   "ice": "#2a8fbf",
+   "mud": "#5a3b2a",
+   "fast": "#6b3fd0",
+   "water": "#2a4dff",
+   "push": "#d13b7a",
+   "skirt": "#4a2380",
+   "tube": "#ffd66e",
+   "flag": "#b6ff2e",
+   "jingle": [
+    659,
+    831,
+    988,
+    1319,
+    1661
+   ],
+   "icon": "course99"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "course1.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "export-ios",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

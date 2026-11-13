@@ -9,3 +9,5 @@ ios/**/.build/
 ios/**/.swiftpm/
 ios/**/*.xcodeproj/
 ios/**/xcuserdata/
+ios/PuttX/Info.plist
+ios/build/

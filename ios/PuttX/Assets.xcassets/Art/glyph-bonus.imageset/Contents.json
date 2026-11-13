@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "glyph-bonus.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "export-ios",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

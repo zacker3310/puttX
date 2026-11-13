@@ -46,7 +46,11 @@ struct CourseView: UIViewRepresentable {
                 let r = renderer == .hand && play.hole.key == "1-1" ? try HandHole.build(play.hole) : try CourseBuilder.exported(play.hole)
                 anchor.addChild(r.root)
                 rig = r
-                if let env = try? Sky.environment(top: r.skyTop, horizon: r.skyHorizon, ground: r.skyGround, sun: r.sunDirection) {
+                // the sky, once it is made: the backdrop and the image-based light
+                v.environment.background = .color(UIColor(red: 0.62, green: 0.85, blue: 0.94, alpha: 1))
+                let img = Sky.image(top: r.skyTop, horizon: r.skyHorizon, ground: r.skyGround, sun: r.sunDirection)
+                Task { @MainActor [weak v] in
+                    guard let env = try? await EnvironmentResource(equirectangular: img), let v else { return }
                     v.environment.background = .skybox(env)
                     v.environment.lighting.resource = env
                 }
@@ -134,7 +138,7 @@ struct CourseView: UIViewRepresentable {
 /// the web's sky (initSky): a gradient from the horizon up to the top and down to the ground, with a
 /// warm glow round the sun, drawn as an equirectangular image for RealityKit to light and backdrop with
 enum Sky {
-    static func environment(top: SIMD3<Double>, horizon: SIMD3<Double>, ground: SIMD3<Double>, sun: SIMD3<Float>) throws -> EnvironmentResource {
+    static func image(top: SIMD3<Double>, horizon: SIMD3<Double>, ground: SIMD3<Double>, sun: SIMD3<Float>) -> CGImage {
         let W = 512, H = 256
         var px = [UInt8](repeating: 255, count: W * H * 4)
         let sd = SIMD3<Double>(Double(sun.x), Double(sun.y), Double(sun.z)), glow = SIMD3<Double>(1, 0.93, 0.8)
@@ -153,6 +157,6 @@ enum Sky {
         }
         let cs = CGColorSpace(name: CGColorSpace.sRGB)!
         let ctx = CGContext(data: &px, width: W, height: H, bitsPerComponent: 8, bytesPerRow: W * 4, space: cs, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-        return try EnvironmentResource.generate(fromEquirectangular: ctx.makeImage()!)
+        return ctx.makeImage()!
     }
 }

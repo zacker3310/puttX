@@ -104,7 +104,7 @@ enum CourseBuilder {
     static func addBall(_ rig: CourseRig) {
         var m = PhysicallyBasedMaterial()
         m.baseColor = .init(tint: UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1))
-        m.roughness = 0.45; m.clearcoat = 1; m.clearcoatRoughness = 0.07
+        m.roughness = 0.45; m.clearcoat = 1.0; m.clearcoatRoughness = 0.07
         rig.ball = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R)), materials: [m])
         rig.root.addChild(rig.ball)
     }
@@ -151,8 +151,8 @@ enum CourseBuilder {
     static func turfMaterial(_ m: SceneMat, along: SIMD2<Float>, stripes: Float) throws -> any Material {
         guard let lib = library else { return SceneStore.shared.material(m) }
         var c = try CustomMaterial(surfaceShader: CustomMaterial.SurfaceShader(named: "turfSurface", in: lib), lightingModel: .lit)
-        if let t = m.map { c.baseColor = .init(tint: SceneStore.color(m.color), texture: try SceneStore.shared.param(t)) }
-        if let t = m.normalMap { c.normal = .init(texture: try SceneStore.shared.param(t, normal: true)) }
+        if let t = m.map { c.baseColor = .init(tint: SceneStore.color(m.color), texture: .init(try SceneStore.shared.texture(t))) }
+        if let t = m.normalMap { c.normal = .init(texture: .init(try SceneStore.shared.texture(t, normal: true))) }
         c.roughness = .init(scale: Float(m.roughness ?? 0.93))
         c.custom.value = SIMD4(along.x, along.y, stripes, 0.7)
         return c
@@ -160,8 +160,8 @@ enum CourseBuilder {
     static func groundMaterial(_ m: SceneMat) throws -> any Material {
         guard let lib = library else { return SceneStore.shared.material(m) }
         var c = try CustomMaterial(surfaceShader: CustomMaterial.SurfaceShader(named: "groundSurface", in: lib), lightingModel: .lit)
-        if let t = m.map { c.baseColor = .init(tint: SceneStore.color(m.color), texture: try SceneStore.shared.param(t)) }
-        if let t = m.normalMap { c.normal = .init(texture: try SceneStore.shared.param(t, normal: true)) }
+        if let t = m.map { c.baseColor = .init(tint: SceneStore.color(m.color), texture: .init(try SceneStore.shared.texture(t))) }
+        if let t = m.normalMap { c.normal = .init(texture: .init(try SceneStore.shared.texture(t, normal: true))) }
         c.custom.value = SIMD4(Float(m.map?.rep[0] ?? 48), 0, 0, 0)
         return c
     }

@@ -32,6 +32,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.puttx.app
+        # Game Center and iCloud key-value saves (a team must be set to sign them)
+        CODE_SIGN_ENTITLEMENTS: PuttX/PuttX.entitlements
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -48,5 +50,8 @@ targets:
       properties:
         # 120 Hz on ProMotion iPhones (iPads allow it already)
         CADisableMinimumFrameDurationOnPhone: true
+        # game controllers drive play; Game Mode gives the game the device's full attention
+        GCSupportsControllerUserInteraction: true
+        GCSupportsGameMode: true
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false

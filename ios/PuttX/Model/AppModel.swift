@@ -30,6 +30,8 @@ final class AppModel {
     private(set) var renderer: Renderer = .exported
 
     @ObservationIgnored private let store = UserDefaults.standard
+    @ObservationIgnored private let cloud = CloudSave()
+    @ObservationIgnored let controllers = Controllers()
     private static func key(_ n: Int) -> String { "puttx.save.\(n)" }
 
     init() {
@@ -39,6 +41,22 @@ final class AppModel {
         progress = load(slot) ?? PlayerProgress(catalog: catalog)
         applyLaunchArguments()
         applySound()
+        // another device played: fold its progress into ours, nothing lost either way
+        cloud.onChange = { [weak self] slots in
+            guard let self else { return }
+            for n in slots { self.pullCloud(n) }
+        }
+        pullCloud(slot)
+        GameCenter.signIn()
+    }
+
+    /// merges a slot's iCloud copy into the local one and writes the union both ways
+    func pullCloud(_ n: Int) {
+        guard let remote = cloud.read(n) else { if let local = load(n) { cloud.write(n, local) }; return }
+        let merged = (load(n) ?? remote).merged(with: remote)
+        if let d = try? JSONEncoder().encode(merged) { store.set(d, forKey: AppModel.key(n)) }
+        cloud.write(n, merged)
+        if n == slot { progress = merged }
     }
 
     // MARK: saves
@@ -46,7 +64,10 @@ final class AppModel {
         guard let d = store.data(forKey: AppModel.key(n)) else { return nil }
         return try? JSONDecoder().decode(PlayerProgress.self, from: d)
     }
-    func save() { if let d = try? JSONEncoder().encode(progress) { store.set(d, forKey: AppModel.key(slot)) } }
+    func save() {
+        if let d = try? JSONEncoder().encode(progress) { store.set(d, forKey: AppModel.key(slot)) }
+        cloud.write(slot, progress)
+    }
     func slotUsed(_ n: Int) -> Bool { !(load(n)?.holes.isEmpty ?? true) }
     func useSlot(_ n: Int) {
         slot = n; store.set(n, forKey: "puttx.slot")
@@ -56,6 +77,7 @@ final class AppModel {
     }
     func erase(_ n: Int) {
         store.removeObject(forKey: AppModel.key(n))
+        cloud.erase(n)
         if n == slot { progress = PlayerProgress(catalog: catalog) }
     }
 
@@ -82,6 +104,7 @@ final class AppModel {
     func finished(_ h: Hole, score: Int) -> HoleRecord {
         let rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
         save()
+        GameCenter.holeBanked(h.key, score: score, progress: progress, catalog: catalog)
         return rec
     }
     func next(after key: String) -> Route {

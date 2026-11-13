@@ -99,8 +99,10 @@ struct HoleView: View {
                 play.record = app.finished(play.hole, score: score)
             }
             play.start()
+            app.controllers.onBack = { app.go(.map(Catalog.course(of: play.hole.key))) }
+            app.controllers.attach(play)
         }
-        .onDisappear { play.stop() }
+        .onDisappear { play.stop(); app.controllers.detach() }
     }
 
     private var hud: some View {

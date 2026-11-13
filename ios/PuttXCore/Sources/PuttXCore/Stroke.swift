@@ -37,6 +37,12 @@ public struct Stroke: Sendable, Equatable {
     /// dead on: in the sweet spot, on tempo
     public let clean: Bool
 
+    /// a stroke with nothing to mis-hit (a controller's trigger): dead on, its power the backswing alone
+    public static func trigger(power: Double) -> Stroke {
+        let p = clamp(power, 0, 1)
+        return Stroke(length: p * Swing.FULL, base: p, tempo: 0, tempoMul: 1, off: 0, contactMul: 1, path: 0, power: p, turn: 0, clean: true)
+    }
+
     /// a pad gesture's samples (the first is the touch) to the stroke, or nil while there is no contact yet
     public static func from(_ s: [PadSample], feel: Feel = Feel()) -> Stroke? {
         guard s.count >= 3 else { return nil }

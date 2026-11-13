@@ -157,7 +157,22 @@ const art = { 'Contents.json': JSON.stringify({ info: { author: 'export-ios', ve
 for (const l of looks) if (l.icon) Object.assign(art, imageSet('course' + l.course, l.icon, false));
 for (const [n, svg] of Object.entries(readGlyphs())) Object.assign(art, imageSet('glyph-' + n, svg, n === 'star'));
 
-const files = [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], [PLAY_OUT, playGolden()], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
+/* the extras, from the web's own code (src/game.js 6c): lost-ball spots for a hole of every fourth
+   course, and the daily hole for a spread of dates */
+function extrasGolden() {
+  const src = fs.readFileSync(path.join(ROOT, 'src/game.js'), 'utf8');
+  const cut = (a, b) => src.slice(src.indexOf(a), src.indexOf(b));
+  const names = ['BALL_R', 'WALL_HALF', 'TUBE_R', 'simulatePutt', 'groundH', 'onFloor', 'zoneAt', 'closestOnSeg'];
+  const lostSpot = new Function(...names, cut('const LOST_SHOTS', '/* the search runs').replace('let lostMesh = null;', '') + '\nreturn lostSpot;')(...names.map(n => S[n]));
+  const dailyKey = new Function('allCourses', 'WORLDS', cut('function dailyKey', 'function finishDaily') + '\nreturn dailyKey;')(S.allCourses, S.WORLDS);
+  const lost = {};
+  S.allCourses().forEach((c, i) => { if (i % 4 === 0) { const h = S.WORLDS[c].holes[3 % S.WORLDS[c].holes.length]; lost[h.key] = lostSpot(h); } });
+  const daily = {};
+  for (let i = 0; i < 40; i++) { const d = new Date(Date.UTC(2026, 0, 1 + i * 37)), ds = d.toISOString().slice(0, 10); daily[ds] = dailyKey(ds); }
+  return JSON.stringify({ v: 1, lost, daily }) + '\n';
+}
+const EXTRAS_OUT = path.join(ROOT, 'ios/PuttXCore/Tests/PuttXCoreTests/Resources/extras.json');
+const files = [[EXTRAS_OUT, extrasGolden()], [HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], [PLAY_OUT, playGolden()], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
 if (process.argv.includes('--check')) {
   /* play.json's outputs come from log2 and atan2, which engines may round differently in the last
      bit: fresh means the same gestures and the same strokes to 1e-12 (the Swift test's own tolerance) */

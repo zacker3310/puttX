@@ -69,3 +69,11 @@ void groundSurface(realitykit::surface_parameters params) {
     params.surface().set_roughness(1.0h);
     params.surface().set_metallic(0.0h);
 }
+
+/// src/game.js waveMat: the pin flag ripples away from the pole, more the further out it reaches
+[[visible]]
+void flagWave(realitykit::geometry_parameters params) {
+    float3 p = params.geometry().model_position();
+    float t = params.uniforms().time(), k = p.x / 0.22;
+    params.geometry().set_model_position_offset(float3(0.0, -0.01 * k * k, sin(p.x * 28.0 - t * 6.0) * 0.012 * k));
+}

@@ -89,6 +89,123 @@ function grabHole(key) {
     /* to the micrometre: invisible, and half the size */
     return { g: geoOf(o.geometry), m: mats.length === 1 ? mats[0] : mats, x: Array.from(x.elements, v => Math.round(v * 1e6) / 1e6), shadow: [o.castShadow, o.receiveShadow], order: o.renderOrder || 0 };
   };
+  /* ---- what moves every frame (a look's tick): each animated object as a formula of the time, so
+     the app replays it without the web's code. A channel is [c, rate, a1, f1, p1, a2, f2, p2, ...]:
+     c + rate * t + sum a * sin(f * t + p) (`relu`: each sine clipped at 0). Checked against the real
+     tick below before anything is written. */
+  const lk = lookOf(holeWorld(h)), G = holeGroup, H = Math.PI / 2;
+  const ticks = new Set([lk.tick]);
+  if (lk.tick && /WORLD_LOOK\[10\]/.test(String(lk.tick)) && WORLD_LOOK[10]) ticks.add(WORLD_LOOK[10].tick);
+  const uses = n => !!(WORLD_LOOK[n] && WORLD_LOOK[n].tick && ticks.has(WORLD_LOOK[n].tick));
+  const A = { objs: new Map(), mats: [], pts: new Map(), weeds: new Set() };
+  const ch = (o, k, spec) => { let r = A.objs.get(o); if (!r) A.objs.set(o, r = { ch: {} }); r.ch[k] = spec; return r; };
+  const ud = G.userData;
+  if (lk.tick) {
+    if (ud.j3flies) A.pts.set(ud.j3flies, { k: 'flies' });
+    if (ud.snow) A.pts.set(ud.snow, { k: 'snow' });
+    if (ud.embers) A.pts.set(ud.embers, { k: 'embers' });
+    if (ud.ship) { ch(ud.ship, 'rz', [0, 0, 0.03, 0.9, 0]); ch(ud.ship, 'py', [-0.05, 0, 0.03, 1.3, 0]); }
+    for (const f of ud.floats || []) ch(f, 'py', [0, 0, 0.025, 1.6, f.userData.bob]);
+    if (ud.embers && ud.crater) A.mats.push({ m: ud.crater.material, p: 'g', ch: [0.38, 0, 0.08, 1.3, 0] });
+    if (ud.embers && ud.smoke) ch(ud.smoke, 'ry', [0, 0, 0.05, 0.1, 0]);
+    if (ud.embers) for (const m of ud.glow || []) A.mats.push({ m, p: 'ei', ch: [0.5, 0, 0.12, 1.7, 0] });
+    if (ud.c7) {
+      const d = ud.c7;
+      for (const b of d.bats) {
+        const u = b.userData.c7;
+        ch(b, 'px', [d.cx, 0, u.rad, u.sp, u.a + H]); ch(b, 'pz', [d.cz, 0, u.rad, u.sp, u.a]);
+        ch(b, 'py', [u.y, 0, 0.3, 0.7, u.a]); ch(b, 'ry', [-u.a, -u.sp]);
+        b.children.forEach(c => { if (c.children[0] && c.children[0].userData.c7Wing) ch(c, 'rz', [0, 0, c.children[0].userData.c7Wing * 0.5, 9, u.a]); });
+      }
+      for (const o of d.bobs) ch(o, 'py', [0, 0, 0.02, 2.2, o.userData.c7Bob]);
+    }
+    if (uses(8)) for (const o of G.children) {
+      if (o.name === 'stars' && o.isPoints) { A.pts.set(o, { k: 'spin', rate: 0.004 }); ch(o, 'ry', [0, 0.004]); }
+      else if (o.name === 'planet') ch(o, 'ry', [0, 0.05]);
+      else if (o.name === 'lamp') ch(o, 'ry', [0, 2]);
+      else if (o.name === 'drift') {
+        ch(o, 'py', [0, 0, 0.06, 0.8, o.userData.bob]);
+        const b = o.getObjectByName('beacon');
+        if (b) { let r = A.objs.get(b); if (!r) A.objs.set(b, r = { ch: {} }); r.vis = [3, o.userData.bob, -0.4]; }
+      }
+    }
+    for (const d of ud.lolly || []) ch(d, 'ry', [d.rotation.y, 0.6]);
+    if (uses(10)) {
+      for (const o of G.children) {
+        const d = o.userData && o.userData.c10drift;
+        if (d) { ch(d.c, 'px', [d.base, 0, 0.6, d.sp * 0.3, d.ph]); ch(d.c, 'py', [d.c.position.y + 0.03 / d.sp * Math.cos(d.ph), 0, -0.03 / d.sp, d.sp, d.ph + H]); }
+      }
+      for (const f of ud.c10far || []) ch(f.c, 'py', [f.base, 0, 0.25, 0.25, f.a * 3]);
+    }
+    if (uses(11)) for (const o of G.children) for (const c of o.children) if (c.userData.c11spin) ch(c, 'ry', [c.rotation.y, c.userData.c11spin]);
+    for (const b of ud.c30bands || []) { A.mats.push({ m: b.m.material, p: 'op', ch: [0.25, 0, 0.12, 0.4, b.ph] }); ch(b.m, 'rz', [0, 0, 0.08, 0.15, b.ph]); }
+    if (uses(98)) for (const o of G.children) if (o.userData.c98sign) for (const c of o.children) if (c.userData.c98flag) ch(c, 'ry', [0, 0, 0.35, 1.7, 0, 0.12, 4.3, 0]);
+    if (uses(99)) for (const o of G.children) if (o.userData.c99spin) o.children.forEach((c, i) => { if (c.material && c.material.emissive && i > 0) A.mats.push({ m: c.material, p: 'ei', ch: [0.5, 0, 0.5, 3, -i * 0.6], relu: 1 }); });
+    G.traverse(o => { if (o.userData.weed && o.userData.mover) A.weeds.add(o.userData.weed); });
+  }
+  const chan = (c, t, relu) => { let v = c[0] + c[1] * t; for (let i = 2; i < c.length; i += 3) { const s = Math.sin(c[i + 1] * t + c[i + 2]); v += c[i] * (relu ? Math.max(0, s) : s); } return v; };
+  /* the particle drifts, in closed form (the tick integrates them frame by frame) */
+  const ptAt = (k, p0, i, t, rate) => {
+    let [x, y, z] = p0;
+    /* a drift that wraps (snow falls, embers rise): x follows the antiderivative F along y, segment by segment */
+    const wrapped = (v, lo, hi, F) => {
+      const L = hi - lo, Y = y + v * t;
+      const n = v > 0 ? Math.max(0, Math.ceil((Y - hi) / L)) : Math.max(0, Math.ceil((lo - Y) / L)), yy = v > 0 ? Y - n * L : Y + n * L;
+      const a = v > 0 ? hi : lo, b = v > 0 ? lo : hi;
+      x += n === 0 ? F(yy) - F(y) : F(a) - F(y) + (n - 1) * (F(a) - F(b)) + F(yy) - F(b);
+      y = yy;
+    };
+    if (k === 'flies') { y += 0.12 / 1.3 * (Math.cos(i) - Math.cos(1.3 * t + i)); x += 0.08 / 0.9 * (Math.sin(0.9 * t + 1.7 * i) - Math.sin(1.7 * i)); }
+    else if (k === 'snow') wrapped(-0.45, 0.6, 6.6, u => 0.05 / 0.9 * Math.cos(2 * u + i));
+    else if (k === 'embers') wrapped(0.25, 0.3, 5, u => -0.03 / (0.25 * 1.7) * Math.cos(1.7 * u + i));
+    else if (k === 'spin') { const a = rate * t, c = Math.cos(a), s = Math.sin(a); [x, z] = [x * c + z * s, -x * s + z * c]; }
+    return [x, y, z];
+  };
+  if (lk.tick) {
+    lk.tick(G, 0, 0);
+    /* the pose at t = 0 is what is exported; step the real tick for 3 s and hold every formula to it */
+    const snap = []; G.traverse(o => snap.push([o, o.position.clone(), o.rotation.clone(), o.scale.clone(), o.visible, o.quaternion.clone()]));
+    const allMats = new Set(); G.traverse(o => { if (o.material) [].concat(o.material).forEach(m => allMats.add(m)); });
+    const msnap = [...allMats].map(m => [m, m.color ? m.color.clone() : null, m.opacity, m.emissiveIntensity]);
+    const psnap = []; G.traverse(o => { if (o.isPoints) psnap.push([o, Array.from(o.geometry.attributes.position.array)]); });
+    const inWeed = o => { for (let a = o; a; a = a.parent) if (A.weeds.has(a)) return true; return false; };
+    const dt = 1 / 240, bad = new Set();
+    for (let k = 1; k <= 720; k++) {
+      const t = k * dt;
+      lk.tick(G, dt, t);
+      if (k % 240) continue;
+      for (const [o, p, r, , vis] of snap) {
+        if (inWeed(o)) continue;
+        const sp = A.objs.get(o), want = { px: p.x, py: p.y, pz: p.z, rx: r.x, ry: r.y, rz: r.z };
+        if (sp) for (const [c, v] of Object.entries(sp.ch)) want[c] = chan(v, t);
+        const got = { px: o.position.x, py: o.position.y, pz: o.position.z, rx: o.rotation.x, ry: o.rotation.y, rz: o.rotation.z };
+        for (const c of Object.keys(want)) if (Math.abs(want[c] - got[c]) > 2e-3) bad.add(`${o.name || o.type} ${c} ${want[c].toFixed(4)} vs ${got[c].toFixed(4)}`);
+        const wv = sp && sp.vis ? Math.sin(sp.vis[0] * t + sp.vis[1]) > sp.vis[2] : vis;
+        if (wv !== o.visible) bad.add(`${o.name || o.type} visible`);
+      }
+      for (const [m, c, op, ei] of msnap) {
+        const want = { g: c && c.g, r: c && c.r, b: c && c.b, op, ei };
+        for (const s of A.mats) if (s.m === m) want[s.p] = chan(s.ch, t, s.relu);
+        const got = { g: m.color && m.color.g, r: m.color && m.color.r, b: m.color && m.color.b, op: m.opacity, ei: m.emissiveIntensity };
+        for (const p of Object.keys(want)) if (want[p] !== undefined && Math.abs(want[p] - got[p]) > 2e-3) bad.add(`material ${m.type} ${p} ${(+want[p]).toFixed(4)} vs ${(+got[p]).toFixed(4)}`);
+      }
+      for (const [o, p0] of psnap) {
+        const sp = A.pts.get(o), a = o.geometry.attributes.position; let off = 0;
+        for (let i = 0; i < a.count; i++) {
+          const w = sp && sp.k !== 'spin' ? ptAt(sp.k, [p0[i * 3], p0[i * 3 + 1], p0[i * 3 + 2]], i, t, sp.rate) : [p0[i * 3], p0[i * 3 + 1], p0[i * 3 + 2]];
+          if (Math.abs(w[0] - a.getX(i)) + Math.abs(w[1] - a.getY(i)) + Math.abs(w[2] - a.getZ(i)) > 5e-3) off++;
+        }
+        /* a flake that wrapped near a checkpoint may sit a hair off; anything more is a wrong formula */
+        if (off > a.count * 0.03) bad.add(`points ${o.name || ''} ${off}/${a.count} off`);
+      }
+    }
+    for (const b of bad) warn.push('anim: ' + b);
+    /* back to t = 0 */
+    for (const [o, p, r, s, vis, q] of snap) { o.position.copy(p); o.quaternion.copy(q); o.scale.copy(s); o.visible = vis; }
+    for (const [m, c, op, ei] of msnap) { if (c) m.color.copy(c); m.opacity = op; if (ei !== undefined) m.emissiveIntensity = ei; }
+    for (const [o, p0] of psnap) { o.geometry.attributes.position.array.set(p0); o.geometry.attributes.position.needsUpdate = true; }
+    G.updateMatrixWorld(true);
+  }
   holeGroup.updateMatrixWorld(true);
   const out = { key, static: [], movers: [], native: { zones: [] } };
   /* the parts grown natively: just their materials and parameters */
@@ -104,35 +221,65 @@ function grabHole(key) {
   const ground = !!out.native.ground;
   out.native.skirt.bottom = ground ? -0.03 : -0.5;
   const moverSet = new Set(moverMeshes);
-  for (const c of holeGroup.children) {
-    if (nativeTop.has(c) || moverSet.has(c)) continue;
-    c.traverseVisible(o => {
-      if (o.isInstancedMesh) {
-        /* one mesh, many copies: each instance's matrix (within the node) and its tint */
-        const n = node(o), im = new THREE.Matrix4(), c = new THREE.Color(), r6 = v => Math.round(v * 1e6) / 1e6;
-        n.inst = [];
-        for (let i = 0; i < o.count; i++) {
-          o.getMatrixAt(i, im);
-          const e = Array.from(im.elements, r6);
-          if (o.instanceColor) { o.getColorAt(i, c); e.push(r6(c.r), r6(c.g), r6(c.b)); }
-          n.inst.push(e);
-        }
-        out.static.push(n);
-      } else if (o.isMesh) out.static.push(node(o));
-      else if (o.isPoints) {
-        /* particles (fireflies, snow, embers, night skies): their points in hole space, to the mm */
-        const P = o.geometry.attributes.position, m = o.material, pts = [], v = new THREE.Vector3();
-        for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld); pts.push(Math.round(v.x * 1000) / 1000, Math.round(v.y * 1000) / 1000, Math.round(v.z * 1000) / 1000); }
-        (out.points = out.points || []).push({ pts, color: lin(m.color), size: m.size, opacity: m.opacity, atten: m.sizeAttenuation !== false, name: o.name || (o.parent && o.parent.name) || '' });
-      } else if (o.isLine || o.isSprite) warn.push(o.type + ' skipped');
-    });
+  const r6 = v => Math.round(v * 1e6) / 1e6, anims = [];
+  /* the scenery: static nodes, and each animated object as its own little rig (its parent's frame,
+     its pose at t = 0, its formulas, and the meshes it carries, in its own frame) */
+  function walk(o, rec) {
+    const sp = A.objs.get(o);
+    if (!o.visible && !(sp && sp.vis)) return;
+    if (sp && !o.isPoints) {
+      const px = new THREE.Matrix4();
+      if (rec) px.copy(rec.o.matrixWorld).invert();
+      px.multiply(o.parent.matrixWorld);
+      if (o.rotation.order !== 'XYZ') warn.push('anim rotation order ' + o.rotation.order);
+      rec = { o, out: { up: rec ? anims.indexOf(rec.out) : -1, px: Array.from(px.elements, r6), b: [...o.position.toArray(), o.rotation.x, o.rotation.y, o.rotation.z, ...o.scale.toArray()].map(r6), ch: sp.ch, vis: sp.vis || null, parts: [] } };
+      anims.push(rec.out);
+    }
+    if (o.isInstancedMesh) {
+      /* one mesh, many copies: each instance's matrix (within the node) and its tint */
+      const n = node(o), im = new THREE.Matrix4(), c = new THREE.Color();
+      n.inst = [];
+      for (let i = 0; i < o.count; i++) {
+        o.getMatrixAt(i, im);
+        const e = Array.from(im.elements, r6);
+        if (o.instanceColor) { o.getColorAt(i, c); e.push(r6(c.r), r6(c.g), r6(c.b)); }
+        n.inst.push(e);
+      }
+      if (rec) warn.push('instanced mesh inside an animated object');
+      out.static.push(n);
+    } else if (o.isMesh) (rec ? rec.out.parts : out.static).push(node(o, rec ? rec.o : undefined));
+    else if (o.isPoints) {
+      /* particles (fireflies, snow, embers, night skies): their points in hole space, to the mm */
+      const P = o.geometry.attributes.position, m = o.material, pts = [], v = new THREE.Vector3();
+      for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld); pts.push(Math.round(v.x * 1000) / 1000, Math.round(v.y * 1000) / 1000, Math.round(v.z * 1000) / 1000); }
+      const cloud = { pts, color: lin(m.color), size: m.size, opacity: m.opacity, atten: m.sizeAttenuation !== false, name: o.name || (o.parent && o.parent.name) || '' };
+      const pa = A.pts.get(o);
+      if (pa) {
+        const e = o.matrixWorld.elements;
+        if (Math.abs(e[0] - 1) + Math.abs(e[5] - 1) + Math.abs(e[10] - 1) + Math.abs(e[1]) + Math.abs(e[2]) + Math.abs(e[4]) + Math.abs(e[6]) + Math.abs(e[8]) + Math.abs(e[9]) > 1e-6) warn.push('animated points turned or scaled');
+        cloud.anim = { k: pa.k, rate: pa.rate || 0, off: [e[12], e[13], e[14]] };
+      }
+      (out.points = out.points || []).push(cloud);
+    } else if (o.isLine || o.isSprite) warn.push(o.type + ' skipped');
+    for (const c of o.children) walk(c, rec);
   }
+  for (const c of holeGroup.children) if (!nativeTop.has(c) && !moverSet.has(c)) walk(c, null);
+  if (anims.length) out.anims = anims;
+  if (A.mats.length) out.matAnims = A.mats.map(s => ({ m: matOf(s.m), p: s.p, ch: s.ch, relu: s.relu || 0 }));
   for (const mv of moverMeshes) {
     const keep = { p: mv.position.clone(), r: mv.rotation.clone() };
     mv.position.set(0, 0, 0); mv.rotation.set(0, 0, 0); mv.updateMatrixWorld(true);
-    const parts = [];
-    mv.traverseVisible(o => { if (o.isMesh) parts.push(node(o, mv)); });
+    mv.traverse(o => { if (A.objs.has(o)) warn.push('animated object inside a mover'); });
+    const parts = [], inner = mv.userData.weed;
+    const within = (o, a) => { for (let p = o; p; p = p.parent) if (p === a) return true; return false; };
+    mv.traverseVisible(o => { if (o.isMesh && !(inner && within(o, inner))) parts.push(node(o, mv)); });
     out.movers.push(parts);
+    if (inner) {
+      /* a tumbleweed: the inner ball rolls (and hops) as the mover travels, as c02's tick turns it */
+      const ip = []; inner.traverseVisible(o => { if (o.isMesh) ip.push(node(o, inner)); });
+      const x = new THREE.Matrix4().copy(mv.matrixWorld).invert().multiply(inner.matrixWorld);
+      (out.weeds = out.weeds || []).push({ i: out.movers.length - 1, x: Array.from(x.elements, r6), r: mv.userData.mover.r, parts: ip });
+    }
     mv.position.copy(keep.p); mv.rotation.copy(keep.r); mv.updateMatrixWorld(true);
   }
   /* the light and air the hole was lit with: the app sets its own sun, sky and fog from these */
@@ -180,7 +327,7 @@ srv.listen(0, '127.0.0.1', async () => {
         tmap[id] = hsh;
       }
       const fix = n => { n.g = gmap[n.g]; return n; };
-      out.static.forEach(fix); out.movers.forEach(p => p.forEach(fix));
+      out.static.forEach(fix); out.movers.forEach(p => p.forEach(fix)); (out.anims || []).forEach(a => a.parts.forEach(fix)); (out.weeds || []).forEach(w => w.parts.forEach(fix));
       for (const m of out.mats) for (const k of Object.keys(m)) if (m[k] && typeof m[k] === 'object' && 't' in m[k]) m[k].t = tmap[m[k].t];
       const js = JSON.stringify(out);
       fs.writeFileSync(path.join(OUT, 'holes', key + '.json'), js + '\n');

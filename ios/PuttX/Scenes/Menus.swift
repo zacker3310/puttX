@@ -25,6 +25,10 @@ struct TitleView: View {
                 .accessibilityLabel("play")
                 .popIn(0.3)
                 .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.9).repeatForever().delay(1.2)) { pulse = true } } }
+                // the hole of the day, bottom right
+                DailyButton()
+                    .position(x: g.size.width - st.s(26 + 118) - g.safeAreaInsets.trailing, y: g.size.height - st.s(24 + 56) - g.safeAreaInsets.bottom)
+                    .popIn(0.5)
             }
         }
         .ignoresSafeArea()

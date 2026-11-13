@@ -18,6 +18,10 @@ final class PlayProps {
     private var ribbonKey = ""
     private var ringFill = -1.0
     private var lastSimTime: Double?
+    /// the hole's gold lost ball, bobbing and turning over a pulsing ring (src/game.js syncLost)
+    private let lost = Entity()
+    private let gold: ModelEntity
+    private let goldRing: ModelEntity
 
     static let PUTTER_SCALE: Float = 0.83, BACK_M = 0.36, GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042
 
@@ -26,6 +30,16 @@ final class PlayProps {
         if let t = try? TextureResource.generate(from: PlayProps.ballSkin(), options: .init(semantic: .color)) { m.baseColor = .init(tint: .white, texture: .init(t)) }
         m.roughness = 0.45; m.clearcoat = 1.0; m.clearcoatRoughness = 0.07
         ball = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R)), materials: [m])
+
+        var gm = PhysicallyBasedMaterial()
+        gm.baseColor = .init(tint: UIColor(red: 1, green: 0.79, blue: 0.29, alpha: 1)); gm.metallic = 0.7; gm.roughness = 0.28
+        gm.emissiveColor = .init(color: UIColor(red: 0.35, green: 0.23, blue: 0, alpha: 1)); gm.emissiveIntensity = 1
+        gold = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R * 0.9)), materials: [gm])
+        var rm = UnlitMaterial(color: UIColor(red: 1, green: 0.91, blue: 0.63, alpha: 1))
+        rm.blending = .transparent(opacity: 0.7); rm.faceCulling = .none
+        goldRing = ModelEntity(mesh: PlayProps.annulus(inner: Float(Sim.BALL_R * 1.3), outer: Float(Sim.BALL_R * 1.75)), materials: [rm])
+        goldRing.position.y = 0.004
+        lost.addChild(gold); lost.addChild(goldRing)
 
         var sm = UnlitMaterial(color: .black)
         if let t = try? TextureResource.generate(from: PlayProps.softDisc(), options: .init(semantic: .color)) { sm.color = .init(tint: .white, texture: .init(t)) }
@@ -51,7 +65,7 @@ final class PlayProps {
         putter.addChild(head); putter.addChild(line); putter.addChild(shaft)
         putter.scale = SIMD3(repeating: PlayProps.PUTTER_SCALE)
 
-        for e in [ball, shadow, putter, ribbon, ring] as [Entity] { root.addChild(e) }
+        for e in [ball, shadow, putter, ribbon, ring, lost] as [Entity] { root.addChild(e) }
     }
 
     func update(_ play: HolePlay, now: CFTimeInterval) {
@@ -71,6 +85,16 @@ final class PlayProps {
         shadow.isEnabled = visible && up < 0.4 && hypot(b.x - h.cup.x, b.z - h.cup.z) >= Sim.CUP_R
         shadow.position = SIMD3(Float(b.x), Float(gy + 0.002), Float(b.z))
         shadow.scale = SIMD3(repeating: Float(1 + up * 6))
+
+        // the lost ball, until it is found
+        if let s = play.lostSpot, !play.lostGot, play.phase != .done {
+            lost.isEnabled = true
+            let t = Float(play.reduceMotion ? 0 : play.time)
+            lost.position = SIMD3(Float(s.x), Float(h.groundH(s.x, s.z)), Float(s.z))
+            gold.position.y = Float(Sim.BALL_R * 0.55) + sin(t * 2.4) * 0.01
+            gold.orientation = simd_quatf(angle: t * 1.5, axis: [0, 1, 0])
+            goldRing.scale = SIMD3(repeating: 1 + (sin(t * 3) + 1) * 0.15)
+        } else { lost.isEnabled = false }
 
         updatePutter(play, now: now)
         updateRibbon(play)
@@ -194,5 +218,18 @@ final class PlayProps {
         let g = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB)!, colors: [UIColor(white: 0, alpha: 0.55).cgColor, UIColor(white: 0, alpha: 0.25).cgColor, UIColor(white: 0, alpha: 0).cgColor] as CFArray, locations: [0, 0.6, 1])!
         ctx.drawRadialGradient(g, startCenter: CGPoint(x: 32, y: 32), startRadius: 0, endCenter: CGPoint(x: 32, y: 32), endRadius: 32, options: [])
         return ctx.makeImage()!
+    }
+
+    /// a flat ring lying on the ground
+    static func annulus(inner: Float, outer: Float, segments: Int = 24) -> MeshResource {
+        var pos: [SIMD3<Float>] = [], idx: [UInt32] = []
+        for i in 0..<segments {
+            let a = Float(i) / Float(segments) * 2 * .pi, c = cos(a), s = sin(a)
+            pos += [SIMD3(c * inner, 0, s * inner), SIMD3(c * outer, 0, s * outer)]
+            let j = UInt32(i * 2), n = UInt32(((i + 1) % segments) * 2)
+            idx += [j, n, j + 1, j + 1, n, n + 1]
+        }
+        var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.normals = MeshBuffers.Normals(Array(repeating: SIMD3(0, 1, 0), count: pos.count)); d.primitives = .triangles(idx)
+        return (try? MeshResource.generate(from: [d])) ?? .generatePlane(width: outer * 2, depth: outer * 2)
     }
 }

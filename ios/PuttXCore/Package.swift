@@ -10,6 +10,6 @@ let package = Package(
     products: [.library(name: "PuttXCore", targets: ["PuttXCore"])],
     targets: [
         .target(name: "PuttXCore", resources: [.copy("Resources/holes.json")]),
-        .testTarget(name: "PuttXCoreTests", dependencies: ["PuttXCore"], resources: [.copy("Resources/golden.json"), .copy("Resources/play.json"), .copy("Resources/terrain.json")]),
+        .testTarget(name: "PuttXCoreTests", dependencies: ["PuttXCore"], resources: [.copy("Resources/golden.json"), .copy("Resources/play.json"), .copy("Resources/terrain.json"), .copy("Resources/extras.json")]),
     ]
 )

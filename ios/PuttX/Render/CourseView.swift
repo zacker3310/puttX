@@ -89,6 +89,8 @@ struct CourseView: UIViewRepresentable {
                     e.orientation = simd_quatf(angle: Float(t * 0.8), axis: [0, 1, 0])
                 }
             }
+            // the scenery's own life: bats, ships, snow, embers, beacons
+            if !play.reduceMotion && !rig.anim.isEmpty { rig.anim.update(t) }
             // conveyors flow
             for (e, _, speed) in rig.flows {
                 guard var mat = e.model?.materials.first as? PhysicallyBasedMaterial else { continue }

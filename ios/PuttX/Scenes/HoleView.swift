@@ -83,6 +83,15 @@ struct HoleView: View {
                 HudChip(icon: .strokes, value: "\(min(play.round.strokes, Scoring.cap(play.hole)))").fixedSize()
                     .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
                     .accessibilityLabel("\(play.round.strokes) strokes")
+                // the mulligan: the last putt back, for a token
+                if play.canTakeBack && play.phase == .aim && play.intro == nil && app.progress.mulligans > 0 {
+                    MulliganButton(tokens: app.progress.mulligans) {
+                        if app.progress.spendMulligan() { play.takeBack(); app.save() }
+                    }
+                    .position(x: st.s(556 + 44), y: st.s(24 + 44))
+                    .transition(.scale.combined(with: .opacity))
+                }
+                if play.lostPop { LostPop().fixedSize().position(x: geo.size.width / 2, y: st.s(120 + 38)).allowsHitTesting(false) }
                 // the tee sign: the hole, its par and its layout, while the hole introduces itself
                 if play.banner {
                     TeeSign(hole: play.hole, aim: play.aim)
@@ -96,7 +105,7 @@ struct HoleView: View {
         .onAppear {
             play.onFinish = { [weak play] score in
                 guard let play else { return }
-                play.record = app.finished(play.hole, score: score)
+                play.record = app.finished(play, score: score)
             }
             play.start()
             app.controllers.onBack = { app.go(.map(Catalog.course(of: play.hole.key))) }
@@ -252,9 +261,10 @@ struct DoneCard: View {
                     Text("\(score)").font(Toy.font(96, st)).foregroundStyle(Toy.inkStrong)
                     Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }
                 }
+                if let g = play.goals { GoalsRow(all: g.all, fresh: g.fresh) }
                 HStack(spacing: st.s(24)) {
                     IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.go(.hole(play.hole.key)) }
-                    IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(app.next(after: play.hole.key)) }
+                    IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(play.daily != nil ? .title : app.next(after: play.hole.key)) }
                 }
             }
             .padding(st.s(40))

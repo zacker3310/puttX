@@ -14,6 +14,12 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
     public var coins = 0
     public var owned: [String] = []
     public var equipped: [String: String] = [:]
+    /// lost balls found (key -> 1), goals met (key -> bits), the daily hole
+    public var lost: [String: Int] = [:]
+    public var obj: [String: Int] = [:]
+    public var daily: DailyRecord?
+
+    public static let coinMax = 999_999
 
     public init(catalog: Catalog) { worlds = [catalog.playableWorlds.first ?? catalog.worldOrder[0]] }
 
@@ -30,6 +36,15 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         coins = try c.decodeIfPresent(Int.self, forKey: .coins) ?? 0
         owned = try c.decodeIfPresent([String].self, forKey: .owned) ?? []
         equipped = try c.decodeIfPresent([String: String].self, forKey: .equipped) ?? [:]
+        lost = (try? c.decodeIfPresent([String: Int].self, forKey: .lost)) ?? [:]
+        obj = (try? c.decodeIfPresent([String: Int].self, forKey: .obj)) ?? [:]
+        daily = try? c.decodeIfPresent(DailyRecord.self, forKey: .daily)
+        // repairExtras: tokens in range, goal bits in range
+        if mulligans < 0 { mulligans = 5 }
+        mulligans = Swift.min(mulligans, 9999)
+        lost = lost.filter { $0.value == 1 }
+        obj = obj.filter { (1...7).contains($0.value) }
+        if let d = daily, !(1...99).contains(d.best) || d.streak < 1 { daily = nil }
     }
 
     /// two saves of the same profile, merged with nothing lost: bests only go down, stars only go up,
@@ -42,6 +57,12 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         m.worlds = Array(Set(worlds).union(o.worlds)).sorted()
         m.coins = Swift.max(coins, o.coins)
         m.owned = Array(Set(owned).union(o.owned)).sorted()
+        m.lost.merge(o.lost) { a, _ in a }
+        m.obj.merge(o.obj) { $0 | $1 }
+        if let b = o.daily {
+            if let a = m.daily, a.d == b.d { m.daily = DailyRecord(d: a.d, best: Swift.min(a.best, b.best), streak: Swift.max(a.streak, b.streak)) }
+            else if m.daily == nil || b.d > m.daily!.d { m.daily = b }
+        }
         return m
     }
 
@@ -76,4 +97,30 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         if catalog.isExtra(w) { return catalog.has(course: w) }
         return worlds.contains(w) && (n == 1 || holes["\(w)-\(n - 1)"] != nil)
     }
+
+    // MARK: the extras (src/game.js 6c)
+    private mutating func addCoins(_ n: Int) -> Int { coins = Swift.min(PlayerProgress.coinMax, coins + n); return n }
+
+    /// the hole's lost ball, rolled over: a token and 15 coins, once per hole
+    public mutating func findLost(_ key: String) -> Int {
+        guard lost[key] == nil else { return 0 }
+        lost[key] = 1; mulligans += 1
+        return addCoins(15)
+    }
+    /// the goals met on a finish: 10 coins for each met for the first time, a token for all three
+    public mutating func finishGoals(_ key: String, bits: Int) -> (coins: Int, fresh: Int, all: Int) {
+        let prev = obj[key] ?? 0, fresh = bits & ~prev, all = prev | bits
+        if all != 0 { obj[key] = all }
+        if all == 7 && prev != 7 { mulligans += 1 }
+        return (addCoins(10 * ((fresh & 1) + ((fresh >> 1) & 1) + ((fresh >> 2) & 1))), fresh, all)
+    }
+    /// the daily hole finished: the first finish of a day pays 25 and a token, days in a row grow the streak
+    public mutating func finishDaily(day: String, yesterday: String, score: Int) -> Int {
+        if let d = daily, d.d == day { daily!.best = Swift.min(d.best, score); return 0 }
+        daily = DailyRecord(d: day, best: score, streak: daily?.d == yesterday ? daily!.streak + 1 : 1)
+        mulligans += 1
+        return addCoins(25)
+    }
+    /// spend a mulligan token
+    public mutating func spendMulligan() -> Bool { guard mulligans > 0 else { return false }; mulligans -= 1; return true }
 }

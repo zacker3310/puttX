@@ -30,6 +30,8 @@ for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
   const p = path.join(DIR, 'holes', f), hole = readHole(p);
   const fix = n => { if (rename[n.g]) n.g = rename[n.g]; };
   hole.static.forEach(fix); hole.movers.forEach(m => m.forEach(fix));
+  for (const a of hole.anims || []) a.parts.forEach(fix);
+  for (const w of hole.weeds || []) w.parts.forEach(fix);
   const out = p.endsWith('.z') ? p : p + '.z';
   fs.writeFileSync(out, zlib.deflateRawSync(JSON.stringify(hole), { level: 9 }));
   if (out !== p) fs.rmSync(p);
@@ -39,7 +41,7 @@ for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
 const usedGeo = new Set(), usedTex = new Set();
 for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
   const hole = readHole(path.join(DIR, 'holes', f));
-  for (const n of hole.static.concat(...hole.movers)) usedGeo.add(n.g);
+  for (const n of hole.static.concat(...hole.movers, ...(hole.anims || []).map(a => a.parts), ...(hole.weeds || []).map(w => w.parts))) usedGeo.add(n.g);
   for (const m of hole.mats) for (const v of Object.values(m)) if (v && typeof v === 'object' && 't' in v) usedTex.add(v.t);
 }
 let swept = 0;

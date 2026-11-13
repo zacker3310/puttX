@@ -71,8 +71,12 @@ struct SceneHole: Decodable {
     let env: SceneEnv
     /// particles: fireflies, snow, embers, night skies
     let points: [ScenePoints]?
+    /// what moves between putts (SceneAnim.swift)
+    let anims: [SceneAnim]?
+    let matAnims: [SceneMatAnim]?
+    let weeds: [SceneWeed]?
 }
-struct ScenePoints: Decodable { let pts: [Float], color: [Double], size: Double, opacity: Double }
+struct ScenePoints: Decodable { let pts: [Float], color: [Double], size: Double, opacity: Double; let anim: PointsAnim? }
 
 /// a mesh as exported: interleaved later, per RealityKit's needs
 struct SceneGeo {
@@ -221,6 +225,11 @@ final class SceneStore {
         if m.transparent { p.blending = .transparent(opacity: .init(floatLiteral: Float(m.opacity))) }
         if m.alphaTest > 0 { p.opacityThreshold = Float(m.alphaTest) }
         p.faceCulling = m.side == "double" ? .none : m.side == "back" ? .front : .back
+        // the pin flag waves (still under reduced motion, as the web's FX clock stops)
+        if m.shader?.hasPrefix("flag-wave") == true, !UIAccessibility.isReduceMotionEnabled, let lib = CourseBuilder.library,
+           let c = try? CustomMaterial(from: p, geometryModifier: CustomMaterial.GeometryModifier(named: "flagWave", in: lib)) {
+            return c
+        }
         return p
     }
 

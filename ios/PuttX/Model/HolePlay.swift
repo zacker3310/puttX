@@ -42,6 +42,25 @@ final class HolePlay {
     /// the 3D view publishes where the cup is on screen (points) for the distance tag; nil when off screen
     var pinOnScreen: CGPoint?
 
+    // MARK: the extras (src/game.js 6c)
+    /// the hole of the day: its date (no mulligans on it)
+    var daily: String?
+    /// a border or post touched by a putt this hole (the clean goal)
+    private(set) var touched = false
+    /// the last putt, to take back with a mulligan token
+    private struct Undo { let round: Round; let aim: Double; let touched: Bool; let logCount: Int }
+    @ObservationIgnored private var undo: Undo?
+    private(set) var canTakeBack = false
+    /// the hole's gold lost ball: where it lies (nil: none, or not looked for yet) and whether it is found
+    private(set) var lostSpot: Vec2?
+    private(set) var lostSearched = false
+    var lostGot = false
+    /// the lost ball was just picked up (the HUD's pop)
+    private(set) var lostPop = false
+    @ObservationIgnored var onLost: (() -> Void)?
+    /// the goals met at the finish (bits), and which were new
+    var goals: (all: Int, fresh: Int)?
+
     @ObservationIgnored private var run: PuttRun?
     @ObservationIgnored private var from = Vec2(0, 0)
     @ObservationIgnored private var acc = 0.0
@@ -82,6 +101,14 @@ final class HolePlay {
     func skipIntro() { intro = nil; banner = false }
 
     func start() {
+        // the lost ball: where some putt from the tee really stops (about 40 ms of sim), off the main thread
+        if !lostGot && !lostSearched {
+            let h = hole
+            Task.detached(priority: .utility) {
+                let spot = LostBall.spot(h)
+                await MainActor.run { [weak self] in self?.lostSpot = spot; self?.lostSearched = true }
+            }
+        }
         if !reduceMotion && intro == nil && round.strokes == 0 { intro = 0 }
         if reduceMotion { DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in self?.banner = false } }
         guard link == nil else { return }
@@ -126,6 +153,8 @@ final class HolePlay {
     func putt(angle: Double, power: Double) {
         guard phase == .aim else { return }
         let a = jsFixed(angle, 3), p = jsFixed(power, 4)
+        undo = Undo(round: round, aim: aim, touched: touched, logCount: log.count)
+        canTakeBack = false
         time = jsFixed(time, 6)
         from = round.at
         log.append([a, p, time])
@@ -168,6 +197,7 @@ final class HolePlay {
                 time += Sim.SIM_DT
             }
         }
+        pickUpLost()
         // the roll, heard: it follows the ball's speed and what it rolls on
         if phase == .roll || phase == .drift {
             Synth.shared.roll(speed: ball.air || ball.tube != nil ? 0 : hypot(ball.vx, ball.vz), surface: hole.zoneAt(ball.x, ball.z)?.surf?.rawValue ?? "felt")
@@ -184,7 +214,9 @@ final class HolePlay {
                 lastHitSound[kind] = time; play()
             }
             switch h.kind {
-            case .wall, .post: once(.wall) { SFX.clonk(h.v, wall: wallKind); Haptics.knock(h.v) }
+            case .wall, .post:
+                if phase == .roll { touched = true }
+                once(.wall) { SFX.clonk(h.v, wall: wallKind); Haptics.knock(h.v) }
             case .bump, .mover: once(.bump) { SFX.boing(h.v); Haptics.knock(h.v) }
             case .lip: SFX.lip(); Haptics.knock(1)
             case .rattle: once(.rattle) { SFX.rattle(min(1, h.v)) }
@@ -235,7 +267,36 @@ final class HolePlay {
         } else {
             phase = .aim
             ball = Ball(hole, round.at.x, round.at.z)
+            canTakeBack = undo != nil && round.strokes > 0 && daily == nil
         }
+    }
+
+    /// whether the lost ball counts as found at the finish: picked up, or the hole has none
+    func lostDone() -> Bool {
+        if lostGot { return true }
+        if !lostSearched { lostSpot = LostBall.spot(hole); lostSearched = true }
+        return lostSpot == nil
+    }
+    /// roll over the gold ball to keep it (src/game.js stepLost)
+    private func pickUpLost() {
+        guard !lostGot, let s = lostSpot, phase == .roll || phase == .drift, ball.tube == nil, !ball.air,
+              hypot(ball.x - s.x, ball.z - s.z) < LostBall.radius else { return }
+        lostGot = true
+        lostPop = true
+        SFX.coin(); DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { SFX.star(2) }
+        Haptics.knock(1)
+        onLost?()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in self?.lostPop = false }
+    }
+    /// the mulligan: the last putt taken back (ball, count, penalty, aim) for a token
+    func takeBack() {
+        guard phase == .aim, canTakeBack, let u = undo else { return }
+        round = u.round; aim = u.aim; touched = u.touched
+        if log.count > u.logCount { log.removeLast(log.count - u.logCount) }
+        ball = Ball(hole, round.at.x, round.at.z)
+        undo = nil; canTakeBack = false
+        lastStroke = nil
+        SFX.tubeOut()
     }
 
     // MARK: into the cup

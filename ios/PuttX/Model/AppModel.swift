@@ -92,6 +92,9 @@ final class AppModel {
             p.birds = night || w == 8 ? 0 : w == 3 ? 1.6 : 0.6
             p.crickets = night || w == 7 ? 1 : 0
             p.reduceMotion = UIAccessibility.isReduceMotionEnabled
+            // the extras: its lost ball, if not found yet, pays a token and 15 coins when rolled over
+            p.lostGot = progress.lost[key] != nil
+            p.onLost = { [weak self] in guard let self else { return }; _ = self.progress.findLost(key); self.save() }
             Synth.shared.bed(water: h.data.zones.contains { $0.surf == .water }, wind: [2, 4, 10].contains(w))
             SFX.jingle(lk.jingle)
             play = p
@@ -100,9 +103,29 @@ final class AppModel {
     }
     func look(_ course: Int) -> CourseLook { progress.neon ? looks[course].night() : looks[course] }
 
-    /// a hole finished: bank it, and say where the player goes next
-    func finished(_ h: Hole, score: Int) -> HoleRecord {
+    /// the hole of the day: the same hole for everyone on a date, from any course
+    func playDaily() {
+        let day = Daily.day()
+        go(.hole(Daily.key(day, catalog: catalog)))
+        play?.daily = day
+    }
+    /// how the daily hole stands today: its key, today's best (nil before a finish) and the live streak
+    var dailyToday: (key: String, best: Int?, streak: Int?) {
+        let day = Daily.day(), yesterday = Daily.yesterday(), d = progress.daily
+        let live = d.map { $0.d == day || $0.d == yesterday } ?? false
+        return (Daily.key(day, catalog: catalog), d?.d == day ? d?.best : nil, live ? d?.streak : nil)
+    }
+
+    /// a hole finished: bank it with its goals (and the daily hole), and say where the player goes next
+    func finished(_ play: HolePlay, score: Int) -> HoleRecord {
+        let h = play.hole
         let rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
+        let bits = Goals.bits(score: score, par: h.par, touched: play.touched, auto: play.round.auto, lostFound: progress.lost[h.key] != nil || play.lostDone())
+        let g = progress.finishGoals(h.key, bits: bits)
+        play.goals = (g.all, g.fresh)
+        if let day = play.daily, day == Daily.day() {
+            _ = progress.finishDaily(day: day, yesterday: Daily.yesterday(), score: score)
+        }
         save()
         GameCenter.holeBanked(h.key, score: score, progress: progress, catalog: catalog)
         return rec

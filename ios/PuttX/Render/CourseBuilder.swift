@@ -16,6 +16,8 @@ final class CourseRig {
     var ball = ModelEntity()
     /// textures that flow (conveyors): their material slots, and how fast
     var flows: [(ModelEntity, Int, Double)] = []
+    /// the scenery that moves between putts
+    let anim = SceneAnimator()
     var sunDirection = SIMD3<Float>(0.53, 0.69, -0.48)
     /// the ground plane, whose fog follows the camera
     var ground: ModelEntity?
@@ -51,14 +53,28 @@ enum CourseBuilder {
             let lift = Float(hole.mats[n.m.list[0]].polygonOffset != nil ? 0.002 : 0)   // RealityKit has no polygon offset
             let e = ModelEntity(mesh: try S.mesh(g, materials: n.m.list.count, lift: lift), materials: n.m.list.map { mats[$0] })
             e.transform = Transform(matrix: x)
+            rig.anim.bind(e, materials: n.m.list, hole: hole)
             rig.root.addChild(e)
         }
+        /// a node in its parent's frame
+        func part(_ n: SceneNode) throws -> ModelEntity {
+            let lift = Float(hole.mats[n.m.list[0]].polygonOffset != nil ? 0.002 : 0)
+            let e = ModelEntity(mesh: try S.mesh(try S.geo(n.g), materials: n.m.list.count, lift: lift), materials: n.m.list.map { mats[$0] })
+            e.transform = Transform(matrix: matrix(n.x))
+            rig.anim.bind(e, materials: n.m.list, hole: hole)
+            return e
+        }
+        try rig.anim.build(hole, root: rig.root, mesh: part)
         for (i, parts) in hole.movers.enumerated() where i < h.data.movers.count {
             let m = Entity()
-            for n in parts {
-                let e = ModelEntity(mesh: try S.mesh(try S.geo(n.g), materials: n.m.list.count), materials: n.m.list.map { mats[$0] })
-                e.transform = Transform(matrix: matrix(n.x))
-                m.addChild(e)
+            for n in parts { m.addChild(try part(n)) }
+            // a tumbleweed's inner ball, which rolls as it travels
+            for w in hole.weeds ?? [] where w.i == i {
+                let inner = Entity()
+                inner.transform = Transform(matrix: matrix(w.x))
+                for n in w.parts { inner.addChild(try part(n)) }
+                m.addChild(inner)
+                rig.anim.addWeed(inner, mover: h.data.movers[i], r: w.r)
             }
             rig.root.addChild(m)
             rig.movers.append((m, h.data.movers[i]))
@@ -82,22 +98,11 @@ enum CourseBuilder {
             rig.ground = g
         }
 
-        // particles, as tiny glowing dots: one merged mesh per cloud
+        // particles, as tiny glowing dots: one mesh per cloud, redrawn as it drifts
         for cloud in hole.points ?? [] {
-            var pos: [SIMD3<Float>] = [], idx: [UInt32] = []
-            let r = Float(cloud.size) * 0.5
-            let dirs: [SIMD3<Float>] = [[r, 0, 0], [-r, 0, 0], [0, r, 0], [0, -r, 0], [0, 0, r], [0, 0, -r]]
-            let faces: [UInt32] = [0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4, 2, 0, 5, 1, 2, 5, 3, 1, 5, 0, 3, 5]
-            for i in stride(from: 0, to: cloud.pts.count - 2, by: 3) {
-                let c = SIMD3(cloud.pts[i], cloud.pts[i + 1], cloud.pts[i + 2]), base = UInt32(pos.count)
-                for d in dirs { pos.append(c + d) }
-                idx += faces.map { $0 + base }
-            }
-            guard !pos.isEmpty else { continue }
-            var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx)
-            var m = UnlitMaterial(color: SceneStore.color(cloud.color))
-            if cloud.opacity < 1 { m.blending = .transparent(opacity: .init(floatLiteral: Float(cloud.opacity))) }
-            rig.root.addChild(ModelEntity(mesh: try MeshResource.generate(from: [d]), materials: [m]))
+            guard let c = try PointCloud(cloud) else { continue }
+            rig.root.addChild(c.entity)
+            if c.animated { rig.anim.add(c) }
         }
 
         light(rig, hole.env)

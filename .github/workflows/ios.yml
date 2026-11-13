@@ -53,6 +53,7 @@ jobs:
           [ $code -eq 0 ] || tail -n 30 build.log
           exit $code
       - name: screenshots of every scene
+        timeout-minutes: 20
         run: ios/scripts/shots.sh ios/build/Build/Products/Debug-iphonesimulator/PuttX.app shots
       - uses: actions/upload-artifact@v4
         if: always()

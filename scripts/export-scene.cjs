@@ -119,7 +119,12 @@ function grabHole(key) {
         }
         out.static.push(n);
       } else if (o.isMesh) out.static.push(node(o));
-      else if (o.isPoints || o.isLine || o.isSprite) warn.push(o.type + ' skipped');
+      else if (o.isPoints) {
+        /* particles (fireflies, snow, embers, night skies): their points in hole space, to the mm */
+        const P = o.geometry.attributes.position, m = o.material, pts = [], v = new THREE.Vector3();
+        for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld); pts.push(Math.round(v.x * 1000) / 1000, Math.round(v.y * 1000) / 1000, Math.round(v.z * 1000) / 1000); }
+        (out.points = out.points || []).push({ pts, color: lin(m.color), size: m.size, opacity: m.opacity, atten: m.sizeAttenuation !== false, name: o.name || (o.parent && o.parent.name) || '' });
+      } else if (o.isLine || o.isSprite) warn.push(o.type + ' skipped');
     });
   }
   for (const mv of moverMeshes) {

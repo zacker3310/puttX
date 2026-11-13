@@ -69,7 +69,10 @@ struct SceneHole: Decodable {
     let movers: [[SceneNode]]
     let native: Native
     let env: SceneEnv
+    /// particles: fireflies, snow, embers, night skies
+    let points: [ScenePoints]?
 }
+struct ScenePoints: Decodable { let pts: [Float], color: [Double], size: Double, opacity: Double }
 
 /// a mesh as exported: interleaved later, per RealityKit's needs
 struct SceneGeo {

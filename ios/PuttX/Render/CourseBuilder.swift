@@ -82,6 +82,24 @@ enum CourseBuilder {
             rig.ground = g
         }
 
+        // particles, as tiny glowing dots: one merged mesh per cloud
+        for cloud in hole.points ?? [] {
+            var pos: [SIMD3<Float>] = [], idx: [UInt32] = []
+            let r = Float(cloud.size) * 0.5
+            let dirs: [SIMD3<Float>] = [[r, 0, 0], [-r, 0, 0], [0, r, 0], [0, -r, 0], [0, 0, r], [0, 0, -r]]
+            let faces: [UInt32] = [0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4, 2, 0, 5, 1, 2, 5, 3, 1, 5, 0, 3, 5]
+            for i in stride(from: 0, to: cloud.pts.count - 2, by: 3) {
+                let c = SIMD3(cloud.pts[i], cloud.pts[i + 1], cloud.pts[i + 2]), base = UInt32(pos.count)
+                for d in dirs { pos.append(c + d) }
+                idx += faces.map { $0 + base }
+            }
+            guard !pos.isEmpty else { continue }
+            var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx)
+            var m = UnlitMaterial(color: SceneStore.color(cloud.color))
+            if cloud.opacity < 1 { m.blending = .transparent(opacity: .init(floatLiteral: Float(cloud.opacity))) }
+            rig.root.addChild(ModelEntity(mesh: try MeshResource.generate(from: [d]), materials: [m]))
+        }
+
         light(rig, hole.env)
         return rig
     }

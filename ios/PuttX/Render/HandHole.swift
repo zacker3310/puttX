@@ -278,5 +278,5 @@ struct Rand {
 
 extension SceneEnv {
     /// course 1's sky and sun, for the hand-built hole
-    static let hand: SceneEnv = try! JSONDecoder().decode(SceneEnv.self, from: Data(#"{"sky":["#9fd8ef","#fff1d6"],"fog":null,"sun":{"dir":[0.5345,0.6949,-0.4811],"color":[1,0.79,0.55],"intensity":3},"night":false}"#.utf8))
+    static let hand: SceneEnv = try! JSONDecoder().decode(SceneEnv.self, from: Data(##"{"sky":["#9fd8ef","#fff1d6"],"fog":null,"sun":{"dir":[0.5345,0.6949,-0.4811],"color":[1,0.79,0.55],"intensity":3},"night":false}"##.utf8))
 }

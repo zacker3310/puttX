@@ -19,16 +19,29 @@ Changing the physics: change JS, re-prove (`node scripts/resolve.cjs`), re-expor
 in `Sim.swift` keeping the JS evaluation order, run `swift test`. `npm test` (suite `ios-check`)
 fails while the exported JSON is stale; the `ios` workflow runs the parity tests on Apple silicon.
 
-    node scripts/export-ios.cjs                     # after any course or physics change
+    node scripts/export-ios.cjs                     # after any course, look or physics change
     cd ios/PuttXCore && swift test -c release       # parity, about 2 s
+    cd ios && xcodegen && open PuttX.xcodeproj      # the app (brew install xcodegen)
+
+The app takes launch arguments for testing: `-route title|profiles|worlds|world:N|map:N|hole:N-M|card:N`
+and `-demo` (a profile with every course played). `ios/scripts/shots.sh` screenshots every scene on an
+iPad and an iPhone simulator; CI uploads them as the `shots` artifact.
+
+What else export-ios writes for the app: `ios/PuttX/Resources/looks.json` (each course's palette, as
+`lookOf` resolves it), the course icons and UI glyphs as vector SVGs in `ios/PuttX/Assets.xcassets/Art`,
+and `play.json` (720 pad gestures scored by the web's `computeStroke`, and `toFixed` cases) for the
+stroke tests.
+
+The bundle id is a placeholder (`com.puttx.app` in `ios/project.yml`); set yours and a team before
+running on a device.
 
 ## Roadmap
 
 | Phase | What | State |
 |---|---|---|
 | 1 Core | sim, putts, border relief, rounds, progress, catalog, parity tests, CI | done |
-| 2 Shell | XcodeGen project, SwiftUI scenes (title, map, hole, card, shop), one stage scaled for iPad and iPhone, 64 pt targets, no words | |
-| 3 Play | the DS-style swing ported with `FEEL`, aim, camera rig, a live loop stepping the sim at 240 Hz and drawing at 120 Hz (ProMotion), drift | |
+| 2 Shell | XcodeGen project, SwiftUI scenes (title, profiles, worlds, world, map, hole, card), one stage scaled for iPad and iPhone, 64 pt targets, no words, CI screenshots | done |
+| 3 Play | the DS-style swing ported with `FEEL`, aim, camera rig, a live loop stepping the sim at 240 Hz and drawing at 120 Hz (ProMotion), drift | stroke, aim, putt log, live loop, drift done; camera with phase 4 |
 | 4 Course | RealityKit: procedural turf, borders, cup, flag, movers, tubes; then each `cNN.look.js` as a Swift look | |
 | 5 Sound | the WebAudio synth on AVAudioEngine source nodes; audio session honours the silent switch | |
 | 6 Platform | Core Haptics, Game Center (a board per course, achievements), iCloud key-value saves, GameController | |

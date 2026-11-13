@@ -1,6 +1,6 @@
-// A hole. Until the RealityKit course (phase 4) and the DS-style swing (phase 3) land, this draws the
-// real sim from above and takes a slingshot drag as the stroke: drag back from the ball, let go. The
-// round, scoring, unlocks and the putt itself are already the real ones.
+// A hole. The stroke is the web's: the DS-style swing pad on the player's side (touch, pull down, push
+// back up through the touch), aim by dragging the course sideways or tapping the aim buttons. Until the
+// RealityKit course lands (phase 4) the hole is drawn from above, from the real sim.
 import SwiftUI
 import PuttXCore
 
@@ -8,18 +8,34 @@ struct HoleView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.stage) private var st
     @Bindable var play: HolePlay
-    @State private var drag: CGSize?
+    /// the course drag that turns the aim: the aim when it started
+    @State private var aimFrom: Double?
 
     var body: some View {
         GeometryReader { geo in
             let view = TopView(hole: play.hole, size: geo.size)
             // read in body, so every sim step redraws the canvas
-            let now = Snapshot(time: play.time, ball: play.ball, phase: play.phase, drag: drag)
+            let now = Snapshot(time: play.time, ball: play.ball, phase: play.phase, aim: play.aim)
+            let lefty = app.progress.hand == "L"
             ZStack(alignment: .topLeading) {
                 Color(hex: play.look.ground ?? play.look.skirt).ignoresSafeArea()
                 Canvas { ctx, _ in draw(ctx, view, now) }
                     .contentShape(Rectangle())
-                    .gesture(slingshot(view))
+                    .gesture(aimDrag)
+                // the swing pad on the player's side, the aim buttons on the other
+                SwingPad(play: play, feel: Feel())
+                    .frame(width: st.s(120), height: st.s(360))
+                    .position(x: lefty ? st.s(18 + 60) : geo.size.width - st.s(18 + 60), y: geo.size.height - st.s(18 + 180))
+                HStack(spacing: st.s(16)) {
+                    IconButton(symbol: "chevron.left", label: "aim left") { play.aim += Swing.NUDGE_DEG }
+                    IconButton(symbol: "chevron.right", label: "aim right") { play.aim -= Swing.NUDGE_DEG }
+                }
+                .position(x: lefty ? geo.size.width - st.s(24 + 96) : st.s(24 + 96), y: geo.size.height - st.s(24 + 44))
+                .disabled(play.phase != .aim)
+                if let shot = play.lastStroke {
+                    ShotReadout(stroke: shot)
+                        .position(x: lefty ? st.s(18 + 120 + 90) : geo.size.width - st.s(18 + 120 + 90), y: geo.size.height - st.s(18 + 30))
+                }
                 TopBar {
                     BackButton { app.go(.map(Catalog.course(of: play.hole.key))) }
                     hud
@@ -49,27 +65,20 @@ struct HoleView: View {
     }
 
     // MARK: input
-    private func slingshot(_ v: TopView) -> some Gesture {
-        DragGesture(minimumDistance: 4)
-            .onChanged { g in if play.phase == .aim { drag = g.translation } }
-            .onEnded { g in
-                defer { drag = nil }
-                guard play.phase == .aim, let shot = aim(v, g.translation) else { return }
-                play.putt(angle: shot.angle, power: shot.power)
+    /// drag the course sideways to turn the aim, as on the web (0.12 degrees per stage px)
+    private var aimDrag: some Gesture {
+        DragGesture(minimumDistance: 6)
+            .onChanged { g in
+                guard play.phase == .aim else { return }
+                let from = aimFrom ?? play.aim
+                aimFrom = from
+                play.aim = from - Double(g.translation.width / st.scale) * Swing.AIM_DEG_PX
             }
-    }
-    /// the shot a drag asks for: away from the drag, harder the further back (full at a third of the screen)
-    private func aim(_ v: TopView, _ t: CGSize) -> (angle: Double, power: Double)? {
-        let len = hypot(t.width, t.height)
-        guard len > st.s(18) else { return nil }
-        let d = v.worldDir(-t.width, -t.height)
-        var a = atan2(d.x, d.z) * 180 / .pi
-        if a < 0 { a += 360 }
-        return (a, min(1, Double(len) / Double(v.size.height / 3)))
+            .onEnded { _ in aimFrom = nil }
     }
 
     // MARK: drawing
-    struct Snapshot { let time: Double, ball: Ball, phase: HolePlay.Phase, drag: CGSize? }
+    struct Snapshot { let time: Double, ball: Ball, phase: HolePlay.Phase, aim: Double }
 
     private func draw(_ ctx: GraphicsContext, _ v: TopView, _ now: Snapshot) {
         let h = play.hole, d = h.data, look = play.look
@@ -136,9 +145,9 @@ struct HoleView: View {
             let b = v.pt(Vec2(ball.x, ball.z)), r = max(5, v.k * Sim.BALL_R), lift = CGFloat(max(0, ball.y - h.groundH(ball.x, ball.z))) * v.k
             ctx.fill(Path(ellipseIn: CGRect(x: b.x - r, y: b.y - r * 0.6, width: 2 * r, height: 1.4 * r)), with: .color(.black.opacity(0.25)))
             ctx.fill(Path(ellipseIn: CGRect(x: b.x - r, y: b.y - r - lift, width: 2 * r, height: 2 * r)), with: .color(Color(hex: "#fffdf7")))
-            if let t = now.drag, now.phase == .aim, let shot = aim(v, t) {
-                let L = (0.6 + 2.4 * shot.power) * v.k, dl = hypot(t.width, t.height)
-                let end = CGPoint(x: b.x - t.width / dl * L, y: b.y - t.height / dl * L)
+            // the aim line: 1.8 m along the aim (the web's AIM_LEN)
+            if now.phase == .aim {
+                let a = now.aim * .pi / 180, end = v.pt(Vec2(ball.x + sin(a) * 1.8, ball.z + cos(a) * 1.8))
                 ctx.stroke(Path { $0.move(to: b); $0.addLine(to: end) }, with: .color(.white.opacity(0.9)), style: StrokeStyle(lineWidth: max(3, r * 0.6), lineCap: .round, dash: [r, r * 0.8]))
             }
         }
@@ -201,5 +210,97 @@ struct DoneCard: View {
             .popIn()
         }
         .accessibilityElement(children: .contain)
+    }
+}
+
+/// The swing pad: touch anywhere on it, pull down for the backswing, push back up through where you
+/// touched. It shows only the path your finger drew: the touch (dot and dashed line), the pull back
+/// (yellow) and the push through (green, red when the stroke was off). The last one stays until the
+/// next touch; before the first, an up-down hint.
+struct SwingPad: View {
+    @Environment(\.stage) private var st
+    let play: HolePlay
+    let feel: Feel
+    @State private var samples: [PadSample] = []
+    @State private var last: (samples: [PadSample], clean: Bool)?
+    @State private var struck = false
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous), swinging = !samples.isEmpty
+        GeometryReader { g in
+            Canvas { ctx, size in drawPath(ctx, size) }
+                .background(shape.fill(Toy.surface.opacity(0.94)))
+                .overlay(shape.strokeBorder(swinging ? Toy.yellowLine : Toy.surfaceLine, lineWidth: st.s(4)))
+                .background(shape.fill(Toy.shadow.opacity(0.14)).offset(y: st.s(6)))
+                .contentShape(shape)
+                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                    .onChanged { v in touch(v) }
+                    .onEnded { _ in letGo() })
+                .frame(width: g.size.width, height: g.size.height)
+        }
+        .opacity(play.phase == .aim ? 1 : 0.6)
+        .accessibilityLabel("swing")
+    }
+
+    /// pad points to stage px: the stroke is measured in stage px, as on the web
+    private func sample(_ v: DragGesture.Value, at p: CGPoint) -> PadSample {
+        PadSample(t: v.time.timeIntervalSinceReferenceDate, x: Double(p.x / st.scale), y: Double(p.y / st.scale))
+    }
+    private func touch(_ v: DragGesture.Value) {
+        if samples.isEmpty {
+            guard play.phase == .aim else { return }
+            struck = false
+            samples = [sample(v, at: v.startLocation)]
+            if v.location == v.startLocation { return }
+        }
+        guard !struck else { return }
+        samples.append(sample(v, at: v.location))
+        if let s = Stroke.from(samples, feel: feel) {
+            struck = true
+            last = (samples, s.clean)
+            play.strike(s)
+        }
+    }
+    private func letGo() {
+        // let go before the ball: no stroke, and the pull back still shows
+        if !struck && samples.count > 1 { last = (samples, true) }
+        samples = []
+    }
+
+    private func drawPath(_ ctx: GraphicsContext, _ size: CGSize) {
+        let path: (samples: [PadSample], clean: Bool)? = samples.isEmpty ? last : (samples, true)
+        let lw = st.s(6)
+        guard let path, let s0 = path.samples.first else {
+            // the hint: down, then up
+            let x = size.width / 2, y0 = size.height * 0.3, y1 = size.height * 0.75
+            var p = Path(); p.move(to: CGPoint(x: x, y: y0)); p.addLine(to: CGPoint(x: x, y: y1))
+            p.move(to: CGPoint(x: x - st.s(16), y: y1 - st.s(16))); p.addLine(to: CGPoint(x: x, y: y1)); p.addLine(to: CGPoint(x: x + st.s(16), y: y1 - st.s(16)))
+            p.move(to: CGPoint(x: x - st.s(16), y: y0 + st.s(16))); p.addLine(to: CGPoint(x: x, y: y0)); p.addLine(to: CGPoint(x: x + st.s(16), y: y0 + st.s(16)))
+            ctx.stroke(p, with: .color(Toy.surfaceDown), style: StrokeStyle(lineWidth: st.s(5), lineCap: .round, lineJoin: .round))
+            return
+        }
+        let sm = path.samples, clean = path.clean
+        let pt = { (q: PadSample) in CGPoint(x: q.x * st.scale, y: q.y * st.scale) }
+        let y = s0.y * st.scale
+        ctx.stroke(Path { $0.move(to: CGPoint(x: 0, y: y)); $0.addLine(to: CGPoint(x: size.width, y: y)) }, with: .color(Toy.surfaceDown), style: StrokeStyle(lineWidth: st.s(3), dash: [st.s(6), st.s(8)]))
+        let k = sm.indices.max { sm[$0].y < sm[$1].y } ?? 0
+        ctx.stroke(Path { $0.addLines(sm[...k].map(pt)) }, with: .color(Toy.yellowDown), style: StrokeStyle(lineWidth: lw, lineCap: .round, lineJoin: .round))
+        if k < sm.count - 1 {
+            ctx.stroke(Path { $0.addLines(sm[k...].map(pt)) }, with: .color(clean ? Toy.greenLine : Toy.redLine), style: StrokeStyle(lineWidth: lw, lineCap: .round, lineJoin: .round))
+        }
+        let c = pt(s0), r = st.s(9)
+        ctx.fill(Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: 2 * r, height: 2 * r)), with: .color(Color(hex: "#fffdf7")))
+        ctx.stroke(Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: 2 * r, height: 2 * r)), with: .color(Toy.inkSoft), lineWidth: st.s(4))
+    }
+}
+
+/// the shot readout: the power, and a dot for the start line (green dead on, yellow a little off, red off)
+struct ShotReadout: View {
+    @Environment(\.stage) private var st
+    let stroke: Stroke
+    var body: some View {
+        let t = abs(stroke.turn), dot = t < 0.75 ? Toy.green : t < 2.5 ? Toy.yellow : Toy.red
+        Tally(value: "\(Int((stroke.power * 100).rounded()))") { Circle().fill(dot).overlay(Circle().strokeBorder(Toy.shadow.opacity(0.3), lineWidth: st.s(3))) }
+            .accessibilityLabel("power \(Int((stroke.power * 100).rounded()))")
     }
 }

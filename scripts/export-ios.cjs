@@ -58,7 +58,8 @@ function playGolden() {
   const gesture = (back, tb, fwd, drift, off, hz) => {
     const out = [{ t: 0, x: 60, y: 120 }];
     const nb = Math.max(2, Math.round(tb * hz));
-    for (let i = 1; i <= nb; i++) out.push({ t: i / hz, x: 60 + off * i / nb, y: 120 + back * Math.sin(i / nb * Math.PI / 2) });
+    /* an ease-out in plain arithmetic, so the samples are the same bits in every engine */
+    for (let i = 1; i <= nb; i++) { const u = i / nb; out.push({ t: i / hz, x: 60 + off * u, y: 120 + back * u * (2 - u) }); }
     let y = 120 + back, x = 60 + off, t = nb / hz;
     while (y > 60 && out.length < 400) { t += 1 / hz; y -= fwd / hz; x += drift / hz; out.push({ t, x, y }); }
     return out;
@@ -158,7 +159,15 @@ for (const [n, svg] of Object.entries(readGlyphs())) Object.assign(art, imageSet
 
 const files = [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], [PLAY_OUT, playGolden()], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
 if (process.argv.includes('--check')) {
-  const stale = files.filter(([f, s]) => !fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== s);
+  /* play.json's outputs come from log2 and atan2, which engines may round differently in the last
+     bit: fresh means the same gestures and the same strokes to 1e-12 (the Swift test's own tolerance) */
+  const near = (a, b) => {
+    if (typeof a === 'number' && typeof b === 'number') return a === b || Math.abs(a - b) <= 1e-12;
+    if (a && b && typeof a === 'object' && typeof b === 'object') { const ka = Object.keys(a), kb = Object.keys(b); return ka.length === kb.length && ka.every(k => near(a[k], b[k])); }
+    return a === b;
+  };
+  const same = (f, s) => f === PLAY_OUT ? near(JSON.parse(fs.readFileSync(f, 'utf8')), JSON.parse(s)) : fs.readFileSync(f, 'utf8') === s;
+  const stale = files.filter(([f, s]) => !fs.existsSync(f) || !same(f, s));
   for (const [f] of stale) console.error('stale: ' + path.relative(ROOT, f) + ' (run node scripts/export-ios.cjs)');
   process.exit(stale.length ? 1 : 0);
 }

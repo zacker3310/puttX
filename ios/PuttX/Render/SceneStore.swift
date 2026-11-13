@@ -88,11 +88,22 @@ final class SceneStore {
     private var geos: [String: SceneGeo] = [:]
     private var textures: [String: TextureResource] = [:]
 
-    func has(_ key: String) -> Bool { root.map { FileManager.default.fileExists(atPath: $0.appendingPathComponent("holes/\(key).json").path) } ?? false }
+    /// a hole's file: deflated (.json.z, as shipped) or plain (.json)
+    private func holeURL(_ key: String) -> URL? {
+        guard let r = root else { return nil }
+        for name in ["holes/\(key).json.z", "holes/\(key).json"] {
+            let u = r.appendingPathComponent(name)
+            if FileManager.default.fileExists(atPath: u.path) { return u }
+        }
+        return nil
+    }
+    func has(_ key: String) -> Bool { holeURL(key) != nil }
 
     func hole(_ key: String) throws -> SceneHole {
-        let url = root!.appendingPathComponent("holes/\(key).json")
-        return try JSONDecoder().decode(SceneHole.self, from: Data(contentsOf: url))
+        guard let url = holeURL(key) else { throw CocoaError(.fileNoSuchFile) }
+        var data = try Data(contentsOf: url)
+        if url.pathExtension == "z" { data = try (data as NSData).decompressed(using: .zlib) as Data }
+        return try JSONDecoder().decode(SceneHole.self, from: data)
     }
 
     func geo(_ hash: String) throws -> SceneGeo {

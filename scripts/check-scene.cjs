@@ -31,7 +31,12 @@ function asPXG1(buf) {
 }
 const srv = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
-  const p = u.startsWith('/scene/') ? path.join(DIR, u.slice(7)) : path.normalize(path.join(ROOT, u));
+  let p = u.startsWith('/scene/') ? path.join(DIR, u.slice(7)) : path.normalize(path.join(ROOT, u));
+  /* a deflated hole file is served plain */
+  if (u.startsWith('/scene/holes/') && !fs.existsSync(p) && fs.existsSync(p + '.z')) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(require('zlib').inflateRawSync(fs.readFileSync(p + '.z')));
+  }
   if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
   if (u.startsWith('/scene/geo/')) { res.writeHead(200, { 'Content-Type': 'application/octet-stream' }); return res.end(asPXG1(fs.readFileSync(p))); }
   res.writeHead(200, { 'Content-Type': p.endsWith('.html') ? 'text/html; charset=utf-8' : 'application/octet-stream' });
@@ -83,6 +88,11 @@ async function rebuild(key) {
     if (n.inst) n.inst.forEach((e, i) => { mesh.setMatrixAt(i, new THREE.Matrix4().fromArray(e)); if (e.length > 16) mesh.setColorAt(i, new THREE.Color(e[16], e[17], e[18])); }); mesh.matrixAutoUpdate = false; mesh.matrix.fromArray(n.x); mesh.castShadow = n.shadow[0]; mesh.receiveShadow = n.shadow[1]; mesh.renderOrder = n.order; return mesh; };
   const g = new THREE.Group();
   for (const n of hole.static) g.add(await mk(n));
+  /* particle clouds, as the web draws them */
+  for (const c of hole.points || []) {
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(c.pts, 3));
+    g.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: new THREE.Color(...c.color), size: c.size, sizeAttenuation: c.atten, transparent: c.opacity < 1, opacity: c.opacity, depthWrite: c.opacity >= 1 })));
+  }
   const movers = [];
   for (const parts of hole.movers) { const m = new THREE.Group(); for (const n of parts) m.add(await mk(n)); movers.push(m); g.add(m); }
   return { g, movers, counts: { static: hole.static.length, movers: hole.movers.length } };

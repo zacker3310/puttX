@@ -6,7 +6,10 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const zlib = require('zlib');
 const { encode, decode } = require('./scene-format.cjs');
+/* a hole file, plain (.json, as export-scene writes it) or deflated (.json.z, as the app ships it) */
+const readHole = p => JSON.parse(p.endsWith('.z') ? zlib.inflateRawSync(fs.readFileSync(p)).toString('utf8') : fs.readFileSync(p, 'utf8'));
 
 const DIR = path.resolve(process.argv[2] || path.join(__dirname, '../ios/PuttX/Scene'));
 const hash = b => crypto.createHash('sha256').update(b).digest('hex').slice(0, 20);
@@ -21,17 +24,21 @@ for (const f of fs.readdirSync(path.join(DIR, 'geo'))) {
   if (h + '.bin' !== f) fs.rmSync(p);
   rename[f.slice(0, -4)] = h; after += b.length;
 }
+/* every hole file renamed to its packed meshes and deflated (8x smaller: the app inflates it) */
 let holes = 0;
 for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
-  const p = path.join(DIR, 'holes', f), hole = JSON.parse(fs.readFileSync(p, 'utf8'));
+  const p = path.join(DIR, 'holes', f), hole = readHole(p);
   const fix = n => { if (rename[n.g]) n.g = rename[n.g]; };
   hole.static.forEach(fix); hole.movers.forEach(m => m.forEach(fix));
-  fs.writeFileSync(p, JSON.stringify(hole) + '\n'); holes++;
+  const out = p.endsWith('.z') ? p : p + '.z';
+  fs.writeFileSync(out, zlib.deflateRawSync(JSON.stringify(hole), { level: 9 }));
+  if (out !== p) fs.rmSync(p);
+  holes++;
 }
 /* sweep: meshes and textures no hole uses any more (left behind by a re-export) */
 const usedGeo = new Set(), usedTex = new Set();
 for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
-  const hole = JSON.parse(fs.readFileSync(path.join(DIR, 'holes', f), 'utf8'));
+  const hole = readHole(path.join(DIR, 'holes', f));
   for (const n of hole.static.concat(...hole.movers)) usedGeo.add(n.g);
   for (const m of hole.mats) for (const v of Object.values(m)) if (v && typeof v === 'object' && 't' in v) usedTex.add(v.t);
 }

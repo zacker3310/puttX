@@ -92,7 +92,7 @@ struct ProfilesView: View {
                 }
                 .padding(.vertical, st.s(14))
                 .frame(width: st.s(300), height: st.s(cardH))
-                .toyCard(st, radius: Toy.rXl, fill: n == app.slot && used ? Toy.surface : Toy.surface.opacity(0.96))
+                .modifier(ProfileCard(state: !used ? .empty : n == app.slot ? .last : .plain))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("profile \(n)")
@@ -409,6 +409,26 @@ struct SettingsPanel: View {
             .background(Dots())
             .toyCard(st, radius: Toy.rXl)
             .popIn()
+        }
+    }
+}
+
+/// a profile card (src/shell.html #profileRow .pcard): cream on a flat shadow; the profile played last
+/// has a yellow rim; an empty slot is just a dashed outline
+struct ProfileCard: ViewModifier {
+    enum State { case plain, last, empty }
+    @Environment(\.stage) private var st
+    let state: State
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous)
+        switch state {
+        case .empty:
+            content.overlay(shape.strokeBorder(Toy.surfaceLine, style: StrokeStyle(lineWidth: st.s(4), dash: [st.s(14), st.s(10)])))
+        case .plain, .last:
+            content
+                .background(shape.fill(Toy.surface))
+                .overlay(shape.strokeBorder(state == .last ? Toy.yellowLine : Toy.surfaceLine, lineWidth: st.s(4)))
+                .background(shape.fill(state == .last ? Toy.yellowDown : Toy.surfaceDown).offset(y: st.s(6)))
         }
     }
 }

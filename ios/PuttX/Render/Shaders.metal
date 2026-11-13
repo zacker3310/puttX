@@ -36,7 +36,11 @@ void turfSurface(realitykit::surface_parameters params) {
     float away = -mown * dot(along, toCam);
     float macro = vnoise(wp.xz * 0.35) * 0.6 + vnoise(wp.xz * 1.7) * 0.4;
     float k = shade * (1.0 + cp.z * away) * (0.93 + 0.14 * macro);
-    params.surface().set_base_color(base * half(k));
+    // the web's turf is a physical material with a pale-green sheen (0.3): it lifts and softens the
+    // felt; its colour comes in the emissive slot, and nothing here glows
+    half3 sheen = half3(params.material_constants().emissive_color()) * 0.3h;
+    params.surface().set_base_color(base * half(k) + sheen * half(shade));
+    params.surface().set_emissive_color(half3(0.0h));
 
     half3 n = params.textures().normal().sample(tiled, uv).rgb * 2.0h - 1.0h;
     n.xy *= 0.55h;
@@ -46,16 +50,20 @@ void turfSurface(realitykit::surface_parameters params) {
     params.surface().set_metallic(0.0h);
 }
 
-/// custom_parameter.x: how many times the texture tiles across the plane
+/// custom_parameter: (texture tiles across the plane, camera x, camera z, fog far); the fog colour
+/// comes in the emissive slot. The web fogs the distance toward the horizon, linearly from 0.29 of far.
 [[visible]]
 void groundSurface(realitykit::surface_parameters params) {
     auto geo = params.geometry();
-    float tiles = params.uniforms().custom_parameter().x;
-    float2 uv = geo.uv0() * tiles;
+    float4 cp = params.uniforms().custom_parameter();
+    float2 uv = geo.uv0() * cp.x;
     uv.y = 1.0 - uv.y;
     float shade = geo.uv1().x;
+    float d = distance(geo.world_position().xz, cp.yz);
+    float fog = cp.w > 0.0 ? clamp((d - cp.w * 0.29) / (cp.w * 0.71), 0.0, 1.0) : 0.0;
     half3 tex = params.textures().base_color().sample(tiled, uv).rgb;
-    params.surface().set_base_color(tex * half3(params.material_constants().base_color_tint()) * half(shade));
+    params.surface().set_base_color(tex * half3(params.material_constants().base_color_tint()) * half(shade * (1.0 - fog)));
+    params.surface().set_emissive_color(half3(params.material_constants().emissive_color()) * half(fog));
     half3 n = params.textures().normal().sample(tiled, uv).rgb * 2.0h - 1.0h;
     params.surface().set_normal(float3(normalize(n)));
     params.surface().set_roughness(1.0h);

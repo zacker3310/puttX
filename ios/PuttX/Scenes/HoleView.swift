@@ -28,12 +28,28 @@ struct HoleView: View {
                         .contentShape(Rectangle())
                         .gesture(aimDrag)
                 } else {
-                    CourseView(play: play, renderer: app.renderer == .hand ? .hand : .exported)
-                        .ignoresSafeArea()
+                    // the web's lens shift: the picture's centre sits 60 stage px toward the aim buttons, clear
+                    // of the swing pad. The same picture: a view 120 px wider, hung off the far edge.
+                    GeometryReader { full in
+                        let shift = st.s(120)
+                        ZStack(alignment: .topLeading) {
+                            CourseView(play: play, renderer: app.renderer == .hand ? .hand : .exported)
+                                .frame(width: full.size.width + shift, height: full.size.height)
+                                .offset(x: lefty ? 0 : -shift)
+                            if let p = play.pinOnScreen {
+                                let h = play.hole, b = play.ball
+                                PinTag(metres: hypot(h.cup.x - b.x, h.cup.z - b.z), riseCm: Int(((h.groundH(h.cup.x, h.cup.z) - b.y) * 100).rounded()))
+                                    .fixedSize()
+                                    .position(x: p.x - (lefty ? 0 : shift), y: p.y - st.s(22))
+                                    .allowsHitTesting(false)
+                            }
+                        }
                         .contentShape(Rectangle())
                         .gesture(aimDrag)
+                    }
+                    .ignoresSafeArea()
                 }
-                // the swing pad on the player's side, the aim buttons on the other
+                // the swing pad on the player's side, the aim buttons and the overview on the other
                 SwingPad(play: play, feel: Feel())
                     .frame(width: st.s(120), height: st.s(360))
                     .position(x: lefty ? st.s(18 + 60) : geo.size.width - st.s(18 + 60), y: geo.size.height - st.s(18 + 180))
@@ -43,14 +59,30 @@ struct HoleView: View {
                 }
                 .position(x: lefty ? geo.size.width - st.s(24 + 96) : st.s(24 + 96), y: geo.size.height - st.s(24 + 44))
                 .disabled(play.phase != .aim)
+                Button { play.overview.toggle() } label: { HudIconView(icon: .eye).frame(width: st.s(52), height: st.s(52)) }
+                    .buttonStyle(ToyButtonStyle(kind: play.overview ? .yellow : .plain))
+                    .accessibilityLabel("overview")
+                    .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(128 + 44))
                 if let shot = play.lastStroke {
-                    ShotReadout(stroke: shot)
-                        .position(x: lefty ? st.s(18 + 120 + 90) : geo.size.width - st.s(18 + 120 + 90), y: geo.size.height - st.s(18 + 30))
+                    ShotPanel(stroke: shot)
+                        .fixedSize()
+                        .position(x: geo.size.width / 2, y: geo.size.height - st.s(20 + 42))
+                        .allowsHitTesting(false)
                 }
-                TopBar {
-                    BackButton { app.go(.map(Catalog.course(of: play.hole.key))) }
-                    hud
-                } right: { SoundButton() }
+                // the top: home, the hole, par; the strokes on the right
+                Button { app.go(.map(Catalog.course(of: play.hole.key))) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
+                    .buttonStyle(ToyButtonStyle())
+                    .accessibilityLabel("map")
+                    .position(x: st.s(24 + 44), y: st.s(24 + 44))
+                HudChip(icon: .hole, value: "\(Catalog.number(of: play.hole.key))").fixedSize()
+                    .position(x: st.s(132) + st.s(76), y: st.s(30 + 38))
+                    .accessibilityLabel("hole \(Catalog.number(of: play.hole.key))")
+                HudChip(icon: .par, value: "\(play.hole.par)").fixedSize()
+                    .position(x: st.s(300) + st.s(66), y: st.s(30 + 38))
+                    .accessibilityLabel("par \(play.hole.par)")
+                HudChip(icon: .strokes, value: "\(min(play.round.strokes, Scoring.cap(play.hole)))").fixedSize()
+                    .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
+                    .accessibilityLabel("\(play.round.strokes) strokes")
                 if play.phase == .done, let rec = play.record { DoneCard(play: play, rec: rec).frame(width: geo.size.width, height: geo.size.height) }
             }
         }
@@ -265,6 +297,8 @@ struct SwingPad: View {
         }
         guard !struck else { return }
         samples.append(sample(v, at: v.location))
+        let s0 = samples[0], last = samples[samples.count - 1]
+        play.swing = (back: max(0, last.y - s0.y), side: last.x - s0.x)
         if let s = Stroke.from(samples, feel: feel) {
             struck = true
             last = (samples, s.clean)
@@ -275,6 +309,7 @@ struct SwingPad: View {
         // let go before the ball: no stroke, and the pull back still shows
         if !struck && samples.count > 1 { last = (samples, true) }
         samples = []
+        play.swing = nil
     }
 
     private func drawPath(_ ctx: GraphicsContext, _ size: CGSize) {

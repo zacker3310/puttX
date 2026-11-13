@@ -28,6 +28,8 @@ struct CourseView: UIViewRepresentable {
     final class Coordinator {
         let play: HolePlay
         private var rig: CourseRig?
+        private let props = PlayProps()
+        private weak var view: ARView?
         private let camera = PerspectiveCamera()
         private var anchor = AnchorEntity(world: .zero)
         private var tick: Cancellable?
@@ -45,7 +47,9 @@ struct CourseView: UIViewRepresentable {
             do {
                 let r = renderer == .hand && play.hole.key == "1-1" ? try HandHole.build(play.hole) : try CourseBuilder.exported(play.hole)
                 anchor.addChild(r.root)
+                anchor.addChild(props.root)
                 rig = r
+                view = v
                 // the sky, once it is made: the backdrop and the image-based light
                 v.environment.background = .color(UIColor(red: 0.62, green: 0.85, blue: 0.94, alpha: 1))
                 let img = Sky.image(top: r.skyTop, horizon: r.skyHorizon, ground: r.skyGround, sun: r.sunDirection)
@@ -68,9 +72,8 @@ struct CourseView: UIViewRepresentable {
         private func update(_ dt: Double, snap: Bool) {
             guard let rig else { return }
             let h = play.hole, b = play.ball, t = play.time
-            // the ball, its centre a radius above its bottom
-            rig.ball.isEnabled = b.tube == nil && play.phase != .done
-            rig.ball.position = SIMD3(Float(b.x), Float(b.y + Sim.BALL_R), Float(b.z))
+            // the ball, the putter, the aim line and the power ring
+            props.update(play, now: CACurrentMediaTime())
             // the movers, posed as updateMovers poses them
             for (e, m) in rig.movers {
                 let s = m.state(at: t)
@@ -103,11 +106,39 @@ struct CourseView: UIViewRepresentable {
                 camLook = camLook! + (goal.look - camLook!) * k
             }
             camera.look(at: camLook!, from: camPos!, relativeTo: nil)
+            // the ground's fog is measured from the camera
+            if let g = rig.ground, var m = g.model?.materials.first as? CustomMaterial {
+                let c = camPos!
+                if abs(m.custom.value.y - c.x) > 0.01 || abs(m.custom.value.z - c.z) > 0.01 {
+                    m.custom.value.y = c.x; m.custom.value.z = c.z
+                    g.model?.materials = [m]
+                }
+            }
+            publishPin()
+        }
+
+        /// where the cup is on screen, for the distance tag: just above the cup, and only while aiming
+        private func publishPin() {
+            let h = play.hole
+            guard play.phase == .aim, !play.overview, let v = view else { if play.pinOnScreen != nil { play.pinOnScreen = nil }; return }
+            let world = SIMD3(Float(h.cup.x), Float(h.groundH(h.cup.x, h.cup.z) + 0.12), Float(h.cup.z))
+            // behind the camera projects nowhere useful
+            let toCup = world - camera.position(relativeTo: nil), fwd = -camera.transform.matrix.columns.2
+            guard simd_dot(toCup, SIMD3(fwd.x, fwd.y, fwd.z)) > 0, var p = v.project(world) else { play.pinOnScreen = nil; return }
+            p.x = max(v.bounds.width * 0.11, min(v.bounds.width * 0.8, p.x))
+            p.y = max(v.bounds.height * 0.22, p.y)
+            if let o = play.pinOnScreen, abs(o.x - p.x) < 0.5, abs(o.y - p.y) < 0.5 { return }
+            play.pinOnScreen = p
         }
 
         /// src/game.js cameraGoal, aiming and rolling
         private func cameraGoal() -> (pos: SIMD3<Float>, look: SIMD3<Float>) {
             let h = play.hole, b = play.ball
+            if play.overview {
+                // the whole hole from above, a little behind the tee
+                let B = Terrain.bounds(h), hi = max(B.x1 - B.x0, (B.z1 - B.z0) * 1.7) * 0.75 + 2
+                return (SIMD3(Float(B.cx), Float(hi), Float(B.cz - hi * 0.3)), SIMD3(Float(B.cx), 0, Float(B.cz)))
+            }
             let aiming = play.phase == .aim || play.phase == .done
             if aiming { yaw = play.aim * .pi / 180 }
             else if hypot(b.vx, b.vz) > 0.5 {

@@ -24,7 +24,7 @@ const crypto = require('crypto');
 const { build, ROOT } = require('./build.cjs');
 
 const args = process.argv.slice(2), val = f => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
-const one = val('--hole'), only = val('--course') ? [Number(val('--course'))] : one ? [Number(one.split('-')[0])] : null;
+const one = val('--hole'), only = val('--course') ? val('--course').split(',').map(Number) : one ? [Number(one.split('-')[0])] : null;
 const OUT = path.resolve(val('--out') || path.join(ROOT, 'ios/PuttX/Scene'));
 for (const d of ['geo', 'tex', 'holes']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
 
@@ -86,7 +86,8 @@ function grabHole(key) {
     const mats = [].concat(o.material).map(matOf);
     const x = new THREE.Matrix4();
     if (root) x.copy(root.matrixWorld).invert().multiply(o.matrixWorld); else x.copy(o.matrixWorld);
-    return { g: geoOf(o.geometry), m: mats.length === 1 ? mats[0] : mats, x: Array.from(x.elements), shadow: [o.castShadow, o.receiveShadow], order: o.renderOrder || 0 };
+    /* to the micrometre: invisible, and half the size */
+    return { g: geoOf(o.geometry), m: mats.length === 1 ? mats[0] : mats, x: Array.from(x.elements, v => Math.round(v * 1e6) / 1e6), shadow: [o.castShadow, o.receiveShadow], order: o.renderOrder || 0 };
   };
   holeGroup.updateMatrixWorld(true);
   const out = { key, static: [], movers: [], native: { zones: [] } };

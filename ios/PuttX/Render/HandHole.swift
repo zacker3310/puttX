@@ -133,7 +133,6 @@ enum HandHole {
         }
 
         CourseBuilder.light(rig, SceneEnv.hand)
-        CourseBuilder.addBall(rig)
         return rig
     }
 

@@ -33,7 +33,9 @@ for spec in "ipad|iPad Pro 13" "iphone|iPhone 1[6-9] Pro\$"; do
     lim 60 xcrun simctl launch "$dev" "$BUNDLE" -demo -route "$r" $extra >/dev/null || { say "$tag: launch $r failed"; fails=$((fails+1)); continue; }
     # a cold launch on CI can take a while: retake until the frame is not the plain launch screen
     f="$OUT/$tag-${r//:/-}${extra:+-${extra##* }}.png"
-    for wait in 6 5 8; do
+    # a hole compiles its custom shaders on first draw: give it longer
+    waits="6 5 8"; [ "${r%%:*}" = "hole" ] && waits="12 6 8"
+    for wait in $waits; do
       sleep $wait
       lim 30 xcrun simctl io "$dev" screenshot "$f" >/dev/null || { say "$tag: screenshot $r failed"; break; }
       python3 -c "

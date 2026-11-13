@@ -28,6 +28,17 @@ final class HolePlay {
     private(set) var log: [[Double]] = []
     /// the finished hole's record, once it is banked
     var record: HoleRecord?
+    /// the swing pad's live gesture: how far back the finger has pulled (stage px) and how far to the
+    /// side of the touch (stage px), for the putter and the power ring; nil when nobody is swinging
+    var swing: (back: Double, side: Double)?
+    /// the whole hole from above instead of the aim view
+    var overview = false
+    /// when the putter met the ball (the follow-through), in display time
+    private(set) var struckAt: CFTimeInterval?
+    /// the putter's pose at contact, for the follow-through
+    @ObservationIgnored var contactPose: (x: Double, y: Double, z: Double, aim: Double, speed: Double)?
+    /// the 3D view publishes where the cup is on screen (points) for the distance tag; nil when off screen
+    var pinOnScreen: CGPoint?
 
     @ObservationIgnored private var run: PuttRun?
     @ObservationIgnored private var from = Vec2(0, 0)
@@ -51,7 +62,31 @@ final class HolePlay {
     /// the putter meets the ball: the stroke turns the aim and sets the power
     func strike(_ s: Stroke) {
         lastStroke = s
+        struckAt = CACurrentMediaTime()
+        swing = nil
+        overview = false
         putt(angle: aim + s.turn, power: s.power)
+    }
+
+    /// the line the ball would start on: a half-power putt from here through the real physics, sampled
+    /// every 2 cm for 1.8 m (src/game.js aimPath). It bends with slopes and banks off walls.
+    @ObservationIgnored private var aimCache: (key: String, pts: [SIMD3<Double>])?
+    func aimPath() -> [SIMD3<Double>] {
+        let moving = !hole.data.movers.isEmpty
+        let key = "\(ball.x),\(ball.z),\(jsFixed(aim, 3)),\(moving ? Int((time * 8).rounded(.down)) : 0)"
+        if let c = aimCache, c.key == key { return c.pts }
+        var s = Ball(hole, ball.x, ball.z)
+        s.launch(aim, 0.5)
+        var pts: [SIMD3<Double>] = [], t = time, went = 0.0, next = Sim.BALL_R * 3, px = s.x, pz = s.z
+        for _ in 0..<2400 {
+            let end = hole.step(&s, t); t += Sim.SIM_DT
+            if s.tube != nil { break }
+            went += hypot(s.x - px, s.z - pz); px = s.x; pz = s.z
+            if went >= next { pts.append(SIMD3(s.x, (s.air ? s.y : hole.groundH(s.x, s.z)) + 0.012, s.z)); next += 0.02 }
+            if end != nil || went >= 1.8 || (!s.air && hypot(s.vx, s.vz) < 0.3) { break }
+        }
+        aimCache = (key, pts)
+        return pts
     }
     /// a putt at (angle degrees, power 0...1), logged and played exactly as the web's beginPutt does
     func putt(angle: Double, power: Double) {

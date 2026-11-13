@@ -17,6 +17,8 @@ final class CourseRig {
     /// textures that flow (conveyors): their material slots, and how fast
     var flows: [(ModelEntity, Int, Double)] = []
     var sunDirection = SIMD3<Float>(0.53, 0.69, -0.48)
+    /// the ground plane, whose fog follows the camera
+    var ground: ModelEntity?
     var skyTop = SIMD3<Double>(0.5, 0.7, 0.9), skyHorizon = SIMD3<Double>(1, 1, 1), skyGround = SIMD3<Double>(0.6, 0.5, 0.4)
 }
 
@@ -75,11 +77,12 @@ enum CourseBuilder {
         }
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.skirt(h, bottom: hole.native.skirt.bottom)), materials: [S.material(hole.mats[hole.native.skirt.m])]))
         if let gi = hole.native.ground {
-            rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.ground()), materials: [try groundMaterial(hole.mats[gi])]))
+            let g = ModelEntity(mesh: try lowMesh(Terrain.ground()), materials: [try groundMaterial(hole.mats[gi], fog: hole.env.fog)])
+            rig.root.addChild(g)
+            rig.ground = g
         }
 
         light(rig, hole.env)
-        addBall(rig)
         return rig
     }
 
@@ -155,14 +158,16 @@ enum CourseBuilder {
         if let t = m.normalMap { c.normal = .init(texture: .init(try SceneStore.shared.texture(t, normal: true))) }
         c.roughness = .init(scale: Float(m.roughness ?? 0.93))
         c.custom.value = SIMD4(along.x, along.y, stripes, 0.7)
+        if let sc = m.sheenColor { c.emissiveColor = .init(color: SceneStore.color(sc)) }
         return c
     }
-    static func groundMaterial(_ m: SceneMat) throws -> any Material {
+    static func groundMaterial(_ m: SceneMat, fog: SceneEnv.Fog?) throws -> any Material {
         guard let lib = library else { return SceneStore.shared.material(m) }
         var c = try CustomMaterial(surfaceShader: CustomMaterial.SurfaceShader(named: "groundSurface", in: lib), lightingModel: .lit)
         if let t = m.map { c.baseColor = .init(tint: SceneStore.color(m.color), texture: .init(try SceneStore.shared.texture(t))) }
         if let t = m.normalMap { c.normal = .init(texture: .init(try SceneStore.shared.texture(t, normal: true))) }
-        c.custom.value = SIMD4(Float(m.map?.rep[0] ?? 48), 0, 0, 0)
+        c.custom.value = SIMD4(Float(m.map?.rep[0] ?? 48), 0, 0, Float(fog?.far ?? 0))
+        if let f = fog { c.emissiveColor = .init(color: SceneStore.color(f.color)) }
         return c
     }
 

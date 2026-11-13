@@ -32,7 +32,6 @@ jobs:
           swift test -c release
 
   app:
-    needs: core
     runs-on: macos-15
     timeout-minutes: 45
     steps:
@@ -44,10 +43,15 @@ jobs:
       - name: build for the simulator
         working-directory: ios
         run: |
+          set +e
           xcodebuild -project PuttX.xcodeproj -scheme PuttX -configuration Debug \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO build | tail -n 60
-          test "${PIPESTATUS[0]}" -eq 0
+            CODE_SIGNING_ALLOWED=NO build > build.log 2>&1
+          code=$?
+          # every diagnostic, once, with its source line: one CI round trip shows all of them
+          grep -E -A3 "^/.*: (error|warning): " build.log | grep -v "^--$" | awk '!seen[$0]++' | head -n 400
+          [ $code -eq 0 ] || tail -n 30 build.log
+          exit $code
       - name: screenshots of every scene
         run: ios/scripts/shots.sh ios/build/Build/Products/Debug-iphonesimulator/PuttX.app shots
       - uses: actions/upload-artifact@v4

@@ -18,6 +18,7 @@ const ROOT = path.join(__dirname, '..');
 const HOLES_OUT = path.join(ROOT, 'ios/PuttXCore/Sources/PuttXCore/Resources/holes.json');
 const GOLDEN_OUT = path.join(ROOT, 'ios/PuttXCore/Tests/PuttXCoreTests/Resources/golden.json');
 const LOOKS_OUT = path.join(ROOT, 'ios/PuttX/Resources/looks.json');
+const PLAY_OUT = path.join(ROOT, 'ios/PuttXCore/Tests/PuttXCoreTests/Resources/play.json');
 const ART_DIR = path.join(ROOT, 'ios/PuttX/Assets.xcassets/Art');
 const S = loadSim();
 
@@ -41,6 +42,45 @@ function readLooks() {
     return { course: c, ...look };
   });
 }
+/* the play layer's pure pieces, for the Swift stroke and rounding to be held to: computeStroke (a pad
+   gesture to a stroke, for two putter feels) over a fixed set of synthetic gestures, and JS toFixed,
+   which beginPutt rounds every logged putt with (ties go away from zero, unlike printf) */
+function playGolden() {
+  const vm = require('vm');
+  const src = fs.readFileSync(path.join(ROOT, 'src/game.js'), 'utf8'), grab = re => src.match(re)[0];
+  const code = [grab(/^const SWING_FULL = .*$/m), grab(/^const FEEL_BASE = .*$/m), grab(/^const FEEL = .*$/m), grab(/^function computeStroke\(samples\) \{[\s\S]*?\n\}/m)].join('\n');
+  const ctx = vm.createContext({ Math });
+  vm.runInContext('const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));\n' + code + '\nglobalThis.api = { computeStroke, FEEL, FEEL_BASE };', ctx);
+  const { computeStroke, FEEL, FEEL_BASE } = ctx.api;
+  const feels = [Object.assign({}, FEEL_BASE), { sweet: 0.3, tempoDead: 0.3, tempoK: 0.12, pathK: 0.35, toeLoss: 0.1, twist: 3 }];
+  /* a gesture: touch, an eased pull back of `back` px over tb seconds, then a push through at `fwd`
+     px/s drifting `drift` px/s sideways, sampled at `hz`, starting `off` px to the side */
+  const gesture = (back, tb, fwd, drift, off, hz) => {
+    const out = [{ t: 0, x: 60, y: 120 }];
+    const nb = Math.max(2, Math.round(tb * hz));
+    for (let i = 1; i <= nb; i++) out.push({ t: i / hz, x: 60 + off * i / nb, y: 120 + back * Math.sin(i / nb * Math.PI / 2) });
+    let y = 120 + back, x = 60 + off, t = nb / hz;
+    while (y > 60 && out.length < 400) { t += 1 / hz; y -= fwd / hz; x += drift / hz; out.push({ t, x, y }); }
+    return out;
+  };
+  const strokes = [];
+  for (const [fi, feel] of feels.entries()) {
+    for (const back of [10, 40, 120, 240, 300]) for (const tb of [0.25, 0.6]) for (const ratio of [0.5, 1, 2.2]) for (const drift of [0, 90]) for (const off of [0, 14, -30]) for (const hz of [120, 240]) {
+      const samples = gesture(back, tb, back / 0.2 * ratio, drift, off, hz);
+      for (const k of Object.keys(FEEL)) delete FEEL[k];
+      Object.assign(FEEL, feel);
+      const r = computeStroke(samples);
+      strokes.push({ feel: fi, samples: samples.map(q => [q.t, q.x, q.y]), stroke: r && { power: r.power, turn: r.turn, clean: r.clean } });
+    }
+  }
+  const fixed = [];
+  for (const [x, f] of [[0.125, 2], [-0.125, 2], [2.5, 0], [-2.5, 0], [1.005, 2], [1.0005, 3], [12.3456785, 6], [359.99951, 3], [-0.0001, 3], [0.99995, 4], [1e-7, 6]]) fixed.push([x, f, +x.toFixed(f)]);
+  for (let i = 0; i < 300; i++) { const x = ((i * 2654435761) % 1000003) / 997.1 - 400, f = [3, 4, 6][i % 3]; fixed.push([x, f, +x.toFixed(f)]); }
+  /* JSON writes -0 as 0; a toFixed of a tiny negative is -0, so the sign travels as a string */
+  for (const c of fixed) if (Object.is(c[2], -0)) c[2] = '-0';
+  return JSON.stringify({ v: 1, feels, strokes, fixed }) + '\n';
+}
+
 /* the UI glyphs the web inlines as SVG strings */
 function readGlyphs() {
   const src = ['src/game.js', 'src/shop.js'].map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
@@ -116,7 +156,7 @@ const art = { 'Contents.json': JSON.stringify({ info: { author: 'export-ios', ve
 for (const l of looks) if (l.icon) Object.assign(art, imageSet('course' + l.course, l.icon, false));
 for (const [n, svg] of Object.entries(readGlyphs())) Object.assign(art, imageSet('glyph-' + n, svg, n === 'star'));
 
-const files = [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
+const files = [[HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], [PLAY_OUT, playGolden()], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
 if (process.argv.includes('--check')) {
   const stale = files.filter(([f, s]) => !fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== s);
   for (const [f] of stale) console.error('stale: ' + path.relative(ROOT, f) + ' (run node scripts/export-ios.cjs)');

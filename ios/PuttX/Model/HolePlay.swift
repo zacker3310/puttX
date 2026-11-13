@@ -19,6 +19,13 @@ final class HolePlay {
     /// the ball now (bottom of the ball at y); nil while it is inside a tube
     private(set) var ball: Ball
     private(set) var lastOutcome: PuttOutcome?
+    /// where the putter points, in degrees (0 = +z); the course drag and the aim buttons turn it
+    var aim: Double
+    /// the last stroke, for the pad's trace and the shot readout
+    private(set) var lastStroke: Stroke?
+    /// every putt as logged (angle, power, hole time), rounded as the web rounds them: replays, ghosts
+    /// and shared shots roll from exactly this
+    private(set) var log: [[Double]] = []
     /// the finished hole's record, once it is banked
     var record: HoleRecord?
 
@@ -32,6 +39,7 @@ final class HolePlay {
         self.hole = hole; self.look = look
         round = Round(hole)
         ball = Ball(hole, hole.tee.x, hole.tee.z)
+        aim = hole.data.aim0 ?? atan2(hole.cup.x - hole.tee.x, hole.cup.z - hole.tee.z) * 180 / .pi
     }
 
     func start() {
@@ -40,11 +48,19 @@ final class HolePlay {
     }
     func stop() { link?.invalidate(); link = nil }
 
-    /// strike: angle in degrees (0 = +z), power 0...1
+    /// the putter meets the ball: the stroke turns the aim and sets the power
+    func strike(_ s: Stroke) {
+        lastStroke = s
+        putt(angle: aim + s.turn, power: s.power)
+    }
+    /// a putt at (angle degrees, power 0...1), logged and played exactly as the web's beginPutt does
     func putt(angle: Double, power: Double) {
         guard phase == .aim else { return }
+        let a = jsFixed(angle, 3), p = jsFixed(power, 4)
+        time = jsFixed(time, 6)
         from = round.at
-        run = PuttRun(hole, from: from, angle: angle, power: power, t0: time)
+        log.append([a, p, time])
+        run = PuttRun(hole, from: from, angle: a, power: p, t0: time)
         phase = .roll
     }
 

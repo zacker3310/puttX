@@ -41,7 +41,8 @@ public enum Sim {
     static let OOB_Y = -1.0
     static let RIM_E = 0.0, RIM_MU = 1.0, RIM_RHO = 0.008, LINER_E = 0.35, LINER_MU = 0.2, SUNK_DEPTH = 0.5
     public static let DISH_R = 0.22, DISH_D = 0.006
-    static let TUBE_R = 0.12, TUBE_T = 0.45
+    public static let TUBE_R = 0.12
+    static let TUBE_T = 0.45
     static let DRAIN_FLAT = CUP_R + 0.07
     static let RELIEF_GAP = 0.025, RELIEF_TO = 0.12
 }

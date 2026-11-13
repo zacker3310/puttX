@@ -1,5 +1,5 @@
 // The app's state: where the player is, which profile is in use, and its progress. Saves are three
-// profile slots, as on the web; phase 6 mirrors them to iCloud (Progress.merged makes that conflict-free).
+// profile slots, as on the web; phase 6 mirrors them to iCloud (PlayerProgress.merged makes that conflict-free).
 import SwiftUI
 import PuttXCore
 
@@ -22,7 +22,7 @@ final class AppModel {
 
     private(set) var route: Route = .title
     private(set) var slot: Int
-    var progress: Progress
+    var progress: PlayerProgress
     /// the hole being played
     private(set) var play: HolePlay?
 
@@ -32,26 +32,26 @@ final class AppModel {
     init() {
         let n = UserDefaults.standard.integer(forKey: "puttx.slot")
         slot = (1...AppModel.slots).contains(n) ? n : 1
-        progress = Progress(catalog: Catalog.shared)
-        progress = load(slot) ?? Progress(catalog: catalog)
+        progress = PlayerProgress(catalog: Catalog.shared)
+        progress = load(slot) ?? PlayerProgress(catalog: catalog)
         applyLaunchArguments()
     }
 
     // MARK: saves
-    func load(_ n: Int) -> Progress? {
+    func load(_ n: Int) -> PlayerProgress? {
         guard let d = store.data(forKey: AppModel.key(n)) else { return nil }
-        return try? JSONDecoder().decode(Progress.self, from: d)
+        return try? JSONDecoder().decode(PlayerProgress.self, from: d)
     }
     func save() { if let d = try? JSONEncoder().encode(progress) { store.set(d, forKey: AppModel.key(slot)) } }
     func slotUsed(_ n: Int) -> Bool { !(load(n)?.holes.isEmpty ?? true) }
     func useSlot(_ n: Int) {
         slot = n; store.set(n, forKey: "puttx.slot")
-        progress = load(n) ?? Progress(catalog: catalog)
+        progress = load(n) ?? PlayerProgress(catalog: catalog)
         save()
     }
     func erase(_ n: Int) {
         store.removeObject(forKey: AppModel.key(n))
-        if n == slot { progress = Progress(catalog: catalog) }
+        if n == slot { progress = PlayerProgress(catalog: catalog) }
     }
 
     // MARK: navigation
@@ -84,7 +84,7 @@ final class AppModel {
     private func applyLaunchArguments() {
         let args = ProcessInfo.processInfo.arguments
         if args.contains("-demo") {
-            var p = Progress(catalog: catalog)
+            var p = PlayerProgress(catalog: catalog)
             for c in catalog.allCourses where c != 30 {
                 for h in catalog.holes(course: c) { p.record(h.key, score: max(1, h.par - [1, 0, 0, 1, -1][Catalog.number(of: h.key) % 5]), par: h.par, catalog: catalog) }
             }

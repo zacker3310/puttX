@@ -40,7 +40,7 @@ struct CardView: View {
         let c = app.catalog
         guard !c.isExtra(course) else { return nil }
         let w = c.world(of: course), list = c.playableWorlds
-        let n = c.has(course: course + c.courseStep) && c.world(of: course + c.courseStep) == w ? course + c.courseStep
+        let n: Int? = c.has(course: course + c.courseStep) && c.world(of: course + c.courseStep) == w ? course + c.courseStep
             : list.firstIndex(of: w).flatMap { $0 + 1 < list.count ? list[$0 + 1] : nil }
         return n.flatMap { app.progress.worlds.contains($0) ? $0 : nil }
     }

@@ -1,9 +1,9 @@
-// Progress (src/game.js 2g): bests and stars only ever go up; finishing a course opens the next
+// PlayerProgress (src/game.js 2g): bests and stars only ever go up; finishing a course opens the next
 // course of its world, and finishing every hole of a world opens the next world.
 
 public struct HoleRecord: Sendable, Codable, Equatable { public var best: Int, stars: Int }
 
-public struct Progress: Sendable, Codable, Equatable {
+public struct PlayerProgress: Sendable, Codable, Equatable {
     public var v = 2
     public var holes: [String: HoleRecord] = [:]
     public var worlds: [Int]
@@ -34,7 +34,7 @@ public struct Progress: Sendable, Codable, Equatable {
 
     /// two saves of the same profile, merged with nothing lost: bests only go down, stars only go up,
     /// open courses only grow. Order does not matter, so two devices always agree (iCloud).
-    public func merged(with o: Progress) -> Progress {
+    public func merged(with o: PlayerProgress) -> PlayerProgress {
         var m = self
         for (k, r) in o.holes {
             if let a = m.holes[k] { m.holes[k] = HoleRecord(best: Swift.min(a.best, r.best), stars: Swift.max(a.stars, r.stars)) } else { m.holes[k] = r }

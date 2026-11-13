@@ -26,12 +26,12 @@ import Testing
     let cat = Catalog.shared
 
     @Test func oldSavesLoad() throws {
-        let p = try JSONDecoder().decode(Progress.self, from: Data(#"{"v":2,"holes":{"1-1":{"best":2,"stars":3}},"worlds":[1],"tally":{}}"#.utf8))
+        let p = try JSONDecoder().decode(PlayerProgress.self, from: Data(#"{"v":2,"holes":{"1-1":{"best":2,"stars":3}},"worlds":[1],"tally":{}}"#.utf8))
         #expect(p.holes["1-1"]?.best == 2 && p.sound && p.coins == 0)
     }
 
     @Test func mergeKeepsTheBestOfBoth() {
-        var a = Progress(catalog: cat), b = Progress(catalog: cat)
+        var a = PlayerProgress(catalog: cat), b = PlayerProgress(catalog: cat)
         a.record("1-1", score: 4, par: 3, catalog: cat); b.record("1-1", score: 2, par: 3, catalog: cat)
         a.record("1-2", score: 3, par: 3, catalog: cat)
         b.worlds.append(11)
@@ -42,7 +42,7 @@ import Testing
     }
 
     @Test func finishingACourseOpensTheNext() {
-        var p = Progress(catalog: cat)
+        var p = PlayerProgress(catalog: cat)
         for h in cat.holes(course: 1) { p.record(h.key, score: h.par, par: h.par, catalog: cat) }
         #expect(p.worlds.contains(11))
         #expect(!p.worlds.contains(2))

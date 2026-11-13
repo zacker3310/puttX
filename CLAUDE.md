@@ -40,3 +40,9 @@ Never hand-edit or Read `index.html` (the three.js line is ~690 KB). Edit the so
     PUTTX_ONLY=5 node tests/holes-check.cjs  # one course's holes
     npm run shot -- --course 5 [--swing]   # PNGs of every hole in preview/shots/
     python3 -m http.server 4173            # then http://localhost:4173/?hole=1-3 or ?map
+
+## iOS port
+
+`ios/` is a native Swift port (`docs/IOS.md`). Holes stay authored in JS: after any course or sim
+change run `node scripts/export-ios.cjs`, and mirror sim changes in `ios/PuttXCore/Sources/PuttXCore/Sim.swift`
+in the same evaluation order. `cd ios/PuttXCore && swift test -c release` must stay bit-exact with JS.

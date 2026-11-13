@@ -5,3 +5,7 @@ tests/shots/
 .DS_Store
 preview/
 test-build.html
+ios/**/.build/
+ios/**/.swiftpm/
+ios/**/*.xcodeproj/
+ios/**/xcuserdata/

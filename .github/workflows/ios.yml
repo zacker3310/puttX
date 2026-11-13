@@ -1,0 +1,32 @@
+name: ios
+
+on:
+  push:
+    branches: [main, 'claude/**']
+    paths: ['ios/**', 'src/game.js', 'courses/**', 'scripts/export-ios.cjs', '.github/workflows/ios.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    # Apple silicon: the parity tests must hold on arm64, where the compiler could fuse multiply-adds
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: hole data and golden putts match the JS sources
+        run: node scripts/export-ios.cjs --check
+      - name: PuttXCore parity (debug and release)
+        working-directory: ios/PuttXCore
+        run: |
+          swift test
+          swift test -c release

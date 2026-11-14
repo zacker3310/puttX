@@ -90,6 +90,8 @@ final class HolePlay {
     @ObservationIgnored var onLost: (() -> Void)?
     /// the goals met at the finish (bits), and which were new
     var goals: (all: Int, fresh: Int)?
+    /// coins the finish paid (finish, under par, ace, first clear, goals, the daily hole)
+    var coinsWon = 0
 
     @ObservationIgnored private var run: PuttRun?
     @ObservationIgnored private var from = Vec2(0, 0)

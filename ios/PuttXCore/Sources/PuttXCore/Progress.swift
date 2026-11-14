@@ -21,12 +21,18 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
     /// each hole's best run as putt inputs (angle, power, hole time), replayed as the ghost; inputs only
     /// mean the same run under the same physics, so a new physics version drops them
     public var ghosts: [String: [[Double]]] = [:]
+    /// holes that already paid the first-clear bonus (nil in a save from before the shop: every hole
+    /// finished by then counts as paid)
+    public var firsts: [String]?
     public var phys = PlayerProgress.physVersion
     public static let physVersion = 3
 
     public static let coinMax = 999_999
 
-    public init(catalog: Catalog) { worlds = [catalog.playableWorlds.first ?? catalog.worldOrder[0]] }
+    public init(catalog: Catalog) {
+        firsts = []; worlds = [catalog.playableWorlds.first ?? catalog.worldOrder[0]]
+        repairGear(Shop.shared)
+    }
 
     /// a save from any version: anything missing takes its default, so old saves always load
     public init(from d: Decoder) throws {
@@ -45,6 +51,7 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         obj = (try? c.decodeIfPresent([String: Int].self, forKey: .obj)) ?? [:]
         daily = try? c.decodeIfPresent(DailyRecord.self, forKey: .daily)
         ghosts = (try? c.decodeIfPresent([String: [[Double]]].self, forKey: .ghosts)) ?? [:]
+        firsts = (try? c.decodeIfPresent([String].self, forKey: .firsts)) ?? nil
         phys = (try? c.decodeIfPresent(Int.self, forKey: .phys)) ?? 0
         if phys != PlayerProgress.physVersion { ghosts = [:]; phys = PlayerProgress.physVersion }
         // repairExtras: tokens in range, goal bits in range
@@ -68,6 +75,7 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         m.lost.merge(o.lost) { a, _ in a }
         m.obj.merge(o.obj) { $0 | $1 }
         // the ghost of the better run (fewer putts) wins
+        if firsts != nil || o.firsts != nil { m.firsts = Array(Set(firsts ?? []).union(o.firsts ?? [])).sorted() }
         m.ghosts.merge(o.ghosts) { a, b in b.count < a.count ? b : a }
         if let b = o.daily {
             if let a = m.daily, a.d == b.d { m.daily = DailyRecord(d: a.d, best: Swift.min(a.best, b.best), streak: Swift.max(a.streak, b.streak)) }

@@ -171,8 +171,24 @@ function extrasGolden() {
   for (let i = 0; i < 40; i++) { const d = new Date(Date.UTC(2026, 0, 1 + i * 37)), ds = d.toISOString().slice(0, 10); daily[ds] = dailyKey(ds); }
   return JSON.stringify({ v: 1, lost, daily }) + '\n';
 }
+/* the pro shop's stock and economy, straight from src/shop.js: the app's catalogue (shop.json) and
+   golden values for its pure rules (coins per finish, each putter's feel) */
+function shopData() {
+  const src = fs.readFileSync(path.join(ROOT, 'src/shop.js'), 'utf8');
+  const g = fs.readFileSync(path.join(ROOT, 'src/game.js'), 'utf8'), base = g.slice(g.indexOf('const FEEL_BASE'), g.indexOf(';', g.indexOf('const FEEL_BASE')) + 1);
+  const body = src.slice(src.indexOf('const COIN ='), src.indexOf('/* ---- save repair'));
+  return new Function('clamp', base + body + '\nreturn { COIN, COIN_MAX, coinsFor, PUTTERS, BALLS, PACKS, MULL_START, MULL_MAX, PREMIUM, STARTER, feelOf, FEEL_BASE };')((v, a, b) => Math.min(b, Math.max(a, v)));
+}
+const SHOP = shopData();
+const shopJson = JSON.stringify({ v: 1, coin: SHOP.COIN, coinMax: SHOP.COIN_MAX, premium: SHOP.PREMIUM, starter: SHOP.STARTER,
+  putters: SHOP.PUTTERS.map(({ kind, ...p }) => p), balls: SHOP.BALLS.map(({ kind, ...b }) => b), packs: SHOP.PACKS }, null, 1) + '\n';
+const shopGolden = () => JSON.stringify({ v: 1,
+  coins: [1, 2, 3, 4, 5, 6, 9].flatMap(s => [2, 3, 4, 5].flatMap(par => [true, false].map(first => [s, par, first, SHOP.coinsFor(s, par, first)]))),
+  feel: Object.fromEntries(SHOP.PUTTERS.map(p => [p.id, SHOP.feelOf(p.id)])) }) + '\n';
+const SHOP_OUT = path.join(ROOT, 'ios/PuttXCore/Sources/PuttXCore/Resources/shop.json');
+const SHOP_GOLD = path.join(ROOT, 'ios/PuttXCore/Tests/PuttXCoreTests/Resources/shopgold.json');
 const EXTRAS_OUT = path.join(ROOT, 'ios/PuttXCore/Tests/PuttXCoreTests/Resources/extras.json');
-const files = [[EXTRAS_OUT, extrasGolden()], [HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], [PLAY_OUT, playGolden()], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
+const files = [[SHOP_OUT, shopJson], [SHOP_GOLD, shopGolden()], [EXTRAS_OUT, extrasGolden()], [HOLES_OUT, holesJson], [GOLDEN_OUT, goldenJson], [LOOKS_OUT, looksJson], [PLAY_OUT, playGolden()], ...Object.entries(art).map(([f, s]) => [path.join(ART_DIR, f), s])];
 if (process.argv.includes('--check')) {
   /* play.json's outputs come from log2 and atan2, which engines may round differently in the last
      bit: fresh means the same gestures and the same strokes to 1e-12 (the Swift test's own tolerance) */

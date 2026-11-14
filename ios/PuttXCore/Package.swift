@@ -9,7 +9,7 @@ let package = Package(
     platforms: [.iOS(.v18), .macOS(.v15)],
     products: [.library(name: "PuttXCore", targets: ["PuttXCore"])],
     targets: [
-        .target(name: "PuttXCore", resources: [.copy("Resources/holes.json")]),
-        .testTarget(name: "PuttXCoreTests", dependencies: ["PuttXCore"], resources: [.copy("Resources/golden.json"), .copy("Resources/play.json"), .copy("Resources/terrain.json"), .copy("Resources/extras.json")]),
+        .target(name: "PuttXCore", resources: [.copy("Resources/holes.json"), .copy("Resources/shop.json")]),
+        .testTarget(name: "PuttXCoreTests", dependencies: ["PuttXCore"], resources: [.copy("Resources/golden.json"), .copy("Resources/play.json"), .copy("Resources/terrain.json"), .copy("Resources/extras.json"), .copy("Resources/shopgold.json")]),
     ]
 )

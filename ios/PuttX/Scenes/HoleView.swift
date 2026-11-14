@@ -50,7 +50,7 @@ struct HoleView: View {
                     .ignoresSafeArea()
                 }
                 // the swing pad on the player's side, the aim buttons and the overview on the other
-                SwingPad(play: play, feel: Feel())
+                SwingPad(play: play, feel: app.feel)
                     .frame(width: st.s(120), height: st.s(360))
                     .position(x: lefty ? st.s(18 + 60) : geo.size.width - st.s(18 + 60), y: geo.size.height - st.s(18 + 180))
                 HStack(spacing: st.s(16)) {
@@ -262,6 +262,12 @@ struct DoneCard: View {
                     Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }
                 }
                 if let g = play.goals { GoalsRow(all: g.all, fresh: g.fresh) }
+                if play.coinsWon > 0 {
+                    Tally(value: "+\(play.coinsWon)") { Glyph.coin.image.resizable().scaledToFit() }
+                        .popIn(0.7)
+                        .onAppear { DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { SFX.coin() } }
+                        .accessibilityLabel("\(play.coinsWon) coins won")
+                }
                 HStack(spacing: st.s(24)) {
                     IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.go(.hole(play.hole.key)) }
                     IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(play.daily != nil ? .title : app.next(after: play.hole.key)) }

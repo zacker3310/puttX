@@ -62,7 +62,9 @@ final class AppModel {
     // MARK: saves
     func load(_ n: Int) -> PlayerProgress? {
         guard let d = store.data(forKey: AppModel.key(n)) else { return nil }
-        return try? JSONDecoder().decode(PlayerProgress.self, from: d)
+        var p = try? JSONDecoder().decode(PlayerProgress.self, from: d)
+        p?.repairGear(Shop.shared)
+        return p
     }
     func save() {
         if let d = try? JSONEncoder().encode(progress) { store.set(d, forKey: AppModel.key(slot)) }
@@ -102,6 +104,8 @@ final class AppModel {
         } else if case .hole = route { play?.stop(); play = nil; Synth.shared.bed(water: false, wind: false); Synth.shared.roll(speed: 0, surface: "felt") }
         withAnimation(.easeInOut(duration: 0.25)) { route = r }
     }
+    /// how the equipped putter turns a gesture into a putt
+    var feel: Feel { Shop.shared.feel(progress.equipped["putter"] ?? "p1") }
     func look(_ course: Int) -> CourseLook { progress.neon ? looks[course].night() : looks[course] }
 
     /// the hole of the day: the same hole for everyone on a date, from any course
@@ -122,12 +126,15 @@ final class AppModel {
         let h = play.hole, prevBest = progress.holes[h.key]?.best
         progress.keepGhost(h.key, log: play.log, score: score, previousBest: prevBest, auto: play.round.auto)
         let rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
+        var won = progress.payFinish(h.key, score: score, par: h.par, shop: Shop.shared)
         let bits = Goals.bits(score: score, par: h.par, touched: play.touched, auto: play.round.auto, lostFound: progress.lost[h.key] != nil || play.lostDone())
         let g = progress.finishGoals(h.key, bits: bits)
         play.goals = (g.all, g.fresh)
+        won += g.coins
         if let day = play.daily, day == Daily.day() {
-            _ = progress.finishDaily(day: day, yesterday: Daily.yesterday(), score: score)
+            won += progress.finishDaily(day: day, yesterday: Daily.yesterday(), score: score)
         }
+        play.coinsWon = won
         save()
         GameCenter.holeBanked(h.key, score: score, progress: progress, catalog: catalog)
         return rec

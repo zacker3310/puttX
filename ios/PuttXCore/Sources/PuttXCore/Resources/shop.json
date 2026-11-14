@@ -1,0 +1,815 @@
+{
+ "v": 1,
+ "coin": {
+  "finish": 5,
+  "under": 10,
+  "ace": 25,
+  "first": 10
+ },
+ "coinMax": 999999,
+ "premium": 250,
+ "starter": {
+  "putter": "p1",
+  "ball": "b1"
+ },
+ "putters": [
+  {
+   "id": "p1",
+   "price": 0,
+   "f": [
+    0,
+    0,
+    0
+   ],
+   "look": {
+    "head": "#c9ced6",
+    "metal": 0.85,
+    "shaft": "#d9dde3",
+    "grip": "#4a3826",
+    "shape": "blade"
+   }
+  },
+  {
+   "id": "p2",
+   "price": 40,
+   "f": [
+    1,
+    1,
+    0
+   ],
+   "look": {
+    "head": "#ffd66e",
+    "metal": 0.2,
+    "shaft": "#d9dde3",
+    "grip": "#ef7d6d",
+    "shape": "blade"
+   }
+  },
+  {
+   "id": "p3",
+   "price": 80,
+   "f": [
+    1,
+    0,
+    2
+   ],
+   "look": {
+    "head": "#d08452",
+    "metal": 0.55,
+    "shaft": "#eadccb",
+    "grip": "#3c2a1c",
+    "shape": "blade"
+   }
+  },
+  {
+   "id": "p4",
+   "price": 130,
+   "f": [
+    2,
+    1,
+    1
+   ],
+   "look": {
+    "head": "#74c465",
+    "metal": 0.2,
+    "shaft": "#d9dde3",
+    "grip": "#fff8ec",
+    "shape": "mallet"
+   }
+  },
+  {
+   "id": "p5",
+   "price": 190,
+   "f": [
+    2,
+    2,
+    2
+   ],
+   "look": {
+    "head": "#6fc0df",
+    "metal": 0.3,
+    "shaft": "#eef2f6",
+    "grip": "#3f83a2",
+    "shape": "mallet"
+   }
+  },
+  {
+   "id": "p6",
+   "price": 260,
+   "f": [
+    3,
+    2,
+    2
+   ],
+   "look": {
+    "head": "#454b59",
+    "metal": 0.5,
+    "shaft": "#2a2e36",
+    "grip": "#ef7d6d",
+    "shape": "blade"
+   }
+  },
+  {
+   "id": "p7",
+   "price": 340,
+   "f": [
+    2,
+    3,
+    3
+   ],
+   "look": {
+    "head": "#ef7d6d",
+    "metal": 0.3,
+    "shaft": "#fff8ec",
+    "grip": "#4a3826",
+    "shape": "mallet"
+   }
+  },
+  {
+   "id": "p8",
+   "price": 440,
+   "f": [
+    3,
+    3,
+    3
+   ],
+   "look": {
+    "head": "#f0c24a",
+    "metal": 0.6,
+    "shaft": "#f3e3b5",
+    "grip": "#2b2b33",
+    "shape": "blade"
+   }
+  },
+  {
+   "id": "p9",
+   "price": 580,
+   "f": [
+    4,
+    3,
+    4
+   ],
+   "look": {
+    "head": "#323a4a",
+    "metal": 0.4,
+    "shaft": "#15171c",
+    "grip": "#ffd66e",
+    "shape": "mallet"
+   }
+  },
+  {
+   "id": "p10",
+   "price": 800,
+   "f": [
+    4,
+    4,
+    4
+   ],
+   "look": {
+    "head": "#ffd66e",
+    "metal": 0.65,
+    "shaft": "#f0c24a",
+    "grip": "#fffdf7",
+    "shape": "mallet"
+   }
+  },
+  {
+   "id": "p11",
+   "price": 300,
+   "f": [
+    2,
+    1,
+    2
+   ],
+   "look": {
+    "head": "#ef5d4d",
+    "metal": 0.2,
+    "shaft": "#ffd66e",
+    "grip": "#3f83a2",
+    "style": "brick"
+   }
+  },
+  {
+   "id": "p12",
+   "price": 340,
+   "f": [
+    1,
+    3,
+    1
+   ],
+   "look": {
+    "head": "#c98a4e",
+    "metal": 0.1,
+    "shaft": "#8a5a32",
+    "grip": "#4a3826",
+    "style": "wood"
+   }
+  },
+  {
+   "id": "p13",
+   "price": 380,
+   "f": [
+    2,
+    2,
+    1
+   ],
+   "look": {
+    "head": "#fffdf7",
+    "metal": 0.1,
+    "shaft": "#fffdf7",
+    "grip": "#e8414b",
+    "style": "candy"
+   }
+  },
+  {
+   "id": "p14",
+   "price": 420,
+   "f": [
+    1,
+    1,
+    3
+   ],
+   "look": {
+    "head": "#5fb35a",
+    "metal": 0.1,
+    "shaft": "#c9a476",
+    "grip": "#ff8fbf",
+    "style": "cactus"
+   }
+  },
+  {
+   "id": "p15",
+   "price": 480,
+   "f": [
+    3,
+    1,
+    2
+   ],
+   "look": {
+    "head": "#ffd84a",
+    "metal": 0.1,
+    "shaft": "#6fc0df",
+    "grip": "#ff9a3d",
+    "style": "duck"
+   }
+  },
+  {
+   "id": "p16",
+   "price": 520,
+   "f": [
+    2,
+    3,
+    2
+   ],
+   "look": {
+    "head": "#ffd84a",
+    "metal": 0.1,
+    "shaft": "#8fd06f",
+    "grip": "#6b4a2a",
+    "style": "banana"
+   }
+  },
+  {
+   "id": "p17",
+   "price": 560,
+   "f": [
+    3,
+    2,
+    2
+   ],
+   "look": {
+    "head": "#f6efdc",
+    "metal": 0.1,
+    "shaft": "#e6dcc6",
+    "grip": "#7d68c4",
+    "style": "bone"
+   }
+  },
+  {
+   "id": "p18",
+   "price": 620,
+   "f": [
+    2,
+    2,
+    3
+   ],
+   "look": {
+    "head": "#bfe9ff",
+    "metal": 0.5,
+    "shaft": "#e6f6ff",
+    "grip": "#3f83a2",
+    "style": "ice"
+   }
+  },
+  {
+   "id": "p19",
+   "price": 680,
+   "f": [
+    4,
+    1,
+    2
+   ],
+   "look": {
+    "head": "#b4bcc7",
+    "metal": 0.7,
+    "shaft": "#b88550",
+    "grip": "#ef5d4d",
+    "style": "hammer"
+   }
+  },
+  {
+   "id": "p20",
+   "price": 740,
+   "f": [
+    2,
+    2,
+    4
+   ],
+   "look": {
+    "head": "#6f8fa8",
+    "metal": 0.3,
+    "shaft": "#d9dde3",
+    "grip": "#2e4f6b",
+    "style": "shark"
+   }
+  },
+  {
+   "id": "p21",
+   "price": 800,
+   "f": [
+    3,
+    3,
+    2
+   ],
+   "look": {
+    "head": "#6b4fa8",
+    "metal": 0.25,
+    "shaft": "#2b2240",
+    "grip": "#74c465",
+    "style": "claw"
+   }
+  },
+  {
+   "id": "p22",
+   "price": 880,
+   "f": [
+    2,
+    4,
+    2
+   ],
+   "look": {
+    "head": "#f4f1ea",
+    "metal": 0.4,
+    "shaft": "#d9dde3",
+    "grip": "#ef5d4d",
+    "style": "rocket"
+   }
+  },
+  {
+   "id": "p23",
+   "price": 960,
+   "f": [
+    3,
+    3,
+    3
+   ],
+   "look": {
+    "head": "#9aa7b8",
+    "metal": 0.6,
+    "shaft": "#5d6878",
+    "grip": "#ffd66e",
+    "style": "robot"
+   }
+  },
+  {
+   "id": "p24",
+   "price": 1040,
+   "f": [
+    4,
+    2,
+    3
+   ],
+   "look": {
+    "head": "#f3ead8",
+    "metal": 0.1,
+    "shaft": "#2e2e38",
+    "grip": "#ff8fbf",
+    "style": "skull"
+   }
+  },
+  {
+   "id": "p25",
+   "price": 1120,
+   "f": [
+    2,
+    3,
+    4
+   ],
+   "look": {
+    "head": "#f0c24a",
+    "metal": 0.85,
+    "shaft": "#2f9c9a",
+    "grip": "#1f5f6b",
+    "style": "trident"
+   }
+  },
+  {
+   "id": "p26",
+   "price": 1200,
+   "f": [
+    3,
+    4,
+    3
+   ],
+   "look": {
+    "head": "#ff5fd2",
+    "metal": 0.3,
+    "shaft": "#2b2b40",
+    "grip": "#59f3ff",
+    "style": "neon"
+   }
+  },
+  {
+   "id": "p27",
+   "price": 1320,
+   "f": [
+    4,
+    3,
+    3
+   ],
+   "look": {
+    "head": "#b48cff",
+    "metal": 0.3,
+    "shaft": "#e9e2ff",
+    "grip": "#5b3fa8",
+    "style": "crystal"
+   }
+  },
+  {
+   "id": "p28",
+   "price": 1460,
+   "f": [
+    3,
+    4,
+    4
+   ],
+   "look": {
+    "head": "#3a2a26",
+    "metal": 0.1,
+    "shaft": "#2a2020",
+    "grip": "#ff7a3d",
+    "style": "lava"
+   }
+  },
+  {
+   "id": "p29",
+   "price": 1640,
+   "f": [
+    4,
+    4,
+    3
+   ],
+   "look": {
+    "head": "#f0c24a",
+    "metal": 0.85,
+    "shaft": "#d9dde3",
+    "grip": "#8e2b3a",
+    "style": "sword"
+   }
+  },
+  {
+   "id": "p30",
+   "price": 2000,
+   "f": [
+    4,
+    4,
+    4
+   ],
+   "look": {
+    "head": "#f0c24a",
+    "metal": 0.9,
+    "shaft": "#c69334",
+    "grip": "#c8402e",
+    "style": "dragon"
+   }
+  }
+ ],
+ "balls": [
+  {
+   "id": "b1",
+   "price": 0,
+   "base": "#fffdf7",
+   "band": "#ffd66e",
+   "mark": "#ef7d6d",
+   "pat": "star"
+  },
+  {
+   "id": "b2",
+   "price": 30,
+   "base": "#ffd66e",
+   "band": "#fffdf7",
+   "mark": "#ef7d6d",
+   "pat": "star"
+  },
+  {
+   "id": "b3",
+   "price": 45,
+   "base": "#e9f7e4",
+   "band": "#74c465",
+   "mark": "#4e9a45",
+   "pat": "stripes"
+  },
+  {
+   "id": "b4",
+   "price": 60,
+   "base": "#fffdf7",
+   "band": "#6fc0df",
+   "mark": "#4a94b5",
+   "pat": "dots"
+  },
+  {
+   "id": "b5",
+   "price": 75,
+   "base": "#fffdf7",
+   "band": "#ef7d6d",
+   "mark": "#ffd66e",
+   "pat": "swirl"
+  },
+  {
+   "id": "b6",
+   "price": 90,
+   "base": "#f3ecff",
+   "band": "#b7a7e0",
+   "mark": "#7d68c4",
+   "pat": "checker"
+  },
+  {
+   "id": "b7",
+   "price": 120,
+   "base": "#bfe8a6",
+   "band": "#3e8a3a",
+   "mark": "#ef5d6d",
+   "pat": "melon"
+  },
+  {
+   "id": "b8",
+   "price": 150,
+   "base": "#2e2e38",
+   "band": "#fffdf7",
+   "mark": "#2e2e38",
+   "pat": "eight",
+   "rough": 0.2
+  },
+  {
+   "id": "b9",
+   "price": 200,
+   "base": "#3a2420",
+   "band": "#ff7a3d",
+   "mark": "#ffd66e",
+   "pat": "lava",
+   "glow": 0.5
+  },
+  {
+   "id": "b10",
+   "price": 260,
+   "base": "#fffdf7",
+   "band": "#ef7d6d",
+   "mark": "#6fc0df",
+   "pat": "rainbow",
+   "rough": 0.25
+  },
+  {
+   "id": "b11",
+   "price": 340,
+   "base": "#1d2340",
+   "band": "#8e7bd8",
+   "mark": "#fff3c4",
+   "pat": "galaxy",
+   "glow": 0.35,
+   "rough": 0.2
+  },
+  {
+   "id": "b12",
+   "price": 450,
+   "base": "#f0c24a",
+   "band": "#fff3c4",
+   "mark": "#c69334",
+   "pat": "gold",
+   "metal": 0.55,
+   "rough": 0.22
+  },
+  {
+   "id": "b13",
+   "price": 80,
+   "base": "#fffdf7",
+   "band": "#2e2e38",
+   "mark": "#c9ced6",
+   "pat": "soccer"
+  },
+  {
+   "id": "b14",
+   "price": 100,
+   "base": "#e8823a",
+   "band": "#2e2016",
+   "mark": "#f6a35e",
+   "pat": "basket",
+   "rough": 0.6
+  },
+  {
+   "id": "b15",
+   "price": 110,
+   "base": "#d7e84a",
+   "band": "#fffdf7",
+   "mark": "#b5c93a",
+   "pat": "tennis",
+   "rough": 0.85
+  },
+  {
+   "id": "b16",
+   "price": 130,
+   "base": "#fffdf7",
+   "band": "#d8443a",
+   "mark": "#e6dcc6",
+   "pat": "baseball",
+   "rough": 0.5
+  },
+  {
+   "id": "b17",
+   "price": 150,
+   "base": "#d9a066",
+   "band": "#4a2a18",
+   "mark": "#b77b45",
+   "pat": "cookie",
+   "rough": 0.85
+  },
+  {
+   "id": "b18",
+   "price": 170,
+   "base": "#ffcf5a",
+   "band": "#c8402e",
+   "mark": "#4e9a45",
+   "pat": "pizza",
+   "rough": 0.6
+  },
+  {
+   "id": "b19",
+   "price": 190,
+   "base": "#f6fbff",
+   "band": "#bfe3ff",
+   "mark": "#8fc8ef",
+   "pat": "snow",
+   "rough": 0.9
+  },
+  {
+   "id": "b20",
+   "price": 220,
+   "base": "#fffdf7",
+   "band": "#4aa3df",
+   "mark": "#1d2340",
+   "pat": "eye",
+   "rough": 0.2
+  },
+  {
+   "id": "b21",
+   "price": 240,
+   "base": "#2a4fb8",
+   "band": "#6f9fe8",
+   "mark": "#14204a",
+   "pat": "bowling",
+   "rough": 0.12,
+   "metal": 0.1
+  },
+  {
+   "id": "b22",
+   "price": 280,
+   "base": "#c9c9cf",
+   "band": "#a3a3ab",
+   "mark": "#e6e6ea",
+   "pat": "moon",
+   "rough": 0.95
+  },
+  {
+   "id": "b23",
+   "price": 320,
+   "base": "#e9c99a",
+   "band": "#c47a45",
+   "mark": "#c8402e",
+   "pat": "planet",
+   "rough": 0.5
+  },
+  {
+   "id": "b24",
+   "price": 360,
+   "base": "#2f86c8",
+   "band": "#5fb35a",
+   "mark": "#fffdf7",
+   "pat": "earth",
+   "rough": 0.45
+  },
+  {
+   "id": "b25",
+   "price": 400,
+   "base": "#e3a65c",
+   "band": "#ff9ccf",
+   "mark": "#6fc0df",
+   "pat": "donut",
+   "rough": 0.4
+  },
+  {
+   "id": "b26",
+   "price": 450,
+   "base": "#c9d2dc",
+   "band": "#fffdf7",
+   "mark": "#8fd3f0",
+   "pat": "disco",
+   "metal": 0.85,
+   "rough": 0.15,
+   "glow": 0.3,
+   "pulse": 1
+  },
+  {
+   "id": "b27",
+   "price": 520,
+   "base": "#1a1530",
+   "band": "#ff5fd2",
+   "mark": "#59f3ff",
+   "pat": "neon",
+   "glow": 0.9,
+   "rough": 0.3,
+   "pulse": 1
+  },
+  {
+   "id": "b28",
+   "price": 600,
+   "base": "#e9e2ff",
+   "band": "#9fe8ff",
+   "mark": "#ffb3e6",
+   "pat": "holo",
+   "metal": 0.6,
+   "rough": 0.2,
+   "glow": 0.3,
+   "pulse": 1
+  },
+  {
+   "id": "b29",
+   "price": 680,
+   "base": "#ffb02e",
+   "band": "#fff0a0",
+   "mark": "#e8641e",
+   "pat": "sun",
+   "glow": 0.85,
+   "rough": 0.5,
+   "pulse": 1
+  },
+  {
+   "id": "b30",
+   "price": 760,
+   "base": "#e8edf2",
+   "band": "#aab3bf",
+   "mark": "#ffd66e",
+   "pat": "chrome",
+   "metal": 0.75,
+   "rough": 0.12
+  },
+  {
+   "id": "b31",
+   "price": 850,
+   "base": "#c8ffd8",
+   "band": "#2e7d4f",
+   "mark": "#ff9ccf",
+   "pat": "smile",
+   "glow": 0.7,
+   "rough": 0.35,
+   "pulse": 1
+  },
+  {
+   "id": "b32",
+   "price": 1000,
+   "base": "#bff4ff",
+   "band": "#fffdf7",
+   "mark": "#c9b6ff",
+   "pat": "diamond",
+   "metal": 0.5,
+   "rough": 0.05,
+   "glow": 0.25,
+   "pulse": 1
+  }
+ ],
+ "packs": [
+  {
+   "id": "m3",
+   "n": 3,
+   "price": 60
+  },
+  {
+   "id": "m10",
+   "n": 10,
+   "price": 180
+  },
+  {
+   "id": "m25",
+   "n": 25,
+   "price": 400
+  }
+ ]
+}

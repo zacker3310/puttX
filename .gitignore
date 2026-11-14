@@ -11,3 +11,5 @@ ios/**/*.xcodeproj/
 ios/**/xcuserdata/
 ios/PuttX/Info.plist
 ios/build/
+ios/build-device/
+ios/build-plain.entitlements

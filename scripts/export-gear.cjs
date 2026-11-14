@@ -59,7 +59,7 @@ function grabItem(id) {
   out.mats = W.mats;
   /* the card picture, at the device's 3x */
   const c = document.createElement('canvas');
-  studioShot(c, id, THUMB_W[it.kind], THUMB_H, 0, false, '#f6e9d2');
+  studioShot(c, id, THUMB_W[it.kind], THUMB_H, 0, false, '#383d47');
   return { out, geos: Object.fromEntries(W.geos), texs: Object.fromEntries(W.texs), thumb: c.toDataURL('image/png'), warn };
 }
 

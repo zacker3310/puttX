@@ -139,7 +139,9 @@ final class HolePlay {
     /// neon night: the hole after dark, with its beat (sound on only)
     var night = false
     var beatOn = false
-    @ObservationIgnored private var beatClock = 0.0, beatAt = 0.0, beatN = 0
+    @ObservationIgnored private var beatClock = 0.0
+    @ObservationIgnored private var beatAt = 0.0
+    @ObservationIgnored private var beatN = 0
     private func stepBeat(_ dt: Double) {
         guard night && beatOn else { beatAt = 0; return }
         beatClock += dt
@@ -236,7 +238,7 @@ final class HolePlay {
         guard link == nil else { return }
         link = DisplayLink { [weak self] dt in self?.tick(dt) }
     }
-    func stop() { link?.invalidate(); link = nil }
+    func stop() { link?.invalidate(); link = nil; Haptics.roll(0) }
 
     /// the putter meets the ball: the stroke turns the aim and sets the power
     func strike(_ s: Stroke) {
@@ -329,7 +331,9 @@ final class HolePlay {
         pickUpLost()
         // the roll, heard: it follows the ball's speed and what it rolls on
         if phase == .roll || phase == .drift {
-            Synth.shared.roll(speed: ball.air || ball.tube != nil ? 0 : hypot(ball.vx, ball.vz), surface: hole.zoneAt(ball.x, ball.z)?.surf?.rawValue ?? "felt")
+            let surf = hole.zoneAt(ball.x, ball.z)?.surf?.rawValue ?? "felt", v = ball.air || ball.tube != nil ? 0 : hypot(ball.vx, ball.vz)
+            Synth.shared.roll(speed: v, surface: surf)
+            Haptics.roll(v, rough: surf == "sand" || surf == "mud")
         }
     }
 
@@ -379,7 +383,7 @@ final class HolePlay {
         lastOutcome = phase == .drift ? round.resolveDrift(res, from: from) : round.resolvePutt(res, from: from)
         if res.end != .sunk && trace.compactMap({ $0 }).count >= 3 { traced += 1; traceShown = true }
         run = nil
-        Synth.shared.roll(speed: 0, surface: "felt")
+        Synth.shared.roll(speed: 0, surface: "felt"); Haptics.roll(0)
         switch lastOutcome {
         case .sunk?:
             SFX.cup(); Haptics.cup()

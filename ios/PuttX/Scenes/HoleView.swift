@@ -398,6 +398,7 @@ struct SwingPad: View {
         samples.append(sample(v, at: v.location))
         let s0 = samples[0], now = samples[samples.count - 1]
         play.swing = (back: max(0, now.y - s0.y), side: now.x - s0.x)
+        Haptics.windup(max(0, now.y - s0.y) / Swing.FULL)
         if let s = Stroke.from(samples, feel: feel) {
             struck = true
             last = (samples, s.clean)

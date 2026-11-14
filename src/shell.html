@@ -47,7 +47,7 @@
 
 /* ---------- 2. SHELL ---------- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; touch-action: none; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0d0e12; touch-action: none; }
 #stage { position: absolute; left: 50%; top: 50%; width: 1200px; height: 700px; transform-origin: 50% 50%;
   overflow: hidden; background: var(--v-surface); font-family: var(--v-font); color: var(--v-ink); }
 #view { position: absolute; inset: 0; width: 1200px; height: 700px; display: block; touch-action: none; }
@@ -132,11 +132,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #cardRow .sc.par { color: var(--v-ink-soft); }
 #cardRow .sc.sub { background: #f6efd9; font-size: 30px; }
 #cardRow .sc.hd.sub { font-size: 20px; }
-#cardRow .mk { display: grid; place-items: center; width: 38px; height: 38px; box-sizing: border-box; color: #2f5d8a; }
-#cardRow .mk.b { border: 3px solid #2f5d8a; border-radius: 50%; }
-#cardRow .mk.e { border: 5px double #2f5d8a; border-radius: 50%; }
-#cardRow .mk.o { border: 3px solid #2f5d8a; border-radius: 4px; }
-#cardRow .mk.d { border: 5px double #2f5d8a; border-radius: 4px; }
+#cardRow .mk { display: grid; place-items: center; width: 38px; height: 38px; box-sizing: border-box; color: #8fd3ff; }
+#cardRow .mk.b { border: 3px solid #8fd3ff; border-radius: 50%; }
+#cardRow .mk.e { border: 5px double #8fd3ff; border-radius: 50%; }
+#cardRow .mk.o { border: 3px solid #8fd3ff; border-radius: 4px; }
+#cardRow .mk.d { border: 5px double #8fd3ff; border-radius: 4px; }
 #cardSum { position: absolute; left: 0; right: 0; top: 352px; display: flex; justify-content: center; align-items: center; gap: 40px; font: 800 80px var(--v-font); color: var(--v-ink-strong); font-variant-numeric: tabular-nums; }
 #cardDiff { font-size: 60px; color: var(--v-ink-soft); }
 #cardStars { display: flex; align-items: center; gap: 8px; font-size: 60px; }
@@ -640,89 +640,138 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
 #profileRow .bin.armed { background: var(--v-accent-red); border-color: var(--v-red-line); box-shadow: 0 6px 0 var(--v-red-down); color: #fff; animation: binShake .4s ease-in-out 2; }
 @keyframes binShake { 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
 @media (prefers-reduced-motion: reduce) { #profileRow .pcard, #profileRow .bin.armed { animation: none; } }
+/* ---------- 23. METAL: the title's look everywhere (ios/PuttX/UI/Theme.swift, TitleMetal.swift) ----------
+   Gunmetal plates with steel rims and white numerals over each world's dramatic scene (#backdrop,
+   painted by paintWorld). --acc0..3 is the world of the day's accent, hot to deep. */
+:root {
+  --v-surface: #2c3039; --v-surface-2: #383d47; --v-surface-line: #6b727e; --v-surface-down: #101216;
+  --v-ink: #d9dee6; --v-ink-strong: #fff; --v-ink-soft: #9aa3b0; --v-ink-dark: #2a2008;
+  --v-mute: #4a4f58; --v-mute-line: #5e646e; --v-mute-down: #1a1c21;
+  --v-shadow-card: 0 6px 0 #101216, 0 10px 22px rgba(0, 0, 0, .35);
+  --v-scrim: rgba(5, 6, 10, .62);
+  --v-dots: radial-gradient(rgba(255, 255, 255, .035) 2.4px, transparent 2.6px);
+  --metal: linear-gradient(#555b66, #363a43 55%, #24272e);
+  --steel: linear-gradient(#c7ccd5, #6b727e 55%, #4b515b);
+  --acc0: #fff2a8; --acc1: #ffb02e; --acc2: #ff5a1a; --acc3: #b3200f;
+}
+#stage { background: #15171c; color: var(--v-ink); }
+#backdrop { position: absolute; inset: 0; width: 1200px; height: 700px; display: none; pointer-events: none; }
+#backdrop.show { display: block; }
+#title, #profiles, #worlds, #world, #map, #shop { background: transparent !important; }
+#worldDecor { display: none; }
+.btn { background: var(--metal); border-color: var(--v-surface-line); box-shadow: 0 6px 0 var(--v-surface-down), 0 8px 16px rgba(0, 0, 0, .3); color: #fff; }
+.btn:active { box-shadow: 0 2px 0 var(--v-surface-down); }
+.btn.go { background: linear-gradient(#8ad57a, #5aab4c); }
+.btn.locked { background: var(--v-mute); color: var(--v-ink-soft); }
+.chip, #holeDone, #cardPanel, #setPanel, #profileRow .pcard:not(.empty) { background-color: #2c3039; background-image: var(--metal); border-color: var(--v-surface-line); color: #fff; }
+.chip { box-shadow: 0 5px 0 var(--v-surface-down), 0 8px 16px rgba(0, 0, 0, .3); }
+#aimL path, #aimR path { stroke: #d9dee6; }
+#homeBtn path, #doneMap path, #partyMap path { fill: #c9a476; }
+#doneRetry path { stroke: #d9dee6; } #doneRetry path:last-child { fill: none; }
+/* yellow faces keep dark ink */
+#worldNodes .cnode.done, #titleStrip .btn.on, #handR.on, #handL.on, #worldTabs .btn.on { color: var(--v-ink-dark); }
+/* the title: the logo, chrome letters and a molten X, cut out in black and pushed out in 3D, tilted */
+#metalLogo { position: absolute; left: 0; right: 0; top: 70px; text-align: center; white-space: nowrap; rotate: -5deg; pointer-events: none;
+  font: italic 900 150px/1 "Arial Black", "Helvetica Neue", system-ui, sans-serif; font-stretch: expanded; letter-spacing: -2px;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .6)); animation: popIn .5s .1s cubic-bezier(.3, 1.6, .5, 1) both; }
+#metalLogo .back, #metalLogo .front { white-space: nowrap; }
+#metalLogo .front { position: absolute; left: 0; right: 0; top: 0; }
+#metalLogo span { display: inline-block; }
+#metalLogo .x { margin-left: -8px; font-size: 1.18em; }
+/* behind: the black cut-out and the extrusion stepping down into the dark */
+#metalLogo .back span { color: #000; -webkit-text-stroke: 12px #000;
+  text-shadow: 1px 1px 0 var(--ex), 2px 2px 0 var(--ex), 3px 3px 0 var(--ex), 4px 5px 0 var(--ex), 5px 6px 0 var(--ex), 6px 7px 0 var(--ex), 7px 8px 0 var(--ex), 8px 10px 0 var(--ex), 9px 12px 0 var(--ex), 10px 14px 0 var(--ex); }
+#metalLogo .back .putt { --ex: #1b1d24; } #metalLogo .back .x { --ex: var(--acc3); }
+/* in front: chrome, and a molten X glowing */
+#metalLogo .front span { color: transparent; -webkit-background-clip: text; background-clip: text; }
+#metalLogo .front .putt { background-image: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, .55) 50%, transparent 58%),
+  linear-gradient(#f4f6fa, #a9b0bc 42%, #4b525e 50%, #c7ccd5 62%, #7d8593); background-size: 300% 100%, 100% 100%; background-position: 160% 0, 0 0; animation: glint 4.2s 1.4s ease-in-out infinite; }
+#metalLogo .front .x { background-image: linear-gradient(var(--acc0), var(--acc1) 35%, var(--acc2) 60%, var(--acc3)); filter: drop-shadow(0 0 10px var(--acc2)); }
+@keyframes glint { 0%, 60% { background-position: 160% 0, 0 0; } 100% { background-position: -60% 0, 0 0; } }
+/* the plate: riveted gunmetal, rimmed and lit in the accent */
+.plate { position: absolute; padding: 0; cursor: pointer; display: grid; place-items: center; border: 5px solid transparent; border-radius: 34px;
+  background: var(--metal) padding-box, linear-gradient(var(--acc1), var(--acc2)) border-box;
+  box-shadow: 0 8px 0 #0d0e12, 0 0 26px var(--acc2); transition: transform .08s; }
+.plate:active { transform: translateY(6px) scale(1.03, .94); box-shadow: 0 2px 0 #0d0e12, 0 0 12px var(--acc2); }
+.plate .rv { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #e6e9ef, #5b616c); border: 1.5px solid rgba(0, 0, 0, .6); }
+.plate .rv:nth-child(1) { left: 9px; top: 9px; } .plate .rv:nth-child(2) { right: 9px; top: 9px; } .plate .rv:nth-child(3) { left: 9px; bottom: 9px; } .plate .rv:nth-child(4) { right: 9px; bottom: 9px; }
+#titleGo { left: 450px; top: 448px; width: 300px; height: 144px; border-radius: 34px; animation: popIn .5s .3s cubic-bezier(.3, 1.6, .5, 1) both, pulse 1.8s 1.2s ease-in-out infinite; }
+#titleGo svg { width: 76px; height: 76px; filter: drop-shadow(0 0 10px var(--acc2)); }
+/* the hole of the day's ticket: gunmetal rimmed in the world's colour */
+#dailyBtn { background: linear-gradient(#5d636e, #2f333b 55%, #1f2228) padding-box, linear-gradient(var(--acc1), var(--acc2)) border-box; border-color: transparent;
+  box-shadow: 0 7px 0 #0d0e12, 0 0 18px var(--acc2); color: #fff; }
+#dailyBtn::before, #dailyBtn::after { display: none; }
+#dailyBtn .world { background: #fff3dc; border-color: var(--acc1); }
+#dailyBtn .pips i { background: var(--acc1); }
+/* the worlds: each card a window into its world, the emblem in a glass ring, a metal foot */
+#worldGrid .wcard { border-color: var(--v-surface-line); background: #15171c !important; justify-content: flex-start; padding-top: 40px; }
+#worldGrid .wcard canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#worldGrid .wcard .art { position: relative; width: 112px; height: 112px; background: rgba(0, 0, 0, .42); border: 4px solid var(--ring, var(--v-mute-line)); box-shadow: 0 0 14px var(--glow, transparent); }
+#worldGrid .wcard .art svg { width: 78px; height: 78px; }
+#worldGrid .wcard .foot { position: absolute; left: 0; right: 0; bottom: 0; height: 60px; display: flex; align-items: center; gap: 6px; padding: 0 16px 0 10px;
+  background: var(--metal); border-top: 3px solid #c7ccd5; font: 800 26px var(--v-font); color: #fff; }
+#worldGrid .wcard .num { position: static; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; font-size: 28px; color: var(--v-ink-dark);
+  background: linear-gradient(var(--m0, #9aa3b0), var(--m1, #6b727e)); margin-right: auto; }
+#worldGrid .wcard .tally { background: none; padding: 0; color: #fff; }
+#worldGrid .wcard .foot .lock { position: static; width: 30px; height: 30px; }
+#worldGrid .wcard.locked { background: #15171c !important; }
+#worldGrid .wcard.locked canvas { filter: grayscale(1); opacity: .55; }
+#classicBtn { background: var(--metal); border-color: #c7ccd5; box-shadow: 0 6px 0 #101216; } #classicBtn .n { color: #fff; }
+/* plaques: dark glass labels that read over any scene */
+#worldNodes .cnode .tally, #profileRow .tally, #profileRow .cont .hn, #titleStrip .tally { background: rgba(0, 0, 0, .58); border: 2px solid rgba(107, 114, 126, .9); color: #fff; }
+#holePath .node .best { color: #d9dee6; text-shadow: 0 2px 3px rgba(0, 0, 0, .8); }
+#worldPath path:first-child { stroke: #8a6a44; }
+#worldBall { background: radial-gradient(circle at 35% 35%, #fff, #c7ccd5); }
+#profileRow .pcard.empty { border-color: rgba(199, 204, 213, .5); }
+#profileRow .num { color: #fff; }
+#profileRow .bin { color: #d9dee6; }
+/* the scorecard: a dark plate ruled in steel, the scores in a bright pen */
+#cardRow .nine { background: #22252c; border-color: #6b727e; }
+#cardRow .sc { color: #fff; border-left-color: #3f444e; }
+#cardRow .sc.hd { background: #2c3039; color: var(--v-ink-soft); }
+#cardRow .sc.sub { background: #30343d; }
+/* in play: hole and par share one plate beside home; the mulligan sits by the strokes; the top middle stays clear */
+#hudHole { left: 124px; width: 150px; border-radius: var(--v-r-lg) 0 0 var(--v-r-lg); border-right-width: 2px; }
+#hudPar { left: 272px; width: 150px; border-radius: 0 var(--v-r-lg) var(--v-r-lg) 0; border-left-width: 2px; }
+#mulliganBtn { left: auto; right: 190px; top: 24px; }
+#updateBtn { left: auto; right: 294px; }
+/* the hole done: one plate in a row (stars over score against par, the goals, redo); home and next at the corners */
+#holeDone { left: 230px; top: 170px; width: 740px; height: 230px; }
+#holeDone .stars { top: 22px; left: 36px; right: auto; width: 230px; gap: 8px; }
+#holeDone .star { width: 62px; height: 62px; } #holeDone .star:nth-child(2) { width: 74px; height: 74px; translate: 0 -8px; }
+#holeDone .score { top: 104px; left: 36px; right: auto; width: 230px; gap: 16px; font-size: 86px; }
+#holeDone .score { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: 16px; row-gap: 8px; }
+#doneStrokes { grid-row: span 2; }
+#doneDiff { min-width: 76px; height: 44px; padding: 0 14px; display: grid; place-items: center; border-radius: 22px; font: 800 28px var(--v-font); color: #fff; background: var(--v-accent-blue); }
+#doneDiff.under { background: var(--v-accent-green); } #doneDiff.over { background: var(--v-accent-red); }
+#holeDone .par { font-size: 30px; }
+#holeDone .par svg { width: 30px; height: 30px; }
+#holeDone::before, #holeDone::after { content: ''; position: absolute; top: 40px; width: 3px; height: 150px; background: var(--steel); }
+#holeDone::before { left: 292px; } #holeDone::after { left: 594px; }
+#doneObj { position: absolute; left: 316px; top: 70px; width: 260px; }
+#doneRetry { left: auto; right: 34px; top: 66px; bottom: auto; }
+/* the card stands at 230, 170 on the stage: home and next sit in the stage's own corners */
+#doneMap { left: -206px; top: 418px; bottom: auto; }
+#doneNext { left: 762px; right: auto; top: 394px; bottom: auto; width: 184px; height: 112px; border-radius: var(--v-r-lg); }
+#doneNext svg { width: 48%; height: 70%; }
+#doneCoins { color: var(--v-ink-dark); }
+#doneBadge { left: -40px !important; top: -30px !important; right: auto !important; bottom: auto !important; rotate: -8deg; }
+@media (prefers-reduced-motion: reduce) { #metalLogo, #metalLogo .front .putt, #titleGo { animation: none; } }
+.chip, #holeDone, #cardPanel, #setPanel, #profileRow .pcard:not(.empty) { background-size: auto; }
+#swingPad { background: rgba(28, 31, 38, .9); }
+#padPath .hint, #padPath .line { stroke: var(--v-ink-soft); }
+#pinTag { background: rgba(0, 0, 0, .62); border-color: rgba(107, 114, 126, .9); color: #fff; }
+
 </style>
 </head>
 <body>
 <div id="stage">
   <canvas id="view" aria-label="golf course"></canvas>
+  <canvas id="backdrop" aria-hidden="true"></canvas>
   <section class="scene" id="title">
-    <svg id="titleArt" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="tSky" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#7cc8ef"/><stop offset=".52" stop-color="#bfe7f7"/><stop offset=".7" stop-color="#8a7fd0"/><stop offset=".84" stop-color="#3b2f86"/><stop offset="1" stop-color="#180f45"/></linearGradient>
-        <linearGradient id="tFade" x1="0" x2="0" y1="0" y2="1"><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/></linearGradient>
-        <linearGradient id="tHill" x1="0" x2="1"><stop offset="0" stop-color="#8fd16f"/><stop offset=".62" stop-color="#7bc463"/><stop offset=".85" stop-color="#3f6a5a"/><stop offset="1" stop-color="#2a3f52"/></linearGradient>
-        <linearGradient id="tGreen" x1="0" x2="1"><stop offset="0" stop-color="#4fae4a"/><stop offset=".7" stop-color="#3f9a42"/><stop offset="1" stop-color="#2c6f4a"/></linearGradient>
-        <pattern id="tStripes" width="80" height="200" patternUnits="userSpaceOnUse" patternTransform="skewX(-28)"><rect width="40" height="200" fill="#fff" opacity=".07"/></pattern>
-        <linearGradient id="tWood" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d79a55"/><stop offset="1" stop-color="#a8692f"/></linearGradient>
-      </defs>
-      <rect width="1200" height="700" fill="url(#tSky)"/>
-      <rect width="1200" height="700" fill="url(#tFade)"/>
-      <!-- sun, moon, stars -->
-      <g class="t-sun"><circle cx="110" cy="96" r="42" fill="#ffd66e"/><g stroke="#ffd66e" stroke-width="7" stroke-linecap="round"><path d="M110 30 V42 M110 150 V162 M44 96 H56 M164 96 H176 M63 49 L72 58 M148 134 L157 143 M63 143 L72 134 M148 58 L157 49"/></g></g>
-      <path d="M1100 54 A40 40 0 1 0 1132 120 A32 32 0 1 1 1100 54 Z" fill="#fff3c4"/>
-      <g class="t-stars" fill="#fff8dc"><circle cx="930" cy="60" r="3"/><circle cx="990" cy="130" r="2.5"/><circle cx="1040" cy="40" r="2"/><circle cx="1160" cy="170" r="3"/><circle cx="880" cy="150" r="2"/><circle cx="1180" cy="60" r="2"/><path d="M1010 200 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/><path d="M860 90 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/></g>
-      <!-- clouds drift -->
-      <g class="t-cloud c1" fill="#fff"><ellipse cx="300" cy="120" rx="60" ry="22"/><ellipse cx="330" cy="104" rx="38" ry="26"/><ellipse cx="270" cy="110" rx="30" ry="18"/></g>
-      <g class="t-cloud c2" fill="#fff" opacity=".9"><ellipse cx="620" cy="70" rx="50" ry="18"/><ellipse cx="645" cy="58" rx="30" ry="20"/></g>
-      <!-- the ten worlds on the horizon, day to night -->
-      <g id="tWorlds">
-        <!-- 1 construction: crane and girders -->
-        <g><path d="M40 430 V250 M40 250 H170 M40 270 H150" stroke="#f2b632" stroke-width="10" stroke-linecap="round"/><path d="M40 250 L60 270 L80 250 L100 270 L120 250 L140 270" stroke="#f2b632" stroke-width="5" fill="none"/><path d="M150 270 V320" stroke="#5a4634" stroke-width="3"/><rect class="t-hook" x="138" y="318" width="24" height="16" rx="3" fill="#5a4634"/><rect x="20" y="410" width="100" height="22" fill="#e9893a"/><rect x="60" y="392" width="70" height="20" fill="#d07030"/></g>
-        <!-- 2 desert: mesa arch and cactus -->
-        <g><path d="M140 432 V340 Q140 320 160 320 H260 Q280 320 280 340 V432 H245 V390 A35 32 0 0 0 175 390 V432 Z" fill="#e07b45"/><path d="M150 320 H270 L262 300 H158 Z" fill="#c9653a"/><path d="M290 432 V384 M290 400 H302 V388 M290 410 H280 V396" stroke="#4f9a47" stroke-width="9" stroke-linecap="round" fill="none"/></g>
-        <!-- 3 jungle temple -->
-        <g><path d="M300 432 H420 L410 410 H310 Z M312 410 H408 L398 388 H322 Z M324 388 H396 L386 366 H334 Z M336 366 H384 L376 346 H344 Z" fill="#7d8f6a"/><rect x="350" y="400" width="20" height="32" fill="#3e4a32"/><path d="M300 360 Q310 330 330 345 M420 370 Q412 340 395 350" stroke="#3f8a3a" stroke-width="7" fill="none" stroke-linecap="round"/></g>
-        <!-- 4 snow peak -->
-        <g><path d="M410 432 L500 270 L590 432 Z" fill="#6f9cc8"/><path d="M500 270 L528 320 L512 312 L500 326 L488 312 L472 320 Z" fill="#fff"/><path d="M560 432 L610 350 L660 432 Z" fill="#88b2d8"/><path d="M610 350 L624 374 L610 368 L596 374 Z" fill="#fff"/></g>
-        <!-- 5 pirate cove: palm and ship -->
-        <g><path d="M640 432 Q636 380 650 330" stroke="#8a5a2b" stroke-width="9" fill="none" stroke-linecap="round"/><path class="t-palm" d="M650 330 Q620 312 600 330 M650 330 Q680 308 700 326 M650 330 Q640 300 618 296 M650 330 Q668 298 690 296" stroke="#3f9a42" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M680 420 H770 L756 438 H694 Z" fill="#8a5a2b"/><path d="M722 420 V360 M722 362 L752 404 H722 M722 368 L698 404 H722" stroke="#5a4634" stroke-width="3" fill="#fffdf7"/><path d="M722 360 L740 366 L722 372 Z" fill="#2f241a"/></g>
-        <!-- 6 volcano with smoke -->
-        <g><path d="M740 432 L800 320 H840 L900 432 Z" fill="#6b4a3a"/><path d="M800 320 H840 L832 340 Q826 360 830 380 Q818 362 812 342 Z" fill="#ff7a2e"/><g class="t-smoke" fill="#cfc4c0"><circle cx="820" cy="300" r="12"/><circle cx="830" cy="278" r="16"/><circle cx="816" cy="252" r="20"/></g></g>
-        <!-- 7 haunted castle -->
-        <g><path d="M880 432 V350 H900 V336 H912 V350 H932 V336 H944 V350 H964 V432 Z" fill="#6c5a9a"/><path d="M864 432 V330 L880 304 L896 330 V432 Z M948 432 V320 L966 290 L984 320 V432 Z" fill="#5a4a86"/><rect x="912" y="396" width="20" height="36" rx="10" fill="#2a1f45"/><circle cx="886" cy="356" r="5" fill="#ffd66e"/><circle cx="966" cy="344" r="5" fill="#ffd66e"/><path class="t-bat" d="M920 280 q8 -8 14 0 q6 -8 14 0 q-7 2 -14 8 q-7 -6 -14 -8z" fill="#2a1f45"/></g>
-        <!-- 8 space: ringed planet -->
-        <g class="t-planet"><circle cx="1020" cy="300" r="34" fill="#c7a0ff"/><ellipse cx="1020" cy="300" rx="62" ry="14" fill="none" stroke="#ffd66e" stroke-width="6" transform="rotate(-18 1020 300)"/><circle cx="1010" cy="290" r="6" fill="#a87de6"/></g>
-        <!-- 9 candy: lollipops -->
-        <g><path d="M1000 432 V370 M1040 432 V384" stroke="#fffdf7" stroke-width="7"/><circle cx="1000" cy="360" r="26" fill="#ff7eb6"/><path d="M1000 360 m-16 0 a16 16 0 1 1 16 16 a10 10 0 1 1 -10 -10" stroke="#fff" stroke-width="5" fill="none"/><circle cx="1040" cy="376" r="18" fill="#6fd6e8"/><path d="M1032 376 a8 8 0 1 1 8 8" stroke="#fff" stroke-width="4" fill="none"/></g>
-        <!-- 10 sky kingdom: floating island castle -->
-        <g class="t-island"><path d="M1080 330 Q1130 316 1190 330 Q1180 372 1135 392 Q1092 372 1080 330 Z" fill="#7a5a3a"/><path d="M1078 330 Q1134 312 1192 330 Q1134 342 1078 330 Z" fill="#7bc463"/><rect x="1110" y="270" width="50" height="58" fill="#fff3e4"/><path d="M1104 272 L1118 240 L1132 272 Z M1138 272 L1152 240 L1166 272 Z" fill="#4a6ad8"/><rect x="1128" y="302" width="14" height="26" rx="7" fill="#4a6ad8"/><path d="M1135 392 V412" stroke="#9fd8ef" stroke-width="4" stroke-dasharray="4 6"/></g>
-      </g>
-      <!-- rolling hills and fences -->
-      <path d="M0 450 Q150 410 300 440 T600 440 T900 436 T1200 440 V700 H0 Z" fill="url(#tHill)"/>
-      <g stroke="#a8804e" stroke-width="7" stroke-linecap="round"><path d="M30 470 H230 M40 456 V492 M90 456 V492 M140 456 V492 M190 456 V492"/><path d="M960 470 H1170 M970 456 V492 M1020 456 V492 M1070 456 V492 M1120 456 V492"/></g>
-      <!-- the putting green -->
-      <path d="M60 690 Q40 560 170 540 L1040 520 Q1170 524 1160 660 L1150 700 H70 Z" fill="#c9893f"/>
-      <path d="M78 676 Q62 568 176 552 L1034 534 Q1146 538 1140 650 L1132 688 Z" fill="url(#tGreen)"/>
-      <path d="M78 676 Q62 568 176 552 L1034 534 Q1146 538 1140 650 L1132 688 Z" fill="url(#tStripes)"/>
-      <!-- cup and waving flag -->
-      <ellipse cx="800" cy="616" rx="34" ry="12" fill="#2b2016"/><ellipse cx="800" cy="618" rx="30" ry="9" fill="#f4f1ea" opacity=".85"/><ellipse cx="800" cy="616" rx="26" ry="7" fill="#1a130c"/>
-      <path d="M818 612 V420" stroke="#fffdf7" stroke-width="7" stroke-linecap="round"/>
-      <path class="t-flag" d="M821 424 Q870 432 910 420 Q888 446 910 474 Q866 462 821 470 Z" fill="#ef7d6d"/>
-      <!-- confetti burst when the ball drops -->
-      <g class="t-confetti"><rect x="796" y="590" width="10" height="16" fill="#ffd66e"/><rect x="790" y="590" width="10" height="16" fill="#ef7d6d"/><rect x="804" y="590" width="10" height="16" fill="#6fc0df"/><rect x="798" y="590" width="10" height="16" fill="#74c465"/><rect x="792" y="590" width="10" height="16" fill="#b7a7e0"/><rect x="800" y="590" width="10" height="16" fill="#ffd66e"/></g>
-      <!-- the putter swings, the ball with a face rolls into the cup -->
-      <g class="t-putter"><path d="M250 330 L300 584" stroke="#c9ced6" stroke-width="9" stroke-linecap="round"/><path d="M246 312 L254 352" stroke="#4a3826" stroke-width="18" stroke-linecap="round"/><rect x="262" y="578" width="64" height="24" rx="8" fill="#9aa3ad" stroke="#6f7881" stroke-width="4"/></g>
-      <g class="t-ball"><ellipse class="t-shadow" cx="370" cy="626" rx="40" ry="10" fill="#1d3a1d" opacity=".3"/>
-        <g class="t-lines" stroke="#fffdf7" stroke-width="7" stroke-linecap="round" opacity=".8"><path d="M300 572 H262 M308 592 H250 M300 612 H266"/></g>
-        <g class="t-body"><circle cx="370" cy="586" r="40" fill="#fffdf7" stroke="#e6d2ab" stroke-width="5"/>
-          <g class="t-spin" fill="#e6d2ab"><circle cx="352" cy="566" r="3.5"/><circle cx="390" cy="604" r="3.5"/><circle cx="356" cy="606" r="3.5"/><circle cx="392" cy="566" r="3"/><circle cx="372" cy="552" r="3"/><circle cx="342" cy="586" r="3"/></g>
-          <g class="t-face"><ellipse cx="380" cy="580" rx="6.5" ry="9" fill="#2f241a"/><ellipse cx="398" cy="580" rx="6.5" ry="9" fill="#2f241a"/><circle cx="382" cy="576" r="2.4" fill="#fff"/><circle cx="400" cy="576" r="2.4" fill="#fff"/><path d="M380 596 Q390 604 400 596" stroke="#2f241a" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="372" cy="594" rx="6" ry="3.5" fill="#ffb3a8" opacity=".7"/><ellipse cx="406" cy="594" rx="5" ry="3.2" fill="#ffb3a8" opacity=".7"/></g>
-        </g>
-      </g>
-      <!-- hanging sign with the emblem: crossed putters, a ball, a flag -->
-      <g class="t-sign" data-logo="1">
-        <path d="M450 0 V58 M750 0 V58" stroke="#5a4634" stroke-width="6"/>
-        <rect x="340" y="54" width="520" height="206" rx="28" fill="url(#tWood)" stroke="#7a4a20" stroke-width="8"/>
-        <rect x="360" y="74" width="480" height="166" rx="20" fill="#fff8ec"/>
-        <circle cx="360" cy="74" r="7" fill="#7a4a20"/><circle cx="840" cy="74" r="7" fill="#7a4a20"/><circle cx="360" cy="240" r="7" fill="#7a4a20"/><circle cx="840" cy="240" r="7" fill="#7a4a20"/>
-        <ellipse cx="600" cy="222" rx="200" ry="9" fill="#74c465"/>
-        <text x="580" y="196" text-anchor="middle" font-family="var(--v-font), system-ui, sans-serif" font-weight="900" font-size="112" letter-spacing="2"
-          fill="#ffb02e" stroke="#7a4a20" stroke-width="10" stroke-linejoin="round" paint-order="stroke">putt<tspan fill="#ef7d6d" font-size="128">X</tspan></text>
-        <path d="M800 220 V112" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M802 114 L836 126 L802 138 Z" fill="#ef7d6d"/><ellipse cx="800" cy="222" rx="14" ry="4.5" fill="#3a2c1e"/>
-        <g fill="#ffd66e" stroke="#dca63f" stroke-width="2"><path d="M392 96 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1z"/><path d="M766 92 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z"/></g>
-      </g>
-    </svg>
-    <button class="btn go" id="titleGo" aria-label="play"><svg viewBox="0 0 64 64"><path d="M22 12 L52 32 L22 52 Z" fill="#fff"/></svg></button>
+    <!-- the logo: chrome letters and a molten X, the one place with letters on screen -->
+    <div id="metalLogo" data-logo="1" role="img" aria-label="PuttX"><div class="back" aria-hidden="true"><span class="putt">Putt</span><span class="x">X</span></div><div class="front" aria-hidden="true"><span class="putt">Putt</span><span class="x">X</span></div></div>
+    <button class="plate" id="titleGo" aria-label="play"><i class="rv"></i><i class="rv"></i><i class="rv"></i><i class="rv"></i><svg viewBox="0 0 64 64"><defs><linearGradient id="molten" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--acc0)"/><stop offset=".5" stop-color="var(--acc1)"/><stop offset="1" stop-color="var(--acc2)"/></linearGradient></defs><path d="M24 14 L52 32 L24 50 Z" fill="#000" transform="translate(2 3)"/><path d="M22 12 L50 30 L22 48 Z" fill="url(#molten)"/></svg></button>
     <button id="dailyBtn" aria-label="hole of the day"><span class="sun" aria-hidden="true"><svg viewBox="0 0 64 64"><g stroke="#dca63f" stroke-width="5" stroke-linecap="round"><path d="M32 3 V10 M32 54 V61 M3 32 H10 M54 32 H61 M11 11 L16 16 M48 48 L53 53 M11 53 L16 48 M48 16 L53 11"/></g><circle cx="32" cy="32" r="17" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/></svg></span><span class="world" id="dailyWorld"></span><span class="hole"><span id="dailyHole">1</span><span class="pips" id="dailyPips"></span></span><span class="streak" id="dailyStreak"><svg viewBox="0 0 64 64"><path d="M34 4 C38 18 52 24 50 42 A18 18 0 0 1 14 42 C13 32 20 26 22 18 C26 26 30 26 30 26 C28 18 30 10 34 4 Z" fill="#ff8a3d"/><path d="M33 30 C36 38 42 40 40 48 A8 8 0 0 1 24 48 C24 42 30 40 33 30 Z" fill="#ffd66e"/></svg><span id="dailyStreakN"></span></span><span class="stamp" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 33 L27 46 L51 19" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
     <div id="titleStrip"></div>
   </section>
@@ -757,7 +806,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     </div>
     <div class="live" id="holeDone" aria-label="hole done">
       <div class="stars"><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg><svg class="star" viewBox="0 0 64 64"><path d="M32 4 L40 23 L60 24 L44 37 L50 58 L32 46 L14 58 L20 37 L4 24 L24 23 Z"/></svg></div>
-      <div class="score"><span id="doneStrokes">1</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
+      <div class="score"><span id="doneStrokes">1</span><span id="doneDiff" aria-label="against par">0</span><span class="par"><svg viewBox="0 0 64 64"><path d="M20 56 V8" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M22 9 L50 18 L22 27 Z" fill="#ef7d6d"/></svg><span id="donePar">2</span></span></div>
       <div id="doneBadge" aria-label="under par"></div>
       <div id="doneObj" aria-label="goals"><i class="obj" data-k="0" aria-label="under par"><svg viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="20" ry="14" fill="currentColor"/><circle cx="44" cy="22" r="11" fill="currentColor"/><path d="M53 20 L62 24 L53 27 Z" fill="#ef7d6d"/><circle cx="46" cy="20" r="2.6" fill="#fffdf7"/><path d="M14 34 Q26 26 34 36 Q24 44 14 34 Z" fill="#fffdf7" opacity=".55"/><path d="M10 38 L2 32 L4 42 Z" fill="currentColor"/></svg></i><i class="obj" data-k="1" aria-label="no walls"><svg viewBox="0 0 64 64"><rect x="8" y="14" width="20" height="12" rx="2" fill="currentColor"/><rect x="32" y="14" width="24" height="12" rx="2" fill="currentColor"/><rect x="8" y="30" width="28" height="12" rx="2" fill="currentColor"/><rect x="40" y="30" width="16" height="12" rx="2" fill="currentColor"/><path d="M8 56 L56 6" stroke="#fffdf7" stroke-width="10" stroke-linecap="round"/><path d="M8 56 L56 6" stroke="#c95a4c" stroke-width="5" stroke-linecap="round"/></svg></i><i class="obj" data-k="2" aria-label="lost ball"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="34" r="22" fill="#c69334"/><circle cx="32" cy="30" r="22" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle cx="25" cy="24" r="3" fill="#dca63f"/><circle cx="37" cy="22" r="3" fill="#dca63f"/><circle cx="31" cy="33" r="3" fill="#dca63f"/><circle cx="41" cy="34" r="3" fill="#dca63f"/><circle cx="23" cy="36" r="3" fill="#dca63f"/></svg></i></div>
       <button class="btn" id="doneMap" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
@@ -822,7 +871,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #2f241a; tou
     </div>
   </section>
   <section class="scene panel" id="shop" aria-label="pro shop">
-    <div id="shopAwning"><svg viewBox="0 0 560 100" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><rect x="0" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="40" y="0" width="40" height="64" fill="#fff8ec"/><rect x="80" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="120" y="0" width="40" height="64" fill="#fff8ec"/><rect x="160" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="200" y="0" width="40" height="64" fill="#fff8ec"/><rect x="240" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="280" y="0" width="40" height="64" fill="#fff8ec"/><rect x="320" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="360" y="0" width="40" height="64" fill="#fff8ec"/><rect x="400" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="440" y="0" width="40" height="64" fill="#fff8ec"/><rect x="480" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="520" y="0" width="40" height="64" fill="#fff8ec"/><path d="M0 64 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 Z" fill="#ef7d6d"/><path d="M0 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M40 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><path d="M80 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M120 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><path d="M160 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M200 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><path d="M240 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M280 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><path d="M320 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M360 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><path d="M400 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M440 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><path d="M480 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M520 64 a20 18 0 0 0 40 0 Z" fill="#efe0c4"/><rect x="0" y="0" width="560" height="10" fill="#c95a4c"/><g transform="translate(280 52)"><circle r="40" fill="#fff8ec" stroke="#a8804e" stroke-width="5"/><circle cy="4" r="27" fill="#c69334"/><circle r="27" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M0 -10 L3 -3 L10 -3 L4.5 1.5 L6.5 9 L0 4.5 L-6.5 9 L-4.5 1.5 L-10 -3 L-3 -3 Z" fill="#dca63f"/></g></svg></div>
+    <div id="shopAwning"><svg viewBox="0 0 560 100" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><rect x="0" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="40" y="0" width="40" height="64" fill="#3a3f49"/><rect x="80" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="120" y="0" width="40" height="64" fill="#3a3f49"/><rect x="160" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="200" y="0" width="40" height="64" fill="#3a3f49"/><rect x="240" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="280" y="0" width="40" height="64" fill="#3a3f49"/><rect x="320" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="360" y="0" width="40" height="64" fill="#3a3f49"/><rect x="400" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="440" y="0" width="40" height="64" fill="#3a3f49"/><rect x="480" y="0" width="40" height="64" fill="#ef7d6d"/><rect x="520" y="0" width="40" height="64" fill="#3a3f49"/><path d="M0 64 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 a20 18 0 0 0 40 0 Z" fill="#ef7d6d"/><path d="M0 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M40 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><path d="M80 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M120 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><path d="M160 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M200 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><path d="M240 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M280 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><path d="M320 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M360 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><path d="M400 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M440 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><path d="M480 64 a20 18 0 0 0 40 0 Z" fill="#c95a4c"/><path d="M520 64 a20 18 0 0 0 40 0 Z" fill="#262a31"/><rect x="0" y="0" width="560" height="10" fill="#c95a4c"/><g transform="translate(280 52)"><circle r="40" fill="#3a3f49" stroke="#a8804e" stroke-width="5"/><circle cy="4" r="27" fill="#c69334"/><circle r="27" fill="#ffd66e" stroke="#dca63f" stroke-width="4"/><circle r="16" fill="none" stroke="#fff3c4" stroke-width="4"/><path d="M0 -10 L3 -3 L10 -3 L4.5 1.5 L6.5 9 L0 4.5 L-6.5 9 L-4.5 1.5 L-10 -3 L-3 -3 Z" fill="#dca63f"/></g></svg></div>
     <button class="btn" id="shopBack" aria-label="map"><svg viewBox="0 0 64 64"><path d="M10 30 L32 10 L54 30 V54 H40 V38 H24 V54 H10 Z" fill="#a8804e"/></svg></button>
     <button class="btn" id="shopTabPutters" aria-label="putters"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M44 6 L26 46" stroke="#8a7360" stroke-width="5" stroke-linecap="round"/><path d="M42 10 L46 2" stroke="#4a3826" stroke-width="8" stroke-linecap="round"/><rect x="8" y="44" width="30" height="12" rx="4" fill="#9aa3ad" stroke="#6f7881" stroke-width="3"/><circle cx="50" cy="50" r="7" fill="#fffdf7" stroke="#e6d2ab" stroke-width="3"/></svg></button>
     <button class="btn" id="shopTabBalls" aria-label="balls"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#fffdf7" stroke="#e6d2ab" stroke-width="4"/><path d="M9 36 H55" stroke="#ffd66e" stroke-width="8"/><path d="M32 13 L34.5 19 L41 19 L36 23 L38 29 L32 25.5 L26 29 L28 23 L23 19 L29.5 19 Z" fill="#ef7d6d"/></svg></button>

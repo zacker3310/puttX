@@ -725,7 +725,7 @@ const THUMB_W = { putter: 132, ball: 108 }, THUMB_H = 150, VIEW_W = 340, VIEW_H 
 const thumbCache = {};
 function thumbFor(id) {
   const it = SHOP_ITEMS[id];
-  if (!thumbCache[id]) { const c = document.createElement('canvas'); studioShot(c, id, THUMB_W[it.kind], THUMB_H, 0, false, '#f6e9d2'); thumbCache[id] = c; }
+  if (!thumbCache[id]) { const c = document.createElement('canvas'); studioShot(c, id, THUMB_W[it.kind], THUMB_H, 0, false, '#383d47'); thumbCache[id] = c; }
   const c = document.createElement('canvas'), src = thumbCache[id];
   c.className = 'thumb'; c.width = src.width; c.height = src.height;
   if (src.width) c.getContext('2d').drawImage(src, 0, 0);
@@ -877,7 +877,7 @@ function renderShop() {
 function drawShopView() {
   if (shopUi.tab === 'mull') return;
   const id = shopUi.sel[shopUi.tab] || progress.equipped[shopUi.tab];
-  studioShot(shopView, id, VIEW_W, VIEW_H, shopUi.spin, true, '#dff0f5');
+  studioShot(shopView, id, VIEW_W, VIEW_H, shopUi.spin, true, '#30343d');
 }
 /* the preview turns slowly while the shop is open (still under reduced motion); glowing gear breathes */
 function shopLoop(now) {

@@ -101,7 +101,7 @@ enum CourseBuilder {
         if let gi = hole.native.ground {
             let gm = hole.mats[gi]
             // the night's grid to the horizon: unlit, its 40 x 40 repeat laid into the mesh's uvs
-            var mesh = Terrain.ground(cutting: h.cup)
+            var mesh = Terrain.ground(cutting: h)
             if hole.env.night, let r = gm.map?.rep { for i in stride(from: 0, to: mesh.uvs.count - 1, by: 2) { mesh.uvs[i] *= Float(r[0]); mesh.uvs[i + 1] *= Float(r[1]) } }
             let g = ModelEntity(mesh: try lowMesh(mesh), materials: [hole.env.night ? glow(gm) : try groundMaterial(gm, fog: hole.env.fog)])
             rig.root.addChild(g)

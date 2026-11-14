@@ -60,21 +60,30 @@ private func diff(_ name: String, _ m: MeshData, _ g: GMesh) -> [String] {
     }
 }
 
-/// the ground cut under the cup: nothing left over the hole, and no gap or overlap anywhere else
-@Test func groundCutUnderTheCup() {
-    for c in [Vec2(0.3, 2.7), Vec2(0, 0), Vec2(-1.95, 4.02), Vec2(2, -2)] {
-        let r = Sim.CUP_R + 0.01, m = Terrain.ground(cutting: c, r: r)
-        var area = 0.0, over = 0
-        for t in stride(from: 0, to: m.indices.count, by: 3) {
-            let p = (0..<3).map { k -> SIMD2<Double> in let i = Int(m.indices[t + k]) * 3; return SIMD2(Double(m.positions[i]), Double(m.positions[i + 2])) }
-            // the triangle's area, signed so a face turned down counts against
-            let e1 = p[1] - p[0], e2 = p[2] - p[0]
-            area += (e1.y * e2.x - e1.x * e2.y) / 2
-            let g = (p[0] + p[1] + p[2]) / 3
-            if hypot(g.x - c.x, g.y - c.z) < r * 0.99 { over += 1 }
+/// the ground cut under the course's dips: nothing left over the cup or over a drain's bowl, every
+/// face up, and only the course's own cells touched
+@Test func groundCutUnderTheDips() throws {
+    for key in ["1-1", "11-6"] {
+        let h = try #require(Catalog.shared.hole(key))
+        let m = Terrain.ground(cutting: h), whole = Terrain.ground()
+        var area = 0.0, wholeArea = 0.0, overCup = 0, overDip = 0, down = 0
+        func tris(_ m: MeshData, _ f: ([SIMD2<Double>]) -> Void) {
+            for t in stride(from: 0, to: m.indices.count, by: 3) {
+                f((0..<3).map { k in let i = Int(m.indices[t + k]) * 3; return SIMD2(Double(m.positions[i]), Double(m.positions[i + 2])) })
+            }
         }
-        let hole = 0.5 * 64 * r * r * sin(2 * .pi / 64)
-        #expect(over == 0, "a triangle over the cup at \(c)")
-        #expect(abs(area - (120 * 120 - hole)) < 0.01, "area \(area) at \(c)")
+        tris(whole) { p in let e1 = p[1] - p[0], e2 = p[2] - p[0]; wholeArea += (e1.y * e2.x - e1.x * e2.y) / 2 }
+        tris(m) { p in
+            let e1 = p[1] - p[0], e2 = p[2] - p[0], a = (e1.y * e2.x - e1.x * e2.y) / 2
+            area += a; if a <= 0 { down += 1 }
+            let g = (p[0] + p[1] + p[2]) / 3
+            if hypot(g.x - h.cup.x, g.y - h.cup.z) < Sim.CUP_R { overCup += 1 }
+            if h.onFloor(g.x, g.y) && h.groundH(g.x, g.y) < -0.05 { overDip += 1 }
+        }
+        let B = Terrain.bounds(h), box = (B.x1 - B.x0 + 4.4) * (B.z1 - B.z0 + 4.4)
+        #expect(overCup == 0, "\(key): ground over the cup")
+        #expect(overDip == 0, "\(key): ground over a dip")
+        #expect(down == 0, "\(key): a face turned down")
+        #expect(area < wholeArea && wholeArea - area < box, "\(key): area \(area) of \(wholeArea)")
     }
 }

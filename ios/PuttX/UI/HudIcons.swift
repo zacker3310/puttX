@@ -16,23 +16,27 @@ enum HudIcon {
             ctx.stroke(circle(32, 32, 24), with: .color(Toy.surfaceLine), style: line(4))
             ctx.fill(circle(32, 32, 6), with: .color(Toy.surfaceLine))
         case .par:
-            ctx.fill(Path(ellipseIn: CGRect(x: 14 * k, y: 51 * k, width: 36 * k, height: 10 * k)), with: .color(Color(hex: "#5a4634")))
+            ctx.fill(Path(ellipseIn: CGRect(x: 14 * k, y: 51 * k, width: 36 * k, height: 10 * k)), with: .color(.black.opacity(0.55)))
             ctx.stroke(Path { $0.move(to: p(20, 56)); $0.addLine(to: p(20, 8)) }, with: .color(Toy.inkSoft), style: line(5))
             ctx.fill(Path { $0.move(to: p(22, 9)); $0.addLine(to: p(50, 18)); $0.addLine(to: p(22, 27)); $0.closeSubpath() }, with: .color(Toy.red))
         case .strokes:
             ctx.stroke(Path { $0.move(to: p(44, 6)); $0.addLine(to: p(24, 48)) }, with: .color(Toy.inkSoft), style: line(6))
             ctx.fill(Path(roundedRect: CGRect(x: 10 * k, y: 44 * k, width: 24 * k, height: 12 * k), cornerRadius: 5 * k), with: .color(Toy.blue))
         case .home:
-            ctx.fill(Path { $0.addLines([p(10, 30), p(32, 10), p(54, 30), p(54, 54), p(40, 54), p(40, 38), p(24, 38), p(24, 54), p(10, 54)]); $0.closeSubpath() }, with: .color(Toy.woodDeep))
+            // a chrome house, its doorway lit
+            let house = Path { $0.addLines([p(10, 30), p(32, 10), p(54, 30), p(54, 54), p(10, 54)]); $0.closeSubpath() }
+            ctx.fill(house, with: .linearGradient(Gradient(colors: [Color(hex: "#f4f6fa"), Color(hex: "#a9b0bc"), Color(hex: "#6b727e")]), startPoint: p(32, 10), endPoint: p(32, 54)))
+            ctx.stroke(house, with: .color(.black.opacity(0.6)), style: line(2.5))
+            ctx.fill(Path(roundedRect: CGRect(x: 25 * k, y: 36 * k, width: 14 * k, height: 18 * k), cornerRadius: 3 * k), with: .linearGradient(Gradient(colors: [Color(hex: "#ffd36b"), Color(hex: "#ff7a1a")]), startPoint: p(32, 36), endPoint: p(32, 54)))
         case .eye:
             let lens = Path { $0.move(to: p(4, 32)); $0.addQuadCurve(to: p(60, 32), control: p(32, 6)); $0.addQuadCurve(to: p(4, 32), control: p(32, 58)); $0.closeSubpath() }
             ctx.fill(lens, with: .color(Color(hex: "#fffdf7"))); ctx.stroke(lens, with: .color(Toy.inkSoft), style: line(5))
-            ctx.fill(circle(32, 32, 10), with: .color(Toy.blue)); ctx.fill(circle(32, 32, 4), with: .color(Toy.inkStrong))
+            ctx.fill(circle(32, 32, 10), with: .color(Toy.blue)); ctx.fill(circle(32, 32, 4), with: .color(Color(hex: "#101216")))
         case .ruler:
             let r = Path(roundedRect: CGRect(x: 6 * k, y: 22 * k, width: 52 * k, height: 20 * k), cornerRadius: 4 * k)
-            ctx.fill(r, with: .color(Toy.yellow)); ctx.stroke(r, with: .color(Toy.woodDeep), style: line(4))
+            ctx.fill(r, with: .color(Toy.yellow)); ctx.stroke(r, with: .color(Toy.inkDark), style: line(4))
             for (x, l) in [(16.0, 32.0), (26, 28), (36, 32), (46, 28)] {
-                ctx.stroke(Path { $0.move(to: p(x, 22)); $0.addLine(to: p(x, l)) }, with: .color(Toy.woodDeep), style: line(3))
+                ctx.stroke(Path { $0.move(to: p(x, 22)); $0.addLine(to: p(x, l)) }, with: .color(Toy.inkDark), style: line(3))
             }
         case .arrowUp:
             ctx.fill(Path { $0.addLines([p(32, 10), p(50, 34), p(38, 34), p(38, 54), p(26, 54), p(26, 34), p(14, 34)]); $0.closeSubpath() }, with: .color(Toy.green))

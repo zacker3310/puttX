@@ -187,8 +187,8 @@ struct WorldsView: View {
                 VStack(spacing: 0) {
                     Spacer(minLength: 0)
                     HStack(spacing: st.s(6 * f)) {
-                        Text("\(w)").font(Toy.font(28 * f, st)).foregroundStyle(open ? Toy.inkDark : Toy.inkSoft)
-                            .frame(width: st.s(44 * f), height: st.s(44 * f))
+                        Text("\(w)").font(Toy.font(w >= 10 ? 22 * f : 26 * f, st)).foregroundStyle(open ? Toy.inkDark : Toy.inkSoft)
+                            .frame(width: st.s(40 * f), height: st.s(40 * f))
                             .background(Circle().fill(open ? AnyShapeStyle(LinearGradient(colors: [accent[0], accent[1]], startPoint: .top, endPoint: .bottom)) : AnyShapeStyle(Toy.mute)))
                         Spacer(minLength: 0)
                         if open {
@@ -198,7 +198,8 @@ struct WorldsView: View {
                             Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(30 * f), height: st.s(30 * f))
                         }
                     }
-                    .padding(.leading, st.s(10 * f)).padding(.trailing, st.s(16 * f)).frame(height: st.s(60 * f))
+                    // clear of the card's 6 px rim on both sides
+                    .padding(.leading, st.s(16 * f)).padding(.trailing, st.s(20 * f)).padding(.bottom, st.s(4 * f)).frame(height: st.s(64 * f))
                     .background(Toy.metal)
                     .overlay(alignment: .top) { Rectangle().fill(Toy.steel).frame(height: st.s(3 * f)) }
                 }

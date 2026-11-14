@@ -319,7 +319,7 @@ struct DoneCard: View {
             ZStack {
                 Toy.scrim.ignoresSafeArea()
                 card(score: score, stars: stars, diff: diff)
-                    .position(x: geo.size.width / 2, y: geo.size.height * 0.42)
+                    .position(x: geo.size.width / 2, y: geo.size.height / 2)
                 // the way on, where a thumb rests: home bottom left, next bottom right, apart from the card
                 Button { app.go(.map(Catalog.course(of: play.hole.key))) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
                     .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")

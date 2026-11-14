@@ -32,6 +32,19 @@ What else export-ios writes for the app: `ios/PuttX/Resources/looks.json` (each 
 and `play.json` (720 pad gestures scored by the web's `computeStroke`, and `toFixed` cases) for the
 stroke tests.
 
+Also from the web, so the app never re-authors what the web already draws:
+
+- `scripts/export-scene.cjs` runs the web's own `buildHoleScene` for every hole in headless Chromium and
+  writes the scenery (`ios/PuttX/Scene`: content-hashed meshes, textures, a deflated manifest per hole).
+  Anything a course look's `tick` moves becomes a rig with a formula per channel, checked against the
+  real tick for 3 s before it is written; the flagstick is a named rig the game poses. Then
+  `node scripts/pack-scene.cjs`. `scripts/check-scene.cjs` holds a rebuilt frame to the web's pixels.
+- `scripts/export-gear.cjs` builds every pro shop putter and ball with `src/shop.js`'s builders, plus
+  each card's studio picture.
+- `scripts/export-ui.cjs` rasterises the title illustration's layers.
+- `export-ios` also writes `shop.json` (stock and coin table) and golden values for the extras (lost-ball
+  spots, daily keys) and the shop (coins per finish, every putter's feel), held bit-exact by `swift test`.
+
 The bundle id is a placeholder (`com.puttx.app` in `ios/project.yml`); set yours and a team before
 running on a device.
 
@@ -40,12 +53,12 @@ running on a device.
 | Phase | What | State |
 |---|---|---|
 | 1 Core | sim, putts, border relief, rounds, progress, catalog, parity tests, CI | done |
-| 2 Shell | XcodeGen project, SwiftUI scenes (title, profiles, worlds, world, map, hole, card), one stage scaled for iPad and iPhone, 64 pt targets, no words, CI screenshots | done |
-| 3 Play | the DS-style swing ported with `FEEL`, aim, camera rig, a live loop stepping the sim at 240 Hz and drawing at 120 Hz (ProMotion), drift | stroke, aim, putt log, live loop, drift done; camera with phase 4 |
-| 4 Course | RealityKit: procedural turf, borders, cup, flag, movers, tubes; then each `cNN.look.js` as a Swift look | |
-| 5 Sound | the WebAudio synth on AVAudioEngine source nodes; audio session honours the silent switch | |
-| 6 Platform | Core Haptics, Game Center (a board per course, achievements), iCloud key-value saves, GameController | |
-| 7 Extras | pro shop, ghosts, daily, the party, the classic and the bonus nine | |
+| 2 Shell | XcodeGen project, SwiftUI scenes, one stage scaled for iPad and iPhone, 64 pt targets, no words, CI screenshots | done |
+| 3 Play | the DS-style swing with `FEEL`, aim, cameras, a 240 Hz live loop, drift, hit-stop, slow motion, the drop | done |
+| 4 Course | RealityKit: exported scenery with its animation, native turf and terrain, sky, fog, the flagstick | done; neon night still to come |
+| 5 Sound | the WebAudio synth on AVAudioEngine; haptics | done |
+| 6 Platform | Game Center, iCloud key-value saves (lossless merge), GameController | done; needs App Store Connect ids |
+| 7 Extras | mulligans, lost balls, goals, daily hole, ghosts, ace replay, FX, pro shop, pass and play | done; practice, guide, slope read and shot codes to come |
 | 8 Ship | icons, launch screen, accessibility, App Store listing (Kids Category: free, no data collected) | |
 
 Notes:

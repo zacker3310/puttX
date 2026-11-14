@@ -47,7 +47,7 @@ struct CourseView: UIViewRepresentable {
             do {
                 let r = renderer == .hand && play.hole.key == "1-1" ? try HandHole.build(play.hole) : try CourseBuilder.exported(play.hole)
                 anchor.addChild(r.root)
-                props.wear(putter: play.gear.putter, ball: play.gear.ball)
+                props.wear(putter: play.gear.putter, ball: play.gear.ball, tint: play.ballTint)
                 anchor.addChild(props.root)
                 rig = r
                 view = v

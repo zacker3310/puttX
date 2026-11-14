@@ -87,6 +87,8 @@ final class AppModel {
 
     // MARK: navigation
     func go(_ r: Route) {
+        // leaving the holes and the card ends a party
+        switch r { case .hole, .card: break; default: party = nil }
         if case .hole(let key) = r, let h = catalog.hole(key) {
             let c = Catalog.course(of: key), lk = look(c), p = HolePlay(hole: h, look: lk)
             // the hole's sound: its borders, its world's birds and crickets, water or wind, the bell at the end
@@ -100,6 +102,11 @@ final class AppModel {
             p.lostGot = progress.lost[key] != nil
             p.setGhost(progress.ghosts[key])
             p.gear = (progress.equipped["putter"] ?? "p1", progress.equipped["ball"] ?? "b1")
+            if let party {
+                // a plain ball in the player's colour, no ghost, no lost ball, no mulligans
+                p.party = true; p.lostGot = true; p.setGhost(nil)
+                p.gear.ball = "b1"; p.ballTint = party.player == 0 ? nil : Party.balls[party.player]
+            }
             p.onLost = { [weak self] in guard let self else { return }; _ = self.progress.findLost(key); self.save() }
             Synth.shared.bed(water: h.data.zones.contains { $0.surf == .water }, wind: [2, 4, 10].contains(w))
             SFX.jingle(lk.jingle)
@@ -110,6 +117,25 @@ final class AppModel {
     /// how the equipped putter turns a gesture into a putt
     var feel: Feel { Shop.shared.feel(progress.equipped["putter"] ?? "p1") }
     func look(_ course: Int) -> CourseLook { progress.neon ? looks[course].night() : looks[course] }
+
+    // MARK: pass and play
+    /// the party on this device, if one is playing
+    var party: Party?
+    func startParty(_ n: Int, course c: Int) {
+        party = Party(n: n, course: c)
+        go(.hole("\(c)-1"))
+    }
+    /// the next player takes the same hole
+    func partyGo() {
+        guard party?.passing != nil, case .hole(let key) = route else { return }
+        party?.passing = nil
+        go(.hole(key))
+    }
+    func partyNext(after key: String) {
+        party?.board = nil
+        if let n = catalog.nextKey(key) { go(.hole(n)) } else if let p = party { go(.card(p.course)) }
+    }
+    func endParty() { party = nil }
 
     /// the hole of the day: the same hole for everyone on a date, from any course
     func playDaily() {
@@ -127,6 +153,11 @@ final class AppModel {
     /// a hole finished: bank it with its goals (and the daily hole), and say where the player goes next
     func finished(_ play: HolePlay, score: Int) -> HoleRecord {
         let h = play.hole, prevBest = progress.holes[h.key]?.best
+        if party != nil {
+            // nothing is saved in a party
+            withAnimation(.spring(response: 0.3)) { party!.finish(h.key, score: score) }
+            return HoleRecord(best: score, stars: 0)
+        }
         progress.keepGhost(h.key, log: play.log, score: score, previousBest: prevBest, auto: play.round.auto)
         let rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
         var won = progress.payFinish(h.key, score: score, par: h.par, shop: Shop.shared)

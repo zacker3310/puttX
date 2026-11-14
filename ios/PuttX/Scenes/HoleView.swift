@@ -99,7 +99,10 @@ struct HoleView: View {
                         .transition(.scale.combined(with: .opacity))
                         .onTapGesture { withAnimation { play.skipIntro() } }
                 }
-                if play.phase == .done, let rec = play.record { DoneCard(play: play, rec: rec).frame(width: geo.size.width, height: geo.size.height) }
+                if app.party != nil {
+                    PartyChip(p: app.party!.player).position(x: st.s(452 + 50), y: st.s(30 + 38))
+                    PartyOverlay(key: play.hole.key).frame(width: geo.size.width, height: geo.size.height)
+                } else if play.phase == .done, let rec = play.record { DoneCard(play: play, rec: rec).frame(width: geo.size.width, height: geo.size.height) }
             }
         }
         .onAppear {

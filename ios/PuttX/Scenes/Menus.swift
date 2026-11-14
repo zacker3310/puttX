@@ -338,6 +338,7 @@ struct MapView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.stage) private var st
     let course: Int
+    @State private var picking = false
 
     var body: some View {
         let look = app.look(course), holes = app.catalog.holes(course: course)
@@ -354,9 +355,14 @@ struct MapView: View {
                 BackButton { app.go(app.catalog.isExtra(course) ? .worlds : .world(app.catalog.world(of: course))) }
                 badge
                 Spacer()
+                if app.open(course: course) {
+                    Button { SFX.tap(); withAnimation(.spring(response: 0.3)) { picking = true } } label: { PartyGlyph().frame(width: st.s(64), height: st.s(64)) }
+                        .buttonStyle(ToyButtonStyle()).accessibilityLabel("pass and play")
+                }
                 Wallet()
             }
             .padding(.horizontal, st.s(24)).padding(.top, st.s(24))
+            if picking { PartyPick(course: course) { withAnimation { picking = false } }.transition(.opacity) }
         }
     }
 

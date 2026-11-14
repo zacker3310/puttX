@@ -109,12 +109,15 @@ final class PlayProps {
     }
 
     /// the equipped gear from the pro shop: its putter (head and all) and its ball's skin
-    func wear(putter id: String, ball bid: String) {
+    func wear(putter id: String, ball bid: String, tint: String? = nil) {
         if let p = Gear.putter(id) {
             for c in Array(putter.children) { c.removeFromParent() }
             for c in Array(p.children) { putter.addChild(c) }
         }
-        if let m = Gear.ballMaterial(bid) { ball.model?.materials = [m] }
+        if var m = Gear.ballMaterial(bid) {
+            if let t = tint, var p = m as? PhysicallyBasedMaterial { p.baseColor.tint = UIColor(Color(hex: t)); m = p }
+            ball.model?.materials = [m]
+        }
     }
 
     // MARK: the putter

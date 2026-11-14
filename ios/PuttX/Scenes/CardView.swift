@@ -10,6 +10,9 @@ struct CardView: View {
     let course: Int
 
     var body: some View {
+        if let p = app.party, p.course == course { PartyCard(party: p) } else { solo }
+    }
+    private var solo: some View {
         let holes = app.catalog.holes(course: course)
         let total = holes.reduce(0) { $0 + (app.progress.holes[$1.key]?.best ?? $1.par) }, par = holes.reduce(0) { $0 + $1.par }
         let diff = total - par

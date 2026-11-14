@@ -197,6 +197,22 @@ final class SceneStore {
         return r
     }
 
+    /// a colour texture's mean, linear, for a surface the shader details itself
+    private var means: [String: SIMD3<Double>] = [:]
+    func meanColor(_ t: SceneTex) -> SIMD3<Double>? {
+        if let m = means[t.t] { return m }
+        let url = root!.appendingPathComponent("tex/\(t.t).png")
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil), let img = CGImageSourceCreateImageAtIndex(src, 0, nil) else { return nil }
+        var px = [UInt8](repeating: 0, count: 4)
+        guard let ctx = CGContext(data: &px, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4, space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+        ctx.interpolationQuality = .medium
+        ctx.draw(img, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        func lin(_ c: UInt8) -> Double { let v = Double(c) / 255; return t.srgb ? (v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4)) : v }
+        let m = SIMD3(lin(px[0]), lin(px[1]), lin(px[2]))
+        means[t.t] = m
+        return m
+    }
+
     /// a texture parameter that tiles and filters as the web's does (repeat wrap, trilinear, anisotropic)
     func param(_ t: SceneTex, normal: Bool = false) throws -> MaterialParameters.Texture {
         var p = MaterialParameters.Texture(try texture(t, normal: normal))

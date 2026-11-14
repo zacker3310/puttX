@@ -112,7 +112,7 @@ final class Synth: @unchecked Sendable {
         lock.withLock {
             if !water && !wind { bedTarget = 0; return }
             bedType = water ? .bandpass : .lowpass; bedFreq = water ? 650 : 380; bedQ = water ? 0.9 : 0.5
-            bedRate = water ? 3.1 : 0.13; bedDepth = water ? 260 : 160; bedTarget = water ? 0.05 : 0.07
+            bedRate = water ? 3.1 : 0.13; bedDepth = water ? 260 : 160; bedTarget = water ? 0.025 : 0.03
         }
     }
 
@@ -217,16 +217,17 @@ enum SFX {
         default: s.tone(330 + k * 30, 0.07, wave: .triangle, vol: vol); s.noise(0.025, vol: vol * 0.45, freq: 900, q: 2)
         }
     }
-    static func boing(_ v: Double) { s.tone(320, 0.2, vol: min(0.3, 0.1 + v * 0.08), slide: 260) }
+    /// a bumper or a mover: a short dull knock, not a cartoon spring
+    static func boing(_ v: Double) { let vol = min(0.3, 0.08 + v * 0.07); s.tone(190 + min(v, 4) * 15, 0.06, wave: .triangle, vol: vol, slide: -40); s.noise(0.03, vol: vol * 0.4, freq: 600, q: 1.5) }
     static func cup() { s.tone(1500, 0.04, wave: .triangle, vol: 0.12, slide: -300) }
-    static func rattle(_ v: Double) { s.tone(1900 - v * 500, 0.035, wave: .square, vol: 0.05 + v * 0.07); s.noise(0.04, vol: 0.08 + v * 0.1, freq: 3200, q: 4) }
+    static func rattle(_ v: Double) { s.tone(1900 - v * 500, 0.035, wave: .triangle, vol: 0.05 + v * 0.07); s.noise(0.04, vol: 0.08 + v * 0.1, freq: 3200, q: 4) }
     static func plunk() { s.tone(150, 0.32, vol: 0.55, slide: -70); s.tone(300, 0.12, wave: .triangle, vol: 0.18, slide: -120); s.noise(0.09, vol: 0.3, freq: 420, q: 1.2, type: .lowpass) }
-    static func lip() { s.tone(900, 0.07, wave: .square, vol: 0.08, slide: 300) }
+    static func lip() { s.tone(1100, 0.03, wave: .triangle, vol: 0.06); s.noise(0.02, vol: 0.05, freq: 2600, q: 3) }
     static func land(_ v: Double) { s.noise(0.08, vol: min(0.4, 0.12 + v * 0.08), freq: 400) }
     static func boink() { s.tone(420, 0.25, vol: 0.3, slide: -220) }
     static func splash() { s.noise(0.35, vol: 0.35, freq: 900, q: 0.7); s.noise(0.2, vol: 0.2, freq: 2600, q: 1, delay: 0.05) }
-    static func tube() { s.noise(0.4, vol: 0.22, freq: 300, q: 3, type: .lowpass) }
-    static func tubeOut() { s.tone(260, 0.16, wave: .triangle, vol: 0.2, slide: 220) }
+    static func tube() { s.noise(0.3, vol: 0.12, freq: 260, q: 0.8, type: .lowpass) }
+    static func tubeOut() { s.noise(0.06, vol: 0.12, freq: 380, q: 1, type: .lowpass) }
     static func tap() { s.tone(660, 0.05, wave: .triangle, vol: 0.18) }
     static func tick() { s.tone(1200, 0.02, wave: .square, vol: 0.05) }
     static func star(_ i: Int) { s.tone([784, 988, 1175][min(i, 2)], 0.22, wave: .triangle, vol: 0.25) }
@@ -241,8 +242,11 @@ enum SFX {
         }
     }
     static func place() { s.tone(880, 0.04, wave: .triangle, vol: 0.1); s.noise(0.03, vol: 0.08, freq: 1200, q: 2, delay: 0.12) }
+    /// off: synthesised birds and crickets read as bleeps, not wildlife
+    static let ambient = false
     /// birdsong (by day) and crickets (by night), now and then
     static func ambientCall(birds: Double, crickets: Double) {
+        guard ambient else { return }
         if birds > 0 && Double.random(in: 0..<1) < 0.35 * birds {
             let f0 = 2400 + Double.random(in: 0..<1800), n = 2 + Int.random(in: 0..<3)
             for i in 0..<n { s.tone(f0 + (i % 2 == 1 ? 380 : 0), 0.07, vol: 0.018, slide: (Double.random(in: 0..<1) - 0.3) * 900, delay: Double(i) * 0.11) }

@@ -93,7 +93,9 @@ enum CourseBuilder {
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.floor(h)), materials: [turfMat]))
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.collar(h)), materials: [turfMat]))
         for (i, z) in hole.native.zones.enumerated() where i < h.data.zones.count {
-            let zm = hole.mats[z.m], e = ModelEntity(mesh: try lowMesh(Terrain.zone(h, i)), materials: [S.material(zm)])
+            let zm = hole.mats[z.m], zd = h.data.zones[i]
+            let real = hole.env.night || zd.push != nil ? nil : zd.surf.flatMap { try? zoneMaterial($0, zm, sky: hole.env.sky) }
+            let e = ModelEntity(mesh: try lowMesh(Terrain.zone(h, i)), materials: [real ?? S.material(zm)])
             if let t = zm.map, t.flow > 0 { rig.flows.append((e, 0, t.flow)) }
             rig.root.addChild(e)
         }
@@ -103,7 +105,9 @@ enum CourseBuilder {
             // the night's grid to the horizon: unlit, its 40 x 40 repeat laid into the mesh's uvs
             var mesh = Terrain.ground(cutting: h)
             if hole.env.night, let r = gm.map?.rep { for i in stride(from: 0, to: mesh.uvs.count - 1, by: 2) { mesh.uvs[i] *= Float(r[0]); mesh.uvs[i + 1] *= Float(r[1]) } }
-            let g = ModelEntity(mesh: try lowMesh(mesh), materials: [hole.env.night ? glow(gm) : try groundMaterial(gm, fog: hole.env.fog)])
+            // the pirate cove's worlds (5, 15, 25) stand in a lagoon: their ground is the sea
+            let sea = !hole.env.night && (Int(h.key.split(separator: "-")[0]) ?? 0) % 10 == 5
+            let g = ModelEntity(mesh: try lowMesh(mesh), materials: [hole.env.night ? glow(gm) : sea ? try seaMaterial(gm, fog: hole.env.fog, sky: hole.env.sky) : try groundMaterial(gm, fog: hole.env.fog)])
             rig.root.addChild(g)
             rig.ground = g
         }
@@ -218,6 +222,37 @@ enum CourseBuilder {
         c.custom.value = SIMD4(Float(m.map?.rep[0] ?? 48), 0, 0, Float(fog?.far ?? 0))
         if let f = fog { c.emissiveColor = .init(color: SceneStore.color(f.color)) }
         return c
+    }
+
+    /// sand, mud and water as they look in the world: the zone's colour, the detail made in the shader
+    static func zoneMaterial(_ surf: Surface, _ m: SceneMat, sky: [String]) throws -> (any Material)? {
+        let kind: Float
+        switch surf { case .sand: kind = 0; case .mud: kind = 1; case .water: kind = 2; default: return nil }
+        guard let lib = library else { return nil }
+        var c = try CustomMaterial(surfaceShader: CustomMaterial.SurfaceShader(named: "zoneSurface", in: lib), lightingModel: .lit)
+        c.baseColor = .init(tint: averageColor(m))
+        c.custom.value = SIMD4(kind, 0, 0, 0)
+        if surf == .water { c.emissiveColor = .init(color: horizon(sky)) }
+        return c
+    }
+    static func seaMaterial(_ m: SceneMat, fog: SceneEnv.Fog?, sky: [String]) throws -> any Material {
+        guard let lib = library else { return SceneStore.shared.material(m) }
+        var c = try CustomMaterial(surfaceShader: CustomMaterial.SurfaceShader(named: "seaSurface", in: lib), lightingModel: .lit)
+        c.baseColor = .init(tint: averageColor(m))
+        c.custom.value = SIMD4(0, 0, 0, Float(fog?.far ?? 0))
+        c.emissiveColor = .init(color: fog.map { SceneStore.color($0.color) } ?? horizon(sky))
+        return c
+    }
+    /// the sky's colour overhead, which water mirrors
+    static func horizon(_ sky: [String]) -> UIColor {
+        let hex = sky.first ?? "#ffffff", v = UInt64(hex.dropFirst(hex.hasPrefix("#") ? 1 : 0), radix: 16) ?? 0
+        return UIColor(red: CGFloat((v >> 16) & 0xff) / 255, green: CGFloat((v >> 8) & 0xff) / 255, blue: CGFloat(v & 0xff) / 255, alpha: 1)
+    }
+    /// a material's colour as it reads from afar: its tint times its texture's mean
+    static func averageColor(_ m: SceneMat) -> UIColor {
+        var k = SIMD3<Double>(m.color[0], m.color[1], m.color[2])
+        if let t = m.map, let mean = SceneStore.shared.meanColor(t) { k *= mean }
+        return SceneStore.color([k.x, k.y, k.z])
     }
 
     static func matrix(_ e: [Float]) -> simd_float4x4 {

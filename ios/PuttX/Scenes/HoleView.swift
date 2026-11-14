@@ -302,50 +302,85 @@ struct DoneCard: View {
     let rec: HoleRecord
 
     var body: some View {
-        let score = play.round.score ?? 0, stars = Scoring.stars(score, play.hole.par)
-        ZStack {
-            Toy.scrim.ignoresSafeArea()
-            VStack(spacing: st.s(22)) {
-                HStack(spacing: st.s(8)) { ForEach(0..<3) { k in StarView(on: k < stars).frame(width: st.s(96)).popIn(0.1 + Double(k) * 0.12) } }
-                    .onAppear { for k in 0..<stars { DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 + Double(k) * 0.12) { SFX.star(k) } } }
-                HStack(spacing: st.s(18)) {
-                    Text("\(score)").font(Toy.font(96, st)).foregroundStyle(Toy.inkStrong)
-                    Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }
-                }
-                if let g = play.goals { GoalsRow(all: g.all, fresh: g.fresh) }
-                HStack(spacing: st.s(24)) {
-                    Button { app.go(.map(Catalog.course(of: play.hole.key))) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
-                        .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")
-                    IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.retry(play) }
-                    IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(play.daily != nil ? app.afterDaily(play.hole.key) : app.next(after: play.hole.key)) }
-                }
-            }
-            .padding(st.s(40))
-            .background(Dots())
-            .toyCard(st, radius: Toy.rXl)
-            // the bird this finish earned, on the card's left edge (src/game.js tallyHole)
-            .overlay(alignment: .topLeading) {
-                if let b = play.bird { BirdBadge(kind: b, diff: score - play.hole.par).offset(x: st.s(22), y: st.s(150)) }
-            }
-            // coins won: a gold sticker slapped on the card's corner
-            .overlay(alignment: .topTrailing) {
-                if play.coinsWon > 0 {
-                    HStack(spacing: st.s(6)) {
-                        Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(44), height: st.s(44))
-                        Text("+\(play.coinsWon)").font(Toy.font(34, st)).foregroundStyle(Toy.inkStrong)
+        let score = play.round.score ?? 0, stars = Scoring.stars(score, play.hole.par), diff = score - play.hole.par
+        GeometryReader { geo in
+            ZStack {
+                Toy.scrim.ignoresSafeArea()
+                card(score: score, stars: stars, diff: diff)
+                    .position(x: geo.size.width / 2, y: geo.size.height / 2 - st.s(44))
+                // the way on, where a thumb rests: home bottom left, next bottom right, apart from the card
+                Button { app.go(.map(Catalog.course(of: play.hole.key))) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
+                    .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")
+                    .position(x: st.s(24 + 44), y: geo.size.height - st.s(24 + 44))
+                    .popIn(0.35)
+                Button { app.go(play.daily != nil ? app.afterDaily(play.hole.key) : app.next(after: play.hole.key)) } label: {
+                    HStack(spacing: st.s(2)) {
+                        Image(systemName: "play.fill").font(.system(size: st.s(46), weight: .black, design: .rounded))
+                        Image(systemName: "chevron.right").font(.system(size: st.s(34), weight: .black, design: .rounded))
                     }
-                    .padding(.horizontal, st.s(14)).frame(height: st.s(64))
-                    .background(Capsule().fill(Toy.yellow)).overlay(Capsule().strokeBorder(Toy.yellowLine, lineWidth: st.s(4)))
-                    .rotationEffect(.degrees(8))
-                    .offset(x: st.s(24), y: -st.s(20))
-                    .popIn(0.7)
-                    .onAppear { DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { SFX.coin() } }
-                    .accessibilityElement(children: .ignore).accessibilityLabel("\(play.coinsWon) coins won")
                 }
+                .buttonStyle(ToyButtonStyle(kind: .go, radius: Toy.rLg, size: CGSize(width: 184, height: 112)))
+                .accessibilityLabel("next")
+                .position(x: geo.size.width - st.s(24 + 92), y: geo.size.height - st.s(24 + 56))
+                .popIn(0.45)
             }
-            .popIn()
         }
         .accessibilityElement(children: .contain)
+    }
+
+    private func card(score: Int, stars: Int, diff: Int) -> some View {
+        VStack(spacing: st.s(14)) {
+            HStack(spacing: st.s(12)) {
+                ForEach(0..<3) { k in StarView(on: k < stars).frame(width: st.s(k == 1 ? 92 : 76)).offset(y: k == 1 ? -st.s(8) : 0).popIn(0.1 + Double(k) * 0.12) }
+            }
+            .onAppear { for k in 0..<stars { DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 + Double(k) * 0.12) { SFX.star(k) } } }
+            // the score against par on the left, the hole's goals on the right
+            HStack(spacing: st.s(28)) {
+                HStack(alignment: .center, spacing: st.s(18)) {
+                    Text("\(score)").font(Toy.font(96, st)).foregroundStyle(Toy.inkStrong)
+                        .accessibilityLabel("\(score) strokes")
+                    VStack(spacing: st.s(10)) {
+                        Text(diff == 0 ? "±0" : diff > 0 ? "+\(diff)" : "\(diff)")
+                            .font(Toy.font(32, st)).foregroundStyle(.white)
+                            .padding(.horizontal, st.s(16)).frame(minWidth: st.s(84), minHeight: st.s(50))
+                            .background(Capsule().fill(diff < 0 ? Toy.green : diff == 0 ? Toy.blue : Toy.red))
+                            .accessibilityLabel(diff == 0 ? "even" : diff > 0 ? "\(diff) over par" : "\(-diff) under par")
+                        Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }.accessibilityLabel("par \(play.hole.par)")
+                    }
+                }
+                if let g = play.goals {
+                    Rectangle().fill(Toy.surfaceLine).frame(width: st.s(3), height: st.s(110))
+                    GoalsRow(all: g.all, fresh: g.fresh)
+                }
+            }
+            IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.retry(play) }
+        }
+        .padding(.horizontal, st.s(44)).padding(.top, st.s(20)).padding(.bottom, st.s(26))
+        .frame(minWidth: st.s(660))
+        .fixedSize()
+        .background(Dots())
+        .toyCard(st, radius: Toy.rXl)
+        // the bird this finish earned, on the card's left edge (src/game.js tallyHole)
+        .overlay(alignment: .leading) {
+            if let b = play.bird { BirdBadge(kind: b, diff: diff).offset(x: -st.s(64)).rotationEffect(.degrees(-8)) }
+        }
+        // coins won: a gold sticker slapped on the card's corner
+        .overlay(alignment: .topTrailing) {
+            if play.coinsWon > 0 {
+                HStack(spacing: st.s(6)) {
+                    Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(44), height: st.s(44))
+                    Text("+\(play.coinsWon)").font(Toy.font(34, st)).foregroundStyle(Toy.inkStrong)
+                }
+                .padding(.horizontal, st.s(14)).frame(height: st.s(64))
+                .background(Capsule().fill(Toy.yellow)).overlay(Capsule().strokeBorder(Toy.yellowLine, lineWidth: st.s(4)))
+                .rotationEffect(.degrees(8))
+                .offset(x: st.s(24), y: -st.s(20))
+                .popIn(0.7)
+                .onAppear { DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { SFX.coin() } }
+                .accessibilityElement(children: .ignore).accessibilityLabel("\(play.coinsWon) coins won")
+            }
+        }
+        .popIn()
     }
 }
 

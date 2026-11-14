@@ -95,7 +95,7 @@ struct ProfilesView: View {
                     }
                 }
                 .padding(.vertical, st.s(14))
-                .frame(width: st.s(300), height: st.s(cardH))
+                .frame(width: st.s(340), height: st.s(cardH))
                 .modifier(ProfileCard(state: !used ? .empty : n == app.slot ? .last : .plain))
             }
             .buttonStyle(PressDown())

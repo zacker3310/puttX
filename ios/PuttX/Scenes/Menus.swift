@@ -61,8 +61,7 @@ struct ProfilesView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            Toy.surface2.ignoresSafeArea()
-            Dots().ignoresSafeArea()
+            WorldScene(look: app.look(app.catalog.allCourses[0])).ignoresSafeArea()
             TopBar { BackButton { app.go(.title) } } right: { EmptyView() }
             HStack(alignment: .top, spacing: st.s(48)) {
                 ForEach(1...AppModel.slots, id: \.self) { n in profile(n).popIn(Double(n - 1) * 0.07) }
@@ -141,8 +140,7 @@ struct WorldsView: View {
         // two rows of 248 px cards under the top bar; a short phone stage scales the grid to fit
         let f = min(1, (st.h - 136 - 24) / (248 * 2 + 24))
         ZStack(alignment: .topLeading) {
-            Toy.surface.ignoresSafeArea()
-            Dots().ignoresSafeArea()
+            WorldScene(look: app.look(app.catalog.allCourses[0]), horizon: 0.86).ignoresSafeArea()
             let cols = Array(repeating: GridItem(.fixed(st.s(200 * f)), spacing: st.s(24 * f)), count: 5)
             LazyVGrid(columns: cols, spacing: st.s(24 * f)) {
                 ForEach(Array(app.catalog.worldOrder.enumerated()), id: \.element) { i, w in worldCard(w, f).popIn(Double(i) * 0.03) }
@@ -173,7 +171,10 @@ struct WorldsView: View {
         let shape = RoundedRectangle(cornerRadius: st.s(Toy.rXl * f), style: .continuous)
         return Button { if open { app.go(.world(w)) } } label: {
             ZStack(alignment: .topLeading) {
-                Rectangle().fill(open ? AnyShapeStyle(LinearGradient(colors: look.skyColors, startPoint: .top, endPoint: .bottom)) : AnyShapeStyle(Toy.mute))
+                // a little window into the world, alive; a locked one stands grey and still
+                WorldScene(look: look, horizon: 0.74, compact: true)
+                    .saturation(open ? 1 : 0).opacity(open ? 1 : 0.55)
+                    .background(Toy.mute)
                 VStack(spacing: st.s(10 * f)) {
                     look.iconImage?.resizable().scaledToFit().frame(width: st.s(84 * f), height: st.s(84 * f))
                         .frame(width: st.s(116 * f), height: st.s(116 * f))
@@ -192,8 +193,9 @@ struct WorldsView: View {
             }
             .frame(width: st.s(200 * f), height: st.s(248 * f))
             .clipShape(shape)
+            .overlay(Gloss(shape: shape).opacity(0.6))
             .overlay(shape.strokeBorder(open ? Toy.surfaceLine : Toy.muteLine, lineWidth: st.s(6)))
-            .background(shape.fill(Toy.shadow.opacity(0.14)).offset(y: st.s(6)))
+            .shadow(color: Toy.shadow.opacity(0.3), radius: st.s(10), y: st.s(10))
         }
         .buttonStyle(PressDown(locked: !open))
         .accessibilityLabel("world \(w)")
@@ -227,7 +229,8 @@ struct PressDown: ButtonStyle {
     /// a locked thing boinks and stays put, as on the web
     var locked = false
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.scaleEffect(configuration.isPressed && !reduceMotion && !locked ? 0.96 : 1)
+        configuration.label
+            .scaleEffect(x: configuration.isPressed && !reduceMotion && !locked ? 0.97 : 1, y: configuration.isPressed && !reduceMotion && !locked ? 0.93 : 1, anchor: .bottom)
             .offset(y: configuration.isPressed && !locked ? 4 : 0)
             .animation(.spring(response: 0.18, dampingFraction: 0.6), value: configuration.isPressed)
             .onChange(of: configuration.isPressed) { _, down in
@@ -254,14 +257,7 @@ struct WorldView: View {
         let P = Array(pos.prefix(cs.count))
         let next = cs.firstIndex { c in app.open(course: c) && !app.catalog.holes(course: c).allSatisfy { app.progress.holes[$0.key] != nil } }
         ZStack(alignment: .topLeading) {
-            LinearGradient(stops: [.init(color: look.skyColors[0], location: 0), .init(color: look.skyColors[1], location: 0.62),
-                                   .init(color: look.color(look.felt), location: 0.62), .init(color: look.color(look.felt), location: 1)],
-                           startPoint: .top, endPoint: .bottom).ignoresSafeArea()
-            // the world's emblem scattered faintly, clear of the road's courses (the web's own seeded spots)
-            ForEach(Array(decor(P).enumerated()), id: \.offset) { _, p in
-                look.iconImage?.resizable().scaledToFit().frame(width: st.s(80), height: st.s(80)).opacity(0.22)
-                    .position(x: st.s(p.x + 40), y: st.s(p.y + 40))
-            }
+            WorldScene(look: look, horizon: 0.62).ignoresSafeArea()
             // the road: a wide tan band with a white dotted line down its middle
             let road = Path { p in
                 p.move(to: st.pt(80, st.h * 0.8))
@@ -303,19 +299,6 @@ struct WorldView: View {
         }
     }
 
-    /// the web's scenery spots: rng32(w * 97), 8 places clear of the courses and each other
-    private func decor(_ P: [CGPoint]) -> [CGPoint] {
-        let r = Noise.rng32(UInt32(world * 97))
-        var spots: [CGPoint] = []
-        var i = 0
-        while i < 300 && spots.count < 8 {
-            let x = 40 + r() * 1080 * Double(st.w / 1200), y = 120 + r() * 520 * Double(st.h / 700)
-            if P.allSatisfy({ hypot(x + 40 - $0.x, y + 40 - $0.y) > 190 }) && spots.allSatisfy({ hypot(x - $0.x, y - $0.y) > 120 }) { spots.append(CGPoint(x: x, y: y)) }
-            i += 1
-        }
-        return spots
-    }
-
     private func courseNode(_ c: Int, _ k: Int) -> some View {
         let open = app.open(course: c), hs = app.catalog.holes(course: c)
         let done = hs.allSatisfy { app.progress.holes[$0.key] != nil }
@@ -325,9 +308,10 @@ struct WorldView: View {
             Text("\(k + 1)").font(.system(size: st.s(80), weight: .black, design: .rounded))
                 .foregroundStyle(open && !done ? .white : (open ? Toy.inkStrong : Toy.inkSoft))
                 .frame(width: st.s(168), height: st.s(168))
-                .background(Circle().fill(kind.face))
+                .background(ZStack { Circle().fill(kind.face); Gloss(shape: Circle()).padding(st.s(8)) })
                 .overlay(Circle().strokeBorder(kind.rim, lineWidth: st.s(6)))
                 .background(Circle().fill(kind.down).offset(y: st.s(8)))
+                .shadow(color: Toy.shadow.opacity(0.3), radius: st.s(10), y: st.s(12))
                 .overlay(alignment: .topTrailing) { if !open { Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(44)).offset(x: st.s(6), y: -st.s(6)) } }
                 .overlay(alignment: .bottomLeading) {
                     if open && crazy > 0 {
@@ -362,7 +346,7 @@ struct MapView: View {
         let rowY = [st.h * 310 / 700, st.h * 550 / 700], dx = (st.w - 260) / 8
         let pts: [CGPoint] = holes.indices.map { i in i < 9 ? CGPoint(x: 130 + CGFloat(i) * dx, y: rowY[0]) : CGPoint(x: st.w - 130 - CGFloat(i - 9) * dx, y: rowY[1]) }
         ZStack(alignment: .topLeading) {
-            SkyBackground(colors: app.progress.neon ? [Color(hex: "#1d2550"), Color(hex: "#3b4a86")] : look.skyColors)
+            WorldScene(look: look, horizon: 0.6).ignoresSafeArea()
             Path { p in p.addLines(pts.map { st.pt($0.x, $0.y) }) }
                 .stroke(Toy.surfaceLine, style: StrokeStyle(lineWidth: st.s(22), lineCap: .round, lineJoin: .round, dash: [st.s(2), st.s(34)]))
             ForEach(Array(holes.enumerated()), id: \.offset) { i, h in
@@ -412,9 +396,10 @@ struct MapView: View {
         return Button { if open { app.go(.hole(h.key)) } } label: {
             Text("\(i + 1)").font(Toy.font(40, st)).foregroundStyle(open ? (rec == nil ? .white : Toy.inkStrong) : Toy.inkSoft)
                 .frame(width: st.s(88), height: st.s(88))
-                .background(Circle().fill(kind.face))
+                .background(ZStack { Circle().fill(kind.face); Gloss(shape: Circle()).padding(st.s(5)) })
                 .overlay(Circle().strokeBorder(crazy && open ? Toy.redLine : kind.rim, lineWidth: st.s(4)))
                 .background(Circle().fill(kind.down).offset(y: st.s(6)))
+                .shadow(color: Toy.shadow.opacity(0.28), radius: st.s(6), y: st.s(8))
                 .overlay(alignment: .top) {
                     if let rec { HStack(spacing: st.s(2)) { ForEach(0..<3) { k in StarView(on: k < rec.stars).frame(width: st.s(22)) } }.offset(y: -st.s(28)) }
                 }

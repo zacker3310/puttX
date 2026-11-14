@@ -17,7 +17,7 @@ struct CardView: View {
         let total = holes.reduce(0) { $0 + (app.progress.holes[$1.key]?.best ?? $1.par) }, par = holes.reduce(0) { $0 + $1.par }
         let diff = total - par
         ZStack(alignment: .topLeading) {
-            SkyBackground(colors: app.look(course).skyColors)
+            WorldScene(look: app.look(course), horizon: 0.7).ignoresSafeArea()
             VStack(spacing: st.s(18)) {
                 ForEach(Array(stride(from: 0, to: holes.count, by: 9)), id: \.self) { k in nine(Array(holes[k..<min(k + 9, holes.count)]), from: k) }
                 HStack(spacing: st.s(24)) {

@@ -10,7 +10,7 @@ import PuttXCore
 final class HolePlay {
     /// aim, then the putt (roll, or drift when a mover shoves a resting ball); a holed ball sinks (a
     /// ball at the stroke cap is rolled in first), then the hole is done
-    enum Phase: Equatable { case aim, roll, drift, auto, sinking, done }
+    enum Phase: Equatable { case aim, roll, drift, auto, sinking, replay, done }
 
     let hole: Hole
     let look: CourseLook
@@ -88,6 +88,46 @@ final class HolePlay {
     /// the lost ball was just picked up (the HUD's pop)
     private(set) var lostPop = false
     @ObservationIgnored var onLost: (() -> Void)?
+    /// what the effects layer should show (PlayFX drains it each frame)
+    enum Fx { case squash, puff(kind: String, at: SIMD3<Double>, n: Int), shake(Double), sinkRing, burst(at: SIMD3<Double>, n: Int) }
+    @ObservationIgnored var fx: [Fx] = []
+    /// the ace replay: the same putt again from a low angle beside its line, at 70% speed; a tap skips
+    @ObservationIgnored private var wantReplay = false
+    struct Replay { var ball: Ball; var t: Double; var acc = 0.0; var done = false; var end = 0.0; let side: Double }
+    private(set) var replay: Replay?
+    private func startReplay() {
+        guard let e = log.first else { return }
+        var b = Ball(hole, hole.tee.x, hole.tee.z); b.launch(e[0], e[1])
+        replay = Replay(ball: b, t: e[2], side: Bool.random() ? 1 : -1)
+        ball = b; hitsHeard = 0
+        phase = .replay
+    }
+    private func stepReplay(_ dt: Double) {
+        guard var r = replay else { return }
+        r.acc += dt * 0.7
+        while r.acc >= Sim.SIM_DT && !r.done {
+            r.acc -= Sim.SIM_DT
+            if hole.step(&r.ball, r.t) != nil { r.done = true }
+            r.t += Sim.SIM_DT
+        }
+        hear(r.ball.hits)
+        if r.done {
+            r.end += dt
+            let k = min(1, r.end / 0.22), dx = r.ball.x - hole.cup.x, dz = r.ball.z - hole.cup.z, d = max(1e-9, hypot(dx, dz)), rr = Sim.CUP_R - Sim.BALL_R - 0.006
+            let rx = hole.cup.x - dx / d * rr * 0.6, rz = hole.cup.z - dz / d * rr * 0.6
+            r.ball.x += (rx - r.ball.x) * k; r.ball.z += (rz - r.ball.z) * k
+            r.ball.y = hole.groundH(hole.cup.x, hole.cup.z) - (Sim.CUP_SINK - 0.004) * k * k
+        }
+        replay = r; ball = r.ball
+        if r.done && r.end > 0.9 { endReplay() }
+    }
+    /// any tap ends the replay
+    func endReplay() {
+        guard phase == .replay else { return }
+        replay = nil
+        phase = .done
+        onFinish?(round.score ?? Scoring.cap(hole))
+    }
     /// the goals met at the finish (bits), and which were new
     var goals: (all: Int, fresh: Int)?
     /// pass and play: no mulligans; the ball wears the player's colour
@@ -205,6 +245,7 @@ final class HolePlay {
         var dt = min(dt0, 0.1)
         ambience(dt)
         if let t = intro { intro = t + dt < HolePlay.introLength ? t + dt : nil; if intro == nil { banner = false } }
+        if phase == .replay { time += dt; stepReplay(dt); return }
         if phase == .auto || phase == .sinking {
             time += dt   // the movers keep turning
             if phase == .auto { stepAuto(dt) } else { stepSink(dt) }
@@ -256,17 +297,23 @@ final class HolePlay {
             case .wall, .post:
                 if phase == .roll { touched = true }
                 once(.wall) { SFX.clonk(h.v, wall: wallKind); Haptics.knock(h.v) }
-            case .bump, .mover: once(.bump) { SFX.boing(h.v); Haptics.knock(h.v) }
+                if h.v > 0.8 { fx.append(.squash) }
+            case .bump, .mover: once(.bump) { SFX.boing(h.v); Haptics.knock(h.v) }; if h.v > 0.8 { fx.append(.squash) }
             case .lip: SFX.lip(); Haptics.knock(1)
             case .rattle: once(.rattle) { SFX.rattle(min(1, h.v)) }
-            case .land: once(.land) { SFX.land(h.v) }
-            case .splash: SFX.splash()
+            case .land:
+                once(.land) { SFX.land(h.v) }
+                if h.v > 0.8 { fx.append(.squash); fx.append(.puff(kind: "dust", at: ballAt, n: min(14, Int(4 + h.v * 4)))) }
+                if h.v > 1.6 { fx.append(.shake(min(1, h.v / 4))) }
+            case .splash: SFX.splash(); fx.append(.puff(kind: "water", at: ballAt, n: 22))
             case .tubeIn: SFX.tube()
-            case .tubeOut: SFX.tubeOut()
+            case .tubeOut: SFX.tubeOut(); fx.append(.puff(kind: "dust", at: ballAt, n: 8))
             }
         }
         hitsHeard = hits.count
     }
+
+    private var ballAt: SIMD3<Double> { SIMD3(ball.x, ball.y, ball.z) }
 
     /// the course's quiet soundscape: birds by day, crickets by night, now and then
     @ObservationIgnored var birds = 0.6
@@ -286,7 +333,11 @@ final class HolePlay {
         switch lastOutcome {
         case .sunk?:
             SFX.cup(); Haptics.cup()
-            if round.score == 1 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { SFX.fanfare() } }
+            if round.score == 1 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { SFX.fanfare() }
+                fx.append(.burst(at: SIMD3(hole.cup.x, hole.groundH(hole.cup.x, hole.cup.z) + 0.1, hole.cup.z), n: 120))
+                wantReplay = !reduceMotion && log.count == 1 && !party
+            }
             if lastOfCourse { let ace = round.score == 1; DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: ace) } }
             startSink(vx: r.ball.vx, vz: r.ball.vz)
             return
@@ -388,7 +439,11 @@ final class HolePlay {
             if k.y < floorY {
                 k.y = floorY
                 if k.vy < -0.3 {
-                    if !k.floor { k.floor = true; SFX.plunk(); Haptics.knock(2) }
+                    if !k.floor {
+                        k.floor = true; SFX.plunk(); Haptics.knock(2)
+                        fx.append(.sinkRing); fx.append(.shake(0.18))
+                        fx.append(.burst(at: SIMD3(hole.cup.x, hole.groundH(hole.cup.x, hole.cup.z) + 0.04, hole.cup.z), n: 45))
+                    }
                     k.vy = -k.vy * 0.32
                 } else { k.vy = 0 }
                 k.vx *= 1 - min(1, 4 * d); k.vz *= 1 - min(1, 4 * d)
@@ -402,6 +457,7 @@ final class HolePlay {
         sinkT += dt
         if sinkT > 1.45 || (k.gone && k.y < floorY - 0.12) {
             sink = nil
+            if wantReplay { wantReplay = false; startReplay(); return }
             phase = .done
             onFinish?(round.score ?? Scoring.cap(hole))
         }

@@ -99,6 +99,8 @@ function grabHole(key) {
     if (uses(99)) for (const o of G.children) if (o.userData.c99spin) o.children.forEach((c, i) => { if (c.material && c.material.emissive && i > 0) A.mats.push({ m: c.material, p: 'ei', ch: [0.5, 0, 0.5, 3, -i * 0.6], relu: 1 }); });
     G.traverse(o => { if (o.userData.weed && o.userData.mover) A.weeds.add(o.userData.weed); });
   }
+  /* the flagstick: its own rig (no formula), so the app can lift it out of the cup as a ball nears */
+  if (typeof flagGroup !== 'undefined' && flagGroup && flagGroup.parent) { let r = A.objs.get(flagGroup); if (!r) A.objs.set(flagGroup, r = { ch: {} }); r.name = 'flag'; }
   const chan = (c, t, relu) => { let v = c[0] + c[1] * t; for (let i = 2; i < c.length; i += 3) { const s = Math.sin(c[i + 1] * t + c[i + 2]); v += c[i] * (relu ? Math.max(0, s) : s); } return v; };
   /* the particle drifts, in closed form (the tick integrates them frame by frame) */
   const ptAt = (k, p0, i, t, rate) => {
@@ -188,7 +190,7 @@ function grabHole(key) {
       if (rec) px.copy(rec.o.matrixWorld).invert();
       px.multiply(o.parent.matrixWorld);
       if (o.rotation.order !== 'XYZ') warn.push('anim rotation order ' + o.rotation.order);
-      rec = { o, out: { up: rec ? anims.indexOf(rec.out) : -1, px: Array.from(px.elements, r6), b: [...o.position.toArray(), o.rotation.x, o.rotation.y, o.rotation.z, ...o.scale.toArray()].map(r6), ch: sp.ch, vis: sp.vis || null, parts: [] } };
+      rec = { o, out: { up: rec ? anims.indexOf(rec.out) : -1, px: Array.from(px.elements, r6), b: [...o.position.toArray(), o.rotation.x, o.rotation.y, o.rotation.z, ...o.scale.toArray()].map(r6), ch: sp.ch, vis: sp.vis || null, name: sp.name || null, parts: [] } };
       anims.push(rec.out);
     }
     if (o.isInstancedMesh) {

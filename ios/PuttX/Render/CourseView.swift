@@ -29,6 +29,7 @@ struct CourseView: UIViewRepresentable {
         let play: HolePlay
         private var rig: CourseRig?
         private let props = PlayProps()
+        private var fx: PlayFX?
         private weak var view: ARView?
         private let camera = PerspectiveCamera()
         private var anchor = AnchorEntity(world: .zero)
@@ -49,6 +50,9 @@ struct CourseView: UIViewRepresentable {
                 anchor.addChild(r.root)
                 props.wear(putter: play.gear.putter, ball: play.gear.ball, tint: play.ballTint)
                 anchor.addChild(props.root)
+                let f = PlayFX(flag: r.anim.named("flag"))
+                anchor.addChild(f.root)
+                fx = f
                 rig = r
                 view = v
                 // the sky, once it is made: the backdrop and the image-based light
@@ -75,6 +79,8 @@ struct CourseView: UIViewRepresentable {
             let h = play.hole, b = play.ball, t = play.time
             // the ball, the putter, the aim line and the power ring
             props.update(play, now: CACurrentMediaTime())
+            let right = camera.transform.matrix.columns.0
+            fx?.update(play, dt: dt, ball: props.ball, cameraRight: SIMD3(right.x, right.y, right.z), skirt: play.look.skirt)
             // the movers, posed as updateMovers poses them
             for (e, m) in rig.movers {
                 let s = m.state(at: t)
@@ -108,7 +114,10 @@ struct CourseView: UIViewRepresentable {
                 camPos = camPos! + (goal.pos - camPos!) * k
                 camLook = camLook! + (goal.look - camLook!) * k
             }
-            camera.look(at: camLook!, from: camPos!, relativeTo: nil)
+            // a heavy landing shakes the camera a little
+            let sh = Float(fx?.shake ?? 0), tt = Float(play.time)
+            let jolt = sh > 0.01 ? SIMD3(sin(tt * 90) * 0.03 * sh, cos(tt * 77) * 0.02 * sh, 0) : .zero
+            camera.look(at: camLook! + jolt, from: camPos! + jolt, relativeTo: nil)
             // the ground's fog is measured from the camera
             if let g = rig.ground, var m = g.model?.materials.first as? CustomMaterial {
                 let c = camPos!
@@ -149,6 +158,12 @@ struct CourseView: UIViewRepresentable {
                 return (a.0 + (c.0 - a.0) * kk, a.1 + (c.1 - a.1) * kk)
             }
             if play.overview { return overviewGoal(h) }
+            // the ace replay: low, beside the ball's path, looking across it
+            if play.phase == .replay, let r = play.replay {
+                let b = r.ball, v = hypot(b.vx, b.vz), ux = v > 0.05 ? b.vx / v : 0, uz = v > 0.05 ? b.vz / v : 1
+                let x = b.x - uz * 0.9 * r.side - ux * 0.5, z = b.z + ux * 0.9 * r.side - uz * 0.5
+                return (SIMD3(Float(x), Float(max(b.y, h.groundH(x, z)) + 0.35), Float(z)), SIMD3(Float(b.x), Float(b.y + 0.05), Float(b.z)))
+            }
             return aimGoal()
         }
         private func overviewGoal(_ h: Hole) -> (SIMD3<Float>, SIMD3<Float>) {

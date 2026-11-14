@@ -187,3 +187,16 @@ struct DailyButton: View {
         .onAppear { if !reduceMotion { withAnimation(.linear(duration: 14).repeatForever(autoreverses: false)) { turn = true } } }
     }
 }
+
+/// the replay's tag: a ball in a ring, on red
+struct ReplayTag: View {
+    var body: some View {
+        Canvas { ctx, s in
+            let k = s.width / 64
+            ctx.fill(Path(ellipseIn: CGRect(x: 0, y: 0, width: 64 * k, height: 64 * k)), with: .color(Toy.red))
+            ctx.fill(Path(ellipseIn: CGRect(x: 18 * k, y: 18 * k, width: 28 * k, height: 28 * k)), with: .color(.white))
+            ctx.stroke(Path(ellipseIn: CGRect(x: 8 * k, y: 8 * k, width: 48 * k, height: 48 * k)), with: .color(.white), lineWidth: 5 * k)
+        }
+        .aspectRatio(1, contentMode: .fit).accessibilityLabel("replay")
+    }
+}

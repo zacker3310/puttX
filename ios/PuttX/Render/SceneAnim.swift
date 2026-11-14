@@ -35,6 +35,8 @@ struct SceneAnim: Decodable {
     let ch: [String: Channel]
     /// blinking: shown while sin(f * t + p) > threshold
     let vis: [Double]?
+    /// a rig the game drives itself ("flag": the flagstick)
+    let name: String?
     let parts: [SceneNode]
 }
 struct SceneMatAnim: Decodable {
@@ -68,6 +70,9 @@ final class SceneAnimator {
     private var weeds: [Weed] = []
     private var lastT: Double?
 
+    /// a named rig's entity (the flagstick), which the game poses itself
+    func named(_ n: String) -> Entity? { rigs.first { $0.a.name == n }?.e }
+
     var isEmpty: Bool { rigs.isEmpty && mats.isEmpty && clouds.isEmpty && weeds.isEmpty }
 
     /// the animated objects as entities under `root`, each carrying its meshes
@@ -95,7 +100,7 @@ final class SceneAnimator {
     func update(_ t: Double) {
         let dt = lastT.map { max(0, min(0.1, t - $0)) } ?? 0
         lastT = t
-        for i in rigs.indices { pose(i, t) }
+        for i in rigs.indices where rigs[i].a.name == nil { pose(i, t) }
         for i in mats.indices { paint(i, t) }
         for c in clouds { c.update(t) }
         for i in weeds.indices { roll(i, t, dt) }

@@ -99,6 +99,12 @@ struct HoleView: View {
                         .transition(.scale.combined(with: .opacity))
                         .onTapGesture { withAnimation { play.skipIntro() } }
                 }
+                // the ace replay: a tag, and any tap skips it
+                if play.phase == .replay {
+                    Color.clear.contentShape(Rectangle()).onTapGesture { play.endReplay() }
+                        .accessibilityAddTraits(.isButton).accessibilityLabel("skip replay")
+                    ReplayTag().frame(width: st.s(64), height: st.s(64)).position(x: geo.size.width / 2, y: st.s(24 + 44)).allowsHitTesting(false)
+                }
                 if app.party != nil {
                     PartyChip(p: app.party!.player).position(x: st.s(452 + 50), y: st.s(30 + 38))
                     PartyOverlay(key: play.hole.key).frame(width: geo.size.width, height: geo.size.height)

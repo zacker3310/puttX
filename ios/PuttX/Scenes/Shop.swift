@@ -4,6 +4,7 @@
 // colours. One big button buys (coins, a lock when short) or equips. Wordless.
 import SwiftUI
 import RealityKit
+import Combine
 import PuttXCore
 
 struct ShopView: View {

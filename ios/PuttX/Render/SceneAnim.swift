@@ -207,7 +207,7 @@ final class PointCloud {
             for p in 0..<pts.count { for (k, f) in Self.faces.enumerated() { out[p * 24 + k] = f + UInt32(p * 6) } }
         }
         var m = UnlitMaterial(color: SceneStore.color(c.color))
-        if c.opacity < 1 { m.blending = .transparent(opacity: .init(floatLiteral: Float(c.opacity))) }
+        if c.opacity < 1 { m.blending = .transparent(opacity: .init(floatLiteral: Float(c.opacity))); m.writesDepth = false }
         entity = ModelEntity(mesh: try MeshResource(from: mesh), materials: [m])
         write(0)
     }

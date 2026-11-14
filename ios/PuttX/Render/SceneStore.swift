@@ -222,7 +222,7 @@ final class SceneStore {
         if m.type == "MeshBasicMaterial" {
             var u = UnlitMaterial(color: SceneStore.color(base))
             if let t = m.map, let p = try? param(t) { u.color = .init(tint: SceneStore.color(base), texture: p) }
-            if m.transparent { u.blending = .transparent(opacity: .init(floatLiteral: Float(m.opacity))) }
+            if m.transparent { u.blending = .transparent(opacity: .init(floatLiteral: Float(m.opacity))); u.writesDepth = m.depthWrite }
             if m.alphaTest > 0 { u.opacityThreshold = Float(m.alphaTest) }
             u.faceCulling = m.side == "double" ? .none : m.side == "back" ? .front : .back
             return u
@@ -241,7 +241,10 @@ final class SceneStore {
         }
         if let s = m.sheen, s > 0, let c = m.sheenColor { p.sheen = .init(tint: SceneStore.color(c, s)) }
         if let c = m.clearcoat, c > 0 { p.clearcoat = .init(floatLiteral: Float(c)); p.clearcoatRoughness = .init(floatLiteral: Float(m.clearcoatRoughness ?? 0)) }
-        if m.transparent { p.blending = .transparent(opacity: .init(floatLiteral: Float(m.opacity))) }
+        // a see-through decal, glow or ring keeps out of the depth buffer as on the web, so it never cuts
+        // into the movers, the ball or the other glass behind it (opaque ones rely on three's draw order,
+        // which RealityKit has no say in, so they keep writing)
+        if m.transparent { p.blending = .transparent(opacity: .init(floatLiteral: Float(m.opacity))); p.writesDepth = m.depthWrite }
         if m.alphaTest > 0 { p.opacityThreshold = Float(m.alphaTest) }
         p.faceCulling = m.side == "double" ? .none : m.side == "back" ? .front : .back
         // the pin flag waves (still under reduced motion, as the web's FX clock stops)

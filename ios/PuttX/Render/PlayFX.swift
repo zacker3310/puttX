@@ -32,7 +32,7 @@ final class PlayFX {
     init(flag: Entity?, night: Bool = false) {
         self.flag = flag; self.night = night
         if let f = flag { flagBase = f.position }
-        func unlit(_ c: UIColor, _ o: Float = 1) -> UnlitMaterial { var m = UnlitMaterial(color: c); m.blending = .transparent(opacity: .init(floatLiteral: o)); m.faceCulling = .none; return m }
+        func unlit(_ c: UIColor, _ o: Float = 1) -> UnlitMaterial { var m = UnlitMaterial(color: c); m.blending = .transparent(opacity: .init(floatLiteral: o)); m.faceCulling = .none; m.writesDepth = false; return m }
         let dot = MeshResource.generateSphere(radius: Float(Sim.BALL_R * 0.55))
         for _ in 0..<30 { let e = ModelEntity(mesh: dot, materials: [unlit(UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1))]); e.isEnabled = false; trail.append(Bit(e: e)); root.addChild(e) }
         let paper = MeshResource.generatePlane(width: 0.045, height: 0.028)

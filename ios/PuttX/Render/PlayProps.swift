@@ -50,17 +50,17 @@ final class PlayProps {
         gm.emissiveColor = .init(color: UIColor(red: 0.35, green: 0.23, blue: 0, alpha: 1)); gm.emissiveIntensity = 1
         gold = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R * 0.9)), materials: [gm])
         var rm = UnlitMaterial(color: UIColor(red: 1, green: 0.91, blue: 0.63, alpha: 1))
-        rm.blending = .transparent(opacity: 0.7); rm.faceCulling = .none
+        rm.blending = .transparent(opacity: 0.7); rm.faceCulling = .none; rm.writesDepth = false
         goldRing = ModelEntity(mesh: PlayProps.annulus(inner: Float(Sim.BALL_R * 1.3), outer: Float(Sim.BALL_R * 1.75)), materials: [rm])
         goldRing.position.y = 0.004
         lost.addChild(gold); lost.addChild(goldRing)
         var ghm = UnlitMaterial(color: UIColor(red: 0.75, green: 0.9, blue: 0.96, alpha: 1))
-        ghm.blending = .transparent(opacity: 0.45)
+        ghm.blending = .transparent(opacity: 0.45); ghm.writesDepth = false
         ghost = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R)), materials: [ghm])
 
         var sm = UnlitMaterial(color: .black)
         if let t = try? TextureResource.generate(from: PlayProps.softDisc(), options: .init(semantic: .color)) { sm.color = .init(tint: .white, texture: .init(t)) }
-        sm.blending = .transparent(opacity: 1.0)
+        sm.blending = .transparent(opacity: 1.0); sm.writesDepth = false
         shadow = ModelEntity(mesh: .generatePlane(width: Float(Sim.BALL_R * 2.5), depth: Float(Sim.BALL_R * 2.5)), materials: [sm])
 
         // the putter: a blade head with a sight line, the shaft rising from the heel toward the hands
@@ -145,7 +145,7 @@ final class PlayProps {
             m.emissiveColor = .init(color: UIColor(red: 0.6, green: 0.6, blue: 0.69, alpha: 1)); m.emissiveIntensity = 1
             ball.model?.materials = [m]
         }
-        var h = UnlitMaterial(color: UIColor(red: 0.85, green: 0.96, blue: 1, alpha: 1)); h.blending = .transparent(opacity: 0.18)
+        var h = UnlitMaterial(color: UIColor(red: 0.85, green: 0.96, blue: 1, alpha: 1)); h.blending = .transparent(opacity: 0.18); h.writesDepth = false
         let halo = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R * 2.6)), materials: [h])
         ball.addChild(halo)
     }
@@ -227,15 +227,16 @@ final class PlayProps {
             pos.append(SIMD3(Float(p.x - sx * w), Float(p.y), Float(p.z - sz * w)))
             if i < m - 1 { let k = UInt32(i * 2); idx += [k, k + 1, k + 2, k + 1, k + 3, k + 2] }
         }
-        // the arrowhead, along the last heading
-        let p = pts[m - 1], (sx, sz) = side(m - 1), ux = -sz, uz = sx, k = UInt32(pos.count)
-        pos.append(SIMD3(Float(p.x + sx * w * 3.5), Float(p.y), Float(p.z + sz * w * 3.5)))
-        pos.append(SIMD3(Float(p.x - sx * w * 3.5), Float(p.y), Float(p.z - sz * w * 3.5)))
-        pos.append(SIMD3(Float(p.x + ux * 0.06), Float(p.y), Float(p.z + uz * 0.06)))
+        // the arrowhead, along the last heading: no wider than the ball and ending where it would, so a
+        // line that runs out against a rail never pokes into it
+        let p = pts[m - 1], (sx, sz) = side(m - 1), ux = -sz, uz = sx, k = UInt32(pos.count), hw = Sim.BALL_R
+        pos.append(SIMD3(Float(p.x + sx * hw - ux * 0.035), Float(p.y), Float(p.z + sz * hw - uz * 0.035)))
+        pos.append(SIMD3(Float(p.x - sx * hw - ux * 0.035), Float(p.y), Float(p.z - sz * hw - uz * 0.035)))
+        pos.append(SIMD3(Float(p.x + ux * 0.01), Float(p.y), Float(p.z + uz * 0.01)))
         idx += [k, k + 1, k + 2]
         if ribbonMesh == nil, let lm = PlayProps.liveMesh(vertices: PlayProps.RIBBON_PTS * 2 + 3, indices: (PlayProps.RIBBON_PTS - 1) * 6 + 3), let mesh = try? MeshResource(from: lm) {
             var mat = UnlitMaterial(color: UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1))
-            mat.blending = .transparent(opacity: 0.9); mat.faceCulling = .none
+            mat.blending = .transparent(opacity: 0.9); mat.faceCulling = .none; mat.writesDepth = false
             ribbon.model = ModelComponent(mesh: mesh, materials: [mat])
             ribbonMesh = lm
         }
@@ -267,7 +268,7 @@ final class PlayProps {
         if hot != ringHot {
             ringHot = hot
             var mat = UnlitMaterial(color: hot ? UIColor(red: 0.94, green: 0.49, blue: 0.43, alpha: 1) : UIColor(red: 1, green: 0.84, blue: 0.43, alpha: 1))
-            mat.blending = .transparent(opacity: 0.95); mat.faceCulling = .none
+            mat.blending = .transparent(opacity: 0.95); mat.faceCulling = .none; mat.writesDepth = false
             ring.model?.materials = [mat]
         }
         if let lm = ringMesh { PlayProps.write(lm, pos, idx) }
@@ -339,7 +340,7 @@ final class PlayProps {
                 var dd = d; dd.primitives = .triangles(bi); dd.materials = .allFaces(UInt32(mats.count))
                 let i = bi[0], c = col[Int(i)]
                 var m = UnlitMaterial(color: UIColor(red: CGFloat(c.x), green: CGFloat(c.y), blue: CGFloat(c.z), alpha: 1))
-                m.blending = .transparent(opacity: 0.85); m.faceCulling = .none
+                m.blending = .transparent(opacity: 0.85); m.faceCulling = .none; m.writesDepth = false
                 mats.append(m); parts.append(dd)
             }
             guard let mesh = try? MeshResource.generate(from: parts) else { return }
@@ -380,7 +381,7 @@ final class PlayProps {
         for (k, idx) in band.enumerated() where !idx.isEmpty {
             var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx); d.materials = .allFaces(UInt32(mats.count))
             var m = UnlitMaterial(color: UIColor(red: CGFloat(cols[k].x), green: CGFloat(cols[k].y), blue: CGFloat(cols[k].z), alpha: 1))
-            m.blending = .transparent(opacity: 0.8); m.faceCulling = .none
+            m.blending = .transparent(opacity: 0.8); m.faceCulling = .none; m.writesDepth = false
             parts.append(d); mats.append(m)
         }
         if let mesh = try? MeshResource.generate(from: parts) { tracer.model = ModelComponent(mesh: mesh, materials: mats) }

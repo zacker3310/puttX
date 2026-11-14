@@ -93,8 +93,10 @@ final class PlayProps {
         let simDt = min(0.1, max(0, play.time - (lastSimTime ?? play.time)))
         lastSimTime = play.time
         let w = SIMD3(Float(b.wx), Float(b.wy), Float(b.wz)), wl = simd_length(w)
-        if (play.phase == .roll || play.phase == .drift) && wl > 1e-6 {
-            ball.orientation = simd_quatf(angle: wl * Float(simDt), axis: w / wl) * ball.orientation
+        // the ace replay turns it too, at the replay's 70% pace (the hole clock runs at full speed there)
+        let spinDt = play.phase == .replay ? simDt * 0.7 : simDt
+        if (play.phase == .roll || play.phase == .drift || (play.phase == .replay && play.replay?.done == false)) && wl > 1e-6 {
+            ball.orientation = simd_quatf(angle: wl * Float(spinDt), axis: w / wl) * ball.orientation
         }
         let d = play.drawBall
         ball.position = SIMD3(Float(d.x), Float(d.y + Sim.BALL_R), Float(d.z))

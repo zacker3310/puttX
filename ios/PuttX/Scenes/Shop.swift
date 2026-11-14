@@ -32,8 +32,8 @@ struct ShopView: View {
 
     var body: some View {
         ZStack {
-            Toy.surface.ignoresSafeArea()
-            Dots().ignoresSafeArea()
+            // the shop stands out in the first world, under its striped awning
+            WorldScene(look: app.look(app.catalog.allCourses[0]), horizon: 0.82).ignoresSafeArea()
             ZStack(alignment: .topLeading) {
                 Color.clear
                 awning.frame(width: st.s(400), height: st.s(100)).offset(x: st.s(436))
@@ -70,7 +70,10 @@ struct ShopView: View {
                 ctx.fill(Path(CGRect(x: CGFloat(i) * w, y: 0, width: w, height: size.height * 0.64)), with: .color(c))
                 ctx.fill(Path(ellipseIn: CGRect(x: CGFloat(i) * w, y: size.height * 0.64 - w / 2, width: w, height: w)), with: .color(c))
             }
+            // the canvas catches the light along its top
+            ctx.fill(Path(CGRect(x: 0, y: 0, width: size.width, height: size.height * 0.3)), with: .linearGradient(Gradient(colors: [.white.opacity(0.35), .white.opacity(0)]), startPoint: .zero, endPoint: CGPoint(x: 0, y: size.height * 0.3)))
         }
+        .shadow(color: Toy.shadow.opacity(0.3), radius: st.s(6), y: st.s(8))
         .allowsHitTesting(false).accessibilityHidden(true)
     }
     private var wallet: some View {
@@ -81,7 +84,9 @@ struct ShopView: View {
             Text("\(app.progress.mulligans)").font(Toy.font(40, st)).foregroundStyle(Toy.inkStrong)
         }
         .padding(.horizontal, st.s(18)).frame(height: st.s(76))
-        .background(Capsule().fill(Toy.surface)).overlay(Capsule().strokeBorder(Toy.surfaceLine, lineWidth: st.s(4)))
+        .background(ZStack { Capsule().fill(Toy.surface); Gloss(shape: Capsule()).padding(st.s(4)) })
+        .overlay(Capsule().strokeBorder(Toy.surfaceLine, lineWidth: st.s(4)))
+        .shadow(color: Toy.shadow.opacity(0.28), radius: st.s(8), y: st.s(9))
         .modifier(Shake(n: shake))
         .accessibilityElement(children: .ignore).accessibilityLabel("\(app.progress.coins) coins, \(app.progress.mulligans) mulligans")
     }
@@ -112,7 +117,7 @@ struct ShopView: View {
                     else { ShopPreview(id: current, ball: app.progress.equipped["ball"] ?? "b1").id(current + (app.progress.equipped["ball"] ?? "")) }
                 }
                 .frame(width: st.s(340), height: st.s(previewH))
-                .background(Color(hex: "#dff0f5"))
+                .background(RadialGradient(colors: [Color(hex: "#ffffff"), Color(hex: "#d6eef6"), Color(hex: "#a9d3e3")], center: UnitPoint(x: 0.5, y: 0.25), startRadius: 0, endRadius: st.s(260)))
                 .clipShape(RoundedRectangle(cornerRadius: st.s(Toy.rLg), style: .continuous))
                 .scaleEffect(nudge % 2 == 1 ? 1.03 : 1)
                 .padding(.top, st.s(10))
@@ -123,6 +128,7 @@ struct ShopView: View {
         }
         .overlay(shape.strokeBorder(Toy.surfaceLine, lineWidth: st.s(5)))
         .background(shape.fill(Toy.surfaceDown).offset(y: st.s(6)))
+        .shadow(color: Toy.shadow.opacity(0.3), radius: st.s(12), y: st.s(12))
     }
     @ViewBuilder private var stats: some View {
         if tab == .putter, let it = shop.putter(current), let eq = shop.putter(app.progress.equipped["putter"] ?? "p1") {
@@ -212,8 +218,12 @@ struct ShopView: View {
                 }
                 .frame(height: st.s(gridH - 72))
                 .background(shape.fill(Toy.surface)).clipShape(shape)
+                .overlay(Gloss(shape: shape).opacity(0.5))
                 .overlay(shape.strokeBorder(selected ? Toy.blueLine : Toy.surfaceLine, lineWidth: st.s(5)))
                 .background(shape.fill(selected ? Toy.blueDown : Toy.surfaceDown).offset(y: st.s(6)))
+                .shadow(color: selected ? Toy.blue.opacity(0.7) : Toy.shadow.opacity(0.25), radius: st.s(selected ? 14 : 7), y: st.s(selected ? 4 : 8))
+                .scaleEffect(selected ? 1.04 : 1)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selected)
             }
             .buttonStyle(PressDown()).accessibilityLabel("\(pk.n) mulligans, costs \(pk.price)"))
         }
@@ -236,9 +246,14 @@ struct ShopView: View {
             }
             .frame(height: st.s(cardH))
             .background(shape.fill(Toy.surface)).clipShape(shape)
+            .overlay(Gloss(shape: shape).opacity(0.5))
             .overlay(shape.strokeBorder(selected ? Toy.blueLine : eq ? Toy.yellowLine : Toy.surfaceLine, lineWidth: st.s(5)))
+            .overlay { if price >= shop.premium { PremiumRim(shape: shape, width: st.s(5)) } }
             .overlay(alignment: .topTrailing) { if price >= shop.premium { Sparkle().frame(width: st.s(30), height: st.s(30)).offset(x: st.s(8), y: -st.s(8)) } }
             .background(shape.fill(selected ? Toy.blueDown : Toy.surfaceDown).offset(y: st.s(6)))
+            .shadow(color: selected ? Toy.blue.opacity(0.7) : Toy.shadow.opacity(0.25), radius: st.s(selected ? 14 : 7), y: st.s(selected ? 4 : 8))
+            .scaleEffect(selected ? 1.05 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: selected)
         }
         .buttonStyle(PressDown())
         .accessibilityLabel((tab == .putter ? "putter " : "ball ") + (eq ? "equipped" : own ? "owned" : "costs \(price)")))
@@ -465,5 +480,19 @@ struct ShopGlyph: View {
             ctx.fill(Path(r(6, 18, 52, 6)), with: .color(Toy.redLine))
         }
         .aspectRatio(1, contentMode: .fit).accessibilityHidden(true)
+    }
+}
+
+/// the rim of a premium item: a rainbow turning slowly round it (still under reduced motion)
+struct PremiumRim<S: InsettableShape>: View {
+    let shape: S
+    let width: CGFloat
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+            let a = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 4) / 4 * 360
+            shape.strokeBorder(AngularGradient(colors: ["#ef7d6d", "#ffd66e", "#74c465", "#6fc0df", "#b58cff", "#ef7d6d"].map(Color.init(hex:)), center: .center, angle: .degrees(a)), lineWidth: width)
+        }
+        .allowsHitTesting(false)
     }
 }

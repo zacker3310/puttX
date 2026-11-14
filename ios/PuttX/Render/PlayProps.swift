@@ -17,6 +17,10 @@ final class PlayProps {
     private let ribbon = ModelEntity()
     private let ring = ModelEntity()
     private var ribbonKey = ""
+    /// the aim line and the power ring change every frame you drag or pull: each is one mesh written in
+    /// place, since a new MeshResource a frame stalls RealityKit's commit on the main thread
+    private var ribbonMesh: LowLevelMesh?, ringMesh: LowLevelMesh?, ringHot: Bool?
+    private static let RIBBON_PTS = 150, RING_SEG = 48
     private var ringFill = -1.0
     private var lastSimTime: Double?
     private var lastNow: CFTimeInterval?
@@ -209,7 +213,7 @@ final class PlayProps {
         let key = "\(pts.count),\(pts[0]),\(pts[pts.count - 1])"
         guard key != ribbonKey else { return }
         ribbonKey = key
-        let w = 0.012, m = pts.count
+        let w = 0.012, m = min(pts.count, PlayProps.RIBBON_PTS)
         func side(_ i: Int) -> (Double, Double) {
             let a = pts[max(0, i - 1)], c = pts[min(m - 1, i + 1)], dx = c.x - a.x, dz = c.z - a.z, d = max(1e-9, hypot(dx, dz))
             return (dz / d, -dx / d)
@@ -227,10 +231,13 @@ final class PlayProps {
         pos.append(SIMD3(Float(p.x - sx * w * 3.5), Float(p.y), Float(p.z - sz * w * 3.5)))
         pos.append(SIMD3(Float(p.x + ux * 0.06), Float(p.y), Float(p.z + uz * 0.06)))
         idx += [k, k + 1, k + 2]
-        var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx)
-        var mat = UnlitMaterial(color: UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1))
-        mat.blending = .transparent(opacity: 0.9); mat.faceCulling = .none
-        if let mesh = try? MeshResource.generate(from: [d]) { ribbon.model = ModelComponent(mesh: mesh, materials: [mat]) }
+        if ribbonMesh == nil, let lm = PlayProps.liveMesh(vertices: PlayProps.RIBBON_PTS * 2 + 3, indices: (PlayProps.RIBBON_PTS - 1) * 6 + 3), let mesh = try? MeshResource(from: lm) {
+            var mat = UnlitMaterial(color: UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1))
+            mat.blending = .transparent(opacity: 0.9); mat.faceCulling = .none
+            ribbon.model = ModelComponent(mesh: mesh, materials: [mat])
+            ribbonMesh = lm
+        }
+        if let lm = ribbonMesh { PlayProps.write(lm, pos, idx) }
     }
 
     // MARK: the power ring
@@ -242,17 +249,26 @@ final class PlayProps {
         ring.position = SIMD3(Float(b.x), Float(b.y + 0.006), Float(b.z))
         guard abs(pw - ringFill) > 0.008 else { return }
         ringFill = pw
-        let r0 = Sim.BALL_R * 1.6, r1 = Sim.BALL_R * 2.3, n = max(2, Int(48 * pw)), sweep = max(0.01, pw * .pi * 2)
+        let r0 = Sim.BALL_R * 1.6, r1 = Sim.BALL_R * 2.3, n = max(2, Int(Double(PlayProps.RING_SEG) * pw)), sweep = max(0.01, pw * .pi * 2)
         var pos: [SIMD3<Float>] = [], idx: [UInt32] = []
         for i in 0...n {
             let a = .pi / 2 + sweep * Double(i) / Double(n)
             pos.append(SIMD3(Float(cos(a) * r0), 0, Float(-sin(a) * r0))); pos.append(SIMD3(Float(cos(a) * r1), 0, Float(-sin(a) * r1)))
             if i < n { let k = UInt32(i * 2); idx += [k, k + 1, k + 2, k + 1, k + 3, k + 2] }
         }
-        var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx)
-        var mat = UnlitMaterial(color: pw > 0.85 ? UIColor(red: 0.94, green: 0.49, blue: 0.43, alpha: 1) : UIColor(red: 1, green: 0.84, blue: 0.43, alpha: 1))
-        mat.blending = .transparent(opacity: 0.95); mat.faceCulling = .none
-        if let mesh = try? MeshResource.generate(from: [d]) { ring.model = ModelComponent(mesh: mesh, materials: [mat]) }
+        if ringMesh == nil, let lm = PlayProps.liveMesh(vertices: (PlayProps.RING_SEG + 1) * 2, indices: PlayProps.RING_SEG * 6), let mesh = try? MeshResource(from: lm) {
+            ring.model = ModelComponent(mesh: mesh, materials: [UnlitMaterial()])
+            ringMesh = lm
+        }
+        // the colour only changes as it turns hot, so the material is set only then
+        let hot = pw > 0.85
+        if hot != ringHot {
+            ringHot = hot
+            var mat = UnlitMaterial(color: hot ? UIColor(red: 0.94, green: 0.49, blue: 0.43, alpha: 1) : UIColor(red: 1, green: 0.84, blue: 0.43, alpha: 1))
+            mat.blending = .transparent(opacity: 0.95); mat.faceCulling = .none
+            ring.model?.materials = [mat]
+        }
+        if let lm = ringMesh { PlayProps.write(lm, pos, idx) }
     }
 
     // MARK: painted with Core Graphics
@@ -366,6 +382,31 @@ final class PlayProps {
             parts.append(d); mats.append(m)
         }
         if let mesh = try? MeshResource.generate(from: parts) { tracer.model = ModelComponent(mesh: mesh, materials: mats) }
+    }
+
+    /// a positions-only mesh of fixed capacity, for geometry rewritten every frame
+    static func liveMesh(vertices: Int, indices: Int) -> LowLevelMesh? {
+        var d = LowLevelMesh.Descriptor()
+        d.vertexAttributes = [.init(semantic: .position, format: .float3, offset: 0)]
+        d.vertexLayouts = [.init(bufferIndex: 0, bufferStride: MemoryLayout<SIMD3<Float>>.stride)]
+        d.vertexCapacity = vertices
+        d.indexCapacity = indices
+        d.indexType = .uint32
+        return try? LowLevelMesh(descriptor: d)
+    }
+    /// this frame's vertices and triangles into a live mesh, in place
+    static func write(_ m: LowLevelMesh, _ pos: [SIMD3<Float>], _ idx: [UInt32]) {
+        let nv = min(pos.count, m.descriptor.vertexCapacity), ni = min(idx.count, m.descriptor.indexCapacity) / 3 * 3
+        var lo = SIMD3<Float>(repeating: .greatestFiniteMagnitude), hi = -lo
+        m.withUnsafeMutableBytes(bufferIndex: 0) { raw in
+            let out = raw.bindMemory(to: SIMD3<Float>.self)
+            for i in 0..<nv { out[i] = pos[i]; lo = simd_min(lo, pos[i]); hi = simd_max(hi, pos[i]) }
+        }
+        m.withUnsafeMutableIndices { raw in
+            let out = raw.bindMemory(to: UInt32.self)
+            for i in 0..<ni { out[i] = idx[i] }
+        }
+        m.parts.replaceAll([LowLevelMesh.Part(indexCount: ni, topology: .triangle, bounds: BoundingBox(min: lo, max: hi))])
     }
 
     /// a flat ring lying on the ground

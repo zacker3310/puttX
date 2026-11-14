@@ -6,14 +6,19 @@
 import UIKit
 import CoreHaptics
 
+/// Core Haptics starts its engine synchronously (tens of ms from cold), so every call runs on one
+/// serial queue of its own and the main thread, which draws the course, never waits on it.
 @MainActor
 enum Haptics {
     static var enabled = true { didSet { if !enabled { roll(0) } } }
 
     private static let supported = CHHapticEngine.capabilitiesForHardware().supportsHaptics
-    private static var engine: CHHapticEngine?
-    private static var rumble: CHHapticAdvancedPatternPlayer?
-    private static var rumbling = false
+    private static let q = DispatchQueue(label: "puttx.haptics", qos: .userInitiated)
+    // touched only on q
+    nonisolated(unsafe) private static var engine: CHHapticEngine?
+    nonisolated(unsafe) private static var rumble: CHHapticAdvancedPatternPlayer?
+    nonisolated(unsafe) private static var rumbling = false
+    nonisolated(unsafe) private static var rumbleSent: (Float, Float) = (-1, -1)
     private static var loaded = 0
 
     // the fallback
@@ -22,31 +27,36 @@ enum Haptics {
     private static let soft = UIImpactFeedbackGenerator(style: .soft)
     private static let note = UINotificationFeedbackGenerator()
 
-    private static func ready() -> CHHapticEngine? {
-        guard supported, enabled else { return nil }
+    /// start the engine ahead of the first touch (a hole calls this as it opens)
+    static func warm() { guard supported, enabled else { return }; q.async { _ = ready() } }
+
+    /// on q
+    nonisolated private static func ready() -> CHHapticEngine? {
         if let e = engine { return e }
         guard let e = try? CHHapticEngine() else { return nil }
-        e.isAutoShutdownEnabled = true
+        // kept running while the app is up: a cold start mid-putt is the stall this queue exists for
+        e.isAutoShutdownEnabled = false
         e.playsHapticsOnly = true
         // after an interruption or a reset the engine starts again on the next touch
-        e.resetHandler = { Task { @MainActor in try? engine?.start(); rumble = nil; rumbling = false } }
-        e.stoppedHandler = { _ in Task { @MainActor in rumble = nil; rumbling = false } }
+        e.resetHandler = { q.async { try? engine?.start(); rumble = nil; rumbling = false; rumbleSent = (-1, -1) } }
+        e.stoppedHandler = { _ in q.async { rumble = nil; rumbling = false; rumbleSent = (-1, -1) } }
         try? e.start()
         engine = e
         return e
     }
     private static func play(_ events: [CHHapticEvent]) {
-        guard let e = ready(), let p = try? CHHapticPattern(events: events, parameters: []), let pl = try? e.makePlayer(with: p) else { return }
-        try? e.start()
-        try? pl.start(atTime: CHHapticTimeImmediate)
+        q.async {
+            guard let e = ready(), let p = try? CHHapticPattern(events: events, parameters: []), let pl = try? e.makePlayer(with: p) else { return }
+            try? pl.start(atTime: CHHapticTimeImmediate)
+        }
     }
-    private static func tap(_ intensity: Double, _ sharpness: Double, at t: Double = 0) -> CHHapticEvent {
+    nonisolated private static func tap(_ intensity: Double, _ sharpness: Double, at t: Double = 0) -> CHHapticEvent {
         CHHapticEvent(eventType: .hapticTransient, parameters: [
             CHHapticEventParameter(parameterID: .hapticIntensity, value: Float(max(0, min(1, intensity)))),
             CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(max(0, min(1, sharpness)))),
         ], relativeTime: t)
     }
-    private static func hum(_ intensity: Double, _ sharpness: Double, at t: Double = 0, for d: Double) -> CHHapticEvent {
+    nonisolated private static func hum(_ intensity: Double, _ sharpness: Double, at t: Double = 0, for d: Double) -> CHHapticEvent {
         CHHapticEvent(eventType: .hapticContinuous, parameters: [
             CHHapticEventParameter(parameterID: .hapticIntensity, value: Float(intensity)),
             CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(sharpness)),
@@ -92,16 +102,22 @@ enum Haptics {
     static func roll(_ speed: Double, rough: Bool = false) {
         guard supported else { return }
         let k = enabled ? min(0.32, speed * (rough ? 0.16 : 0.1)) : 0
-        if k < 0.02 {
-            if rumbling { try? rumble?.stop(atTime: CHHapticTimeImmediate); rumbling = false }
-            return
+        q.async {
+            if k < 0.02 {
+                if rumbling { try? rumble?.stop(atTime: CHHapticTimeImmediate); rumbling = false; rumbleSent = (-1, -1) }
+                return
+            }
+            guard let e = ready() else { return }
+            if rumble == nil, let p = try? CHHapticPattern(events: [hum(1, 0.15, for: 60)], parameters: []) { rumble = try? e.makeAdvancedPlayer(with: p); rumble?.loopEnabled = true }
+            if !rumbling { try? rumble?.start(atTime: CHHapticTimeImmediate); rumbling = true }
+            // only a change you could feel is sent, not one every frame
+            let want = (Float(k), Float(rough ? 0.35 : 0.1))
+            guard abs(want.0 - rumbleSent.0) > 0.01 || want.1 != rumbleSent.1 else { return }
+            rumbleSent = want
+            try? rumble?.sendParameters([
+                CHHapticDynamicParameter(parameterID: .hapticIntensityControl, value: want.0, relativeTime: 0),
+                CHHapticDynamicParameter(parameterID: .hapticSharpnessControl, value: want.1, relativeTime: 0),
+            ], atTime: CHHapticTimeImmediate)
         }
-        guard let e = ready() else { return }
-        if rumble == nil, let p = try? CHHapticPattern(events: [hum(1, 0.15, for: 60)], parameters: []) { rumble = try? e.makeAdvancedPlayer(with: p); rumble?.loopEnabled = true }
-        if !rumbling { try? e.start(); try? rumble?.start(atTime: CHHapticTimeImmediate); rumbling = true }
-        try? rumble?.sendParameters([
-            CHHapticDynamicParameter(parameterID: .hapticIntensityControl, value: Float(k), relativeTime: 0),
-            CHHapticDynamicParameter(parameterID: .hapticSharpnessControl, value: rough ? 0.35 : 0.1, relativeTime: 0),
-        ], atTime: CHHapticTimeImmediate)
     }
 }

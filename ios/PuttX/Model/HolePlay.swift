@@ -230,6 +230,8 @@ final class HolePlay {
     func skipIntro() { intro = nil; banner = false }
 
     func start() {
+        // both engines up before the first putt, off the main thread, so the strike never waits on them
+        Synth.shared.wake(); Haptics.warm()
         // the lost ball: where some putt from the tee really stops (about 40 ms of sim), off the main thread
         if !lostGot && !lostSearched {
             let h = hole

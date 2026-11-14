@@ -173,7 +173,8 @@ struct HoleView: View {
     // MARK: input
     /// drag the course sideways to turn the aim, as on the web (0.12 degrees per stage px)
     private var aimDrag: some Gesture {
-        DragGesture(minimumDistance: 6)
+        // no dead zone: the aim follows the finger from the first point, with nothing to catch up on
+        DragGesture(minimumDistance: 0)
             .onChanged { g in
                 if play.intro != nil { withAnimation { play.skipIntro() } }
                 guard play.phase == .aim else { return }

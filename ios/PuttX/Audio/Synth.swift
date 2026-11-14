@@ -73,12 +73,20 @@ final class Synth: @unchecked Sendable {
         NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] _ in self?.wake() }
     }
 
-    /// starts (or restarts, after a call or the background) the engine
+    /// starts (or restarts, after a call or the background) the engine. Starting it takes tens of ms,
+    /// so it happens on a queue of its own; sounds asked for meanwhile wait in `pending` and play once
+    /// it runs.
+    private let starter = DispatchQueue(label: "puttx.audio.start", qos: .userInitiated)
+    private var starting = false
     func wake() {
         guard !engine.isRunning else { return }
-        try? AVAudioSession.sharedInstance().setActive(true)
-        try? engine.start()
-        started = engine.isRunning
+        let go = lock.withLock { () -> Bool in if starting { return false }; starting = true; return true }
+        guard go else { return }
+        starter.async { [self] in
+            try? AVAudioSession.sharedInstance().setActive(true)
+            try? engine.start()
+            lock.withLock { started = engine.isRunning; starting = false }
+        }
     }
     var enabled = true { didSet { lock.withLock { master = enabled ? 0.8 : 0 } } }
 

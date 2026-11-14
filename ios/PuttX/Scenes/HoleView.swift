@@ -49,21 +49,32 @@ struct HoleView: View {
                     }
                     .ignoresSafeArea()
                 }
+                // what shows when (shell.html #hole[data-phase]): the pad and the shot readout go while the
+                // hole introduces itself, under the done card and in the replay; the aim controls only
+                // while the ball is the player's to aim or watch
+                let padUp = play.phase != .done && play.phase != .replay && play.intro == nil
+                let aimUp = (play.phase == .aim || play.phase == .roll || play.phase == .drift) && play.intro == nil
                 // the swing pad on the player's side, the aim buttons and the overview on the other
-                SwingPad(play: play, feel: app.feel)
-                    .frame(width: st.s(120), height: st.s(360))
-                    .position(x: lefty ? st.s(18 + 60) : geo.size.width - st.s(18 + 60), y: geo.size.height - st.s(18 + 180))
-                HStack(spacing: st.s(16)) {
-                    IconButton(symbol: "chevron.left", label: "aim left") { play.aim += Swing.NUDGE_DEG }
-                    IconButton(symbol: "chevron.right", label: "aim right") { play.aim -= Swing.NUDGE_DEG }
+                if padUp {
+                    SwingPad(play: play, feel: app.feel)
+                        .frame(width: st.s(120), height: st.s(360))
+                        .position(x: lefty ? st.s(18 + 60) : geo.size.width - st.s(18 + 60), y: geo.size.height - st.s(18 + 180))
+                        .transition(.opacity)
                 }
-                .position(x: lefty ? geo.size.width - st.s(24 + 96) : st.s(24 + 96), y: geo.size.height - st.s(24 + 44))
-                .disabled(play.phase != .aim)
-                Button { play.overview.toggle() } label: { HudIconView(icon: .eye).frame(width: st.s(52), height: st.s(52)) }
-                    .buttonStyle(ToyButtonStyle(kind: play.overview ? .yellow : .plain))
-                    .accessibilityLabel("overview")
-                    .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(128 + 44))
-                if let shot = play.lastStroke {
+                if aimUp {
+                    HStack(spacing: st.s(16)) {
+                        IconButton(symbol: "chevron.left", label: "aim left") { play.aim += Swing.NUDGE_DEG }
+                        IconButton(symbol: "chevron.right", label: "aim right") { play.aim -= Swing.NUDGE_DEG }
+                    }
+                    .position(x: lefty ? geo.size.width - st.s(24 + 96) : st.s(24 + 96), y: geo.size.height - st.s(24 + 44))
+                    .disabled(play.phase != .aim)
+                    .opacity(play.phase == .aim ? 1 : 0.5)
+                    Button { play.overview.toggle() } label: { HudIconView(icon: .eye).frame(width: st.s(52), height: st.s(52)) }
+                        .buttonStyle(ToyButtonStyle(kind: play.overview ? .yellow : .plain))
+                        .accessibilityLabel("overview")
+                        .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(128 + 44))
+                }
+                if padUp, let shot = play.lastStroke {
                     ShotPanel(stroke: shot)
                         .fixedSize()
                         .position(x: geo.size.width / 2, y: geo.size.height - st.s(20 + 42))
@@ -84,8 +95,8 @@ struct HoleView: View {
                     .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
                     .accessibilityLabel("\(play.round.strokes) strokes")
                 // the slope read, and in practice the guide
-                if play.phase == .aim || play.phase == .roll || play.phase == .drift {
-                    Button { play.reading.toggle(); SFX.tap() } label: { ReadGlyph().frame(width: st.s(56), height: st.s(56)) }
+                if aimUp {
+                    Button { play.reading.toggle() } label: { ReadGlyph().frame(width: st.s(56), height: st.s(56)) }
                         .buttonStyle(ToyButtonStyle(kind: play.reading ? .go : .plain))
                         .accessibilityLabel("read the slope").accessibilityAddTraits(play.reading ? .isSelected : [])
                         .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(232 + 44))
@@ -94,29 +105,31 @@ struct HoleView: View {
                     Button { play.showGuide() } label: { GuideGlyph().frame(width: st.s(56), height: st.s(56)) }
                         .buttonStyle(ToyButtonStyle())
                         .accessibilityLabel("show me the line")
-                        .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(336 + 44))
+                        // on a short stage the column would reach the top bar: the guide sits beside the read
+                        .position(x: lefty ? geo.size.width - st.s(24 + 44 + (st.h < 600 ? 104 : 0)) : st.s(24 + 44 + (st.h < 600 ? 104 : 0)),
+                                  y: geo.size.height - st.s((st.h < 600 ? 232 : 336) + 44))
                 }
                 // the mulligan: the last putt back, for a token
                 if play.canTakeBack && play.phase == .aim && play.intro == nil && (play.practice || app.progress.mulligans > 0) {
                     MulliganButton(tokens: play.practice ? nil : app.progress.mulligans) {
                         if play.practice { play.takeBack() } else if app.progress.spendMulligan() { play.takeBack(); app.save() }
                     }
-                    .position(x: st.s(556 + 44), y: st.s(24 + 44))
+                    .position(x: st.s(452 + 44), y: st.s(24 + 44))
                     .transition(.scale.combined(with: .opacity))
                 }
                 if play.lostPop { LostPop().fixedSize().position(x: geo.size.width / 2, y: st.s(120 + 38)).allowsHitTesting(false) }
                 // the tee sign: the hole, its par and its layout, while the hole introduces itself
                 if play.banner {
                     TeeSign(hole: play.hole, aim: play.aim)
-                        .position(x: geo.size.width / 2, y: st.s(200))
-                        .transition(.scale.combined(with: .opacity))
+                        .position(x: geo.size.width / 2, y: st.s(min(230 + 85, st.h * 0.45)))
+                        .transition(play.reduceMotion ? .opacity : .scale.combined(with: .opacity))
                         .onTapGesture { withAnimation { play.skipIntro() } }
                 }
                 // the ace replay: a tag, and any tap skips it
                 if play.phase == .replay {
                     Color.clear.contentShape(Rectangle()).onTapGesture { play.endReplay() }
                         .accessibilityAddTraits(.isButton).accessibilityLabel("skip replay")
-                    ReplayTag().frame(width: st.s(64), height: st.s(64)).position(x: geo.size.width / 2, y: st.s(24 + 44)).allowsHitTesting(false)
+                    ReplayTag().frame(width: st.s(120), height: st.s(76)).position(x: geo.size.width / 2, y: st.s(24 + 38)).allowsHitTesting(false)
                 }
                 if app.party != nil {
                     PartyChip(p: app.party!.player).position(x: st.s(452 + 50), y: st.s(30 + 38))
@@ -284,13 +297,9 @@ struct DoneCard: View {
                     Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }
                 }
                 if let g = play.goals { GoalsRow(all: g.all, fresh: g.fresh) }
-                if play.coinsWon > 0 {
-                    Tally(value: "+\(play.coinsWon)") { Glyph.coin.image.resizable().scaledToFit() }
-                        .popIn(0.7)
-                        .onAppear { DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { SFX.coin() } }
-                        .accessibilityLabel("\(play.coinsWon) coins won")
-                }
                 HStack(spacing: st.s(24)) {
+                    Button { app.go(.map(Catalog.course(of: play.hole.key))) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
+                        .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")
                     IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.retry(play) }
                     IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(play.daily != nil ? app.afterDaily(play.hole.key) : app.next(after: play.hole.key)) }
                 }
@@ -298,6 +307,26 @@ struct DoneCard: View {
             .padding(st.s(40))
             .background(Dots())
             .toyCard(st, radius: Toy.rXl)
+            // the bird this finish earned, on the card's left edge (src/game.js tallyHole)
+            .overlay(alignment: .topLeading) {
+                if let b = play.bird { BirdBadge(kind: b, diff: score - play.hole.par).offset(x: st.s(22), y: st.s(150)) }
+            }
+            // coins won: a gold sticker slapped on the card's corner
+            .overlay(alignment: .topTrailing) {
+                if play.coinsWon > 0 {
+                    HStack(spacing: st.s(6)) {
+                        Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(44), height: st.s(44))
+                        Text("+\(play.coinsWon)").font(Toy.font(34, st)).foregroundStyle(Toy.inkStrong)
+                    }
+                    .padding(.horizontal, st.s(14)).frame(height: st.s(64))
+                    .background(Capsule().fill(Toy.yellow)).overlay(Capsule().strokeBorder(Toy.yellowLine, lineWidth: st.s(4)))
+                    .rotationEffect(.degrees(8))
+                    .offset(x: st.s(24), y: -st.s(20))
+                    .popIn(0.7)
+                    .onAppear { DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { SFX.coin() } }
+                    .accessibilityElement(children: .ignore).accessibilityLabel("\(play.coinsWon) coins won")
+                }
+            }
             .popIn()
         }
         .accessibilityElement(children: .contain)
@@ -415,20 +444,20 @@ struct TeeSign: View {
     let hole: Hole
     let aim: Double
     var body: some View {
-        HStack(spacing: st.s(18)) {
-            Canvas { ctx, size in draw(ctx, size) }.frame(width: st.s(150), height: st.s(150))
-            VStack(spacing: st.s(4)) {
-                Text("\(Catalog.number(of: hole.key))").font(Toy.font(96, st)).foregroundStyle(.white)
-                HStack(spacing: st.s(6)) {
-                    HudIconView(icon: .par).frame(width: st.s(40), height: st.s(40))
-                    Text("\(hole.par)").font(Toy.font(48, st)).foregroundStyle(.white)
-                }
+        // the web's banner: the hole's layout, its number big, and its par, on a dark glass pill
+        let shadow = Color(red: 74 / 255, green: 53 / 255, blue: 35 / 255).opacity(0.35)
+        HStack(spacing: st.s(34)) {
+            Canvas { ctx, size in draw(ctx, size) }.frame(width: st.s(120), height: st.s(120))
+            Text("\(Catalog.number(of: hole.key))").font(.system(size: st.s(150), weight: .black, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white).shadow(color: shadow, radius: 0, x: 0, y: st.s(8))
+            HStack(spacing: st.s(8)) {
+                HudIconView(icon: .par).frame(width: st.s(96), height: st.s(96))
+                Text("\(hole.par)").font(.system(size: st.s(92), weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white).shadow(color: shadow, radius: 0, x: 0, y: st.s(8))
             }
         }
-        .padding(st.s(22))
-        .background(RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous).fill(Color(hex: "#3f7a3a")))
-        .overlay(RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous).strokeBorder(Color(hex: "#fffdf7"), lineWidth: st.s(6)))
-        .background(RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous).fill(Toy.shadow.opacity(0.25)).offset(y: st.s(8)))
+        .padding(.horizontal, st.s(44)).padding(.top, st.s(4)).padding(.bottom, st.s(10))
+        .background(Capsule().fill(Color(red: 47 / 255, green: 36 / 255, blue: 26 / 255).opacity(0.55)))
         .accessibilityLabel("hole \(Catalog.number(of: hole.key)), par \(hole.par)")
     }
     private func draw(_ ctx: GraphicsContext, _ size: CGSize) {

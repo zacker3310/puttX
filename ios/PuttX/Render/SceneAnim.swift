@@ -97,7 +97,16 @@ final class SceneAnimator {
     /// every entity drawn with an animated material
     func bind(_ e: ModelEntity, materials: [Int], hole: SceneHole) {
         for (slot, m) in materials.enumerated() {
-            for a in hole.matAnims ?? [] where a.m == m { mats.append(MatTarget(e: e, slot: slot, a: a, base: hole.mats[m], last: .nan)) }
+            for a in hole.matAnims ?? [] where a.m == m {
+                mats.append(MatTarget(e: e, slot: slot, a: a, base: hole.mats[m], last: .nan))
+                // an opacity channel fades the entity through its opacity component: the material
+                // itself goes fully opaque-capable once, and nothing is rebuilt per frame
+                if a.p == "op", var list = e.model?.materials, slot < list.count {
+                    if var u = list[slot] as? UnlitMaterial { u.blending = .transparent(opacity: 1.0); list[slot] = u }
+                    else if var p = list[slot] as? PhysicallyBasedMaterial { p.blending = .transparent(opacity: 1.0); list[slot] = p }
+                    e.model?.materials = list
+                }
+            }
         }
     }
     func add(_ c: PointCloud) { clouds.append(c) }
@@ -132,7 +141,9 @@ final class SceneAnimator {
     private func paint(_ i: Int, _ t: Double) {
         let x = mats[i], beat = x.a.beat.map { $0 * exp(-5 * (t * SFX.bpm / 60).truncatingRemainder(dividingBy: 1)) } ?? 0
         let val = x.a.ch.at(t, relu: x.a.relu != 0) + beat
-        if abs(val - x.last) < 0.002 { return }
+        if x.a.p == "op" { x.e.components.set(OpacityComponent(opacity: Float(max(0, min(1, val))))); return }
+        // colour and glow: rebuilt only when the change would show
+        if abs(val - x.last) < 0.01 { return }
         mats[i].last = val
         guard var list = x.e.model?.materials, x.slot < list.count else { return }
         let m = list[x.slot]

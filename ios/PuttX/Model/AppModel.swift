@@ -194,6 +194,7 @@ final class AppModel {
             won += progress.finishDaily(day: day, yesterday: Daily.dayBefore(day), score: score)
         }
         play.coinsWon = won
+        play.bird = progress.tallyHole(score: score, par: h.par)
         save()
         if counts { GameCenter.holeBanked(h.key, score: score, progress: progress, catalog: catalog) }
         return rec

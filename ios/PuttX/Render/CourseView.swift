@@ -36,6 +36,8 @@ struct CourseView: UIViewRepresentable {
         private var tick: Cancellable?
         private var camPos: SIMD3<Float>?, camLook: SIMD3<Float>?
         private var yaw: Double = 0
+        /// this frame's length, for the chase camera's turn (the same at 60 or 120 Hz)
+        private var frameDt = 1.0 / 60
 
         init(play: HolePlay) { self.play = play }
 
@@ -100,7 +102,8 @@ struct CourseView: UIViewRepresentable {
             // the scenery's own life: bats, ships, snow, embers, beacons
             if !play.reduceMotion && !rig.anim.isEmpty { rig.anim.update(t) }
             // conveyors flow
-            for (e, _, speed) in rig.flows {
+            frameDt = max(1.0 / 240, min(0.1, dt))
+            for (e, _, speed) in rig.flows where !play.reduceMotion {
                 guard var mat = e.model?.materials.first as? PhysicallyBasedMaterial else { continue }
                 var tr = mat.textureCoordinateTransform
                 tr.offset.y -= Float(dt * 0.4 * min(3, speed))
@@ -183,12 +186,12 @@ struct CourseView: UIViewRepresentable {
                 let dx = h.cup.x - f.x, dz = h.cup.z - f.z, d = max(1e-6, hypot(dx, dz)), cy = h.groundH(h.cup.x, h.cup.z)
                 return (SIMD3(Float(h.cup.x - dx / d * 0.42), Float(cy + 0.36), Float(h.cup.z - dz / d * 0.42)), SIMD3(Float(h.cup.x), Float(cy - 0.08), Float(h.cup.z)))
             }
-            let aiming = play.phase == .aim || play.phase == .done
+            let aiming = play.phase == .aim
             if aiming { yaw = play.aim * .pi / 180 }
             else if hypot(b.vx, b.vz) > 0.5 {
                 var d = atan2(b.vx, b.vz) - yaw
                 d = atan2(sin(d), cos(d))
-                yaw += d * (1 - exp(-2.2 / 60))
+                yaw += d * (1 - exp(-2.2 * frameDt))
             }
             let ux = sin(yaw), uz = cos(yaw)
             var ahead = 2.2
@@ -231,7 +234,9 @@ enum Sky {
             }
         }
         let cs = CGColorSpace(name: CGColorSpace.sRGB)!
-        let ctx = CGContext(data: &px, width: W, height: H, bitsPerComponent: 8, bytesPerRow: W * 4, space: cs, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-        return ctx.makeImage()!
+        // the pixels are copied into the image's own provider, so nothing points at the array afterwards
+        let provider = CGDataProvider(data: Data(px) as CFData)!
+        return CGImage(width: W, height: H, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: W * 4, space: cs,
+                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue), provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent)!
     }
 }

@@ -176,6 +176,8 @@ final class HolePlay {
     var ballTint: String?
     /// the equipped putter and ball
     var gear = (putter: "p1", ball: "b1")
+    /// the bird this finish earned (birdie, eagle, alb), for the done card's badge
+    var bird: String?
     /// coins the finish paid (finish, under par, ace, first clear, goals, the daily hole)
     var coinsWon = 0
 

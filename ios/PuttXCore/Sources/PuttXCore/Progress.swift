@@ -15,6 +15,8 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
     /// all coins and tokens ever spent: they only grow, so two devices' saves merge without a refund
     /// (earned is balance + spent, the merge keeps the most earned and the most spent)
     public var coinsSpent = 0
+    /// birdies, eagles, albatrosses and aces, counted for life
+    public var tally: [String: Int] = [:]
     public var mulligansSpent = 0
     public var owned: [String] = []
     public var equipped: [String: String] = [:]
@@ -50,6 +52,7 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         mulligans = try c.decodeIfPresent(Int.self, forKey: .mulligans) ?? 5
         coins = try c.decodeIfPresent(Int.self, forKey: .coins) ?? 0
         coinsSpent = max(0, (try? c.decodeIfPresent(Int.self, forKey: .coinsSpent)) ?? 0)
+        tally = ((try? c.decodeIfPresent([String: Int].self, forKey: .tally)) ?? [:]).filter { ["birdie", "eagle", "alb", "ace"].contains($0.key) && $0.value >= 0 }
         mulligansSpent = max(0, (try? c.decodeIfPresent(Int.self, forKey: .mulligansSpent)) ?? 0)
         owned = try c.decodeIfPresent([String].self, forKey: .owned) ?? []
         equipped = try c.decodeIfPresent([String: String].self, forKey: .equipped) ?? [:]
@@ -84,6 +87,7 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         m.owned = Array(Set(owned).union(o.owned)).sorted()
         m.lost.merge(o.lost) { a, _ in a }
         m.obj.merge(o.obj) { $0 | $1 }
+        m.tally.merge(o.tally) { Swift.max($0, $1) }
         // the ghost of the better run (fewer putts) wins
         if firsts != nil || o.firsts != nil { m.firsts = Array(Set(firsts ?? []).union(o.firsts ?? [])).sorted() }
         m.ghosts.merge(o.ghosts) { a, b in b.count < a.count ? b : a }
@@ -152,6 +156,16 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
     /// a new best (or a first finish) becomes the hole's ghost, unless the cap rolled it in
     public mutating func keepGhost(_ key: String, log: [[Double]], score: Int, previousBest: Int?, auto: Bool) {
         if !auto && (previousBest == nil || score <= previousBest!) && log.count == score { ghosts[key] = log }
+    }
+    /// the bird a score earns against par: birdie (1 under), eagle (2), albatross (3 or more)
+    public static func bird(score: Int, par: Int) -> String? { par - score >= 3 ? "alb" : par - score == 2 ? "eagle" : par - score == 1 ? "birdie" : nil }
+    /// counts a finish's bird (and an ace) for life; returns the bird for the done card's badge
+    @discardableResult
+    public mutating func tallyHole(score: Int, par: Int) -> String? {
+        let b = PlayerProgress.bird(score: score, par: par)
+        if let b { tally[b, default: 0] += 1 }
+        if score == 1 { tally["ace", default: 0] += 1 }
+        return b
     }
     /// spend a mulligan token
     public mutating func spendMulligan() -> Bool { guard mulligans > 0 else { return false }; mulligans -= 1; mulligansSpent += 1; return true }

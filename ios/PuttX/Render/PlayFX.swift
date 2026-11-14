@@ -34,12 +34,12 @@ final class PlayFX {
         if let f = flag { flagBase = f.position }
         func unlit(_ c: UIColor, _ o: Float = 1) -> UnlitMaterial { var m = UnlitMaterial(color: c); m.blending = .transparent(opacity: .init(floatLiteral: o)); m.faceCulling = .none; return m }
         let dot = MeshResource.generateSphere(radius: Float(Sim.BALL_R * 0.55))
-        for _ in 0..<30 { let e = ModelEntity(mesh: dot, materials: [unlit(UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1), 0)]); e.isEnabled = false; trail.append(Bit(e: e)); root.addChild(e) }
+        for _ in 0..<30 { let e = ModelEntity(mesh: dot, materials: [unlit(UIColor(red: 1, green: 0.99, blue: 0.97, alpha: 1))]); e.isEnabled = false; trail.append(Bit(e: e)); root.addChild(e) }
         let paper = MeshResource.generatePlane(width: 0.045, height: 0.028)
         for i in 0..<140 { let e = ModelEntity(mesh: paper, materials: [unlit(PlayFX.colors[i % 5])]); e.isEnabled = false; confetti.append(Bit(e: e)); root.addChild(e) }
         let blob = MeshResource.generateSphere(radius: 0.02)
-        for _ in 0..<40 { let e = ModelEntity(mesh: blob, materials: [unlit(.white, 0)]); e.isEnabled = false; puffs.append(Bit(e: e)); root.addChild(e) }
-        ring = ModelEntity(mesh: PlayProps.annulus(inner: 0.9, outer: 1, segments: 48), materials: [unlit(UIColor(red: 1, green: 0.95, blue: 0.77, alpha: 1), 0.9)])
+        for _ in 0..<40 { let e = ModelEntity(mesh: blob, materials: [unlit(.white)]); e.isEnabled = false; puffs.append(Bit(e: e)); root.addChild(e) }
+        ring = ModelEntity(mesh: PlayProps.annulus(inner: 0.9, outer: 1, segments: 48), materials: [unlit(UIColor(red: 1, green: 0.95, blue: 0.77, alpha: 1))])
         ring.isEnabled = false
         root.addChild(ring)
     }
@@ -145,10 +145,9 @@ final class PlayFX {
         }
     }
 
+    /// fades through the entity's opacity component: no material rebuilt per frame
     private func opacity(_ e: ModelEntity, _ o: Float) {
-        guard var m = e.model?.materials.first as? UnlitMaterial else { return }
-        m.blending = .transparent(opacity: .init(floatLiteral: max(0, min(1, o))))
-        e.model?.materials = [m]
+        e.components.set(OpacityComponent(opacity: max(0, min(1, o))))
     }
     static func mix(_ a: String, _ b: String, _ k: CGFloat) -> UIColor {
         var r1: CGFloat = 0, g1: CGFloat = 0, b1: CGFloat = 0, r2: CGFloat = 0, g2: CGFloat = 0, b2: CGFloat = 0, x: CGFloat = 0

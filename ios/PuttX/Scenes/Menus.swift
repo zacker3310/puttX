@@ -232,6 +232,7 @@ struct WorldView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let world: Int
     @State private var hop = false
+    @State private var tracking = false
 
     var body: some View {
         let look = app.look(world), cs = app.catalog.courses(ofWorld: world)
@@ -281,8 +282,12 @@ struct WorldView: View {
                 .padding(.horizontal, st.s(18)).frame(height: st.s(76)).toyCard(st, radius: Toy.rLg)
                 Spacer()
                 IconButton(symbol: app.progress.neon ? "moon.stars.fill" : "moon", kind: app.progress.neon ? .blue : .plain, label: "neon night") { app.toggleNeon() }
+                // the birdie tracker
+                Button { withAnimation(.spring(response: 0.3)) { tracking = true } } label: { TrophyGlyph().frame(width: st.s(60), height: st.s(60)) }
+                    .buttonStyle(ToyButtonStyle()).accessibilityLabel("birdie tracker")
             }
             .padding(.horizontal, st.s(24)).padding(.top, st.s(24))
+            if tracking { TrackerPanel(world: world) { withAnimation { tracking = false } }.transition(.opacity) }
         }
     }
 

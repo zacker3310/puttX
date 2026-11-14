@@ -34,13 +34,7 @@ struct HoleView: View {
                             CourseView(play: play, renderer: app.renderer == .hand ? .hand : .exported)
                                 .frame(width: full.size.width + shift, height: full.size.height)
                                 .offset(x: lefty ? 0 : -shift)
-                            if let p = play.pinOnScreen {
-                                let h = play.hole, b = play.ball
-                                PinTag(metres: hypot(h.cup.x - b.x, h.cup.z - b.z), riseCm: Int(((h.groundH(h.cup.x, h.cup.z) - b.y) * 100).rounded()))
-                                    .fixedSize()
-                                    .position(x: p.x - (lefty ? 0 : shift), y: p.y - st.s(22))
-                                    .allowsHitTesting(false)
-                            }
+                            PinLayer(play: play, dx: lefty ? 0 : shift)
                         }
                         .contentShape(Rectangle())
                         .gesture(aimDrag)
@@ -51,7 +45,8 @@ struct HoleView: View {
                 // hole introduces itself, under the done card and in the replay; the aim controls only
                 // while the ball is the player's to aim or watch
                 let padUp = play.phase != .done && play.phase != .replay && play.intro == nil
-                let aimUp = (play.phase == .aim || play.phase == .roll || play.phase == .drift) && play.intro == nil
+                // solid while the ball is yours to aim, gone while it rolls: nothing half-faded over the course
+                let aimUp = play.phase == .aim && play.intro == nil
                 // the swing pad on the player's side, the aim buttons and the overview on the other
                 if padUp {
                     SwingPad(play: play, feel: app.feel)
@@ -65,12 +60,12 @@ struct HoleView: View {
                         AimButton(symbol: "chevron.right", label: "aim right") { if play.phase == .aim { play.aim -= $0 } }
                     }
                     .position(x: lefty ? geo.size.width - st.s(24 + 96) : st.s(24 + 96), y: geo.size.height - st.s(24 + 44))
-                    .disabled(play.phase != .aim)
-                    .opacity(play.phase == .aim ? 1 : 0.5)
+                    .transition(.opacity)
                     Button { play.overview.toggle() } label: { HudIconView(icon: .eye).frame(width: st.s(52), height: st.s(52)) }
                         .buttonStyle(ToyButtonStyle(kind: play.overview ? .yellow : .plain))
                         .accessibilityLabel("overview")
                         .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(128 + 44))
+                        .transition(.opacity)
                 }
                 if padUp, let shot = play.lastStroke {
                     ShotPanel(stroke: shot)
@@ -371,7 +366,7 @@ struct SwingPad: View {
         let shape = RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous), swinging = !samples.isEmpty
         GeometryReader { g in
             Canvas { ctx, size in drawPath(ctx, size) }
-                .background(shape.fill(Toy.surface.opacity(0.94)))
+                .background(shape.fill(Toy.surface))
                 .overlay(shape.strokeBorder(swinging ? Toy.yellowLine : Toy.surfaceLine, lineWidth: st.s(4)))
                 .background(shape.fill(Toy.shadow.opacity(0.14)).offset(y: st.s(6)))
                 .contentShape(shape)
@@ -380,7 +375,8 @@ struct SwingPad: View {
                     .onEnded { _ in letGo() })
                 .frame(width: g.size.width, height: g.size.height)
         }
-        .opacity(play.phase == .aim ? 1 : 0.6)
+        .opacity(play.phase == .aim ? 1 : 0)
+        .animation(.easeOut(duration: 0.15), value: play.phase == .aim)
         // VoiceOver: swipe up or down to set the power, double-tap to putt (a dead-on stroke, as a
         // controller's trigger gives), so the hole is playable without the gesture
         .accessibilityElement(children: .ignore)
@@ -528,5 +524,22 @@ struct AimButton: View {
                 }
                 .onEnded { _ in timer?.invalidate(); timer = nil })
             .onDisappear { timer?.invalidate(); timer = nil }
+    }
+}
+
+/// the distance tag over the cup. The 3D view moves it every frame the camera turns, so it reads the
+/// cup's spot in its own body: only the tag redraws, not the whole hole screen
+private struct PinLayer: View {
+    @Environment(\.stage) private var st
+    let play: HolePlay
+    let dx: CGFloat
+    var body: some View {
+        if let p = play.pinOnScreen {
+            let h = play.hole, b = play.ball
+            PinTag(metres: hypot(h.cup.x - b.x, h.cup.z - b.z), riseCm: Int(((h.groundH(h.cup.x, h.cup.z) - b.y) * 100).rounded()))
+                .fixedSize()
+                .position(x: p.x - dx, y: p.y - st.s(22))
+                .allowsHitTesting(false)
+        }
     }
 }

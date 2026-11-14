@@ -18,6 +18,11 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
     public var lost: [String: Int] = [:]
     public var obj: [String: Int] = [:]
     public var daily: DailyRecord?
+    /// each hole's best run as putt inputs (angle, power, hole time), replayed as the ghost; inputs only
+    /// mean the same run under the same physics, so a new physics version drops them
+    public var ghosts: [String: [[Double]]] = [:]
+    public var phys = PlayerProgress.physVersion
+    public static let physVersion = 3
 
     public static let coinMax = 999_999
 
@@ -39,6 +44,9 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         lost = (try? c.decodeIfPresent([String: Int].self, forKey: .lost)) ?? [:]
         obj = (try? c.decodeIfPresent([String: Int].self, forKey: .obj)) ?? [:]
         daily = try? c.decodeIfPresent(DailyRecord.self, forKey: .daily)
+        ghosts = (try? c.decodeIfPresent([String: [[Double]]].self, forKey: .ghosts)) ?? [:]
+        phys = (try? c.decodeIfPresent(Int.self, forKey: .phys)) ?? 0
+        if phys != PlayerProgress.physVersion { ghosts = [:]; phys = PlayerProgress.physVersion }
         // repairExtras: tokens in range, goal bits in range
         if mulligans < 0 { mulligans = 5 }
         mulligans = Swift.min(mulligans, 9999)
@@ -59,6 +67,8 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         m.owned = Array(Set(owned).union(o.owned)).sorted()
         m.lost.merge(o.lost) { a, _ in a }
         m.obj.merge(o.obj) { $0 | $1 }
+        // the ghost of the better run (fewer putts) wins
+        m.ghosts.merge(o.ghosts) { a, b in b.count < a.count ? b : a }
         if let b = o.daily {
             if let a = m.daily, a.d == b.d { m.daily = DailyRecord(d: a.d, best: Swift.min(a.best, b.best), streak: Swift.max(a.streak, b.streak)) }
             else if m.daily == nil || b.d > m.daily!.d { m.daily = b }
@@ -120,6 +130,10 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         daily = DailyRecord(d: day, best: score, streak: daily?.d == yesterday ? daily!.streak + 1 : 1)
         mulligans += 1
         return addCoins(25)
+    }
+    /// a new best (or a first finish) becomes the hole's ghost, unless the cap rolled it in
+    public mutating func keepGhost(_ key: String, log: [[Double]], score: Int, previousBest: Int?, auto: Bool) {
+        if !auto && (previousBest == nil || score <= previousBest!) && log.count == score { ghosts[key] = log }
     }
     /// spend a mulligan token
     public mutating func spendMulligan() -> Bool { guard mulligans > 0 else { return false }; mulligans -= 1; return true }

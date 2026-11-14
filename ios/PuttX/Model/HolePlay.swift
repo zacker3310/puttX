@@ -47,8 +47,38 @@ final class HolePlay {
     var daily: String?
     /// a border or post touched by a putt this hole (the clean goal)
     private(set) var touched = false
+    /// the ghost: your best run of this hole, stroke for stroke. When you strike putt k it strikes its
+    /// putt k from where its own ball lies, on the same physics (src/game.js 6b)
+    struct Ghost { var log: [[Double]]; var k = 0; var ball: Ball; var live = false; var t = 0.0; var done = false; var from: Vec2? }
+    private(set) var ghost: Ghost?
+    func setGhost(_ log: [[Double]]?) {
+        guard let log, !log.isEmpty, log.allSatisfy({ $0.count == 3 && $0.allSatisfy(\.isFinite) }) else { ghost = nil; return }
+        ghost = Ghost(log: log, ball: Ball(hole, hole.tee.x, hole.tee.z))
+    }
+    private func ghostPutt(_ k: Int) {
+        guard var g = ghost, k < g.log.count, !g.done else { return }
+        let e = g.log[k]
+        g.from = Vec2(g.ball.x, g.ball.z)
+        var b = Ball(hole, g.ball.x, g.ball.z); b.launch(e[0], e[1])
+        g.ball = b; g.t = e[2]; g.live = true; g.k = k + 1
+        ghost = g
+    }
+    private func stepGhost() {
+        guard var g = ghost, g.live else { return }
+        let end = hole.step(&g.ball, g.t); g.t += Sim.SIM_DT; g.ball.hits.removeAll(keepingCapacity: true)
+        if let end {
+            g.live = false
+            if end == .sunk { g.done = true }
+            if end == .oob { let f = g.from ?? Vec2(g.ball.x, g.ball.z); g.ball = Ball(hole, f.x, f.z) }
+            else if end == .stop { let r = hole.restSpot(g.ball.x, g.ball.z); g.ball = Ball(hole, r.x, r.z) }
+        }
+        ghost = g
+    }
+    /// whether the ghost shows: after its first putt, out of tubes, until it has dropped
+    var ghostVisible: Bool { guard let g = ghost else { return false }; return g.k > 0 && g.ball.tube == nil && !(g.done && !g.live) }
+
     /// the last putt, to take back with a mulligan token
-    private struct Undo { let round: Round; let aim: Double; let touched: Bool; let logCount: Int }
+    private struct Undo { let round: Round; let aim: Double; let touched: Bool; let logCount: Int; let ghost: Ghost? }
     @ObservationIgnored private var undo: Undo?
     private(set) var canTakeBack = false
     /// the hole's gold lost ball: where it lies (nil: none, or not looked for yet) and whether it is found
@@ -153,12 +183,13 @@ final class HolePlay {
     func putt(angle: Double, power: Double) {
         guard phase == .aim else { return }
         let a = jsFixed(angle, 3), p = jsFixed(power, 4)
-        undo = Undo(round: round, aim: aim, touched: touched, logCount: log.count)
+        undo = Undo(round: round, aim: aim, touched: touched, logCount: log.count, ghost: ghost)
         canTakeBack = false
         time = jsFixed(time, 6)
         from = round.at
         log.append([a, p, time])
         run = PuttRun(hole, from: from, angle: a, power: p, t0: time)
+        ghostPutt(log.count - 1)
         hitsHeard = 0
         phase = .roll
     }
@@ -182,6 +213,7 @@ final class HolePlay {
         var steps = 0
         while acc >= Sim.SIM_DT && steps < 64 {
             acc -= Sim.SIM_DT; steps += 1
+            stepGhost()
             if var r = run {
                 let end = r.step()
                 run = r; time = r.t; ball = r.ball
@@ -291,7 +323,7 @@ final class HolePlay {
     /// the mulligan: the last putt taken back (ball, count, penalty, aim) for a token
     func takeBack() {
         guard phase == .aim, canTakeBack, let u = undo else { return }
-        round = u.round; aim = u.aim; touched = u.touched
+        round = u.round; aim = u.aim; touched = u.touched; ghost = u.ghost
         if log.count > u.logCount { log.removeLast(log.count - u.logCount) }
         ball = Ball(hole, round.at.x, round.at.z)
         undo = nil; canTakeBack = false

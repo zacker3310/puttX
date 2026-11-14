@@ -22,6 +22,8 @@ final class PlayProps {
     private let lost = Entity()
     private let gold: ModelEntity
     private let goldRing: ModelEntity
+    /// the ghost of your best run, see-through
+    private let ghost: ModelEntity
 
     static let PUTTER_SCALE: Float = 0.83, BACK_M = 0.36, GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042
 
@@ -40,6 +42,9 @@ final class PlayProps {
         goldRing = ModelEntity(mesh: PlayProps.annulus(inner: Float(Sim.BALL_R * 1.3), outer: Float(Sim.BALL_R * 1.75)), materials: [rm])
         goldRing.position.y = 0.004
         lost.addChild(gold); lost.addChild(goldRing)
+        var ghm = UnlitMaterial(color: UIColor(red: 0.75, green: 0.9, blue: 0.96, alpha: 1))
+        ghm.blending = .transparent(opacity: 0.45)
+        ghost = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R)), materials: [ghm])
 
         var sm = UnlitMaterial(color: .black)
         if let t = try? TextureResource.generate(from: PlayProps.softDisc(), options: .init(semantic: .color)) { sm.color = .init(tint: .white, texture: .init(t)) }
@@ -65,7 +70,7 @@ final class PlayProps {
         putter.addChild(head); putter.addChild(line); putter.addChild(shaft)
         putter.scale = SIMD3(repeating: PlayProps.PUTTER_SCALE)
 
-        for e in [ball, shadow, putter, ribbon, ring, lost] as [Entity] { root.addChild(e) }
+        for e in [ball, shadow, putter, ribbon, ring, lost, ghost] as [Entity] { root.addChild(e) }
     }
 
     func update(_ play: HolePlay, now: CFTimeInterval) {
@@ -86,6 +91,8 @@ final class PlayProps {
         shadow.position = SIMD3(Float(b.x), Float(gy + 0.002), Float(b.z))
         shadow.scale = SIMD3(repeating: Float(1 + up * 6))
 
+        ghost.isEnabled = play.ghostVisible
+        if let g = play.ghost, ghost.isEnabled { ghost.position = SIMD3(Float(g.ball.x), Float(g.ball.y + Sim.BALL_R), Float(g.ball.z)) }
         // the lost ball, until it is found
         if let s = play.lostSpot, !play.lostGot, play.phase != .done {
             lost.isEnabled = true

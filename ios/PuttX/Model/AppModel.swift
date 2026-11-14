@@ -94,6 +94,7 @@ final class AppModel {
             p.reduceMotion = UIAccessibility.isReduceMotionEnabled
             // the extras: its lost ball, if not found yet, pays a token and 15 coins when rolled over
             p.lostGot = progress.lost[key] != nil
+            p.setGhost(progress.ghosts[key])
             p.onLost = { [weak self] in guard let self else { return }; _ = self.progress.findLost(key); self.save() }
             Synth.shared.bed(water: h.data.zones.contains { $0.surf == .water }, wind: [2, 4, 10].contains(w))
             SFX.jingle(lk.jingle)
@@ -118,7 +119,8 @@ final class AppModel {
 
     /// a hole finished: bank it with its goals (and the daily hole), and say where the player goes next
     func finished(_ play: HolePlay, score: Int) -> HoleRecord {
-        let h = play.hole
+        let h = play.hole, prevBest = progress.holes[h.key]?.best
+        progress.keepGhost(h.key, log: play.log, score: score, previousBest: prevBest, auto: play.round.auto)
         let rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
         let bits = Goals.bits(score: score, par: h.par, touched: play.touched, auto: play.round.auto, lostFound: progress.lost[h.key] != nil || play.lostDone())
         let g = progress.finishGoals(h.key, bits: bits)

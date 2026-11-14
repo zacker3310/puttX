@@ -18,6 +18,9 @@ struct CourseView: UIViewRepresentable {
         let v = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
         v.renderOptions.insert(.disableMotionBlur)
         v.renderOptions.insert(.disableDepthOfField)
+        // the course takes no touches itself: the SwiftUI aim drag over it gets them at once (with the
+        // view hit-tested first, the drag came through only after ~50 pt of travel, all in a burst)
+        v.isUserInteractionEnabled = false
         context.coordinator.attach(v, renderer: renderer)
         return v
     }

@@ -123,6 +123,16 @@ final class PlayProps {
         updateRing(play)
     }
 
+    /// neon night: the ball lights up under the black light, inside a soft halo (src/game.js tickNight)
+    func glow() {
+        if var m = ball.model?.materials.first as? PhysicallyBasedMaterial {
+            m.emissiveColor = .init(color: UIColor(red: 0.6, green: 0.6, blue: 0.69, alpha: 1)); m.emissiveIntensity = 1
+            ball.model?.materials = [m]
+        }
+        var h = UnlitMaterial(color: UIColor(red: 0.85, green: 0.96, blue: 1, alpha: 1)); h.blending = .transparent(opacity: 0.18)
+        let halo = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R * 2.6)), materials: [h])
+        ball.addChild(halo)
+    }
     /// the equipped gear from the pro shop: its putter (head and all) and its ball's skin
     func wear(putter id: String, ball bid: String, tint: String? = nil) {
         if let p = Gear.putter(id) {

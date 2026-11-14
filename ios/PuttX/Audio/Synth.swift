@@ -9,8 +9,8 @@ import os
 final class Synth: @unchecked Sendable {
     static let shared = Synth()
 
-    enum Wave { case sine, triangle, square }
-    enum Filter { case bandpass, lowpass }
+    enum Wave { case sine, triangle, square, sawtooth }
+    enum Filter { case bandpass, lowpass, highpass }
 
     private struct Voice {
         enum Kind { case tone(Wave, Double, Double), noise(Biquad) }   // tone: wave, start freq, end freq
@@ -25,6 +25,7 @@ final class Synth: @unchecked Sendable {
             switch type {
             case .bandpass: b0 = alpha / a0; b1 = 0; b2 = -alpha / a0
             case .lowpass: b0 = (1 - c) / 2 / a0; b1 = (1 - c) / a0; b2 = (1 - c) / 2 / a0
+            case .highpass: b0 = (1 + c) / 2 / a0; b1 = -(1 + c) / a0; b2 = (1 + c) / 2 / a0
             }
             a1 = -2 * c / a0; a2 = (1 - alpha) / a0
         }
@@ -138,6 +139,7 @@ final class Synth: @unchecked Sendable {
                     case .sine: s = sin(2 * .pi * v.phase)
                     case .triangle: s = 1 - 4 * abs(v.phase - 0.5)
                     case .square: s = v.phase < 0.5 ? 0.6 : -0.6
+                    case .sawtooth: s = 0.7 * (2 * v.phase - 1)
                     }
                 case .noise(var bq):
                     s = bq.run(noiseBuf[v.noiseAt % noiseBuf.count]); v.noiseAt += 1
@@ -179,6 +181,16 @@ final class Synth: @unchecked Sendable {
 /// the web's sound recipes (src/game.js SFX)
 enum SFX {
     static var s: Synth { Synth.shared }
+    /// neon night's beat (src/game.js neonBeat), 118 to the minute: a kick, an offbeat hat, a bass line,
+    /// a clap every fourth. `n` counts beats; `d` is how far ahead it falls
+    static let bpm = 118.0
+    static func beat(_ n: Int, in d: Double) {
+        let step = 60 / bpm, bass = [55.0, 55, 65.4, 49, 55, 73.4, 65.4, 49]
+        s.tone(110, 0.22, vol: 0.22, slide: -70, delay: d)
+        s.noise(0.04, vol: 0.05, freq: 8000, q: 0.8, type: .highpass, delay: d + step / 2)
+        s.tone(bass[n % bass.count], step * 0.45, wave: .sawtooth, vol: 0.045, delay: d + step / 2)
+        if n % 4 == 3 { s.noise(0.12, vol: 0.07, freq: 1800, q: 0.7, delay: d) }
+    }
     /// a clean strike rings; a toe or heel strike thuds
     static func putt(_ p: Double, clean: Bool) {
         let c = clean ? 1.0 : 0

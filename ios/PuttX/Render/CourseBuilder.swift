@@ -16,6 +16,8 @@ final class CourseRig {
     var ball = ModelEntity()
     /// textures that flow (conveyors): their material slots, and how fast
     var flows: [(ModelEntity, Int, Double)] = []
+    /// neon night: the ball glows and the trail runs in neon
+    var night = false
     /// the scenery that moves between putts
     let anim = SceneAnimator()
     var sunDirection = SIMD3<Float>(0.53, 0.69, -0.48)
@@ -29,8 +31,10 @@ enum CourseBuilder {
     static let library: MTLLibrary? = MTLCreateSystemDefaultDevice()?.makeDefaultLibrary()
 
     /// the hole as the web builds it: exported scenery plus natively grown surfaces
-    static func exported(_ h: Hole) throws -> CourseRig {
-        let S = SceneStore.shared, hole = try S.hole(h.key), rig = CourseRig()
+    static func exported(_ h: Hole, night: Bool = false) throws -> CourseRig {
+        let S = SceneStore.shared, hole = try S.hole(h.key, night: night), rig = CourseRig()
+        rig.anim.hole = h
+        rig.night = hole.env.night
         let mats = hole.mats.map { S.material($0) }
 
         // the scenery, as the web built it
@@ -83,7 +87,8 @@ enum CourseBuilder {
         // the surfaces grown from the sim
         let turf = hole.mats[hole.native.floor]
         let along = simd_normalize(SIMD2(Float(h.cup.x - h.tee.x), Float(h.cup.z - h.tee.z)))
-        let turfMat = try turfMaterial(turf, along: along, stripes: hole.env.night ? 0 : 0.13)
+        // at night the carpet is black-light paint (an emissive texture): the stock material carries it
+        let turfMat: any Material = hole.env.night ? S.material(turf) : try turfMaterial(turf, along: along, stripes: 0.13)
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.floor(h)), materials: [turfMat]))
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.collar(h)), materials: [turfMat]))
         for (i, z) in hole.native.zones.enumerated() where i < h.data.zones.count {
@@ -93,7 +98,7 @@ enum CourseBuilder {
         }
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.skirt(h, bottom: hole.native.skirt.bottom)), materials: [S.material(hole.mats[hole.native.skirt.m])]))
         if let gi = hole.native.ground {
-            let g = ModelEntity(mesh: try lowMesh(Terrain.ground()), materials: [try groundMaterial(hole.mats[gi], fog: hole.env.fog)])
+            let g = ModelEntity(mesh: try lowMesh(Terrain.ground()), materials: [hole.env.night ? S.material(hole.mats[gi]) : try groundMaterial(hole.mats[gi], fog: hole.env.fog)])
             rig.root.addChild(g)
             rig.ground = g
         }
@@ -106,6 +111,15 @@ enum CourseBuilder {
         }
 
         light(rig, hole.env)
+        // the night's lamp over the cup (three's candela to RealityKit's lumens, 4 pi, at the scene's scale)
+        for l in hole.lights ?? [] {
+            let p = PointLight()
+            p.light.color = SceneStore.color(l.color)
+            p.light.intensity = Float(l.intensity * 4 * .pi * 120)
+            p.light.attenuationRadius = Float(l.distance > 0 ? l.distance : 4)
+            p.position = SIMD3(Float(l.pos[0]), Float(l.pos[1]), Float(l.pos[2]))
+            rig.root.addChild(p)
+        }
         return rig
     }
 

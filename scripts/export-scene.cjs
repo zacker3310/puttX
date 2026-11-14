@@ -14,7 +14,8 @@
    groundH): the turf grid, its collar round the cup, the zones, the skirt and the ground plane. For
    those the hole file names the material and the parameters.
 
-   Usage: node scripts/export-scene.cjs [--course 5 | --hole 5-3] [--out dir]
+   Usage: node scripts/export-scene.cjs [--course 5 | --hole 5-3] [--neon] [--out dir]
+   (--neon writes holes/<key>.n.json, the hole under neon night)
    CHROMIUM=/path/to/chrome when playwright-core's own download is not installed. */
 'use strict';
 const fs = require('fs');
@@ -25,6 +26,7 @@ const { build, ROOT } = require('./build.cjs');
 const { sceneWriter } = require('./scene-writer.cjs');
 
 const args = process.argv.slice(2), val = f => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
+const neon = args.includes('--neon');
 const one = val('--hole'), only = val('--course') ? val('--course').split(',').map(Number) : one ? [Number(one.split('-')[0])] : null;
 const OUT = path.resolve(val('--out') || path.join(ROOT, 'ios/PuttX/Scene'));
 for (const d of ['geo', 'tex', 'holes']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
@@ -41,7 +43,9 @@ const srv = http.createServer((req, res) => {
 
 /* runs in the page: serialises holeGroup. Meshes and textures come back as content (hashed here in
    Node), everything else as plain JSON. */
-function grabHole(key) {
+function grabHole([key, neon]) {
+  /* neon night: the same hole as the web dresses it after dark (nightDecor) */
+  progress.neon = !!neon;
   startHole(key);
   const h = play.hole, warn = [];
   const { geos, texs, mats, geoOf, texOf, matOf, node, lin } = sceneWriter(warn);
@@ -101,6 +105,22 @@ function grabHole(key) {
   }
   /* the flagstick: its own rig (no formula), so the app can lift it out of the cup as a ball nears */
   if (typeof flagGroup !== 'undefined' && flagGroup && flagGroup.parent) { let r = A.objs.get(flagGroup); if (!r) A.objs.set(flagGroup, r = { ch: {} }); r.name = 'flag'; }
+  /* neon night (tickNight): lasers sweep, the disco ball turns and wheels its spots over the carpet,
+     the shapes tumble, and the cup ring and the wall halos breathe on the beat (`beat`: the channel's
+     amplitude times exp(-5 x the beat's phase), 118 to the minute) */
+  const night = !!G.getObjectByName('neonDrift');
+  if (night) {
+    for (const p of G.getObjectByName('lasers').children) { const ph = p.userData.phase, sd = p.userData.side; ch(p, 'rx', [0, 0, 0.45, 0.6, ph]); ch(p, 'rz', [-sd * 0.45, 0, -sd * 0.3, 0.42, 0.7 * ph]); }
+    const disco = G.getObjectByName('disco'); ch(disco, 'ry', [disco.rotation.y, 0.8]);
+    const spots = G.getObjectByName('spots');
+    for (const m of spots.children) { let r = A.objs.get(m); if (!r) A.objs.set(m, r = { ch: {} }); r.orbit = [m.userData.a, m.userData.r, spots.position.x, spots.position.z]; }
+    for (const o of G.getObjectByName('neonDrift').children) { ch(o, 'rx', [o.rotation.x, o.userData.spin]); ch(o, 'ry', [o.rotation.y, o.userData.spin * 0.7]); }
+    const glow = G.getObjectByName('cupGlow'); if (glow) A.mats.push({ m: glow.material, p: 'op', ch: [0.6, 0], beat: 0.4 });
+    const walls = G.getObjectByName('walls'), seen = new Set();
+    if (walls) for (const c of walls.children) if (c.name === 'halo' && !seen.has(c.material)) { seen.add(c.material); A.mats.push({ m: c.material, p: 'op', ch: [0.1, 0], beat: 0.22 }); }
+  }
+  const beatK = t => Math.exp(-((t * BPM / 60) % 1) * 5);
+  const orbitAt = (o, t) => { const [a0, r, cx, cz] = o, a = a0 + t * 0.35, x = Math.cos(a) * r, z = Math.sin(a) * r; return { x, z, y: groundH(h, cx + x, cz + z) + 0.006, vis: onFloor(h, cx + x, cz + z) }; };
   const chan = (c, t, relu) => { let v = c[0] + c[1] * t; for (let i = 2; i < c.length; i += 3) { const s = Math.sin(c[i + 1] * t + c[i + 2]); v += c[i] * (relu ? Math.max(0, s) : s); } return v; };
   /* the particle drifts, in closed form (the tick integrates them frame by frame) */
   const ptAt = (k, p0, i, t, rate) => {
@@ -119,8 +139,9 @@ function grabHole(key) {
     else if (k === 'spin') { const a = rate * t, c = Math.cos(a), s = Math.sin(a); [x, z] = [x * c + z * s, -x * s + z * c]; }
     return [x, y, z];
   };
-  if (lk.tick) {
-    lk.tick(G, 0, 0);
+  const tickAll = (dt, t) => { if (lk.tick) lk.tick(G, dt, t); if (night) tickNight(dt, t); };
+  if (lk.tick || night) {
+    tickAll(0, 0);
     /* the pose at t = 0 is what is exported; step the real tick for 3 s and hold every formula to it */
     const snap = []; G.traverse(o => snap.push([o, o.position.clone(), o.rotation.clone(), o.scale.clone(), o.visible, o.quaternion.clone()]));
     const allMats = new Set(); G.traverse(o => { if (o.material) [].concat(o.material).forEach(m => allMats.add(m)); });
@@ -130,20 +151,21 @@ function grabHole(key) {
     const dt = 1 / 240, bad = new Set();
     for (let k = 1; k <= 720; k++) {
       const t = k * dt;
-      lk.tick(G, dt, t);
+      tickAll(dt, t);
       if (k % 240) continue;
       for (const [o, p, r, , vis] of snap) {
         if (inWeed(o)) continue;
         const sp = A.objs.get(o), want = { px: p.x, py: p.y, pz: p.z, rx: r.x, ry: r.y, rz: r.z };
         if (sp) for (const [c, v] of Object.entries(sp.ch)) want[c] = chan(v, t);
+        if (sp && sp.orbit) { const q = orbitAt(sp.orbit, t); want.px = q.x; want.py = q.y; want.pz = q.z; }
         const got = { px: o.position.x, py: o.position.y, pz: o.position.z, rx: o.rotation.x, ry: o.rotation.y, rz: o.rotation.z };
         for (const c of Object.keys(want)) if (Math.abs(want[c] - got[c]) > 2e-3) bad.add(`${o.name || o.type} ${c} ${want[c].toFixed(4)} vs ${got[c].toFixed(4)}`);
-        const wv = sp && sp.vis ? Math.sin(sp.vis[0] * t + sp.vis[1]) > sp.vis[2] : vis;
+        const wv = sp && sp.orbit ? orbitAt(sp.orbit, t).vis : sp && sp.vis ? Math.sin(sp.vis[0] * t + sp.vis[1]) > sp.vis[2] : vis;
         if (wv !== o.visible) bad.add(`${o.name || o.type} visible`);
       }
       for (const [m, c, op, ei] of msnap) {
         const want = { g: c && c.g, r: c && c.r, b: c && c.b, op, ei };
-        for (const s of A.mats) if (s.m === m) want[s.p] = chan(s.ch, t, s.relu);
+        for (const s of A.mats) if (s.m === m) want[s.p] = chan(s.ch, t, s.relu) + (s.beat ? s.beat * beatK(t) : 0);
         const got = { g: m.color && m.color.g, r: m.color && m.color.r, b: m.color && m.color.b, op: m.opacity, ei: m.emissiveIntensity };
         for (const p of Object.keys(want)) if (want[p] !== undefined && Math.abs(want[p] - got[p]) > 2e-3) bad.add(`material ${m.type} ${p} ${(+want[p]).toFixed(4)} vs ${(+got[p]).toFixed(4)}`);
       }
@@ -184,13 +206,13 @@ function grabHole(key) {
      its pose at t = 0, its formulas, and the meshes it carries, in its own frame) */
   function walk(o, rec) {
     const sp = A.objs.get(o);
-    if (!o.visible && !(sp && sp.vis)) return;
+    if (!o.visible && !(sp && (sp.vis || sp.orbit))) return;
     if (sp && !o.isPoints) {
       const px = new THREE.Matrix4();
       if (rec) px.copy(rec.o.matrixWorld).invert();
       px.multiply(o.parent.matrixWorld);
       if (o.rotation.order !== 'XYZ') warn.push('anim rotation order ' + o.rotation.order);
-      rec = { o, out: { up: rec ? anims.indexOf(rec.out) : -1, px: Array.from(px.elements, r6), b: [...o.position.toArray(), o.rotation.x, o.rotation.y, o.rotation.z, ...o.scale.toArray()].map(r6), ch: sp.ch, vis: sp.vis || null, name: sp.name || null, parts: [] } };
+      rec = { o, out: { up: rec ? anims.indexOf(rec.out) : -1, px: Array.from(px.elements, r6), b: [...o.position.toArray(), o.rotation.x, o.rotation.y, o.rotation.z, ...o.scale.toArray()].map(r6), ch: sp.ch, vis: sp.vis || null, name: sp.name || null, orbit: sp.orbit || null, parts: [] } };
       anims.push(rec.out);
     }
     if (o.isInstancedMesh) {
@@ -223,7 +245,11 @@ function grabHole(key) {
   }
   for (const c of holeGroup.children) if (!nativeTop.has(c) && !moverSet.has(c)) walk(c, null);
   if (anims.length) out.anims = anims;
-  if (A.mats.length) out.matAnims = A.mats.map(s => ({ m: matOf(s.m), p: s.p, ch: s.ch, relu: s.relu || 0 }));
+  if (A.mats.length) out.matAnims = A.mats.map(s => ({ m: matOf(s.m), p: s.p, ch: s.ch, relu: s.relu || 0, beat: s.beat || 0 }));
+  /* lights the hole adds (the night's lamp over the cup) */
+  const lights = [];
+  G.traverse(o => { if (o.isPointLight) { o.updateMatrixWorld(true); const v = new THREE.Vector3().setFromMatrixPosition(o.matrixWorld); lights.push({ color: lin(o.color), intensity: o.intensity, distance: o.distance, decay: o.decay, pos: v.toArray() }); } });
+  if (lights.length) out.lights = lights;
   for (const mv of moverMeshes) {
     const keep = { p: mv.position.clone(), r: mv.rotation.clone() };
     mv.position.set(0, 0, 0); mv.rotation.set(0, 0, 0); mv.updateMatrixWorld(true);
@@ -271,7 +297,7 @@ srv.listen(0, '127.0.0.1', async () => {
     await tab.addScriptTag({ content: sceneWriter.toString() });
     const keys = one ? [one] : S.WORLDS[c].holes.map(h => h.key);
     for (const key of keys) {
-      const { out, geos, texs, warn } = await tab.evaluate(grabHole, key);
+      const { out, geos, texs, warn } = await tab.evaluate(grabHole, [key, neon]);
       for (const w of warn) stats.warn.set(w, (stats.warn.get(w) || 0) + 1);
       /* content hashes: the same mesh or texture anywhere in the game is stored once */
       const gmap = {}, tmap = {};
@@ -289,7 +315,7 @@ srv.listen(0, '127.0.0.1', async () => {
       out.static.forEach(fix); out.movers.forEach(p => p.forEach(fix)); (out.anims || []).forEach(a => a.parts.forEach(fix)); (out.weeds || []).forEach(w => w.parts.forEach(fix));
       for (const m of out.mats) for (const k of Object.keys(m)) if (m[k] && typeof m[k] === 'object' && 't' in m[k]) m[k].t = tmap[m[k].t];
       const js = JSON.stringify(out);
-      fs.writeFileSync(path.join(OUT, 'holes', key + '.json'), js + '\n');
+      fs.writeFileSync(path.join(OUT, 'holes', key + (neon ? '.n' : '') + '.json'), js + '\n');
       stats.bytes += js.length; stats.holes++;
       process.stdout.write(`${key} `);
     }

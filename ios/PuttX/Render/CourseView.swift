@@ -46,11 +46,12 @@ struct CourseView: UIViewRepresentable {
             anchor.addChild(camera)
             v.scene.addAnchor(anchor)
             do {
-                let r = renderer == .hand && play.hole.key == "1-1" ? try HandHole.build(play.hole) : try CourseBuilder.exported(play.hole)
+                let r = renderer == .hand && play.hole.key == "1-1" ? try HandHole.build(play.hole) : try CourseBuilder.exported(play.hole, night: play.night)
                 anchor.addChild(r.root)
                 props.wear(putter: play.gear.putter, ball: play.gear.ball, tint: play.ballTint)
                 anchor.addChild(props.root)
-                let f = PlayFX(flag: r.anim.named("flag"))
+                if r.night { props.glow() }
+                let f = PlayFX(flag: r.anim.named("flag"), night: r.night)
                 anchor.addChild(f.root)
                 fx = f
                 rig = r

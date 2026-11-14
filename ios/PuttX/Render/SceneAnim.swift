@@ -37,6 +37,8 @@ struct SceneAnim: Decodable {
     let vis: [Double]?
     /// a rig the game drives itself ("flag": the flagstick)
     let name: String?
+    /// a night floor spot: wheels round (cx, cz) at radius r from angle a, on the ground, shown only over the felt
+    let orbit: [Double]?
     let parts: [SceneNode]
 }
 struct SceneMatAnim: Decodable {
@@ -45,6 +47,8 @@ struct SceneMatAnim: Decodable {
     let p: String
     let ch: Channel
     let relu: Int
+    /// pulses on neon night's beat: plus this times exp(-5 x the beat's phase)
+    let beat: Double?
 }
 struct SceneWeed: Decodable {
     let i: Int
@@ -69,6 +73,8 @@ final class SceneAnimator {
     private struct Weed { let e: Entity; let mover: Mover; let base: SIMD3<Float>; let r: Double; var roll: Double }
     private var weeds: [Weed] = []
     private var lastT: Double?
+    /// the hole, for the night spots' ground and felt
+    var hole: Hole?
 
     /// a named rig's entity (the flagstick), which the game poses itself
     func named(_ n: String) -> Entity? { rigs.first { $0.a.name == n }?.e }
@@ -115,10 +121,17 @@ final class SceneAnimator {
         r.e.orientation = qx * qy * qz
         r.e.scale = SIMD3(Float(b[6]), Float(b[7]), Float(b[8]))
         if let s = a.vis { r.e.isEnabled = sin(s[0] * t + s[1]) > s[2] }
+        // a night spot wheeling over the carpet, set on the ground, hidden off the felt
+        if let o = a.orbit, o.count == 4, let h = hole {
+            let ang = o[0] + t * 0.35, x = cos(ang) * o[1], z = sin(ang) * o[1], wx = o[2] + x, wz = o[3] + z
+            r.e.position = SIMD3(Float(x), Float(h.groundH(wx, wz) + 0.006), Float(z))
+            r.e.isEnabled = h.onFloor(wx, wz)
+        }
     }
 
     private func paint(_ i: Int, _ t: Double) {
-        let x = mats[i], val = x.a.ch.at(t, relu: x.a.relu != 0)
+        let x = mats[i], beat = x.a.beat.map { $0 * exp(-5 * (t * SFX.bpm / 60).truncatingRemainder(dividingBy: 1)) } ?? 0
+        let val = x.a.ch.at(t, relu: x.a.relu != 0) + beat
         if abs(val - x.last) < 0.002 { return }
         mats[i].last = val
         guard var list = x.e.model?.materials, x.slot < list.count else { return }

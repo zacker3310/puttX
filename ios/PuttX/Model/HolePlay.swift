@@ -136,6 +136,17 @@ final class HolePlay {
     }
     /// the goals met at the finish (bits), and which were new
     var goals: (all: Int, fresh: Int)?
+    /// neon night: the hole after dark, with its beat (sound on only)
+    var night = false
+    var beatOn = false
+    @ObservationIgnored private var beatClock = 0.0, beatAt = 0.0, beatN = 0
+    private func stepBeat(_ dt: Double) {
+        guard night && beatOn else { beatAt = 0; return }
+        beatClock += dt
+        let step = 60 / SFX.bpm
+        if beatAt == 0 || beatAt < beatClock - 0.5 { beatAt = beatClock + 0.05 }
+        while beatAt < beatClock + 0.2 { SFX.beat(beatN, in: beatAt - beatClock); beatAt += step; beatN += 1 }
+    }
     /// practice: nothing counts, mulligans are free, and the guide can show the proven line
     var practice = false
     var canGuide: Bool { practice && !party && phase == .aim && intro == nil && !hole.data.sol.isEmpty }
@@ -275,6 +286,7 @@ final class HolePlay {
     private func tick(_ dt0: Double) {
         var dt = min(dt0, 0.1)
         ambience(dt)
+        stepBeat(dt)
         if let t = intro { intro = t + dt < HolePlay.introLength ? t + dt : nil; if intro == nil { banner = false } }
         if phase == .replay { time += dt; stepReplay(dt); return }
         if phase == .auto || phase == .sinking {

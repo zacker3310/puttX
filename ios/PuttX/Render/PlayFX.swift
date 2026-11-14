@@ -24,8 +24,13 @@ final class PlayFX {
     private let calm = UIAccessibility.isReduceMotionEnabled
     private static let colors: [UIColor] = ["#ef7d6d", "#ffd66e", "#74c465", "#6fc0df", "#fff8ec"].map { UIColor(SwiftUI.Color(hex: $0)) }
 
-    init(flag: Entity?) {
-        self.flag = flag
+    /// neon night: a longer trail, each dot its own neon
+    private let night: Bool
+    private var trailN = 0
+    private static let neon: [UIColor] = ["#ff3df2", "#2ef2ff", "#b6ff2e", "#ffb02e", "#8b5cff"].map { UIColor(SwiftUI.Color(hex: $0)) }
+
+    init(flag: Entity?, night: Bool = false) {
+        self.flag = flag; self.night = night
         if let f = flag { flagBase = f.position }
         func unlit(_ c: UIColor, _ o: Float = 1) -> UnlitMaterial { var m = UnlitMaterial(color: c); m.blending = .transparent(opacity: .init(floatLiteral: o)); m.faceCulling = .none; return m }
         let dot = MeshResource.generateSphere(radius: Float(Sim.BALL_R * 0.55))
@@ -48,14 +53,15 @@ final class PlayFX {
         let rolling = play.phase == .roll || play.phase == .drift || play.phase == .replay
         if !calm && rolling && b.tube == nil && trailClock >= trailNext && hypot(b.vx, b.vz) > 0.3, let i = trail.firstIndex(where: { !$0.e.isEnabled }) ?? trail.indices.first {
             trailNext = trailClock + 0.03
-            trail[i].life = 0.4; trail[i].e.isEnabled = true
+            trail[i].life = night ? 0.8 : 0.4; trail[i].e.isEnabled = true
+            if night, var m = trail[i].e.model?.materials.first as? UnlitMaterial { m.color.tint = PlayFX.neon[trailN % 5]; trailN += 1; trail[i].e.model?.materials = [m] }
             trail[i].e.position = SIMD3(Float(b.x), Float(b.y + Sim.BALL_R * 0.6), Float(b.z))
         }
         for i in trail.indices where trail[i].e.isEnabled {
             trail[i].life -= dt
             if trail[i].life <= 0 || calm { trail[i].e.isEnabled = false; continue }
-            let k = trail[i].life / 0.4
-            opacity(trail[i].e, Float(k * 0.55)); trail[i].e.scale = SIMD3(repeating: Float(0.4 + k * 0.6))
+            let L = night ? 0.8 : 0.4, k = trail[i].life / L
+            opacity(trail[i].e, Float(k * (night ? 0.9 : 0.55))); trail[i].e.scale = SIMD3(repeating: Float((0.4 + k * 0.6) * (night ? 1.6 : 1)))
         }
         // squash on hard hits
         let s = calm ? 0 : squash

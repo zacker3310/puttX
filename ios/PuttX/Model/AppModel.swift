@@ -103,6 +103,7 @@ final class AppModel {
             p.lostGot = progress.lost[key] != nil
             p.setGhost(progress.ghosts[key])
             p.gear = (progress.equipped["putter"] ?? "p1", progress.equipped["ball"] ?? "b1")
+            p.night = progress.neon; p.beatOn = progress.sound
             p.practice = practice && party == nil
             if p.practice { p.lostGot = true }
             if let party {

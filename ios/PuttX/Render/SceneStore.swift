@@ -75,7 +75,10 @@ struct SceneHole: Decodable {
     let anims: [SceneAnim]?
     let matAnims: [SceneMatAnim]?
     let weeds: [SceneWeed]?
+    /// lights the hole adds (the night's lamp over the cup)
+    let lights: [SceneLight]?
 }
+struct SceneLight: Decodable { let color: [Double], intensity: Double, distance: Double, decay: Double, pos: [Double] }
 /// a putter (its parts, in its own frame; `head` marks the head) or a ball (its finish)
 struct SceneGear: Decodable {
     struct Part: Decodable { let g: String; let m: SceneNode.MatRef; let x: [Float]; let head: Bool }
@@ -101,9 +104,10 @@ final class SceneStore {
     private var textures: [String: TextureResource] = [:]
 
     /// a hole's file: deflated (.json.z, as shipped) or plain (.json)
-    private func holeURL(_ key: String) -> URL? {
+    private func holeURL(_ key: String, night: Bool = false) -> URL? {
         guard let r = root else { return nil }
-        for name in ["holes/\(key).json.z", "holes/\(key).json"] {
+        let names = night ? ["holes/\(key).n.json.z", "holes/\(key).n.json"] : ["holes/\(key).json.z", "holes/\(key).json"]
+        for name in names {
             let u = r.appendingPathComponent(name)
             if FileManager.default.fileExists(atPath: u.path) { return u }
         }
@@ -111,8 +115,9 @@ final class SceneStore {
     }
     func has(_ key: String) -> Bool { holeURL(key) != nil }
 
-    func hole(_ key: String) throws -> SceneHole {
-        guard let url = holeURL(key) else { throw CocoaError(.fileNoSuchFile) }
+    /// a hole's scenery; at night its neon dress when exported (else the day's)
+    func hole(_ key: String, night: Bool = false) throws -> SceneHole {
+        guard let url = (night ? holeURL(key, night: true) : nil) ?? holeURL(key) else { throw CocoaError(.fileNoSuchFile) }
         var data = try Data(contentsOf: url)
         if url.pathExtension == "z" { data = try (data as NSData).decompressed(using: .zlib) as Data }
         return try JSONDecoder().decode(SceneHole.self, from: data)

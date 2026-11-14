@@ -25,7 +25,7 @@ if [ "${PLAIN:-0}" = 1 ]; then
 fi
 
 # the first connected (or networked) iPhone or iPad
-DEV=$(xcrun devicectl list devices 2>/dev/null | awk '/iPhone|iPad/ && /available|connected/ {for (i=1;i<=NF;i++) if ($i ~ /^[0-9A-F-]{25,}$/) {print $i; exit}}')
+DEV=$(xcrun devicectl list devices 2>/dev/null | awk '/iPhone|iPad/ && /available|connected/ && !/unavailable|simulated/ {for (i=1;i<=NF;i++) if ($i ~ /^[0-9A-F-]{25,}$/) {print $i; exit}}')
 [ -n "$DEV" ] || { echo "no paired iPhone or iPad found: pair it in Xcode > Window > Devices and Simulators"; exit 1; }
 echo "device $DEV"
 

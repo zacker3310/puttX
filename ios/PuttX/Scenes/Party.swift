@@ -129,24 +129,61 @@ struct PartyCard: View {
     @Environment(\.stage) private var st
     let party: Party
     var body: some View {
-        let best = (0..<party.n).map(party.total).min() ?? 0
+        let holes = app.catalog.holes(course: party.course), best = (0..<party.n).map(party.total).min() ?? 0
         ZStack {
             SkyBackground(colors: app.look(party.course).skyColors)
-            VStack(spacing: st.s(14)) {
-                ForEach((0..<party.n).sorted { party.total($0) < party.total($1) }, id: \.self) { p in
-                    HStack(spacing: st.s(18)) {
-                        PartyBall(p: p, size: st.s(72))
-                        Text("\(party.total(p))").font(Toy.font(64, st)).foregroundStyle(Toy.inkStrong).frame(width: st.s(120))
-                        Group { if party.total(p) == best { Crown() } else { Color.clear } }.frame(width: st.s(64), height: st.s(64))
+            VStack(spacing: st.s(12)) {
+                // the web's party scorecard: each nine with a row per player, each row labelled by ball
+                ForEach(Array(stride(from: 0, to: holes.count, by: 9)), id: \.self) { k in nine(Array(holes[k..<min(k + 9, holes.count)]), from: k) }
+                HStack(spacing: st.s(22)) {
+                    ForEach((0..<party.n).sorted { party.total($0) < party.total($1) }, id: \.self) { p in
+                        HStack(spacing: st.s(8)) {
+                            PartyBall(p: p, size: st.s(56))
+                            Text("\(party.total(p))").font(Toy.font(48, st)).foregroundStyle(Toy.inkStrong)
+                            if party.total(p) == best { Crown().frame(width: st.s(48), height: st.s(48)) }
+                        }
+                        .accessibilityElement(children: .ignore).accessibilityLabel("player \(p + 1), total \(party.total(p))" + (party.total(p) == best ? ", winner" : ""))
                     }
-                    .accessibilityElement(children: .ignore).accessibilityLabel("player \(p + 1), total \(party.total(p))")
+                    Spacer(minLength: 0)
+                    Button { app.endParty(); app.go(.map(party.course)) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
+                        .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")
                 }
-                Button { app.endParty(); app.go(.map(party.course)) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
-                    .buttonStyle(ToyButtonStyle()).accessibilityLabel("map").padding(.top, st.s(16))
             }
-            .padding(st.s(44)).toyCard(st, radius: Toy.rXl).popIn()
+            .padding(st.s(28)).toyCard(st, radius: Toy.rXl).padding(.horizontal, st.s(40)).popIn()
         }
         .onAppear { SFX.fanfare() }
+    }
+    private var rowH: CGFloat { min(30, max(22, (st.h - 230) / (2 * (2 + CGFloat(party.n))))) }
+    private func nine(_ ns: [Hole], from k: Int) -> some View {
+        let cell = st.s(min(70, (st.w - 360) / 11)), lab = st.s(56), subW = st.s(84)
+        let paper = Color(hex: "#fffdf3"), rule = Color(hex: "#c9dbe8")
+        func t(_ s: String, _ w: CGFloat, _ c: Color) -> some View { Text(s).font(Toy.font(rowH * 0.75, st)).foregroundStyle(c).frame(width: w, height: st.s(rowH)) }
+        return Grid(horizontalSpacing: 0, verticalSpacing: 0) {
+            GridRow {
+                Color.clear.frame(width: lab, height: st.s(rowH))
+                ForEach(ns.indices, id: \.self) { i in t("\(k + i + 1)", cell, Toy.inkSoft) }
+                t("\(k + 1)-\(k + ns.count)", subW, Toy.inkSoft)
+            }
+            .background(Color(hex: "#f3ead2"))
+            GridRow {
+                Glyph.flag.image.resizable().scaledToFit().frame(width: st.s(rowH)).frame(width: lab, height: st.s(rowH))
+                ForEach(ns.indices, id: \.self) { i in t("\(ns[i].par)", cell, Toy.inkSoft) }
+                t("\(ns.reduce(0) { $0 + $1.par })", subW, Toy.inkSoft)
+            }
+            ForEach(0..<party.n, id: \.self) { p in
+                GridRow {
+                    PartyBall(p: p, size: st.s(rowH - 4)).frame(width: lab, height: st.s(rowH))
+                    ForEach(ns.indices, id: \.self) { i in t(party.scores[ns[i].key]?[p].map { "\($0)" } ?? "", cell, Color(hex: "#2f5d8a")) }
+                    t("\(ns.reduce(0) { $0 + (party.scores[$1.key]?[p] ?? 0) })", subW, Toy.inkStrong)
+                }
+                // the card's blue ruling under each player's line
+                .overlay(alignment: .bottom) { Rectangle().fill(rule).frame(height: st.s(2)) }
+            }
+        }
+        .overlay(alignment: .leading) { Rectangle().fill(Color(hex: "#ef9a8a")).frame(width: st.s(3)).offset(x: lab) }
+        .background(paper)
+        .clipShape(RoundedRectangle(cornerRadius: st.s(Toy.rMd)))
+        .overlay(RoundedRectangle(cornerRadius: st.s(Toy.rMd)).strokeBorder(Color(hex: "#d9cfb4"), lineWidth: st.s(3)))
     }
 }
 

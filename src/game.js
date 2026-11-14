@@ -2520,7 +2520,8 @@ function stepFrame(now) {
   const dt = lastNow ? Math.min(0.1, Math.max(0, (now - lastNow) / 1000)) : 0;
   lastNow = now;
   if (!loopPaused) advance(dt);
-  renderFrame(dt);
+  /* a menu's backdrop covers the whole stage: the 3D hole behind it is not drawn */
+  if (!backdropOn) renderFrame(dt);
   return dt;
 }
 function frame(now) { stepFrame(now); requestAnimationFrame(frame); }
@@ -3413,7 +3414,7 @@ function paintWorld(c, W, H, t, w) {
 }
 /* the backdrop's loop: which world each menu shows, painted while a menu is up */
 const BACKDROP_SCENES = ['title', 'profiles', 'worlds', 'world', 'map', 'card', 'shop'];
-let backdropT0 = 0, backdropLast = 0, backdropOn = false;
+let backdropT0 = 0, backdropLast = 0, backdropOn = false, cardsLast = 0;
 function backdropFor(scene) {
   if (scene === 'world') return backdropWorld(mapWorld);
   if (scene === 'map' || scene === 'card') return backdropWorld(mapWorld);
@@ -3436,6 +3437,14 @@ function backdropLoop(now) {
   if (BACKDROP_SCENES.includes(currentScene) && (now - backdropLast > 33) && (!reducedMotion() || backdrop.dataset.scene !== currentScene + backdropFor(currentScene))) {
     backdropLast = now; paintBackdrop(now); backdrop.dataset.scene = currentScene + backdropFor(currentScene);
   } else if (!BACKDROP_SCENES.includes(currentScene) && backdropOn) paintBackdrop(now);
+  /* the world cards are live windows too, at a gentler twelve frames a second (still under reduced motion) */
+  if (currentScene === 'worlds' && !reducedMotion() && now - cardsLast > 83) {
+    cardsLast = now;
+    for (const cv of worldGrid.querySelectorAll('.wcard:not(.locked) canvas')) {
+      const c = cv.getContext('2d'), k = 472 / 700;
+      c.setTransform(k, 0, 0, k, -(1200 * k - 376) / 2, 0); paintWorld(c, 1200, 700, 4 + (now - backdropT0) / 1000, Number(cv.dataset.w));
+    }
+  }
   requestAnimationFrame(backdropLoop);
 }
 
@@ -3478,7 +3487,7 @@ function showWorlds() {
     /* a window into the world (its title scene, still), the emblem in a glass ring of its colour, a metal foot */
     const A = TITLE_ACCENT[w];
     if (open) { b.style.setProperty('--ring', A[1]); b.style.setProperty('--glow', A[2]); b.style.setProperty('--m0', A[0]); b.style.setProperty('--m1', A[1]); }
-    b.innerHTML = `<canvas width="376" height="472"></canvas><span class="art">${look.icon || ''}</span><span class="foot"><span class="num">${w}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}</span>` : LOCK_SVG) + '</span>';
+    b.innerHTML = `<canvas width="376" height="472" data-w="${w}"></canvas><span class="art">${look.icon || ''}</span><span class="foot"><span class="num">${w}</span>` + (open ? `<span class="tally">${STAR_SVG}${stars}</span>` : LOCK_SVG) + '</span>';
     { const c = b.querySelector('canvas').getContext('2d'), k = 472 / 700; c.setTransform(k, 0, 0, k, -(1200 * k - 376) / 2, 0); paintWorld(c, 1200, 700, 4, w); }
     b.onclick = () => { if (open) { sfx('tap'); showWorld(w); } else sfx('boink'); };
     worldGrid.append(b);

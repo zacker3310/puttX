@@ -146,6 +146,18 @@ final class HolePlay {
         ghostPutt(0)
         SFX.tubeOut()
     }
+    /// the putt tracer: the last putt's whole line, painted on the green until the next (x, y, z, speed;
+    /// nil where a tube broke it). `traced` counts each finished line, for the view to redraw
+    @ObservationIgnored private(set) var trace: [SIMD4<Double>?] = []
+    private(set) var traced = 0
+    private(set) var traceShown = false
+    private func recordTrace() {
+        let b = ball
+        if b.tube != nil { if let l = trace.last, l != nil { trace.append(nil) }; return }
+        let p = SIMD4(b.x, b.y, b.z, hypot(b.vx, b.vz))
+        if let l = trace.last { if let l, hypot(b.x - l.x, b.z - l.z) <= 0.025 { return } }
+        trace.append(p)
+    }
     /// the slope read: arrows over the green pointing downhill
     var reading = false
     /// pass and play: no mulligans; the ball wears the player's colour
@@ -255,6 +267,7 @@ final class HolePlay {
         log.append([a, p, time])
         run = PuttRun(hole, from: from, angle: a, power: p, t0: time)
         if ghost?.auto != true { ghostPutt(log.count - 1) }
+        trace = []; traceShown = false; recordTrace()
         hitsHeard = 0
         phase = .roll
     }
@@ -283,6 +296,7 @@ final class HolePlay {
             if var r = run {
                 let end = r.step()
                 run = r; time = r.t; ball = r.ball
+                recordTrace()
                 hear(r.ball.hits)
                 if end != nil { finish(r); return }
             } else {
@@ -346,6 +360,7 @@ final class HolePlay {
     private func finish(_ r: PuttRun) {
         guard let res = r.raw else { return }
         lastOutcome = phase == .drift ? round.resolveDrift(res, from: from) : round.resolvePutt(res, from: from)
+        if res.end != .sunk && trace.compactMap({ $0 }).count >= 3 { traced += 1; traceShown = true }
         run = nil
         Synth.shared.roll(speed: 0, surface: "felt")
         switch lastOutcome {

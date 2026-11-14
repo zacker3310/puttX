@@ -27,6 +27,9 @@ final class PlayProps {
     private var ghostGuide = false
     /// the slope read's arrows, built when it is first turned on
     private var read: ModelEntity?
+    /// the putt tracer's painted line
+    private let tracer = ModelEntity()
+    private var tracedShown = -1
 
     static let PUTTER_SCALE: Float = 0.83, BACK_M = 0.36, GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042
 
@@ -103,6 +106,7 @@ final class PlayProps {
             ghost.model?.materials = [m]
         }
         updateRead(play)
+        updateTrace(play)
         if let g = play.ghost, ghost.isEnabled { ghost.position = SIMD3(Float(g.ball.x), Float(g.ball.y + Sim.BALL_R), Float(g.ball.z)) }
         // the lost ball, until it is found
         if let s = play.lostSpot, !play.lostGot, play.phase != .done {
@@ -306,6 +310,42 @@ final class PlayProps {
             read = e
         }
         read?.isEnabled = true
+    }
+
+    /// the last putt's line, coloured by pace: sky blue slow, sun yellow, coral fast (src/game.js showTrace)
+    private func updateTrace(_ play: HolePlay) {
+        tracer.isEnabled = play.traceShown
+        guard play.traceShown, play.traced != tracedShown else { return }
+        tracedShown = play.traced
+        if tracer.parent == nil { root.addChild(tracer) }
+        let cols: [SIMD3<Float>] = [[0.435, 0.753, 0.875], [1, 0.839, 0.431], [0.937, 0.49, 0.427]]
+        var runs: [[SIMD4<Double>]] = [[]]
+        for p in play.trace { if let p { runs[runs.count - 1].append(p) } else { runs.append([]) } }
+        // three colour bands are enough to read pace; each quad takes the band of its start
+        var pos: [SIMD3<Float>] = [], band: [[UInt32]] = [[], [], []]
+        let w = 0.007
+        for run in runs where run.count >= 2 {
+            let n = run.count, base = UInt32(pos.count)
+            var bandOf: [Int] = []
+            for i in 0..<n {
+                let a = run[max(0, i - 1)], b = run[min(n - 1, i + 1)], p = run[i], dx = b.x - a.x, dz = b.z - a.z, d = max(1e-9, hypot(dx, dz))
+                let sx = dz / d * w, sz = -dx / d * w
+                pos.append(SIMD3(Float(p.x + sx), Float(p.y + 0.004), Float(p.z + sz))); pos.append(SIMD3(Float(p.x - sx), Float(p.y + 0.004), Float(p.z - sz)))
+                bandOf.append(min(2, Int((min(1, p.w / 3) * 2).rounded())))
+            }
+            for i in 1..<n {
+                let j = base + UInt32(i) * 2
+                band[bandOf[i]] += [j - 2, j - 1, j, j - 1, j + 1, j]
+            }
+        }
+        var parts: [MeshDescriptor] = [], mats: [UnlitMaterial] = []
+        for (k, idx) in band.enumerated() where !idx.isEmpty {
+            var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx); d.materials = .allFaces(UInt32(mats.count))
+            var m = UnlitMaterial(color: UIColor(red: CGFloat(cols[k].x), green: CGFloat(cols[k].y), blue: CGFloat(cols[k].z), alpha: 1))
+            m.blending = .transparent(opacity: 0.8); m.faceCulling = .none
+            parts.append(d); mats.append(m)
+        }
+        if let mesh = try? MeshResource.generate(from: parts) { tracer.model = ModelComponent(mesh: mesh, materials: mats) }
     }
 
     /// a flat ring lying on the ground

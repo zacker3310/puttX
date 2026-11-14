@@ -12,19 +12,19 @@ struct TitleView: View {
     @State private var pulse = false
     var body: some View {
         GeometryReader { g in
-            let k = TitleArt.scale(g.size)
+            let u = g.size.height / 700
             ZStack {
-                TitleArt()
-                // the pill sits on the art's green (art x 440...760, y 396...540)
-                Button { app.go(.profiles) } label: {
-                    Image(systemName: "play.fill").font(.system(size: st.s(60), weight: .black))
-                }
-                .buttonStyle(ToyButtonStyle(kind: .go, radius: 72, size: CGSize(width: 320, height: 144)))
-                .scaleEffect(pulse ? 1.04 : 1)
-                .position(x: g.size.width / 2 + (600 - 600) * k, y: g.size.height / 2 + (468 - 350) * k)
-                .accessibilityLabel("play")
-                .popIn(0.3)
-                .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.9).repeatForever().delay(1.2)) { pulse = true } } }
+                MetalTitleScene()
+                MetalLogo()
+                    .position(x: g.size.width / 2, y: g.size.height * 0.25)
+                    .popIn(0.1)
+                Button { app.go(.profiles) } label: { MoltenPlay() }
+                    .buttonStyle(MetalButtonStyle(radius: 34, size: CGSize(width: 300, height: 128)))
+                    .scaleEffect(pulse ? 1.04 : 1)
+                    .position(x: g.size.width / 2, y: g.size.height / 2 + 170 * u)
+                    .accessibilityLabel("play")
+                    .popIn(0.3)
+                    .onAppear { if !reduceMotion { withAnimation(.easeInOut(duration: 0.9).repeatForever().delay(1.2)) { pulse = true } } }
                 // the hole of the day, bottom right
                 DailyButton()
                     .position(x: g.size.width - st.s(26 + 118) - g.safeAreaInsets.trailing, y: g.size.height - st.s(24 + 56) - g.safeAreaInsets.bottom)

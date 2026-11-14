@@ -159,26 +159,24 @@ struct DailyButton: View {
                     else { app.looks[w].iconImage?.resizable().scaledToFit() }
                 }
                 .padding(st.s(8)).frame(width: st.s(70), height: st.s(70))
-                .background(Circle().fill(Color(hex: "#fffdf7"))).overlay(Circle().strokeBorder(Toy.yellowLine, lineWidth: st.s(4)))
+                .background(Circle().fill(Color(hex: "#fff3dc"))).overlay(Circle().strokeBorder(Color(hex: "#ffb02e"), lineWidth: st.s(4)))
                 VStack(spacing: st.s(6)) {
-                    Text("\(n)").font(Toy.font(40, st)).foregroundStyle(Toy.inkStrong)
+                    Text("\(n)").font(Toy.font(40, st)).foregroundStyle(.white)
                     if !app.catalog.isExtra(c) {
                         let k = (app.catalog.courses(ofWorld: w).firstIndex(of: c) ?? 0) + 1
-                        HStack(spacing: st.s(4)) { ForEach(0..<k, id: \.self) { _ in Circle().fill(Toy.inkSoft).frame(width: st.s(9), height: st.s(9)) } }
+                        HStack(spacing: st.s(4)) { ForEach(0..<k, id: \.self) { _ in Circle().fill(Color(hex: "#ffb02e")).frame(width: st.s(9), height: st.s(9)) } }
                     }
                 }
                 Spacer(minLength: 0)
                 if let s = d.streak {
-                    HStack(spacing: st.s(2)) { ExtraIconView(icon: .flame).frame(width: st.s(34), height: st.s(34)); Text("\(s)").font(Toy.font(28, st)).foregroundStyle(Toy.inkStrong) }
+                    HStack(spacing: st.s(2)) { ExtraIconView(icon: .flame).frame(width: st.s(34), height: st.s(34)); Text("\(s)").font(Toy.font(28, st)).foregroundStyle(.white) }
                 }
             }
             .padding(.leading, st.s(10)).padding(.trailing, st.s(16))
             .frame(width: st.s(236), height: st.s(112))
-            .background(shape.fill(LinearGradient(colors: [Color(hex: "#ffe9a3"), Toy.yellow], startPoint: .top, endPoint: .bottom)))
-            .overlay(shape.strokeBorder(Toy.yellowLine, lineWidth: st.s(5)))
-            // the ticket's notches
-            .overlay(alignment: .leading) { Circle().fill(Color(hex: "#7bc463")).frame(width: st.s(22), height: st.s(22)).offset(x: -st.s(13)) }
-            .overlay(alignment: .trailing) { Circle().fill(Color(hex: "#3f6a5a")).frame(width: st.s(22), height: st.s(22)).offset(x: st.s(13)) }
+            // a gunmetal ticket rimmed in fire, to match the title
+            .background(shape.fill(LinearGradient(colors: [Color(hex: "#5d636e"), Color(hex: "#2f333b"), Color(hex: "#1f2228")], startPoint: .top, endPoint: .bottom)))
+            .overlay(shape.strokeBorder(LinearGradient(colors: [Color(hex: "#ffd36b"), Color(hex: "#ff5a1a")], startPoint: .top, endPoint: .bottom), lineWidth: st.s(5)))
             .overlay(alignment: .topLeading) {
                 ExtraIconView(icon: .sun).frame(width: st.s(64), height: st.s(64))
                     .rotationEffect(.degrees(turn ? 360 : 0))
@@ -191,7 +189,8 @@ struct DailyButton: View {
                         .rotationEffect(.degrees(12)).offset(x: st.s(14), y: -st.s(16))
                 }
             }
-            .background(shape.fill(Toy.yellowDown).offset(y: st.s(7)))
+            .background(shape.fill(Color(hex: "#0d0e12")).offset(y: st.s(7)))
+            .shadow(color: Color(hex: "#ff5a1a").opacity(0.45), radius: st.s(14))
         }
         .buttonStyle(PressDown())
         .accessibilityLabel("hole of the day" + (d.streak.map { ", \($0) days in a row" } ?? ""))

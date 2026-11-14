@@ -92,7 +92,8 @@ final class PlayProps {
         if (play.phase == .roll || play.phase == .drift) && wl > 1e-6 {
             ball.orientation = simd_quatf(angle: wl * Float(simDt), axis: w / wl) * ball.orientation
         }
-        ball.position = SIMD3(Float(b.x), Float(b.y + Sim.BALL_R), Float(b.z))
+        let d = play.drawBall
+        ball.position = SIMD3(Float(d.x), Float(d.y + Sim.BALL_R), Float(d.z))
         // lifted from where it stopped against a rail and set down where the rule puts it
         if let f = play.placeFrom, !play.reduceMotion, play.placeT < 0.35 {
             play.placeT += min(0.1, max(0, now - (lastNow ?? now)))
@@ -101,9 +102,9 @@ final class PlayProps {
         }
         lastNow = now
         // its shadow: on the ground under it, fading and spreading as it lifts
-        let gy = h.groundH(b.x, b.z), up = max(0, b.y - gy)
-        shadow.isEnabled = visible && up < 0.4 && hypot(b.x - h.cup.x, b.z - h.cup.z) >= Sim.CUP_R
-        shadow.position = SIMD3(Float(b.x), Float(gy + 0.002), Float(b.z))
+        let gy = h.groundH(d.x, d.z), up = max(0, d.y - gy)
+        shadow.isEnabled = visible && up < 0.4 && hypot(d.x - h.cup.x, d.z - h.cup.z) >= Sim.CUP_R
+        shadow.position = SIMD3(Float(d.x), Float(gy + 0.002), Float(d.z))
         shadow.scale = SIMD3(repeating: Float(1 + up * 6))
 
         ghost.isEnabled = play.ghostVisible

@@ -59,3 +59,22 @@ private func diff(_ name: String, _ m: MeshData, _ g: GMesh) -> [String] {
         #expect(got.count == 3 && got.allSatisfy { $0 >= 0 && $0 < 1 })
     }
 }
+
+/// the ground cut under the cup: nothing left over the hole, and no gap or overlap anywhere else
+@Test func groundCutUnderTheCup() {
+    for c in [Vec2(0.3, 2.7), Vec2(0, 0), Vec2(-1.95, 4.02), Vec2(2, -2)] {
+        let r = Sim.CUP_R + 0.01, m = Terrain.ground(cutting: c, r: r)
+        var area = 0.0, over = 0
+        for t in stride(from: 0, to: m.indices.count, by: 3) {
+            let p = (0..<3).map { k -> SIMD2<Double> in let i = Int(m.indices[t + k]) * 3; return SIMD2(Double(m.positions[i]), Double(m.positions[i + 2])) }
+            // the triangle's area, signed so a face turned down counts against
+            let e1 = p[1] - p[0], e2 = p[2] - p[0]
+            area += (e1.y * e2.x - e1.x * e2.y) / 2
+            let g = (p[0] + p[1] + p[2]) / 3
+            if hypot(g.x - c.x, g.y - c.z) < r * 0.99 { over += 1 }
+        }
+        let hole = 0.5 * 64 * r * r * sin(2 * .pi / 64)
+        #expect(over == 0, "a triangle over the cup at \(c)")
+        #expect(abs(area - (120 * 120 - hole)) < 0.01, "area \(area) at \(c)")
+    }
+}

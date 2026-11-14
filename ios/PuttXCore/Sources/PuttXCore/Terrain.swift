@@ -197,4 +197,59 @@ public enum Terrain {
         } }
         return m
     }
+
+    /// the ground with a round hole under the cup. The web draws its ground first without depth, as a
+    /// backdrop; RealityKit cannot, so a plane 3 cm down would plug every cup on a flat hole. The grid
+    /// cells under the cup go, and a ring with the hole in it fills their rectangle, its uvs and shade
+    /// laid as the grid lays them, so the cut shows only down the cup.
+    public static func ground(cutting c: Vec2, r: Double = Sim.CUP_R + 0.01) -> MeshData {
+        var m = ground()
+        let n = 60, cell = 2.0, half = 60.0
+        func idx(_ v: Double) -> Int { max(0, min(n - 1, Int(((v + half) / cell).rounded(.down)))) }
+        let ix0 = idx(c.x - r), ix1 = idx(c.x + r), iz0 = idx(c.z - r), iz1 = idx(c.z + r)
+        // vertex row iy sits at z = iy * cell - half, so cells index straight from x and z
+        var keep: [UInt32] = []
+        for iy in 0..<n { for ix in 0..<n where !(ix0...ix1 ~= ix && iz0...iz1 ~= iy) {
+            let k = (iy * n + ix) * 6
+            keep += m.indices[k..<k + 6]
+        } }
+        m.indices = keep
+        let X0 = Double(ix0) * cell - half, X1 = Double(ix1 + 1) * cell - half
+        let Z0 = Double(iz0) * cell - half, Z1 = Double(iz1 + 1) * cell - half
+        // shade between the grid's own vertices, as the grid would interpolate it along its edges
+        func shade(_ x: Double, _ z: Double) -> Float {
+            let fx = (x + half) / cell, fz = (z + half) / cell
+            let i = max(0, min(n - 1, Int(fx.rounded(.down)))), j = max(0, min(n - 1, Int(fz.rounded(.down))))
+            let u = Float(fx - Double(i)), v = Float(fz - Double(j))
+            func s(_ a: Int, _ b: Int) -> Float { m.shade![b * (n + 1) + a] }
+            return (s(i, j) * (1 - u) + s(i + 1, j) * u) * (1 - v) + (s(i, j + 1) * (1 - u) + s(i + 1, j + 1) * u) * v
+        }
+        func vertex(_ x: Double, _ z: Double) -> UInt32 {
+            let k = UInt32(m.positions.count / 3)
+            m.positions += [Float(x), -0.03, Float(z)]
+            m.normals += [0, 1, 0]
+            m.uvs += [Float((x + half) / (2 * half)), Float(1 - (z + half) / (2 * half))]
+            m.shade!.append(shade(x, z))
+            return k
+        }
+        // round the cup, with the rectangle's corners among the angles so its edges stay straight
+        var angles = (0..<64).map { Double($0) / 64 * 2 * .pi }
+        for (x, z) in [(X0, Z0), (X1, Z0), (X1, Z1), (X0, Z1)] {
+            let a = atan2(z - c.z, x - c.x); angles.append(a < 0 ? a + 2 * .pi : a)
+        }
+        angles.sort()
+        var ring: [(UInt32, UInt32)] = []
+        for a in angles {
+            let ux = cos(a), uz = sin(a)
+            var t = Double.infinity
+            if ux > 1e-12 { t = min(t, (X1 - c.x) / ux) } else if ux < -1e-12 { t = min(t, (X0 - c.x) / ux) }
+            if uz > 1e-12 { t = min(t, (Z1 - c.z) / uz) } else if uz < -1e-12 { t = min(t, (Z0 - c.z) / uz) }
+            ring.append((vertex(c.x + ux * r, c.z + uz * r), vertex(c.x + ux * t, c.z + uz * t)))
+        }
+        for i in 0..<ring.count {
+            let (a, b) = ring[i], (a2, b2) = ring[(i + 1) % ring.count]
+            m.indices += [a, a2, b, b, a2, b2]
+        }
+        return m
+    }
 }

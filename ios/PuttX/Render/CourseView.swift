@@ -70,6 +70,7 @@ struct CourseView: UIViewRepresentable {
                 print("course: \(error)")
             }
             yaw = play.aim * .pi / 180
+            play.driveFromRenderer()
             update(0, snap: true)
             tick = v.scene.subscribe(to: SceneEvents.Update.self) { [weak self] e in
                 MainActor.assumeIsolated { self?.update(e.deltaTime, snap: false) }
@@ -79,7 +80,9 @@ struct CourseView: UIViewRepresentable {
 
         private func update(_ dt: Double, snap: Bool) {
             guard let rig else { return }
-            let h = play.hole, b = play.ball, t = play.time
+            // the hole steps here, on the frame it is drawn in
+            if !snap { play.renderTick(dt) }
+            let h = play.hole, t = play.time
             // the ball, the putter, the aim line and the power ring
             props.update(play, now: CACurrentMediaTime())
             let right = camera.transform.matrix.columns.0
@@ -149,7 +152,7 @@ struct CourseView: UIViewRepresentable {
 
         /// src/game.js cameraGoal, aiming and rolling
         private func cameraGoal() -> (pos: SIMD3<Float>, look: SIMD3<Float>) {
-            let h = play.hole, b = play.ball
+            let h = play.hole
             // the introduction: from high over the cup, through the overview, down to the aim view
             if let t = play.intro {
                 let u = min(1, t / HolePlay.introLength), e = u * u * (3 - 2 * u), B = Terrain.bounds(h), ext = max(B.x1 - B.x0, B.z1 - B.z0) / 2
@@ -198,8 +201,9 @@ struct CourseView: UIViewRepresentable {
             let cdx = h.cup.x - b.x, cdz = h.cup.z - b.z, cd = hypot(cdx, cdz)
             if cd > 0.05 && (cdx * ux + cdz * uz) / cd > cos(35 * Double.pi / 180) { ahead = cd }
             ahead = min(5.5, max(1.4, ahead))
-            let bx = b.tube?.def.b.x ?? b.x, bz = b.tube?.def.b.z ?? b.z
-            let by = b.tube.map { h.groundH($0.def.b.x, $0.def.b.z) } ?? b.y
+            let d = play.drawBall
+            let bx = b.tube?.def.b.x ?? d.x, bz = b.tube?.def.b.z ?? d.z
+            let by = b.tube.map { h.groundH($0.def.b.x, $0.def.b.z) } ?? d.y
             let back = aiming ? 0.62 + 0.2 * ahead : 1.25, high = aiming ? 0.6 + 0.27 * ahead : 1.0
             var pos = SIMD3(bx - ux * back, by + high, bz - uz * back)
             pos.y = max(pos.y, h.groundH(pos.x, pos.z) + 0.45)

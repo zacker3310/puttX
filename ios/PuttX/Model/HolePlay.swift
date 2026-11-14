@@ -187,6 +187,11 @@ final class HolePlay {
     @ObservationIgnored private var from = Vec2(0, 0)
     @ObservationIgnored private var acc = 0.0
     @ObservationIgnored private var link: DisplayLink?
+    /// the 3D view steps the hole from its own frame update, so the ball moves once per drawn frame
+    @ObservationIgnored private var renderDriven = false
+    @ObservationIgnored private var running = false
+    /// the ball one sim step ago, to draw between steps
+    @ObservationIgnored private var prevBall: Ball?
     @ObservationIgnored var onFinish: ((Int) -> Void)?
     /// what the borders are made of (steel rails ring, timber tocks, stone clacks)
     @ObservationIgnored var wallKind = "wood"
@@ -235,10 +240,24 @@ final class HolePlay {
         }
         if !reduceMotion && !skipIntroFlight && intro == nil && round.strokes == 0 { intro = 0 }
         if reduceMotion { DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in self?.banner = false } }
-        guard link == nil else { return }
+        running = true
+        guard link == nil, !renderDriven else { return }
         link = DisplayLink { [weak self] dt in self?.tick(dt) }
     }
-    func stop() { link?.invalidate(); link = nil; Haptics.roll(0) }
+    func stop() { running = false; link?.invalidate(); link = nil; Haptics.roll(0) }
+
+    /// the 3D view takes over the clock: one tick per rendered frame, in step with what is drawn
+    func driveFromRenderer() { renderDriven = true; link?.invalidate(); link = nil }
+    func renderTick(_ dt: Double) { if running && renderDriven { tick(dt) } }
+    /// where to draw the ball: between the last two sim steps by the time left over, so the 240 Hz sim
+    /// reads smooth whatever the frame rate (the sim itself is untouched)
+    var drawBall: SIMD3<Double> {
+        let now = SIMD3(ball.x, ball.y, ball.z)
+        guard let p = prevBall, phase == .roll || phase == .drift, ball.tube == nil, p.tube == nil else { return now }
+        let was = SIMD3(p.x, p.y, p.z)
+        guard hypot(hypot(now.x - was.x, now.y - was.y), now.z - was.z) < 0.1 else { return now }   // a jump (a tube, a reset): no smear
+        return was + (now - was) * min(1, acc / Sim.SIM_DT)
+    }
 
     /// the putter meets the ball: the stroke turns the aim and sets the power
     func strike(_ s: Stroke) {
@@ -283,7 +302,7 @@ final class HolePlay {
         time = jsFixed(time, 6)
         from = round.at
         log.append([a, p, time])
-        run = PuttRun(hole, from: from, angle: a, power: p, t0: time)
+        run = PuttRun(hole, from: from, angle: a, power: p, t0: time); prevBall = nil
         if ghost?.auto != true { ghostPutt(log.count - 1) }
         trace = []; traceShown = false; recordTrace()
         hitsHeard = 0
@@ -314,14 +333,14 @@ final class HolePlay {
             stepGhost()
             if var r = run {
                 let end = r.step()
-                run = r; time = r.t; ball = r.ball
+                run = r; time = r.t; prevBall = ball; ball = r.ball
                 recordTrace()
                 hear(r.ball.hits)
                 if end != nil { finish(r); return }
             } else {
                 if phase == .aim && !hole.data.movers.isEmpty && hole.moverTouch(ball, time) {
                     from = round.at
-                    run = PuttRun(drift: hole, at: from, t0: time)
+                    run = PuttRun(drift: hole, at: from, t0: time); prevBall = nil
                     phase = .drift; swing = nil
                     continue
                 }

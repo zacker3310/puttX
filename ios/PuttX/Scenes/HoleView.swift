@@ -18,13 +18,11 @@ struct HoleView: View {
             // player's side, the aim buttons below
             let pad = st.s(18 + 120 + 22), view = TopView(hole: play.hole, size: geo.size, top: st.s(130), bottom: st.s(124),
                                                          left: lefty ? pad : st.s(24), right: lefty ? st.s(24) : pad)
-            // read in body, so every sim step redraws the canvas
-            let now = Snapshot(time: play.time, ball: play.ball, phase: play.phase, aim: play.aim)
             ZStack(alignment: .topLeading) {
                 Color(hex: play.look.ground ?? play.look.skirt).ignoresSafeArea()
                 if app.renderer == .top || (app.renderer == .exported && !SceneStore.shared.has(play.hole.key)) {
                     // from above, straight from the sim: for holes whose scenery is not exported yet
-                    Canvas { ctx, _ in draw(ctx, view, now) }
+                    TopCanvas(play: play, view: view, draw: draw)
                         .contentShape(Rectangle())
                         .gesture(aimDrag)
                 } else {
@@ -188,6 +186,14 @@ struct HoleView: View {
 
     // MARK: drawing
     struct Snapshot { let time: Double, ball: Ball, phase: HolePlay.Phase, aim: Double }
+    /// the top-down canvas reads the sim in its own body, so every sim step redraws it and nothing else
+    private struct TopCanvas: View {
+        let play: HolePlay, view: TopView, draw: (GraphicsContext, TopView, Snapshot) -> Void
+        var body: some View {
+            let now = Snapshot(time: play.time, ball: play.ball, phase: play.phase, aim: play.aim)
+            Canvas { ctx, _ in draw(ctx, view, now) }
+        }
+    }
 
     private func draw(_ ctx: GraphicsContext, _ v: TopView, _ now: Snapshot) {
         let h = play.hole, d = h.data, look = play.look

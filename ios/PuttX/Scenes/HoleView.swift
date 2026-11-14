@@ -315,6 +315,7 @@ struct SwingPad: View {
     @State private var samples: [PadSample] = []
     @State private var last: (samples: [PadSample], clean: Bool)?
     @State private var struck = false
+    @State private var voPower = 0.4
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: st.s(Toy.rXl), style: .continuous), swinging = !samples.isEmpty
@@ -330,7 +331,15 @@ struct SwingPad: View {
                 .frame(width: g.size.width, height: g.size.height)
         }
         .opacity(play.phase == .aim ? 1 : 0.6)
+        // VoiceOver: swipe up or down to set the power, double-tap to putt (a dead-on stroke, as a
+        // controller's trigger gives), so the hole is playable without the gesture
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel("swing")
+        .accessibilityValue("power \(Int((voPower * 100).rounded()))")
+        .accessibilityAdjustableAction { d in
+            switch d { case .increment: voPower = min(1, voPower + 0.05); case .decrement: voPower = max(0.05, voPower - 0.05); default: break }
+        }
+        .accessibilityAction { if play.phase == .aim { play.strike(.trigger(power: voPower)) } }
     }
 
     /// pad points to stage px: the stroke is measured in stage px, as on the web

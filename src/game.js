@@ -728,6 +728,11 @@ function noise(dur, { vol = 0.2, freq = 2000, q = 1, type = 'bandpass', delay = 
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   src.connect(f); f.connect(g); g.connect(master); src.start(t, Math.random() * 0.5); src.stop(t + dur + 0.02);
 }
+/* struck metal: a fundamental and a bell's inharmonic partials, ringing down */
+function ping(f, dur, vol, delay = 0) {
+  tone(f, dur, { vol, delay }); tone(f * 2.76, dur * 0.6, { vol: vol * 0.35, delay }); tone(f * 5.4, dur * 0.3, { vol: vol * 0.15, delay });
+  noise(0.012, { vol: vol * 0.4, freq: 6000, q: 2, delay });
+}
 const SFX = {
   /* a clean strike rings; a toe or heel strike thuds */
   putt: (p, clean = 1) => { noise(0.03, { vol: 0.25 + p * 0.3, freq: 2200 + 1500 * clean, q: 2 }); tone(500 + p * 400 + clean * 300, 0.06, { type: 'triangle', vol: 0.2 + p * 0.2, slide: -300 }); },
@@ -739,26 +744,33 @@ const SFX = {
     else if (wallKindNow === 'paint') tone(520 + k * 50, 0.06, { type: 'sine', vol: vol * 0.8, slide: -120 });
     else { tone(330 + k * 30, 0.07, { type: 'triangle', vol }); noise(0.025, { vol: vol * 0.45, freq: 900, q: 2 }); }
   },
-  boing: v => tone(320, 0.2, { vol: Math.min(0.3, 0.1 + v * 0.08), slide: 260 }),
+  /* a bumper or a mover: a short dull knock, not a cartoon spring */
+  boing: v => { const vol = Math.min(0.3, 0.08 + v * 0.07); tone(190 + Math.min(v, 4) * 15, 0.06, { type: 'triangle', vol, slide: -40 }); noise(0.03, { vol: vol * 0.4, freq: 600, q: 1.5 }); },
   cup: () => tone(1500, 0.04, { type: 'triangle', vol: 0.12, slide: -300 }),
-  rattle: (v = 0.5) => { tone(1900 - v * 500, 0.035, { type: 'square', vol: 0.05 + v * 0.07 }); noise(0.04, { vol: 0.08 + v * 0.1, freq: 3200, q: 4 }); },
+  rattle: (v = 0.5) => { tone(1900 - v * 500, 0.035, { type: 'triangle', vol: 0.05 + v * 0.07 }); noise(0.04, { vol: 0.08 + v * 0.1, freq: 3200, q: 4 }); },
   plunk: () => { tone(150, 0.32, { vol: 0.55, slide: -70 }); tone(300, 0.12, { type: 'triangle', vol: 0.18, slide: -120 }); noise(0.09, { vol: 0.3, freq: 420, q: 1.2, type: 'lowpass' }); },
-  lip: () => tone(900, 0.07, { type: 'square', vol: 0.08, slide: 300 }),
+  lip: () => { tone(1100, 0.03, { type: 'triangle', vol: 0.06 }); noise(0.02, { vol: 0.05, freq: 2600, q: 3 }); },
   land: v => noise(0.08, { vol: Math.min(0.4, 0.12 + v * 0.08), freq: 400 }),
-  boink: () => tone(420, 0.25, { vol: 0.3, slide: -220 }),
+  /* a locked thing: a dull clank of a plate that will not move */
+  boink: () => { tone(140, 0.12, { type: 'triangle', vol: 0.22, slide: -30 }); noise(0.05, { vol: 0.12, freq: 700, q: 1.4 }); },
   splash: () => { noise(0.35, { vol: 0.35, freq: 900, q: 0.7 }); noise(0.2, { vol: 0.2, freq: 2600, q: 1, delay: 0.05 }); },
-  tube: () => noise(0.4, { vol: 0.22, freq: 300, q: 3, type: 'lowpass' }),
-  tubeOut: () => tone(260, 0.16, { type: 'triangle', vol: 0.2, slide: 220 }),
-  tap: () => tone(660, 0.05, { type: 'triangle', vol: 0.18 }),
-  tick: () => tone(1200, 0.02, { type: 'square', vol: 0.05 }),
-  star: i => tone([784, 988, 1175][i] || 1175, 0.22, { type: 'triangle', vol: 0.25 }),
-  coin: () => { tone(988, 0.07, { type: 'square', vol: 0.08 }); tone(1319, 0.14, { type: 'square', vol: 0.08, delay: 0.07 }); },
-  jingle: w => lookOf(w).jingle.forEach((f, i) => tone(f, 0.16, { type: 'triangle', vol: 0.18, delay: i * 0.11 })),
-  fanfare: () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.22, { type: 'square', vol: 0.12, delay: i * 0.09 })),
+  tube: () => noise(0.3, { vol: 0.12, freq: 260, q: 0.8, type: 'lowpass' }),
+  tubeOut: () => noise(0.06, { vol: 0.12, freq: 380, q: 1, type: 'lowpass' }),
+  /* a touch: a short click of metal, a tick on top and a thunk under it */
+  tap: () => { noise(0.018, { vol: 0.12, freq: 4200, q: 2.5 }); tone(1850, 0.035, { vol: 0.05 }); tone(150, 0.04, { type: 'triangle', vol: 0.1, slide: -40 }); },
+  tick: () => { noise(0.012, { vol: 0.07, freq: 5200, q: 3 }); tone(2400, 0.02, { vol: 0.025 }); },
+  star: i => ping([784, 988, 1175][i] || 1175, 0.5, 0.16),
+  coin: () => { ping(1319, 0.25, 0.1); ping(1760, 0.35, 0.1, 0.07); },
+  jingle: w => lookOf(w).jingle.forEach((f, i) => ping(f, 0.3, 0.12, i * 0.11)),
+  /* a big finish: a deep hit under a chime rising through the chord */
+  fanfare: () => {
+    tone(82, 0.5, { type: 'sawtooth', vol: 0.12, slide: -10 }); tone(123, 0.4, { type: 'sawtooth', vol: 0.07 }); noise(0.2, { vol: 0.12, freq: 300, q: 0.8, type: 'lowpass' });
+    [659, 784, 988, 1319].forEach((f, i) => ping(f, 0.45, 0.11, 0.06 + i * 0.08));
+  },
   /* the clubhouse bell on the last hole; rung twice and brighter for an ace */
   bell: (ace = 0) => { for (let i = 0; i < (ace ? 3 : 1); i++) { tone(1568, 1.2, { vol: 0.16, delay: i * 0.28 }); tone(3920, 0.6, { vol: 0.05, delay: i * 0.28 }); tone(784, 1.4, { type: 'triangle', vol: 0.08, delay: i * 0.28 }); } },
   /* the ball lifted and set down out from the border */
-  place: () => { tone(880, 0.04, { type: 'triangle', vol: 0.1 }); noise(0.03, { vol: 0.08, freq: 1200, q: 2, delay: 0.12 }); },
+  place: () => { tone(160, 0.05, { type: 'triangle', vol: 0.12, slide: -30 }); noise(0.02, { vol: 0.08, freq: 2600, q: 2, delay: 0.1 }); },
 };
 let wallKindNow = 'wood';
 /* ---- the course's soundscape: very quiet, under everything. Water burbles where a hole has water,
@@ -766,7 +778,8 @@ let wallKindNow = 'wood';
 const amb = { key: '', bed: null, birds: 0, crickets: 0, next: 0 };
 function setAmbience(look, h) {
   const water = h.zones.some(z => z.surf === 'water'), w = worldOf(holeWorld(h)), wind = w === 4 || w === 10 || w === 2;
-  amb.birds = look.night || w === 8 ? 0 : w === 3 ? 1.6 : 0.6; amb.crickets = look.night || w === 7 ? 1 : 0;
+  /* no synthesised birds or crickets: they read as bleeps, not wildlife */
+  amb.birds = 0; amb.crickets = 0;
   const key = [water, wind].join();
   if (!actx || !master || key === amb.key) return;
   amb.key = key;
@@ -775,7 +788,7 @@ function setAmbience(look, h) {
   const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain(), lfo = actx.createOscillator(), lg = actx.createGain();
   src.buffer = noiseBuf; src.loop = true; f.type = water ? 'bandpass' : 'lowpass'; f.frequency.value = water ? 650 : 380; f.Q.value = water ? 0.9 : 0.5;
   lfo.frequency.value = water ? 3.1 : 0.13; lg.gain.value = water ? 260 : 160; lfo.connect(lg); lg.connect(f.frequency);
-  g.gain.value = 0; g.gain.setTargetAtTime(water ? 0.05 : 0.07, actx.currentTime, 1.2);
+  g.gain.value = 0; g.gain.setTargetAtTime(water ? 0.025 : 0.03, actx.currentTime, 1.2);
   src.connect(f); f.connect(g); g.connect(master); src.start(); lfo.start();
   amb.bed = { src, g };
 }
@@ -783,7 +796,7 @@ function tickAmbience(dt) {
   /* the audio wakes on the first touch, often mid-hole: start this hole's bed then */
   if (actx && master && !amb.key && play.hole) setAmbience(lookOf(holeWorld(play.hole)), play.hole);
   if (!actx || !master || currentScene !== 'hole') { if (amb.bed && actx) amb.bed.g.gain.setTargetAtTime(0, actx.currentTime, 0.3); return; }
-  if (amb.bed) amb.bed.g.gain.setTargetAtTime(amb.key.startsWith('true') ? 0.05 : 0.07, actx.currentTime, 0.6);
+  if (amb.bed) amb.bed.g.gain.setTargetAtTime(amb.key.startsWith('true') ? 0.025 : 0.03, actx.currentTime, 0.6);
   if ((amb.next -= dt) > 0) return;
   amb.next = 0.6 + Math.random() * 2.4;
   if (amb.birds && Math.random() < 0.35 * amb.birds) {

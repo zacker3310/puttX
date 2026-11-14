@@ -68,7 +68,6 @@ enum CourseBuilder {
             rig.anim.bind(e, materials: n.m.list, hole: hole)
             return e
         }
-        try rig.anim.build(hole, root: rig.root, mesh: part)
         for (i, parts) in hole.movers.enumerated() where i < h.data.movers.count {
             let m = Entity()
             for n in parts { m.addChild(try part(n)) }
@@ -83,6 +82,8 @@ enum CourseBuilder {
             rig.root.addChild(m)
             rig.movers.append((m, h.data.movers[i]))
         }
+        // the animated scenery, riders on movers included, once the movers stand
+        try rig.anim.build(hole, root: rig.root, movers: rig.movers.map(\.0), mesh: part)
 
         // the surfaces grown from the sim
         let turf = hole.mats[hole.native.floor]

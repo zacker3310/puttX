@@ -253,10 +253,17 @@ function grabHole([key, neon]) {
   for (const mv of moverMeshes) {
     const keep = { p: mv.position.clone(), r: mv.rotation.clone() };
     mv.position.set(0, 0, 0); mv.rotation.set(0, 0, 0); mv.updateMatrixWorld(true);
-    mv.traverse(o => { if (A.objs.has(o)) warn.push('animated object inside a mover'); });
     const parts = [], inner = mv.userData.weed;
     const within = (o, a) => { for (let p = o; p; p = p.parent) if (p === a) return true; return false; };
-    mv.traverseVisible(o => { if (o.isMesh && !(inner && within(o, inner))) parts.push(node(o, mv)); });
+    /* something animated riding a mover (c07's ghosts bob inside theirs): its own rig, in the mover's
+       frame, carried along as the mover goes */
+    const riders = []; mv.traverse(o => { if (o !== mv && A.objs.has(o) && !riders.some(r => within(o, r))) riders.push(o); });
+    for (const o of riders) {
+      const sp = A.objs.get(o), px = new THREE.Matrix4().copy(mv.matrixWorld).invert().multiply(o.parent.matrixWorld), rp = [];
+      o.traverseVisible(q => { if (q.isMesh) rp.push(node(q, o)); });
+      (out.anims = out.anims || []).push({ up: -1, mover: out.movers.length, px: Array.from(px.elements, r6), b: [...o.position.toArray(), o.rotation.x, o.rotation.y, o.rotation.z, ...o.scale.toArray()].map(r6), ch: sp.ch, vis: sp.vis || null, name: null, orbit: null, parts: rp });
+    }
+    mv.traverseVisible(o => { if (o.isMesh && !(inner && within(o, inner)) && !riders.some(r => within(o, r))) parts.push(node(o, mv)); });
     out.movers.push(parts);
     if (inner) {
       /* a tumbleweed: the inner ball rolls (and hops) as the mover travels, as c02's tick turns it */

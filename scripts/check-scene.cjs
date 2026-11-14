@@ -93,22 +93,22 @@ async function rebuild(key) {
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(c.pts, 3));
     g.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: new THREE.Color(...c.color), size: c.size, sizeAttenuation: c.atten, transparent: c.opacity < 1, opacity: c.opacity, depthWrite: c.opacity >= 1 })));
   }
-  /* the animated objects, at their t = 0 pose */
-  const rigs = [];
-  for (const a of hole.anims || []) {
-    const p = new THREE.Group(); p.matrixAutoUpdate = false; p.matrix.fromArray(a.px);
-    (a.up >= 0 ? rigs[a.up] : g).add(p);
-    const o = new THREE.Group(), c = k => a.ch[k] ? a.ch[k][0] + a.ch[k].slice(2).reduce((s, v, i, l) => i % 3 ? s : s + v * Math.sin(l[i + 2]), 0) : null;
-    o.position.set(c('px') ?? a.b[0], c('py') ?? a.b[1], c('pz') ?? a.b[2]); o.rotation.set(c('rx') ?? a.b[3], c('ry') ?? a.b[4], c('rz') ?? a.b[5]); o.scale.set(a.b[6], a.b[7], a.b[8]);
-    if (a.vis) o.visible = Math.sin(a.vis[1]) > a.vis[2];
-    for (const n of a.parts) o.add(await mk(n));
-    p.add(o); rigs.push(o);
-  }
   const movers = [];
   for (const [i, parts] of hole.movers.entries()) {
     const m = new THREE.Group(); for (const n of parts) m.add(await mk(n));
     for (const w of (hole.weeds || []).filter(w => w.i === i)) { const inner = new THREE.Group(); inner.matrixAutoUpdate = false; inner.matrix.fromArray(w.x); for (const n of w.parts) inner.add(await mk(n)); m.add(inner); }
     movers.push(m); g.add(m);
+  }
+  /* the animated objects, at their t = 0 pose */
+  const rigs = [];
+  for (const a of hole.anims || []) {
+    const p = new THREE.Group(); p.matrixAutoUpdate = false; p.matrix.fromArray(a.px);
+    (a.mover != null ? movers[a.mover] : a.up >= 0 ? rigs[a.up] : g).add(p);
+    const o = new THREE.Group(), c = k => a.ch[k] ? a.ch[k][0] + a.ch[k].slice(2).reduce((s, v, i, l) => i % 3 ? s : s + v * Math.sin(l[i + 2]), 0) : null;
+    o.position.set(c('px') ?? a.b[0], c('py') ?? a.b[1], c('pz') ?? a.b[2]); o.rotation.set(c('rx') ?? a.b[3], c('ry') ?? a.b[4], c('rz') ?? a.b[5]); o.scale.set(a.b[6], a.b[7], a.b[8]);
+    if (a.vis) o.visible = Math.sin(a.vis[1]) > a.vis[2];
+    for (const n of a.parts) o.add(await mk(n));
+    p.add(o); rigs.push(o);
   }
   return { g, movers, counts: { static: hole.static.length, movers: hole.movers.length } };
 }

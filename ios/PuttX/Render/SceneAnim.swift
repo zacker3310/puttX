@@ -39,6 +39,8 @@ struct SceneAnim: Decodable {
     let name: String?
     /// a night floor spot: wheels round (cx, cz) at radius r from angle a, on the ground, shown only over the felt
     let orbit: [Double]?
+    /// riding a mover (that mover's index): its frame is the mover's, carried along as it goes
+    let mover: Int?
     let parts: [SceneNode]
 }
 struct SceneMatAnim: Decodable {
@@ -82,11 +84,12 @@ final class SceneAnimator {
     var isEmpty: Bool { rigs.isEmpty && mats.isEmpty && clouds.isEmpty && weeds.isEmpty }
 
     /// the animated objects as entities under `root`, each carrying its meshes
-    func build(_ hole: SceneHole, root: Entity, mesh: (SceneNode) throws -> ModelEntity) throws {
+    func build(_ hole: SceneHole, root: Entity, movers: [Entity] = [], mesh: (SceneNode) throws -> ModelEntity) throws {
         for a in hole.anims ?? [] {
             let parent = Entity()
             parent.transform = Transform(matrix: CourseBuilder.matrix(a.px))
-            (a.up >= 0 && a.up < rigs.count ? rigs[a.up].e : root).addChild(parent)
+            let holder = a.mover.flatMap { $0 < movers.count ? movers[$0] : nil } ?? (a.up >= 0 && a.up < rigs.count ? rigs[a.up].e : root)
+            holder.addChild(parent)
             let o = Entity()
             parent.addChild(o)
             for n in a.parts { o.addChild(try mesh(n)) }

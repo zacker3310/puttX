@@ -87,6 +87,9 @@ final class AppModel {
 
     // MARK: navigation
     func go(_ r: Route) {
+        // a ball already dropping (or rolling itself in) keeps its result when the player leaves,
+        // banked as the round it was (so before a party or practice ends)
+        play?.finishNow()
         // leaving the holes and the card ends a party
         switch r { case .hole, .card: break; default: party = nil }
         switch r { case .hole, .map, .card: break; default: practice = false }
@@ -136,7 +139,16 @@ final class AppModel {
         guard party?.passing != nil, case .hole(let key) = route else { return }
         party?.passing = nil
         go(.hole(key))
+        play?.skipIntroFlight = true
     }
+    /// play the hole again, as the same kind of round (the hole of the day stays the hole of the day)
+    func retry(_ p: HolePlay) {
+        let day = p.daily
+        go(.hole(p.hole.key))
+        play?.daily = day
+    }
+    /// after the hole of the day: its course's map when that course is open, else the title
+    func afterDaily(_ key: String) -> Route { open(course: Catalog.course(of: key)) ? .map(Catalog.course(of: key)) : .title }
     func partyNext(after key: String) {
         party?.board = nil
         if let n = catalog.nextKey(key) { go(.hole(n)) } else if let p = party { go(.card(p.course)) }
@@ -165,19 +177,25 @@ final class AppModel {
             withAnimation(.spring(response: 0.3)) { party!.finish(h.key, score: score) }
             return HoleRecord(best: score, stars: 0)
         }
-        progress.keepGhost(h.key, log: play.log, score: score, previousBest: prevBest, auto: play.round.auto)
-        let rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
-        var won = progress.payFinish(h.key, score: score, par: h.par, shop: Shop.shared)
+        // a daily hole on a course not reached yet counts only for itself: no record, ghost or first clear
+        let counts = progress.unlocked(h.key, catalog: catalog)
+        var rec = HoleRecord(best: score, stars: Scoring.stars(score, h.par)), won = 0
+        if counts {
+            progress.keepGhost(h.key, log: play.log, score: score, previousBest: prevBest, auto: play.round.auto)
+            rec = progress.record(h.key, score: score, par: h.par, catalog: catalog)
+            won = progress.payFinish(h.key, score: score, par: h.par, shop: Shop.shared)
+        }
         let bits = Goals.bits(score: score, par: h.par, touched: play.touched, auto: play.round.auto, lostFound: progress.lost[h.key] != nil || play.lostDone())
         let g = progress.finishGoals(h.key, bits: bits)
         play.goals = (g.all, g.fresh)
         won += g.coins
-        if let day = play.daily, day == Daily.day() {
-            won += progress.finishDaily(day: day, yesterday: Daily.yesterday(), score: score)
+        // the daily is credited to the day it was started on, even past midnight
+        if let day = play.daily {
+            won += progress.finishDaily(day: day, yesterday: Daily.dayBefore(day), score: score)
         }
         play.coinsWon = won
         save()
-        GameCenter.holeBanked(h.key, score: score, progress: progress, catalog: catalog)
+        if counts { GameCenter.holeBanked(h.key, score: score, progress: progress, catalog: catalog) }
         return rec
     }
     func next(after key: String) -> Route {

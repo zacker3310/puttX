@@ -17,7 +17,13 @@ struct ShopView: View {
     @State private var nudge = 0
     @State private var shake = 0
     private let shop = Shop.shared
-    private var per: Int { tab == .putter ? 10 : tab == .ball ? 12 : 3 }
+    // the layout reflows to the stage (never scaled below it, so every button stays at least 64 pt):
+    // the grid takes the width the preview leaves, two rows of as many columns as fit
+    private var gridW: CGFloat { min(756, st.w - 444) }
+    private var gridH: CGFloat { st.h - 248 }
+    private func cols(_ t: Tab) -> Int { t == .putter ? min(5, max(3, Int(gridW / 140))) : t == .ball ? min(6, max(4, Int(gridW / 116))) : 3 }
+    private func perOf(_ t: Tab) -> Int { t == .mull ? 3 : cols(t) * 2 }
+    private var per: Int { perOf(tab) }
     private var ids: [String] { tab == .putter ? shop.putters.map(\.id) : tab == .ball ? shop.balls.map(\.id) : shop.packs.map(\.id) }
     private var pages: Int { max(1, (ids.count + per - 1) / per) }
     private var current: String {
@@ -25,7 +31,6 @@ struct ShopView: View {
     }
 
     var body: some View {
-        let f = min(1, st.w / 1200, st.h / 700)
         ZStack {
             Toy.surface.ignoresSafeArea()
             Dots().ignoresSafeArea()
@@ -41,16 +46,20 @@ struct ShopView: View {
                         .accessibilityAddTraits(tab == t ? .isSelected : [])
                         .offset(x: st.s(128 + 100 * CGFloat(i)), y: st.s(24))
                 }
-                wallet.offset(x: st.s(1200 - 24) - st.s(300), y: st.s(30)).frame(width: st.s(300), alignment: .trailing)
-                stage.frame(width: st.s(372), height: st.s(548)).offset(x: st.s(24), y: st.s(128))
-                grid.frame(width: st.s(756), height: st.s(452), alignment: .top).offset(x: st.s(420), y: st.s(128))
-                if pages > 1 { pager.frame(width: st.s(756)).offset(x: st.s(420), y: st.s(596)) }
+                wallet.frame(width: st.s(400), alignment: .trailing).offset(x: st.s(st.w - 24 - 400), y: st.s(30))
+                stage.frame(width: st.s(372), height: st.s(st.h - 152)).offset(x: st.s(24), y: st.s(128))
+                grid.frame(width: st.s(gridW), height: st.s(gridH), alignment: .top).offset(x: st.s(420), y: st.s(128))
+                if pages > 1 { pager.frame(width: st.s(gridW)).offset(x: st.s(420), y: st.s(st.h - 104)) }
             }
-            .frame(width: st.s(1200), height: st.s(700))
-            .scaleEffect(f)
+            .frame(width: st.s(st.w), height: st.s(st.h))
         }
         .onAppear { for (t, k) in [(Tab.putter, "putter"), (.ball, "ball")] { let id = app.progress.equipped[k] ?? ""; sel[t] = id; page[t] = pageOf(t, id) } }
     }
+
+    /// the preview panel's parts on a short stage: the stats give a little, the studio the rest
+    private var cardH: CGFloat { min(214, (gridH - 16) / 2 - 8) }
+    private var statsH: CGFloat { min(150, max(100, st.h - 152 - 262 - 100)) }
+    private var previewH: CGFloat { max(100, min(230, st.h - 152 - 162 - statsH)) }
 
     // MARK: pieces
     private var awning: some View {
@@ -102,12 +111,12 @@ struct ShopView: View {
                     if tab == .mull, let pk = shop.packs.first(where: { $0.id == current }) { PackArt(n: pk.n) }
                     else { ShopPreview(id: current, ball: app.progress.equipped["ball"] ?? "b1").id(current + (app.progress.equipped["ball"] ?? "")) }
                 }
-                .frame(width: st.s(340), height: st.s(230))
+                .frame(width: st.s(340), height: st.s(previewH))
                 .background(Color(hex: "#dff0f5"))
                 .clipShape(RoundedRectangle(cornerRadius: st.s(Toy.rLg), style: .continuous))
                 .scaleEffect(nudge % 2 == 1 ? 1.03 : 1)
                 .padding(.top, st.s(10))
-                stats.frame(height: st.s(150)).padding(.horizontal, st.s(24)).padding(.top, st.s(12))
+                stats.frame(height: st.s(statsH)).padding(.horizontal, st.s(24)).padding(.top, st.s(12))
                 Spacer(minLength: 0)
                 action.padding(st.s(22))
             }
@@ -161,7 +170,7 @@ struct ShopView: View {
         let eq = app.progress.equipped.values.contains(id)
         let price = tab == .mull ? shop.packs.first { $0.id == id }?.price ?? 0 : shop.price(id) ?? 0
         let poor = !own && app.progress.coins < price
-        let kind: ToyKind = tab != .mull && eq ? .blue : tab != .mull && own ? .plain : poor ? .locked : .go
+        let kind: ToyKind = tab != .mull && eq ? .yellow : tab != .mull && own ? .plain : poor ? .locked : .go
         return Button { act(id, price: price) } label: {
             HStack(spacing: st.s(12)) {
                 if tab != .mull && (own || eq) { Image(systemName: "checkmark").font(.system(size: st.s(48), weight: .black)) }
@@ -179,7 +188,7 @@ struct ShopView: View {
     }
 
     private var grid: some View {
-        let cols = Array(repeating: GridItem(.flexible(), spacing: st.s(tab == .ball ? 10 : 14)), count: tab == .putter ? 5 : tab == .ball ? 6 : 3)
+        let cols = Array(repeating: GridItem(.flexible(), spacing: st.s(tab == .ball ? 10 : 14)), count: cols(tab))
         let pg = min(page[tab] ?? 0, pages - 1), slice = Array(ids.dropFirst(pg * per).prefix(per))
         return LazyVGrid(columns: cols, spacing: st.s(16)) {
             ForEach(Array(slice.enumerated()), id: \.element) { j, id in card(id).popIn(Double(j) * 0.025) }
@@ -195,13 +204,13 @@ struct ShopView: View {
         let shape = RoundedRectangle(cornerRadius: st.s(Toy.rLg), style: .continuous), selected = id == current
         if tab == .mull, let pk = shop.packs.first(where: { $0.id == id }) {
             let poor = app.progress.coins < pk.price
-            return AnyView(Button { sel[.mull] = id; SFX.tick() } label: {
+            return AnyView(Button { sel[.mull] = id } label: {
                 VStack(spacing: 0) {
-                    PackArt(n: pk.n).frame(height: st.s(300))
+                    PackArt(n: pk.n).frame(height: st.s(gridH - 152))
                     HStack(spacing: st.s(4)) { Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(32)); Text("\(pk.price)") }
                         .font(Toy.font(30, st)).foregroundStyle(poor ? Toy.inkSoft : Toy.inkStrong).frame(maxHeight: .infinity)
                 }
-                .frame(height: st.s(380))
+                .frame(height: st.s(gridH - 72))
                 .background(shape.fill(Toy.surface)).clipShape(shape)
                 .overlay(shape.strokeBorder(selected ? Toy.blueLine : Toy.surfaceLine, lineWidth: st.s(5)))
                 .background(shape.fill(selected ? Toy.blueDown : Toy.surfaceDown).offset(y: st.s(6)))
@@ -212,11 +221,12 @@ struct ShopView: View {
         let price = shop.price(id) ?? 0, poor = !own && app.progress.coins < price
         return AnyView(Button { tap(id) } label: {
             VStack(spacing: 0) {
-                Image("shop-" + id).resizable().scaledToFill().frame(height: st.s(150)).clipped()
+                Image("shop-" + id).resizable().scaledToFill().frame(height: st.s(cardH - 64)).clipped()
                     .background(Toy.surface2)
                 HStack(spacing: st.s(4)) {
-                    if eq { Image(systemName: "checkmark").font(.system(size: st.s(28), weight: .black)).foregroundStyle(Toy.green) }
-                    else if !own {
+                    if eq { Image(systemName: "checkmark").font(.system(size: st.s(28), weight: .black)).foregroundStyle(Toy.yellowDown) }
+                    else if own { Circle().fill(Toy.green).overlay(Circle().strokeBorder(Toy.greenLine, lineWidth: st.s(3))).frame(width: st.s(20), height: st.s(20)) }
+                    else {
                         Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(32))
                         Text("\(price)").font(Toy.font(26, st))
                         if poor { Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(22)).opacity(0.6) }
@@ -224,9 +234,9 @@ struct ShopView: View {
                 }
                 .foregroundStyle(poor ? Toy.inkSoft : Toy.inkStrong).frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(height: st.s(214))
+            .frame(height: st.s(cardH))
             .background(shape.fill(Toy.surface)).clipShape(shape)
-            .overlay(shape.strokeBorder(selected ? Toy.blueLine : eq ? Toy.greenLine : Toy.surfaceLine, lineWidth: st.s(5)))
+            .overlay(shape.strokeBorder(selected ? Toy.blueLine : eq ? Toy.yellowLine : Toy.surfaceLine, lineWidth: st.s(5)))
             .overlay(alignment: .topTrailing) { if price >= shop.premium { Sparkle().frame(width: st.s(30), height: st.s(30)).offset(x: st.s(8), y: -st.s(8)) } }
             .background(shape.fill(selected ? Toy.blueDown : Toy.surfaceDown).offset(y: st.s(6)))
         }
@@ -237,7 +247,11 @@ struct ShopView: View {
         HStack(spacing: st.s(24)) {
             IconButton(symbol: "arrow.left", label: "previous page") { turn(-1) }
             HStack(spacing: st.s(10)) {
-                ForEach(0..<pages, id: \.self) { n in Circle().fill(n == (page[tab] ?? 0) ? Toy.inkStrong : Toy.surfaceLine).frame(width: st.s(14), height: st.s(14)) }
+                ForEach(0..<pages, id: \.self) { n in
+                    let on = n == (page[tab] ?? 0)
+                    Circle().fill(on ? Toy.yellow : Toy.surfaceLine).overlay(Circle().strokeBorder(on ? Toy.yellowLine : .clear, lineWidth: st.s(3)))
+                        .frame(width: st.s(24), height: st.s(24)).scaleEffect(on ? 1.35 : 1)
+                }
             }
             .accessibilityElement(children: .ignore).accessibilityLabel("page \((page[tab] ?? 0) + 1) of \(pages)")
             IconButton(symbol: "arrow.right", label: "next page") { turn(1) }
@@ -247,7 +261,7 @@ struct ShopView: View {
 
     // MARK: actions
     private func pageOf(_ t: Tab, _ id: String) -> Int {
-        let list = t == .putter ? shop.putters.map(\.id) : shop.balls.map(\.id), n = t == .putter ? 10 : 12
+        let list = t == .putter ? shop.putters.map(\.id) : shop.balls.map(\.id), n = perOf(t)
         return max(0, (list.firstIndex(of: id) ?? 0) / n)
     }
     private func pick(_ t: Tab) {
@@ -263,8 +277,7 @@ struct ShopView: View {
         sel[tab] = id
         if app.progress.owned.contains(id) {
             if !app.progress.equipped.values.contains(id) { app.progress.equip(id, shop: shop); app.save() }
-            SFX.tap()
-        } else { SFX.tick() }
+        }
     }
     private func act(_ id: String, price: Int) {
         if tab == .mull {
@@ -277,6 +290,7 @@ struct ShopView: View {
     private func bought() {
         SFX.coin(); DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) { SFX.star(2) }
         Haptics.knock(1)
+        guard !UIAccessibility.isReduceMotionEnabled else { return }
         withAnimation(.spring(response: 0.25, dampingFraction: 0.4)) { nudge += 1 }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { withAnimation(.spring) { nudge += 1 } }
     }

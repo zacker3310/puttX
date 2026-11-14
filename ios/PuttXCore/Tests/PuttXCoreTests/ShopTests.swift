@@ -35,3 +35,22 @@ import Testing
         #expect(p.buyPack("m3", shop: shop) == false)
     }
 }
+
+@Suite struct CloudMerge {
+    @Test func aPurchaseIsNotRefundedByAnOlderCopy() {
+        var old = PlayerProgress(catalog: Catalog.shared)
+        _ = old.payFinish("1-1", score: 1, par: 3, shop: Shop.shared)   // 60 coins
+        var now = old
+        let bought = now.buy("p2", shop: Shop.shared)                   // spends 40
+        #expect(bought)
+        _ = now.spendMulligan()
+        let m = now.merged(with: old), n = old.merged(with: now)
+        #expect(m.coins == 20 && n.coins == 20 && m.owned.contains("p2"))
+        #expect(m.mulligans == old.mulligans - 1 && n.mulligans == m.mulligans)
+        // earnings on both sides since the split are kept
+        var a = now, b = old
+        _ = a.payFinish("1-2", score: 2, par: 3, shop: Shop.shared)
+        _ = b.payFinish("1-3", score: 2, par: 3, shop: Shop.shared)
+        #expect(a.merged(with: b).coins >= a.coins)
+    }
+}

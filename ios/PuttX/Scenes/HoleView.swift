@@ -291,8 +291,8 @@ struct DoneCard: View {
                         .accessibilityLabel("\(play.coinsWon) coins won")
                 }
                 HStack(spacing: st.s(24)) {
-                    IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.go(.hole(play.hole.key)) }
-                    IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(play.daily != nil ? .title : app.next(after: play.hole.key)) }
+                    IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.retry(play) }
+                    IconButton(symbol: "play.fill", kind: .go, label: "next") { app.go(play.daily != nil ? app.afterDaily(play.hole.key) : app.next(after: play.hole.key)) }
                 }
             }
             .padding(st.s(40))

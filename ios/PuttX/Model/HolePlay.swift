@@ -81,7 +81,7 @@ final class HolePlay {
         ghost = g
     }
     /// whether the ghost shows: after its first putt, out of tubes, until it has dropped
-    var ghostVisible: Bool { guard let g = ghost else { return false }; return g.k > 0 && g.ball.tube == nil && !(g.done && !g.live) }
+    var ghostVisible: Bool { guard let g = ghost else { return false }; return g.k > 0 && g.ball.tube == nil && !(g.done && !g.live) && phase != .replay }
 
     /// the last putt, to take back with a mulligan token
     private struct Undo { let round: Round; let aim: Double; let touched: Bool; let logCount: Int; let ghost: Ghost? }
@@ -96,7 +96,7 @@ final class HolePlay {
     @ObservationIgnored var onLost: (() -> Void)?
     /// what the effects layer should show (PlayFX drains it each frame)
     enum Fx { case squash, puff(kind: String, at: SIMD3<Double>, n: Int), shake(Double), sinkRing, burst(at: SIMD3<Double>, n: Int) }
-    @ObservationIgnored var fx: [Fx] = []
+    @ObservationIgnored var fx: [Fx] = [] { didSet { if fx.count > 64 { fx.removeFirst(fx.count - 64) } } }
     /// the ace replay: the same putt again from a low angle beside its line, at 70% speed; a tap skips
     @ObservationIgnored private var wantReplay = false
     struct Replay { var ball: Ball; var t: Double; var acc = 0.0; var done = false; var end = 0.0; let side: Double }
@@ -211,6 +211,8 @@ final class HolePlay {
         aim = hole.data.aim0 ?? atan2(hole.cup.x - hole.tee.x, hole.cup.z - hole.tee.z) * 180 / .pi
     }
 
+    /// the next player in a party walks straight up to the tee: no flight
+    @ObservationIgnored var skipIntroFlight = false
     /// the hole introduces itself: seconds into the flight from over the cup back to the tee, or nil
     private(set) var intro: Double?
     static let introLength = 2.4
@@ -227,7 +229,7 @@ final class HolePlay {
                 await MainActor.run { [weak self] in self?.lostSpot = spot; self?.lostSearched = true }
             }
         }
-        if !reduceMotion && intro == nil && round.strokes == 0 { intro = 0 }
+        if !reduceMotion && !skipIntroFlight && intro == nil && round.strokes == 0 { intro = 0 }
         if reduceMotion { DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in self?.banner = false } }
         guard link == nil else { return }
         link = DisplayLink { [weak self] dt in self?.tick(dt) }
@@ -236,6 +238,7 @@ final class HolePlay {
 
     /// the putter meets the ball: the stroke turns the aim and sets the power
     func strike(_ s: Stroke) {
+        guard phase == .aim else { swing = nil; return }
         skipIntro()
         lastStroke = s
         struckAt = CACurrentMediaTime()
@@ -315,7 +318,7 @@ final class HolePlay {
                 if phase == .aim && !hole.data.movers.isEmpty && hole.moverTouch(ball, time) {
                     from = round.at
                     run = PuttRun(drift: hole, at: from, t0: time)
-                    phase = .drift
+                    phase = .drift; swing = nil
                     continue
                 }
                 time += Sim.SIM_DT
@@ -383,7 +386,7 @@ final class HolePlay {
                 fx.append(.burst(at: SIMD3(hole.cup.x, hole.groundH(hole.cup.x, hole.cup.z) + 0.1, hole.cup.z), n: 120))
                 wantReplay = !reduceMotion && log.count == 1 && !party
             }
-            if lastOfCourse { let ace = round.score == 1; DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: ace) } }
+            if lastOfCourse && !practice { let ace = round.score == 1; DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: ace) } }
             startSink(vx: r.ball.vx, vz: r.ball.vz)
             return
         case .auto?:
@@ -400,10 +403,36 @@ final class HolePlay {
             ball = Ball(hole, hole.cup.x, hole.cup.z)
             onFinish?(round.score ?? Scoring.cap(hole))
         } else {
+            // the border rule moved it out from a rail: lift it and set it down there, as a player would
+            if res.end != .oob && hypot(res.x - round.at.x, res.z - round.at.z) > 0.005 {
+                placeFrom = Vec2(res.x, res.z); placeT = 0; SFX.place()
+            } else { placeFrom = nil }
             phase = .aim
             ball = Ball(hole, round.at.x, round.at.z)
+            // with the cup in sight, the next putt starts aimed at it
+            if cupInSight(round.at) { aim = atan2(hole.cup.x - round.at.x, hole.cup.z - round.at.z) * 180 / .pi }
             canTakeBack = undo != nil && round.strokes > 0 && daily == nil && !party
         }
+    }
+
+    /// the lift-and-place when the border rule moves a ball (PlayProps draws it): from where, how far along
+    private(set) var placeFrom: Vec2?
+    @ObservationIgnored var placeT = 0.0
+    /// no wall between (x, z) and the cup (src/game.js cupInSight)
+    private func cupInSight(_ p: Vec2) -> Bool {
+        let cx = hole.cup.x, cz = hole.cup.z
+        func cr(_ ax: Double, _ az: Double, _ bx: Double, _ bz: Double, _ px: Double, _ pz: Double) -> Double { (bx - ax) * (pz - az) - (bz - az) * (px - ax) }
+        return hole.segs.allSatisfy { s in
+            !(cr(p.x, p.z, cx, cz, s.ax, s.az) * cr(p.x, p.z, cx, cz, s.bx, s.bz) < 0 && cr(s.ax, s.az, s.bx, s.bz, p.x, p.z) * cr(s.ax, s.az, s.bx, s.bz, cx, cz) < 0)
+        }
+    }
+    /// leaving mid-drop (the map, or the controller's back): a ball already in the cup, or rolling
+    /// itself in at the cap, keeps its result, written now with no fanfare (src/game.js leaveHole)
+    func finishNow() {
+        guard phase == .sinking || phase == .auto || phase == .replay, round.done else { return }
+        sink = nil; replay = nil; wantReplay = false
+        phase = .done
+        onFinish?(round.score ?? Scoring.cap(hole))
     }
 
     /// whether the lost ball counts as found at the finish: picked up, or the hole has none
@@ -430,7 +459,8 @@ final class HolePlay {
         if log.count > u.logCount { log.removeLast(log.count - u.logCount) }
         ball = Ball(hole, round.at.x, round.at.z)
         undo = nil; canTakeBack = false
-        lastStroke = nil
+        lastStroke = nil; placeFrom = nil
+        trace = []; traceShown = false
         SFX.tubeOut()
     }
 
@@ -473,7 +503,7 @@ final class HolePlay {
                 k.x = nx * wall; k.z = nz * wall
             }
             // the last hole keeps your ball: down the drain and away to the clubhouse
-            if lastOfCourse && k.floor {
+            if lastOfCourse && !practice && k.floor {
                 k.swallowT += d
                 if k.swallowT > 0.35 {
                     if !k.gone { k.gone = true; SFX.tube() }
@@ -519,7 +549,7 @@ final class HolePlay {
         if t >= 1 {
             SFX.cup()
             let d = max(1e-9, hypot(hole.cup.x - f.x, hole.cup.z - f.z))
-            if lastOfCourse { DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: false) } }
+            if lastOfCourse && !practice { DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { SFX.bell(ace: false) } }
             phase = .roll   // so the sink carries the ball's fall in
             startSink(vx: (hole.cup.x - f.x) / d * 0.5, vz: (hole.cup.z - f.z) / d * 0.5)
         }

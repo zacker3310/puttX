@@ -18,6 +18,7 @@ final class PlayProps {
     private var ribbonKey = ""
     private var ringFill = -1.0
     private var lastSimTime: Double?
+    private var lastNow: CFTimeInterval?
     /// the hole's gold lost ball, bobbing and turning over a pulsing ring (src/game.js syncLost)
     private let lost = Entity()
     private let gold: ModelEntity
@@ -91,6 +92,13 @@ final class PlayProps {
             ball.orientation = simd_quatf(angle: wl * Float(simDt), axis: w / wl) * ball.orientation
         }
         ball.position = SIMD3(Float(b.x), Float(b.y + Sim.BALL_R), Float(b.z))
+        // lifted from where it stopped against a rail and set down where the rule puts it
+        if let f = play.placeFrom, !play.reduceMotion, play.placeT < 0.35 {
+            play.placeT += min(0.1, max(0, now - (lastNow ?? now)))
+            let k = min(1, play.placeT / 0.35), e = k * k * (3 - 2 * k)
+            ball.position = SIMD3(Float(f.x + (b.x - f.x) * e), Float(b.y + Sim.BALL_R + sin(k * .pi) * 0.04), Float(f.z + (b.z - f.z) * e))
+        }
+        lastNow = now
         // its shadow: on the ground under it, fading and spreading as it lifts
         let gy = h.groundH(b.x, b.z), up = max(0, b.y - gy)
         shadow.isEnabled = visible && up < 0.4 && hypot(b.x - h.cup.x, b.z - h.cup.z) >= Sim.CUP_R
@@ -109,7 +117,7 @@ final class PlayProps {
         updateTrace(play)
         if let g = play.ghost, ghost.isEnabled { ghost.position = SIMD3(Float(g.ball.x), Float(g.ball.y + Sim.BALL_R), Float(g.ball.z)) }
         // the lost ball, until it is found
-        if let s = play.lostSpot, !play.lostGot, play.phase != .done {
+        if let s = play.lostSpot, !play.lostGot, play.phase != .done, play.phase != .replay {
             lost.isEnabled = true
             let t = Float(play.reduceMotion ? 0 : play.time)
             lost.position = SIMD3(Float(s.x), Float(h.groundH(s.x, s.z)), Float(s.z))

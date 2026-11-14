@@ -12,6 +12,10 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
     public var neon = false
     public var mulligans = 5
     public var coins = 0
+    /// all coins and tokens ever spent: they only grow, so two devices' saves merge without a refund
+    /// (earned is balance + spent, the merge keeps the most earned and the most spent)
+    public var coinsSpent = 0
+    public var mulligansSpent = 0
     public var owned: [String] = []
     public var equipped: [String: String] = [:]
     /// lost balls found (key -> 1), goals met (key -> bits), the daily hole
@@ -45,6 +49,8 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         neon = try c.decodeIfPresent(Bool.self, forKey: .neon) ?? false
         mulligans = try c.decodeIfPresent(Int.self, forKey: .mulligans) ?? 5
         coins = try c.decodeIfPresent(Int.self, forKey: .coins) ?? 0
+        coinsSpent = max(0, (try? c.decodeIfPresent(Int.self, forKey: .coinsSpent)) ?? 0)
+        mulligansSpent = max(0, (try? c.decodeIfPresent(Int.self, forKey: .mulligansSpent)) ?? 0)
         owned = try c.decodeIfPresent([String].self, forKey: .owned) ?? []
         equipped = try c.decodeIfPresent([String: String].self, forKey: .equipped) ?? [:]
         lost = (try? c.decodeIfPresent([String: Int].self, forKey: .lost)) ?? [:]
@@ -70,7 +76,11 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
             if let a = m.holes[k] { m.holes[k] = HoleRecord(best: Swift.min(a.best, r.best), stars: Swift.max(a.stars, r.stars)) } else { m.holes[k] = r }
         }
         m.worlds = Array(Set(worlds).union(o.worlds)).sorted()
-        m.coins = Swift.max(coins, o.coins)
+        // nothing bought on one device comes back on the other, and nothing earned is lost
+        let earned = Swift.max(coins + coinsSpent, o.coins + o.coinsSpent), spent = Swift.max(coinsSpent, o.coinsSpent)
+        m.coinsSpent = spent; m.coins = Swift.max(0, Swift.min(PlayerProgress.coinMax, earned - spent))
+        let got = Swift.max(mulligans + mulligansSpent, o.mulligans + o.mulligansSpent), used = Swift.max(mulligansSpent, o.mulligansSpent)
+        m.mulligansSpent = used; m.mulligans = Swift.max(0, Swift.min(9999, got - used))
         m.owned = Array(Set(owned).union(o.owned)).sorted()
         m.lost.merge(o.lost) { a, _ in a }
         m.obj.merge(o.obj) { $0 | $1 }
@@ -144,5 +154,5 @@ public struct PlayerProgress: Sendable, Codable, Equatable {
         if !auto && (previousBest == nil || score <= previousBest!) && log.count == score { ghosts[key] = log }
     }
     /// spend a mulligan token
-    public mutating func spendMulligan() -> Bool { guard mulligans > 0 else { return false }; mulligans -= 1; return true }
+    public mutating func spendMulligan() -> Bool { guard mulligans > 0 else { return false }; mulligans -= 1; mulligansSpent += 1; return true }
 }

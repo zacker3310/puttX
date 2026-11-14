@@ -61,6 +61,12 @@ public enum Daily {
     public static func yesterday(_ d: Date = Date(), calendar: Calendar = .current) -> String {
         day(calendar.date(byAdding: .day, value: -1, to: d) ?? d.addingTimeInterval(-86_400), calendar: calendar)
     }
+    /// the day before a "yyyy-mm-dd" day, in the same calendar
+    public static func dayBefore(_ s: String, calendar: Calendar = .current) -> String {
+        let p = s.split(separator: "-").compactMap { Int($0) }
+        guard p.count == 3, let d = calendar.date(from: DateComponents(year: p[0], month: p[1], day: p[2], hour: 12)) else { return yesterday() }
+        return yesterday(d, calendar: calendar)
+    }
     /// the same hole for everyone on a date: any hole from the third on, of any course
     public static func key(_ day: String, catalog: Catalog) -> String {
         var x: UInt32 = 2166136261

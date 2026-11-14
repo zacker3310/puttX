@@ -83,7 +83,7 @@ extension PlayerProgress {
     /// buy (and wear) an item; short of coins nothing changes
     public mutating func buy(_ id: String, shop: Shop) -> Bool {
         guard let price = shop.price(id), !owned.contains(id), coins >= price else { return false }
-        coins -= price; owned.append(id)
+        coins -= price; coinsSpent += price; owned.append(id)
         equip(id, shop: shop)
         return true
     }
@@ -94,7 +94,7 @@ extension PlayerProgress {
     /// a pack of mulligan tokens for coins
     public mutating func buyPack(_ id: String, shop: Shop) -> Bool {
         guard let p = shop.packs.first(where: { $0.id == id }), coins >= p.price else { return false }
-        coins -= p.price; mulligans = Swift.min(9999, mulligans + p.n)
+        coins -= p.price; coinsSpent += p.price; mulligans = Swift.min(9999, mulligans + p.n)
         return true
     }
 }

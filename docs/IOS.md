@@ -55,10 +55,10 @@ running on a device.
 | 1 Core | sim, putts, border relief, rounds, progress, catalog, parity tests, CI | done |
 | 2 Shell | XcodeGen project, SwiftUI scenes, one stage scaled for iPad and iPhone, 64 pt targets, no words, CI screenshots | done |
 | 3 Play | the DS-style swing with `FEEL`, aim, cameras, a 240 Hz live loop, drift, hit-stop, slow motion, the drop | done |
-| 4 Course | RealityKit: exported scenery with its animation, native turf and terrain, sky, fog, the flagstick | done; neon night still to come |
-| 5 Sound | the WebAudio synth on AVAudioEngine; haptics | done |
+| 4 Course | RealityKit: exported scenery with its animation (riders on movers too), native turf and terrain, sky, fog, the flagstick, neon night (`--neon`, holes/<key>.n.json) | done |
+| 5 Sound | the WebAudio synth on AVAudioEngine, neon night's beat; Core Haptics (strike, windup, roll rumble, cup) | done |
 | 6 Platform | Game Center, iCloud key-value saves (lossless merge), GameController | done; needs App Store Connect ids |
-| 7 Extras | mulligans, lost balls, goals, daily hole, ghosts, ace replay, FX, pro shop, pass and play | done; practice, guide, slope read and shot codes to come |
+| 7 Extras | mulligans, lost balls, goals, daily hole, ghosts, ace replay, FX, tracer, pro shop, pass and play, practice and the guide, slope read, birdie tracker | done; shot codes to come |
 | 8 Ship | icons, launch screen, accessibility, App Store listing (Kids Category: free, no data collected) | |
 
 Notes:

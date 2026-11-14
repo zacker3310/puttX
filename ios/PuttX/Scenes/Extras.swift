@@ -150,7 +150,7 @@ struct DailyButton: View {
     @State private var turn = false
     var body: some View {
         let d = app.dailyToday, c = Catalog.course(of: d.key), n = Catalog.number(of: d.key), w = app.catalog.world(of: c)
-        let shape = RoundedRectangle(cornerRadius: st.s(22), style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: st.s(22), style: .continuous), accent = TitleWorld.accent(TitleWorld.today)
         Button { app.playDaily() } label: {
             HStack(spacing: st.s(8)) {
                 Group {
@@ -159,12 +159,12 @@ struct DailyButton: View {
                     else { app.looks[w].iconImage?.resizable().scaledToFit() }
                 }
                 .padding(st.s(8)).frame(width: st.s(70), height: st.s(70))
-                .background(Circle().fill(Color(hex: "#fff3dc"))).overlay(Circle().strokeBorder(Color(hex: "#ffb02e"), lineWidth: st.s(4)))
+                .background(Circle().fill(Color(hex: "#fff3dc"))).overlay(Circle().strokeBorder(accent[1], lineWidth: st.s(4)))
                 VStack(spacing: st.s(6)) {
                     Text("\(n)").font(Toy.font(40, st)).foregroundStyle(.white)
                     if !app.catalog.isExtra(c) {
                         let k = (app.catalog.courses(ofWorld: w).firstIndex(of: c) ?? 0) + 1
-                        HStack(spacing: st.s(4)) { ForEach(0..<k, id: \.self) { _ in Circle().fill(Color(hex: "#ffb02e")).frame(width: st.s(9), height: st.s(9)) } }
+                        HStack(spacing: st.s(4)) { ForEach(0..<k, id: \.self) { _ in Circle().fill(accent[1]).frame(width: st.s(9), height: st.s(9)) } }
                     }
                 }
                 Spacer(minLength: 0)
@@ -174,9 +174,9 @@ struct DailyButton: View {
             }
             .padding(.leading, st.s(10)).padding(.trailing, st.s(16))
             .frame(width: st.s(236), height: st.s(112))
-            // a gunmetal ticket rimmed in fire, to match the title
+            // a gunmetal ticket rimmed in the world of the day's colour, to match the title
             .background(shape.fill(LinearGradient(colors: [Color(hex: "#5d636e"), Color(hex: "#2f333b"), Color(hex: "#1f2228")], startPoint: .top, endPoint: .bottom)))
-            .overlay(shape.strokeBorder(LinearGradient(colors: [Color(hex: "#ffd36b"), Color(hex: "#ff5a1a")], startPoint: .top, endPoint: .bottom), lineWidth: st.s(5)))
+            .overlay(shape.strokeBorder(LinearGradient(colors: [accent[1], accent[2]], startPoint: .top, endPoint: .bottom), lineWidth: st.s(5)))
             .overlay(alignment: .topLeading) {
                 ExtraIconView(icon: .sun).frame(width: st.s(64), height: st.s(64))
                     .rotationEffect(.degrees(turn ? 360 : 0))
@@ -190,7 +190,7 @@ struct DailyButton: View {
                 }
             }
             .background(shape.fill(Color(hex: "#0d0e12")).offset(y: st.s(7)))
-            .shadow(color: Color(hex: "#ff5a1a").opacity(0.45), radius: st.s(14))
+            .shadow(color: accent[2].opacity(0.45), radius: st.s(14))
         }
         .buttonStyle(PressDown())
         .accessibilityLabel("hole of the day" + (d.streak.map { ", \($0) days in a row" } ?? ""))

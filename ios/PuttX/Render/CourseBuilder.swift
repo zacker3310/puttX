@@ -54,17 +54,32 @@ enum CourseBuilder {
                 }
                 continue
             }
+            // a flat decal on the turf (the tee mat, the cup's shade, painted marks), draped over the turf
+            // as it is drawn: on a slope or by a step the turf's grid rises through a flat piece, which the
+            // web's polygon offset hides and RealityKit cannot
+            if hole.mats[n.m.list[0]].polygonOffset != nil, n.m.list.count == 1, let mesh = drape(g, x, h) {
+                var mat = mats[n.m.list[0]]
+                if var p = mat as? PhysicallyBasedMaterial { p.faceCulling = .none; mat = p }
+                if var u = mat as? UnlitMaterial { u.faceCulling = .none; mat = u }
+                let e = ModelEntity(mesh: mesh, materials: [mat])
+                rig.anim.bind(e, materials: n.m.list, hole: hole)
+                rig.root.addChild(e)
+                continue
+            }
             let lift = Float(hole.mats[n.m.list[0]].polygonOffset != nil ? 0.002 : 0)   // RealityKit has no polygon offset
-            let e = ModelEntity(mesh: try S.mesh(g, materials: n.m.list.count, lift: lift), materials: n.m.list.map { mats[$0] })
-            e.transform = Transform(matrix: x)
+            // a sheared matrix (a turned child in a stretched group: the sky islands' rock roots, some tee
+            // mats) cannot be a RealityKit transform, which keeps only scale, turn and place: bake it in
+            let bake = sheared(x)
+            let e = ModelEntity(mesh: try S.mesh(g, materials: n.m.list.count, lift: lift, transforms: [bake ? x : matrix_identity_float4x4]), materials: n.m.list.map { mats[$0] })
+            if !bake { e.transform = Transform(matrix: x) }
             rig.anim.bind(e, materials: n.m.list, hole: hole)
             rig.root.addChild(e)
         }
         /// a node in its parent's frame
         func part(_ n: SceneNode) throws -> ModelEntity {
-            let lift = Float(hole.mats[n.m.list[0]].polygonOffset != nil ? 0.002 : 0)
-            let e = ModelEntity(mesh: try S.mesh(try S.geo(n.g), materials: n.m.list.count, lift: lift), materials: n.m.list.map { mats[$0] })
-            e.transform = Transform(matrix: matrix(n.x))
+            let lift = Float(hole.mats[n.m.list[0]].polygonOffset != nil ? 0.002 : 0), x = matrix(n.x), bake = sheared(x)
+            let e = ModelEntity(mesh: try S.mesh(try S.geo(n.g), materials: n.m.list.count, lift: lift, transforms: [bake ? x : matrix_identity_float4x4]), materials: n.m.list.map { mats[$0] })
+            if !bake { e.transform = Transform(matrix: x) }
             rig.anim.bind(e, materials: n.m.list, hole: hole)
             return e
         }
@@ -253,6 +268,50 @@ enum CourseBuilder {
         var k = SIMD3<Double>(m.color[0], m.color[1], m.color[2])
         if let t = m.map, let mean = SceneStore.shared.meanColor(t) { k *= mean }
         return SceneStore.color([k.x, k.y, k.z])
+    }
+
+    /// a flat piece laid in the world by `x`, cut until no edge is longer than 2.5 cm, lying 2 mm over the
+    /// turf (6 mm over a zone, which lies 4 mm up) as the turf is drawn; nil for anything not flat
+    /// and lying (more than 2 cm of height in it, or tipped up), which is left as it is
+    static func drape(_ g: SceneGeo, _ x: simd_float4x4, _ h: Hole) -> MeshResource? {
+        let w = g.positions.map { p -> SIMD3<Float> in let q = x * SIMD4(p, 1); return SIMD3(q.x, q.y, q.z) }
+        guard let lo = w.map(\.y).min(), let hi = w.map(\.y).max(), hi - lo < 0.02, g.indices.count >= 3 else { return nil }
+        let up = simd_normalize(SIMD3(x.columns.1.x, x.columns.1.y, x.columns.1.z)), out = simd_normalize(SIMD3(x.columns.2.x, x.columns.2.y, x.columns.2.z))
+        // a plane faces along its local z, anything else along its local y: either must point up
+        guard max(abs(up.y), abs(out.y)) > 0.9 else { return nil }
+        let uv0 = g.uvs
+        var pos: [SIMD3<Float>] = [], uvs: [SIMD2<Float>] = [], idx: [UInt32] = []
+        func put(_ p: SIMD3<Float>, _ u: SIMD2<Float>) -> UInt32 {
+            let floor = Float(Terrain.floorHeight(h, Double(p.x), Double(p.z)) + (h.zoneAt(Double(p.x), Double(p.z)) != nil ? 0.006 : 0.002))
+            // lying on the turf (within 1.5 cm of it): follows it up and down; held up off it on purpose: kept,
+            // only never under it
+            let y = !h.onFloor(Double(p.x), Double(p.z)) ? p.y : abs(p.y - floor) < 0.015 ? floor : max(p.y, floor)
+            pos.append(SIMD3(p.x, y, p.z)); uvs.append(u)
+            return UInt32(pos.count - 1)
+        }
+        func tri(_ a: SIMD3<Float>, _ b: SIMD3<Float>, _ c: SIMD3<Float>, _ ua: SIMD2<Float>, _ ub: SIMD2<Float>, _ uc: SIMD2<Float>, _ depth: Int) {
+            let e = max(simd_distance(SIMD2(a.x, a.z), SIMD2(b.x, b.z)), simd_distance(SIMD2(b.x, b.z), SIMD2(c.x, c.z)), simd_distance(SIMD2(a.x, a.z), SIMD2(c.x, c.z)))
+            if e < 0.025 || depth >= 6 { idx += [put(a, ua), put(b, ub), put(c, uc)]; return }
+            let ab = (a + b) / 2, bc = (b + c) / 2, ca = (c + a) / 2, uab = (ua + ub) / 2, ubc = (ub + uc) / 2, uca = (uc + ua) / 2
+            tri(a, ab, ca, ua, uab, uca, depth + 1); tri(ab, b, bc, uab, ub, ubc, depth + 1); tri(ca, bc, c, uca, ubc, uc, depth + 1); tri(ab, bc, ca, uab, ubc, uca, depth + 1)
+        }
+        for t in stride(from: 0, to: g.indices.count - 2, by: 3) {
+            let i = Int(g.indices[t]), j = Int(g.indices[t + 1]), k = Int(g.indices[t + 2])
+            tri(w[i], w[j], w[k], uv0?[i] ?? .zero, uv0?[j] ?? .zero, uv0?[k] ?? .zero, 0)
+        }
+        guard pos.count < 400_000 else { return nil }
+        var d = MeshDescriptor()
+        d.positions = MeshBuffers.Positions(pos)
+        d.normals = MeshBuffers.Normals(Array(repeating: SIMD3<Float>(0, 1, 0), count: pos.count))
+        if uv0 != nil { d.textureCoordinates = MeshBuffers.TextureCoordinates(uvs) }
+        d.primitives = .triangles(idx)
+        return try? MeshResource.generate(from: [d])
+    }
+
+    /// whether a matrix's axes have been pushed off square (a non-uniform scale over a turn)
+    static func sheared(_ m: simd_float4x4) -> Bool {
+        let a = simd_normalize(SIMD3(m.columns.0.x, m.columns.0.y, m.columns.0.z)), b = simd_normalize(SIMD3(m.columns.1.x, m.columns.1.y, m.columns.1.z)), c = simd_normalize(SIMD3(m.columns.2.x, m.columns.2.y, m.columns.2.z))
+        return abs(simd_dot(a, b)) > 1e-3 || abs(simd_dot(b, c)) > 1e-3 || abs(simd_dot(a, c)) > 1e-3
     }
 
     static func matrix(_ e: [Float]) -> simd_float4x4 {

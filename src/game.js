@@ -1254,7 +1254,12 @@ function drainSpiral(h, dr) {
       const u = i / N, rr = dr.r - (dr.r - f) * u, th = k * 2.094 + u * Math.PI * 3.2, x = dr.x + Math.cos(th) * rr, z = dr.z + Math.sin(th) * rr;
       const nx = Math.cos(th), nz = Math.sin(th);
       for (const sgn of [-1, 1]) { const px = x + nx * w * sgn * (1 - u * 0.5), pz = z + nz * w * sgn * (1 - u * 0.5); pos.push(px, groundH(h, px, pz) + 0.004, pz); }
-      if (i < N) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+      /* paint only on the floor: a bowl cut short by its walls keeps its arms inside them */
+      if (i < N) {
+        const r1 = dr.r - (dr.r - f) * (i + 1) / N, t1 = k * 2.094 + (i + 1) / N * Math.PI * 3.2;
+        const on = (px, pz) => onFloor(h, px, pz) && h.segs.every(sg => { const p = closestOnSeg(sg[0], sg[1], sg[2], sg[3], px, pz); return hyp(px - p[0], pz - p[1]) > WALL_HALF; });
+        if (on(x, z) && on(dr.x + Math.cos(t1) * r1, dr.z + Math.sin(t1) * r1)) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+      }
     }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx);
     const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: cols[k], transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 }));

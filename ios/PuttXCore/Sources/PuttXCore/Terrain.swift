@@ -126,6 +126,15 @@ public enum Terrain {
         }
     }
 
+    /// the height the turf mesh is drawn at over (x, z): the ground at its grid's corners, cut straight
+    /// across each cell's two triangles as `grid` lays them, so a flat decal can lie on what is seen
+    public static func floorHeight(_ h: Hole, _ x: Double, _ z: Double) -> Double {
+        let B = bounds(h), C = (B.x1 - B.x0) * (B.z1 - B.z0) > 60 ? 0.07 : 0.05
+        let fi = (x - B.x0) / C, fj = (z - B.z0) / C, i = fi.rounded(.down), j = fj.rounded(.down), fx = fi - i, fz = fj - j
+        let x0 = B.x0 + i * C, z0 = B.z0 + j * C
+        let ha = h.groundH(x0, z0), hb = h.groundH(x0 + C, z0), hc = h.groundH(x0, z0 + C), hd = h.groundH(x0 + C, z0 + C)
+        return fx + fz <= 1 ? ha + fx * (hb - ha) + fz * (hc - ha) : hd + (1 - fx) * (hc - hd) + (1 - fz) * (hb - hd)
+    }
     public static func floor(_ h: Hole) -> MeshData {
         grid(h, shade: floorShade(h)) { x, z in h.onFloor(x, z) && offCup(h, x, z) }
     }

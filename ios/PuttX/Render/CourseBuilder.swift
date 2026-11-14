@@ -88,8 +88,8 @@ enum CourseBuilder {
         // the surfaces grown from the sim
         let turf = hole.mats[hole.native.floor]
         let along = simd_normalize(SIMD2(Float(h.cup.x - h.tee.x), Float(h.cup.z - h.tee.z)))
-        // at night the carpet is black-light paint (an emissive texture): the stock material carries it
-        let turfMat: any Material = hole.env.night ? S.material(turf) : try turfMaterial(turf, along: along, stripes: 0.13)
+        // at night the carpet is black-light paint, lit by itself: drawn unlit from its own texture
+        let turfMat: any Material = hole.env.night ? glow(turf) : try turfMaterial(turf, along: along, stripes: 0.13)
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.floor(h)), materials: [turfMat]))
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.collar(h)), materials: [turfMat]))
         for (i, z) in hole.native.zones.enumerated() where i < h.data.zones.count {
@@ -99,7 +99,11 @@ enum CourseBuilder {
         }
         rig.root.addChild(ModelEntity(mesh: try lowMesh(Terrain.skirt(h, bottom: hole.native.skirt.bottom)), materials: [S.material(hole.mats[hole.native.skirt.m])]))
         if let gi = hole.native.ground {
-            let g = ModelEntity(mesh: try lowMesh(Terrain.ground()), materials: [hole.env.night ? S.material(hole.mats[gi]) : try groundMaterial(hole.mats[gi], fog: hole.env.fog)])
+            let gm = hole.mats[gi]
+            // the night's grid to the horizon: unlit, its 40 x 40 repeat laid into the mesh's uvs
+            var mesh = Terrain.ground()
+            if hole.env.night, let r = gm.map?.rep { for i in stride(from: 0, to: mesh.uvs.count - 1, by: 2) { mesh.uvs[i] *= Float(r[0]); mesh.uvs[i + 1] *= Float(r[1]) } }
+            let g = ModelEntity(mesh: try lowMesh(mesh), materials: [hole.env.night ? glow(gm) : try groundMaterial(gm, fog: hole.env.fog)])
             rig.root.addChild(g)
             rig.ground = g
         }
@@ -198,6 +202,13 @@ enum CourseBuilder {
         c.custom.value = SIMD4(along.x, along.y, stripes, 0.7)
         if let sc = m.sheenColor { c.emissiveColor = .init(color: SceneStore.color(sc)) }
         return c
+    }
+    /// a self-lit surface (black-light paint): its texture as it is, no light needed
+    static func glow(_ m: SceneMat) -> any Material {
+        guard let t = m.map, let tex = try? SceneStore.shared.param(t) else { return SceneStore.shared.material(m) }
+        var u = UnlitMaterial()
+        u.color = .init(tint: .white, texture: tex)
+        return u
     }
     static func groundMaterial(_ m: SceneMat, fog: SceneEnv.Fog?) throws -> any Material {
         guard let lib = library else { return SceneStore.shared.material(m) }

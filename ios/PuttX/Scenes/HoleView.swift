@@ -61,8 +61,8 @@ struct HoleView: View {
                 }
                 if aimUp {
                     HStack(spacing: st.s(16)) {
-                        IconButton(symbol: "chevron.left", label: "aim left") { play.aim += Swing.NUDGE_DEG }
-                        IconButton(symbol: "chevron.right", label: "aim right") { play.aim -= Swing.NUDGE_DEG }
+                        AimButton(symbol: "chevron.left", label: "aim left") { if play.phase == .aim { play.aim += $0 } }
+                        AimButton(symbol: "chevron.right", label: "aim right") { if play.phase == .aim { play.aim -= $0 } }
                     }
                     .position(x: lefty ? geo.size.width - st.s(24 + 96) : st.s(24 + 96), y: geo.size.height - st.s(24 + 44))
                     .disabled(play.phase != .aim)
@@ -172,6 +172,8 @@ struct HoleView: View {
 
     // MARK: input
     /// drag the course sideways to turn the aim, as on the web (0.12 degrees per stage px)
+    /// a finger on a phone covers less ground than a mouse: the course drag turns half as much again
+    static let AIM_TOUCH = 1.5
     private var aimDrag: some Gesture {
         // no dead zone: the aim follows the finger from the first point, with nothing to catch up on
         DragGesture(minimumDistance: 0)
@@ -180,7 +182,7 @@ struct HoleView: View {
                 guard play.phase == .aim else { return }
                 let from = aimFrom ?? play.aim
                 aimFrom = from
-                play.aim = from - Double(g.translation.width / st.scale) * Swing.AIM_DEG_PX
+                play.aim = from - Double(g.translation.width / st.scale) * Swing.AIM_DEG_PX * HoleView.AIM_TOUCH
             }
             .onEnded { _ in aimFrom = nil }
     }
@@ -498,5 +500,33 @@ struct TeeSign: View {
         ctx.stroke(Path { $0.move(to: c); $0.addLine(to: CGPoint(x: c.x, y: c.y - 14 * s)) }, with: .color(Color(hex: "#fffdf7")), lineWidth: 2 * s)
         ctx.fill(Path { $0.move(to: CGPoint(x: c.x, y: c.y - 14 * s)); $0.addLine(to: CGPoint(x: c.x + 9 * s, y: c.y - 10.5 * s)); $0.addLine(to: CGPoint(x: c.x, y: c.y - 7 * s)); $0.closeSubpath() }, with: .color(Toy.red))
         ctx.fill(Path(ellipseIn: CGRect(x: c.x - 3 * s, y: c.y - 3 * s, width: 6 * s, height: 6 * s)), with: .color(Color(hex: "#2f241a")))
+    }
+}
+
+/// an aim arrow: a tap nudges a quarter degree; held, it keeps turning, faster the longer it is held
+struct AimButton: View {
+    let symbol: String
+    let label: String
+    let turn: (Double) -> Void
+    @State private var timer: Timer?
+    var body: some View {
+        IconButton(symbol: symbol, label: label) {}
+            .simultaneousGesture(DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    guard timer == nil else { return }
+                    turn(Swing.NUDGE_DEG)
+                    let t0 = CACurrentMediaTime()
+                    let t = Timer(timeInterval: 1.0 / 60, repeats: true) { _ in
+                        MainActor.assumeIsolated {
+                            // a short pause, so a tap stays a nudge, then 6 deg/s rising to 45
+                            let held = CACurrentMediaTime() - t0
+                            if held > 0.25 { turn(min(45, 6 + 40 * (held - 0.25)) / 60) }
+                        }
+                    }
+                    RunLoop.main.add(t, forMode: .common)
+                    timer = t
+                }
+                .onEnded { _ in timer?.invalidate(); timer = nil })
+            .onDisappear { timer?.invalidate(); timer = nil }
     }
 }

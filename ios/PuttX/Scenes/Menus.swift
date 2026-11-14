@@ -56,6 +56,7 @@ struct ProfilesView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.stage) private var st
     @State private var armed = 0
+    @State private var shakes = 0
     @State private var disarm: Task<Void, Never>?
 
     var body: some View {
@@ -104,6 +105,8 @@ struct ProfilesView: View {
                 HStack(spacing: st.s(20)) {
                     Button { tapBin(n) } label: { Image(systemName: "trash.fill").font(.system(size: st.s(36), weight: .bold)) }
                         .buttonStyle(ToyButtonStyle(kind: armed == n ? .red : .plain))
+                        // armed: a little shake (still under reduced motion)
+                        .modifier(Shake(n: armed == n ? shakes : 0))
                         .accessibilityLabel("erase profile \(n)")
                     if let p, let next = p.nextHole(catalog: app.catalog) {
                         Button { app.useSlot(n); app.go(.hole(next)) } label: {
@@ -122,6 +125,7 @@ struct ProfilesView: View {
         disarm?.cancel()
         if armed != n {
             armed = n
+            withAnimation(.linear(duration: 0.8)) { shakes += 1 }
             disarm = Task { try? await Task.sleep(for: .seconds(3)); if !Task.isCancelled { armed = 0 } }
         } else { armed = 0; app.erase(n) }
     }

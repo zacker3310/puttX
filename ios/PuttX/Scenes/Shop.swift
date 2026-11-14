@@ -301,7 +301,7 @@ struct ShopView: View {
 }
 
 /// a little shake (short of coins); still under reduced motion
-private struct Shake: GeometryEffect {
+struct Shake: GeometryEffect {
     var n: Int
     var animatableData: CGFloat
     init(n: Int) { self.n = n; animatableData = CGFloat(n) }

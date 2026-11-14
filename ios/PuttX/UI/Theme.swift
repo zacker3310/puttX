@@ -11,18 +11,25 @@ extension Color {
 }
 
 enum Toy {
-    static let surface = Color(hex: "#fff8ec"), surface2 = Color(hex: "#f6e9d2"), surfaceLine = Color(hex: "#e6d2ab"), surfaceDown = Color(hex: "#d9c193")
-    static let ink = Color(hex: "#5a4634"), inkStrong = Color(hex: "#4a3826"), inkSoft = Color(hex: "#8a7360")
+    // gunmetal plates with steel rims and white numerals, after the title (TitleMetal.swift)
+    static let surface = Color(hex: "#2c3039"), surface2 = Color(hex: "#383d47"), surfaceLine = Color(hex: "#6b727e"), surfaceDown = Color(hex: "#101216")
+    static let ink = Color(hex: "#d9dee6"), inkStrong = Color.white, inkSoft = Color(hex: "#9aa3b0")
+    /// the dark numerals on a bright face (yellow)
+    static let inkDark = Color(hex: "#2a2008")
     static let wood = Color(hex: "#c9a476"), woodDeep = Color(hex: "#a8804e"), woodDark = Color(hex: "#6e5233"), woodLine = Color(hex: "#8a6538")
     static let green = Color(hex: "#74c465"), greenLine = Color(hex: "#4e9a45"), greenDown = Color(hex: "#438a3b")
     static let red = Color(hex: "#ef7d6d"), redLine = Color(hex: "#c95a4c"), redDown = Color(hex: "#b34e41")
     static let blue = Color(hex: "#6fc0df"), blueLine = Color(hex: "#4a94b5"), blueDown = Color(hex: "#3f83a2")
     static let yellow = Color(hex: "#ffd66e"), yellowLine = Color(hex: "#dca63f"), yellowDown = Color(hex: "#c69334")
-    static let mute = Color(hex: "#cfc0a6"), muteLine = Color(hex: "#b1a082"), muteDown = Color(hex: "#a3916d")
-    static let shadow = Color(red: 74 / 255, green: 53 / 255, blue: 35 / 255)
-    static let scrim = Color(red: 64 / 255, green: 44 / 255, blue: 28 / 255).opacity(0.55)
+    static let mute = Color(hex: "#4a4f58"), muteLine = Color(hex: "#5e646e"), muteDown = Color(hex: "#1a1c21")
+    static let shadow = Color.black
+    static let scrim = Color(hex: "#05060a").opacity(0.62)
     static let rSm: CGFloat = 16, rMd: CGFloat = 22, rLg: CGFloat = 30, rXl: CGFloat = 38
 
+    /// brushed gunmetal, lit from above
+    static let metal = AnyShapeStyle(LinearGradient(colors: [Color(hex: "#555b66"), Color(hex: "#363a43"), Color(hex: "#24272e")], startPoint: .top, endPoint: .bottom))
+    /// a steel rim, bright at the top edge
+    static let steel = LinearGradient(colors: [Color(hex: "#c7ccd5"), Color(hex: "#6b727e"), Color(hex: "#4b515b")], startPoint: .top, endPoint: .bottom)
     static func font(_ size: CGFloat, _ st: StageMetrics) -> Font { .system(size: st.s(size), weight: .heavy, design: .rounded).monospacedDigit() }
 }
 
@@ -30,9 +37,11 @@ enum Toy {
 enum ToyKind {
     case plain, go, red, blue, yellow, locked
     var face: Color { switch self { case .plain: Toy.surface; case .go: Toy.green; case .red: Toy.red; case .blue: Toy.blue; case .yellow: Toy.yellow; case .locked: Toy.mute } }
+    /// the face as painted: brushed metal for the plain plates, the colour as enamel over it otherwise
+    var fill: AnyShapeStyle { switch self { case .plain, .locked: Toy.metal; default: AnyShapeStyle(LinearGradient(colors: [face.opacity(1), face.mix(with: .black, by: 0.25)], startPoint: .top, endPoint: .bottom)) } }
     var rim: Color { switch self { case .plain: Toy.surfaceLine; case .go: Toy.greenLine; case .red: Toy.redLine; case .blue: Toy.blueLine; case .yellow: Toy.yellowLine; case .locked: Toy.muteLine } }
     var down: Color { switch self { case .plain: Toy.surfaceDown; case .go: Toy.greenDown; case .red: Toy.redDown; case .blue: Toy.blueDown; case .yellow: Toy.yellowDown; case .locked: Toy.muteDown } }
-    var ink: Color { switch self { case .plain, .locked, .yellow: Toy.inkStrong; default: .white } }
+    var ink: Color { switch self { case .yellow: Toy.inkDark; case .locked: Toy.inkSoft; default: .white } }
 }
 
 /// A chunky toy button: it sits on a flat shadow and presses down into it.
@@ -49,7 +58,7 @@ struct ToyButtonStyle: ButtonStyle {
             .font(Toy.font(40, st))
             .foregroundStyle(kind.ink)
             .frame(minWidth: size.map { st.s($0.width) }, minHeight: size.map { st.s($0.height) })
-            .background(ZStack { shape.fill(kind.face); Gloss(shape: shape).padding(st.s(4)) })
+            .background(ZStack { shape.fill(kind.fill); Gloss(shape: shape).padding(st.s(4)).opacity(0.6) })
             .overlay(shape.strokeBorder(kind.rim, lineWidth: st.s(4)))
             .background(shape.fill(kind.down).offset(y: pressed ? st.s(2) : lift))
             // lifted off the scenery behind it; squashes a touch as it goes down
@@ -68,9 +77,11 @@ extension View {
     /// a cream card with a rim and a flat shadow
     func toyCard(_ st: StageMetrics, radius: CGFloat = Toy.rLg, fill: Color = Toy.surface) -> some View {
         let shape = RoundedRectangle(cornerRadius: st.s(radius), style: .continuous)
-        return background(shape.fill(fill))
-            .overlay(shape.strokeBorder(Toy.surfaceLine, lineWidth: st.s(4)))
-            .background(shape.fill(Toy.shadow.opacity(0.14)).offset(y: st.s(6)))
+        return background(shape.fill(fill == Toy.surface ? Toy.metal : AnyShapeStyle(fill)))
+            .overlay(shape.strokeBorder(Toy.steel, lineWidth: st.s(4)))
+            .overlay(shape.inset(by: st.s(4)).strokeBorder(.black.opacity(0.5), lineWidth: st.s(1.5)))
+            .background(shape.fill(Toy.surfaceDown).offset(y: st.s(6)))
+            .compositingGroup().shadow(color: .black.opacity(0.35), radius: st.s(12), y: st.s(8))
     }
 }
 
@@ -96,7 +107,7 @@ struct Tally<Icon: View>: View {
         HStack(spacing: st.s(6)) { icon.frame(width: st.s(34), height: st.s(34)); Text(value) }
             .font(Toy.font(30, st)).foregroundStyle(Toy.inkStrong)
             .padding(.horizontal, st.s(14)).padding(.vertical, st.s(4))
-            .background(Capsule().fill(Toy.surface.opacity(0.92)))
+            .background(Capsule().fill(Toy.surface.opacity(0.92))).overlay(Capsule().strokeBorder(Toy.surfaceLine.opacity(0.8), lineWidth: st.s(2)))
     }
 }
 

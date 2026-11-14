@@ -91,7 +91,8 @@ const realErrors = errs => errs.filter(e => !/Failed to load resource/.test(e));
   check('finishing holes pays: first clear, par again, under par, an ace on a new hole, the capped worst', [eco.a, eco.b, eco.c, eco.d, eco.e].join() === want.join(), JSON.stringify(eco) + ' want ' + want);
   check('coins are saved with the progress', eco.saved === eco.e);
   check('hole-done card shows the coin pop (+N), wordless', eco.shown && eco.chip === '+5' && (await visibleLetters(page)).length === 0 && (await smallTargets(page)).length === 0, JSON.stringify(eco));
-  await page.waitForTimeout(900);
+  /* the chime is due 700 ms after the card: wait for it rather than a fixed sleep a busy machine overruns */
+  await page.waitForFunction(() => sfxLog.includes('coin'), null, { timeout: 3000 }).catch(() => {});
   check('the coin pop chimes', await page.evaluate(() => sfxLog.includes('coin')));
 
   /* never negative */

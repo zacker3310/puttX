@@ -33,7 +33,7 @@ struct ShopView: View {
     var body: some View {
         ZStack {
             // the shop stands out in the first world, under its striped awning
-            WorldScene(look: app.look(app.catalog.allCourses[0]), horizon: 0.82).ignoresSafeArea()
+            WorldScene(look: app.look(TitleWorld.today), horizon: 0.82).ignoresSafeArea()
             ZStack(alignment: .topLeading) {
                 Color.clear
                 awning.frame(width: st.s(400), height: st.s(100)).offset(x: st.s(436))

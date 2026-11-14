@@ -61,7 +61,7 @@ struct ProfilesView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            WorldScene(look: app.look(app.catalog.allCourses[0])).ignoresSafeArea()
+            WorldScene(look: app.look(TitleWorld.today)).ignoresSafeArea()
             TopBar { BackButton { app.go(.title) } } right: { EmptyView() }
             HStack(alignment: .top, spacing: st.s(48)) {
                 ForEach(1...AppModel.slots, id: \.self) { n in profile(n).popIn(Double(n - 1) * 0.07) }
@@ -140,7 +140,7 @@ struct WorldsView: View {
         // two rows of 248 px cards under the top bar; a short phone stage scales the grid to fit
         let f = min(1, (st.h - 136 - 24) / (248 * 2 + 24))
         ZStack(alignment: .topLeading) {
-            WorldScene(look: app.look(app.catalog.allCourses[0]), horizon: 0.86).ignoresSafeArea()
+            WorldScene(look: app.look(TitleWorld.today), horizon: 0.86).ignoresSafeArea()
             let cols = Array(repeating: GridItem(.fixed(st.s(200 * f)), spacing: st.s(24 * f)), count: 5)
             LazyVGrid(columns: cols, spacing: st.s(24 * f)) {
                 ForEach(Array(app.catalog.worldOrder.enumerated()), id: \.element) { i, w in worldCard(w, f).popIn(Double(i) * 0.03) }

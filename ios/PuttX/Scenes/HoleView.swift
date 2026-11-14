@@ -461,13 +461,13 @@ struct SwingPad: View {
             var p = Path(); p.move(to: CGPoint(x: x, y: y0)); p.addLine(to: CGPoint(x: x, y: y1))
             p.move(to: CGPoint(x: x - st.s(16), y: y1 - st.s(16))); p.addLine(to: CGPoint(x: x, y: y1)); p.addLine(to: CGPoint(x: x + st.s(16), y: y1 - st.s(16)))
             p.move(to: CGPoint(x: x - st.s(16), y: y0 + st.s(16))); p.addLine(to: CGPoint(x: x, y: y0)); p.addLine(to: CGPoint(x: x + st.s(16), y: y0 + st.s(16)))
-            ctx.stroke(p, with: .color(Toy.surfaceDown), style: StrokeStyle(lineWidth: st.s(5), lineCap: .round, lineJoin: .round))
+            ctx.stroke(p, with: .color(Toy.inkSoft), style: StrokeStyle(lineWidth: st.s(5), lineCap: .round, lineJoin: .round))
             return
         }
         let sm = path.samples, clean = path.clean
         let pt = { (q: PadSample) in CGPoint(x: q.x * st.scale, y: q.y * st.scale) }
         let y = s0.y * st.scale
-        ctx.stroke(Path { $0.move(to: CGPoint(x: 0, y: y)); $0.addLine(to: CGPoint(x: size.width, y: y)) }, with: .color(Toy.surfaceDown), style: StrokeStyle(lineWidth: st.s(3), dash: [st.s(6), st.s(8)]))
+        ctx.stroke(Path { $0.move(to: CGPoint(x: 0, y: y)); $0.addLine(to: CGPoint(x: size.width, y: y)) }, with: .color(Toy.inkSoft), style: StrokeStyle(lineWidth: st.s(3), dash: [st.s(6), st.s(8)]))
         let k = sm.indices.max { sm[$0].y < sm[$1].y } ?? 0
         ctx.stroke(Path { $0.addLines(sm[...k].map(pt)) }, with: .color(Toy.yellowDown), style: StrokeStyle(lineWidth: lw, lineCap: .round, lineJoin: .round))
         if k < sm.count - 1 {

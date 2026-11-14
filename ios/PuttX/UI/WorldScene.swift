@@ -11,11 +11,18 @@ struct WorldScene: View {
     var compact = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var start = Date()
+    /// the world (1...10) a course belongs to: its course number mod ten; nil for the extras
+    private var world: Int? { (1...30).contains(look.course) ? (look.course - 1) % 10 + 1 : nil }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: compact ? 1.0 / 15 : 1.0 / 30, paused: reduceMotion)) { tl in
             let t = reduceMotion ? 0 : tl.date.timeIntervalSince(start)
-            Canvas { ctx, size in WorldPainter(look: look, horizon: horizon, compact: compact).draw(ctx, size, t) }
+            Canvas { ctx, size in
+                // a world's menus stand in its title scene; the extras keep their own sky and hills
+                if let w = world {
+                    if w == 6 { MetalTitlePainter().draw(ctx, size, t) } else { WorldTitlePainter(world: w).draw(ctx, size, t) }
+                } else { WorldPainter(look: look, horizon: horizon, compact: compact).draw(ctx, size, t) }
+            }
         }
         .accessibilityHidden(true)
     }

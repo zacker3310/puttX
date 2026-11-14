@@ -226,7 +226,7 @@ struct ReadGlyph: View {
             let k = s.width / 64
             func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: y * k) }
             ctx.stroke(Path { $0.move(to: p(8, 44)); $0.addQuadCurve(to: p(56, 44), control: p(32, 20)) }, with: .color(Toy.green), style: StrokeStyle(lineWidth: 6 * k, lineCap: .round))
-            ctx.stroke(Path { $0.addLines([p(20, 22), p(14, 34), p(26, 32)]); $0.move(to: p(44, 22)); $0.addLines([p(44, 22), p(50, 34), p(38, 32)]) }, with: .color(Color(hex: "#5a4634")), style: StrokeStyle(lineWidth: 5 * k, lineCap: .round, lineJoin: .round))
+            ctx.stroke(Path { $0.addLines([p(20, 22), p(14, 34), p(26, 32)]); $0.move(to: p(44, 22)); $0.addLines([p(44, 22), p(50, 34), p(38, 32)]) }, with: .color(Toy.ink), style: StrokeStyle(lineWidth: 5 * k, lineCap: .round, lineJoin: .round))
         }
         .aspectRatio(1, contentMode: .fit).accessibilityHidden(true)
     }

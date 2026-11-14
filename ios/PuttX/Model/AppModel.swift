@@ -220,15 +220,18 @@ final class AppModel {
     private func applyLaunchArguments() {
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-render"), i + 1 < args.count, let r = Renderer(rawValue: args[i + 1]) { renderer = r }
+        // `-neon`: the night remix, for its screenshot
+        let neonShot = args.contains("-neon")
         if args.contains("-demo") {
             var p = PlayerProgress(catalog: catalog)
             for c in catalog.allCourses where c != 30 {
                 for h in catalog.holes(course: c) { p.record(h.key, score: max(1, h.par - [1, 0, 0, 1, -1][Catalog.number(of: h.key) % 5]), par: h.par, catalog: catalog) }
             }
             p.coins = 240
+            p.neon = neonShot
             progress = p
             save()
-        }
+        } else if neonShot { progress.neon = true }
         guard let i = args.firstIndex(of: "-route"), i + 1 < args.count else { return }
         let parts = args[i + 1].split(separator: ":", maxSplits: 1).map(String.init)
         let arg = parts.count > 1 ? parts[1] : ""

@@ -36,6 +36,8 @@ function grabItem(id) {
   const out = { id, kind: it.kind };
   if (it.kind === 'putter') {
     const g = dressPutter(buildPutter(it.look), it.look); shine(g);
+    /* the game keeps its putter hidden until there is a ball to address; this one is for keeps */
+    g.visible = true;
     g.updateMatrixWorld(true);
     out.parts = [];
     /* which parts are the head: the room check and the face's aim live there */

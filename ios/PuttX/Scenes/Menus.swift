@@ -12,7 +12,7 @@ struct TitleView: View {
     @State private var pulse = false
     var body: some View {
         GeometryReader { g in
-            let k = max(g.size.width / 1200, g.size.height / 700)
+            let k = TitleArt.scale(g.size)
             ZStack {
                 TitleArt()
                 // the pill sits on the art's green (art x 440...760, y 396...540)

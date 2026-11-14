@@ -89,13 +89,21 @@ private func pose(_ l: TitleLayer, _ t: Double) -> Pose {
 }
 
 struct TitleArt: View {
+    /// art units to points: the art's full height on screen
+    static func scale(_ size: CGSize) -> CGFloat { size.height / 700 }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var start = Date()
 
     var body: some View {
         GeometryReader { g in
-            // fill the screen as the web's slice does: the art's shorter side meets the screen's
-            let k = max(g.size.width / 1200, g.size.height / 700)
+            // the whole height always shows (a phone is wider than the art: slicing it cut the sign
+            // and the putter off); the bands either side carry on the art's own edge colours
+            let k = TitleArt.scale(g.size)
+            HStack(spacing: 0) {
+                LinearGradient(stops: TitleEdges.left, startPoint: .top, endPoint: .bottom)
+                Spacer(minLength: 1200 * k)
+                LinearGradient(stops: TitleEdges.right, startPoint: .top, endPoint: .bottom)
+            }
             TimelineView(.animation(paused: reduceMotion)) { tl in
                 let t = reduceMotion ? 0 : tl.date.timeIntervalSince(start)
                 ZStack(alignment: .topLeading) {
@@ -177,4 +185,23 @@ struct LogoText: View {
         }
         .accessibilityLabel("PuttX")
     }
+}
+
+/// the background art's left and right edge columns, sampled once, as gradient stops for the bands
+/// beside the art on a screen wider than it
+enum TitleEdges {
+    static let (left, right): ([Gradient.Stop], [Gradient.Stop]) = {
+        guard let cg = UIImage(named: "title-bg")?.cgImage else { return ([], []) }
+        let w = cg.width, h = cg.height, n = 48
+        var px = [UInt8](repeating: 0, count: w * h * 4)
+        guard let ctx = CGContext(data: &px, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return ([], []) }
+        ctx.draw(cg, in: CGRect(x: 0, y: 0, width: w, height: h))
+        func column(_ x: Int) -> [Gradient.Stop] {
+            (0...n).map { i in
+                let y = min(h - 1, i * h / n), k = (y * w + x) * 4
+                return .init(color: Color(.sRGB, red: Double(px[k]) / 255, green: Double(px[k + 1]) / 255, blue: Double(px[k + 2]) / 255), location: Double(i) / Double(n))
+            }
+        }
+        return (column(1), column(w - 2))
+    }()
 }

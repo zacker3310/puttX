@@ -153,6 +153,9 @@ struct WorldsView: View {
                 extraChip(Catalog.classic, .classic, face: Color(hex: "#e9efe6"), rim: Color(hex: "#9aa3ad"), down: Color(hex: "#6f7881"), ink: Color(hex: "#2e5a3a"), glow: false, label: "classic")
                 Spacer()
                 Wallet()
+                // the pro shop
+                Button { SFX.tap(); app.go(.shop) } label: { ShopGlyph().frame(width: st.s(62), height: st.s(62)) }
+                    .buttonStyle(ToyButtonStyle(kind: .yellow)).accessibilityLabel("pro shop")
                 IconButton(symbol: "gearshape.fill", label: "settings") { withAnimation(.spring(response: 0.3)) { settings = true } }
             }
             .padding(.horizontal, st.s(24)).padding(.top, st.s(24))

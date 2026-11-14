@@ -76,6 +76,14 @@ struct SceneHole: Decodable {
     let matAnims: [SceneMatAnim]?
     let weeds: [SceneWeed]?
 }
+/// a putter (its parts, in its own frame; `head` marks the head) or a ball (its finish)
+struct SceneGear: Decodable {
+    struct Part: Decodable { let g: String; let m: SceneNode.MatRef; let x: [Float]; let head: Bool }
+    let id: String, kind: String
+    let parts: [Part]?
+    let mat: Int?
+    let mats: [SceneMat]
+}
 struct ScenePoints: Decodable { let pts: [Float], color: [Double], size: Double, opacity: Double; let anim: PointsAnim? }
 
 /// a mesh as exported: interleaved later, per RealityKit's needs
@@ -108,6 +116,12 @@ final class SceneStore {
         var data = try Data(contentsOf: url)
         if url.pathExtension == "z" { data = try (data as NSData).decompressed(using: .zlib) as Data }
         return try JSONDecoder().decode(SceneHole.self, from: data)
+    }
+
+    /// a pro shop item as export-gear wrote it
+    func gear(_ id: String) throws -> SceneGear {
+        guard let r = root else { throw CocoaError(.fileNoSuchFile) }
+        return try JSONDecoder().decode(SceneGear.self, from: Data(contentsOf: r.appendingPathComponent("gear/\(id).json")))
     }
 
     func geo(_ hash: String) throws -> SceneGeo {

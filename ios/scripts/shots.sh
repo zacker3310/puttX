@@ -7,7 +7,7 @@ set -uo pipefail
 APP="$1"; OUT="$2"; mkdir -p "$OUT"
 BUNDLE=com.puttx.app
 # a route, then any extra launch arguments after a bar
-ROUTES=("title" "profiles" "worlds" "world:5" "map:5" "hole:1-1|-render exported" "hole:1-1|-render hand" "hole:1-9|-render exported" "hole:5-3" "card:1")
+ROUTES=("title" "profiles" "worlds" "world:5" "map:5" "hole:1-1|-render exported" "hole:1-1|-render hand" "hole:1-9|-render exported" "hole:5-3" "hole:7-2" "hole:8-1" "hole:6-4" "card:1" "shop")
 lim() { local s=$1; shift; perl -e 'alarm shift; exec @ARGV' "$s" "$@"; }
 say() { echo "[$(date +%H:%M:%S)] $*"; }
 pick() { xcrun simctl list devices available -j | python3 -c "

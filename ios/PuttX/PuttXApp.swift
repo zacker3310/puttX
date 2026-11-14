@@ -29,6 +29,7 @@ struct RootView: View {
                 case .map(let c): MapView(course: c)
                 case .hole: if let p = app.play { HoleView(play: p).id(p.hole.key + "\(ObjectIdentifier(p).hashValue)") }
                 case .card(let c): CardView(course: c)
+                case .shop: ShopView()
                 }
             }
             .transition(.opacity)

@@ -12,6 +12,8 @@ enum Route: Equatable {
     case hole(String)
     /// a finished course's scorecard
     case card(Int)
+    /// the pro shop
+    case shop
 }
 
 @MainActor @Observable
@@ -97,6 +99,7 @@ final class AppModel {
             // the extras: its lost ball, if not found yet, pays a token and 15 coins when rolled over
             p.lostGot = progress.lost[key] != nil
             p.setGhost(progress.ghosts[key])
+            p.gear = (progress.equipped["putter"] ?? "p1", progress.equipped["ball"] ?? "b1")
             p.onLost = { [weak self] in guard let self else { return }; _ = self.progress.findLost(key); self.save() }
             Synth.shared.bed(water: h.data.zones.contains { $0.surf == .water }, wind: [2, 4, 10].contains(w))
             SFX.jingle(lk.jingle)
@@ -179,6 +182,7 @@ final class AppModel {
         case "map": go(.map(Int(arg) ?? 1))
         case "hole": go(.hole(arg.isEmpty ? "1-1" : arg))
         case "card": go(.card(Int(arg) ?? 1))
+        case "shop": go(.shop)
         default: break
         }
     }

@@ -44,6 +44,14 @@ for (const f of fs.readdirSync(path.join(DIR, 'holes'))) {
   for (const n of hole.static.concat(...hole.movers, ...(hole.anims || []).map(a => a.parts), ...(hole.weeds || []).map(w => w.parts))) usedGeo.add(n.g);
   for (const m of hole.mats) for (const v of Object.values(m)) if (v && typeof v === 'object' && 't' in v) usedTex.add(v.t);
 }
+/* the pro shop's gear (export-gear) shares the meshes and textures */
+const gearDir = path.join(DIR, 'gear');
+if (fs.existsSync(gearDir)) for (const f of fs.readdirSync(gearDir)) {
+  const p = path.join(gearDir, f), it = JSON.parse(fs.readFileSync(p, 'utf8'));
+  for (const n of it.parts || []) { if (rename[n.g]) n.g = rename[n.g]; usedGeo.add(n.g); }
+  for (const m of it.mats) for (const v of Object.values(m)) if (v && typeof v === 'object' && 't' in v) usedTex.add(v.t);
+  fs.writeFileSync(p, JSON.stringify(it) + '\n');
+}
 let swept = 0;
 for (const [dir, used, ext] of [['geo', usedGeo, '.bin'], ['tex', usedTex, '.png']]) {
   for (const f of fs.readdirSync(path.join(DIR, dir))) if (!used.has(f.slice(0, -ext.length))) { fs.rmSync(path.join(DIR, dir, f)); swept++; }

@@ -31,7 +31,7 @@ final class PlayProps {
         var m = PhysicallyBasedMaterial()
         if let t = try? TextureResource.generate(from: PlayProps.ballSkin(), options: .init(semantic: .color)) { m.baseColor = .init(tint: .white, texture: .init(t)) }
         m.roughness = 0.45; m.clearcoat = 1.0; m.clearcoatRoughness = 0.07
-        ball = ModelEntity(mesh: .generateSphere(radius: Float(Sim.BALL_R)), materials: [m])
+        ball = ModelEntity(mesh: Gear.sphere(radius: Float(Sim.BALL_R)), materials: [m])
 
         var gm = PhysicallyBasedMaterial()
         gm.baseColor = .init(tint: UIColor(red: 1, green: 0.79, blue: 0.29, alpha: 1)); gm.metallic = 0.7; gm.roughness = 0.28
@@ -106,6 +106,15 @@ final class PlayProps {
         updatePutter(play, now: now)
         updateRibbon(play)
         updateRing(play)
+    }
+
+    /// the equipped gear from the pro shop: its putter (head and all) and its ball's skin
+    func wear(putter id: String, ball bid: String) {
+        if let p = Gear.putter(id) {
+            for c in Array(putter.children) { c.removeFromParent() }
+            for c in Array(p.children) { putter.addChild(c) }
+        }
+        if let m = Gear.ballMaterial(bid) { ball.model?.materials = [m] }
     }
 
     // MARK: the putter

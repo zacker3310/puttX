@@ -39,7 +39,6 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: PuttX
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.sports-games
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_UIStatusBarHidden: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
@@ -53,5 +52,8 @@ targets:
         # game controllers drive play; Game Mode gives the game the device's full attention
         GCSupportsControllerUserInteraction: true
         GCSupportsGameMode: true
+        # the launch screen is the title's sky, so the app opens into its own colour, not white
+        UILaunchScreen:
+          UIColorName: LaunchSky
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false

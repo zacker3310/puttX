@@ -224,16 +224,27 @@ enum SFX {
     static func plunk() { s.tone(150, 0.32, vol: 0.55, slide: -70); s.tone(300, 0.12, wave: .triangle, vol: 0.18, slide: -120); s.noise(0.09, vol: 0.3, freq: 420, q: 1.2, type: .lowpass) }
     static func lip() { s.tone(1100, 0.03, wave: .triangle, vol: 0.06); s.noise(0.02, vol: 0.05, freq: 2600, q: 3) }
     static func land(_ v: Double) { s.noise(0.08, vol: min(0.4, 0.12 + v * 0.08), freq: 400) }
-    static func boink() { s.tone(420, 0.25, vol: 0.3, slide: -220) }
+    /// a locked thing: a dull clank of a plate that will not move
+    static func boink() { s.tone(140, 0.12, wave: .triangle, vol: 0.22, slide: -30); s.noise(0.05, vol: 0.12, freq: 700, q: 1.4) }
     static func splash() { s.noise(0.35, vol: 0.35, freq: 900, q: 0.7); s.noise(0.2, vol: 0.2, freq: 2600, q: 1, delay: 0.05) }
     static func tube() { s.noise(0.3, vol: 0.12, freq: 260, q: 0.8, type: .lowpass) }
     static func tubeOut() { s.noise(0.06, vol: 0.12, freq: 380, q: 1, type: .lowpass) }
-    static func tap() { s.tone(660, 0.05, wave: .triangle, vol: 0.18) }
-    static func tick() { s.tone(1200, 0.02, wave: .square, vol: 0.05) }
-    static func star(_ i: Int) { s.tone([784, 988, 1175][min(i, 2)], 0.22, wave: .triangle, vol: 0.25) }
-    static func coin() { s.tone(988, 0.07, wave: .square, vol: 0.08); s.tone(1319, 0.14, wave: .square, vol: 0.08, delay: 0.07) }
-    static func jingle(_ notes: [Double]) { for (i, f) in notes.enumerated() { s.tone(f, 0.16, wave: .triangle, vol: 0.18, delay: Double(i) * 0.11) } }
-    static func fanfare() { for (i, f) in [523.0, 659, 784, 1047, 1319].enumerated() { s.tone(f, 0.22, wave: .square, vol: 0.12, delay: Double(i) * 0.09) } }
+    /// a touch: a short click of metal, a tick on top and a thunk under it
+    static func tap() { s.noise(0.018, vol: 0.12, freq: 4200, q: 2.5); s.tone(1850, 0.035, vol: 0.05); s.tone(150, 0.04, wave: .triangle, vol: 0.1, slide: -40) }
+    static func tick() { s.noise(0.012, vol: 0.07, freq: 5200, q: 3); s.tone(2400, 0.02, vol: 0.025) }
+    /// struck metal: a fundamental and a bell's inharmonic partials, ringing down
+    static func ping(_ f: Double, _ dur: Double, vol: Double, delay: Double = 0) {
+        s.tone(f, dur, vol: vol, delay: delay); s.tone(f * 2.76, dur * 0.6, vol: vol * 0.35, delay: delay); s.tone(f * 5.4, dur * 0.3, vol: vol * 0.15, delay: delay)
+        s.noise(0.012, vol: vol * 0.4, freq: 6000, q: 2, delay: delay)
+    }
+    static func star(_ i: Int) { ping([784, 988, 1175][min(i, 2)], 0.5, vol: 0.16) }
+    static func coin() { ping(1319, 0.25, vol: 0.1); ping(1760, 0.35, vol: 0.1, delay: 0.07) }
+    static func jingle(_ notes: [Double]) { for (i, f) in notes.enumerated() { ping(f, 0.3, vol: 0.12, delay: Double(i) * 0.11) } }
+    /// a big finish: a deep hit under a chime rising through the chord
+    static func fanfare() {
+        s.tone(82, 0.5, wave: .sawtooth, vol: 0.12, slide: -10); s.tone(123, 0.4, wave: .sawtooth, vol: 0.07); s.noise(0.2, vol: 0.12, freq: 300, q: 0.8, type: .lowpass)
+        for (i, f) in [659.0, 784, 988, 1319].enumerated() { ping(f, 0.45, vol: 0.11, delay: 0.06 + Double(i) * 0.08) }
+    }
     /// the clubhouse bell on the last hole; three times for an ace
     static func bell(ace: Bool) {
         for i in 0..<(ace ? 3 : 1) {
@@ -241,7 +252,7 @@ enum SFX {
             s.tone(1568, 1.2, vol: 0.16, delay: d); s.tone(3920, 0.6, vol: 0.05, delay: d); s.tone(784, 1.4, wave: .triangle, vol: 0.08, delay: d)
         }
     }
-    static func place() { s.tone(880, 0.04, wave: .triangle, vol: 0.1); s.noise(0.03, vol: 0.08, freq: 1200, q: 2, delay: 0.12) }
+    static func place() { s.tone(160, 0.05, wave: .triangle, vol: 0.12, slide: -30); s.noise(0.02, vol: 0.08, freq: 2600, q: 2, delay: 0.1) }
     /// off: synthesised birds and crickets read as bleeps, not wildlife
     static let ambient = false
     /// birdsong (by day) and crickets (by night), now and then

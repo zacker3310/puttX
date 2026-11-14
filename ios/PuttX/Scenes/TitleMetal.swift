@@ -155,6 +155,8 @@ struct MetalTitlePainter {
 
 /// the logo: chrome letters and a molten X, cut out in black, pushed out in 3D, tilted for attitude
 struct MetalLogo: View {
+    /// the X's colours, hot to deep (the world of the day's)
+    var accent: [Color] = TitleWorld.accent(6)
     @Environment(\.stage) private var st
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shine = false
@@ -177,11 +179,11 @@ struct MetalLogo: View {
     var body: some View {
         let chrome = LinearGradient(stops: [.init(color: Color(hex: "#f4f6fa"), location: 0), .init(color: Color(hex: "#a9b0bc"), location: 0.42), .init(color: Color(hex: "#4b525e"), location: 0.5),
                                             .init(color: Color(hex: "#c7ccd5"), location: 0.62), .init(color: Color(hex: "#7d8593"), location: 1)], startPoint: .top, endPoint: .bottom)
-        let molten = LinearGradient(stops: [.init(color: Color(hex: "#fff2a8"), location: 0), .init(color: Color(hex: "#ffb02e"), location: 0.35), .init(color: Color(hex: "#ff5a1a"), location: 0.6), .init(color: Color(hex: "#b3200f"), location: 1)], startPoint: .top, endPoint: .bottom)
+        let molten = LinearGradient(stops: [.init(color: accent[0], location: 0), .init(color: accent[1], location: 0.35), .init(color: accent[2], location: 0.6), .init(color: accent[3], location: 1)], startPoint: .top, endPoint: .bottom)
         HStack(spacing: -st.s(10)) {
             layers("Putt", fill: chrome, depth: Color(hex: "#1b1d24"))
-            layers("X", fill: molten, depth: Color(hex: "#5a0d08"))
-                .shadow(color: Color(hex: "#ff5a1a").opacity(0.55), radius: st.s(8))
+            layers("X", fill: molten, depth: accent[3].opacity(0.85))
+                .shadow(color: accent[2].opacity(0.55), radius: st.s(8))
                 .scaleEffect(1.18, anchor: .bottomLeading)
         }
         // a glint sweeping across the metal now and then
@@ -208,6 +210,7 @@ struct MetalButtonStyle: ButtonStyle {
     var radius: CGFloat = 26
     var size: CGSize
     var hot = true
+    var accent: [Color] = TitleWorld.accent(6)
     @Environment(\.stage) private var st
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -231,11 +234,11 @@ struct MetalButtonStyle: ButtonStyle {
                     }
                 }
             }
-            .overlay(shape.strokeBorder(LinearGradient(colors: hot ? [Color(hex: "#ffd36b"), Color(hex: "#ff5a1a")] : [Color(hex: "#c7ccd5"), Color(hex: "#5b616c")], startPoint: .top, endPoint: .bottom), lineWidth: st.s(5)))
+            .overlay(shape.strokeBorder(LinearGradient(colors: hot ? [accent[1], accent[2]] : [Color(hex: "#c7ccd5"), Color(hex: "#5b616c")], startPoint: .top, endPoint: .bottom), lineWidth: st.s(5)))
             .overlay(shape.inset(by: st.s(5)).strokeBorder(.black.opacity(0.55), lineWidth: st.s(2)))
             .background(shape.fill(Color(hex: "#0d0e12")).offset(y: pressed ? st.s(2) : st.s(8)))
             .compositingGroup()
-            .shadow(color: hot ? Color(hex: "#ff5a1a").opacity(pressed ? 0.35 : 0.6) : .black.opacity(0.4), radius: st.s(pressed ? 8 : 18))
+            .shadow(color: hot ? accent[2].opacity(pressed ? 0.35 : 0.6) : .black.opacity(0.4), radius: st.s(pressed ? 8 : 18))
             .scaleEffect(x: pressed && !reduceMotion ? 1.04 : 1, y: pressed && !reduceMotion ? 0.93 : 1, anchor: .bottom)
             .offset(y: pressed ? st.s(6) : 0)
             .animation(reduceMotion ? nil : .spring(response: 0.14, dampingFraction: 0.55), value: pressed)
@@ -247,11 +250,12 @@ struct MetalButtonStyle: ButtonStyle {
 /// play: a molten triangle, cut out in black
 struct MoltenPlay: View {
     @Environment(\.stage) private var st
+    var accent: [Color] = TitleWorld.accent(6)
     var body: some View {
         Image(systemName: "play.fill")
             .font(.system(size: st.s(64), weight: .black))
-            .foregroundStyle(LinearGradient(colors: [Color(hex: "#fff2a8"), Color(hex: "#ffb02e"), Color(hex: "#ff5a1a")], startPoint: .top, endPoint: .bottom))
+            .foregroundStyle(LinearGradient(colors: [accent[0], accent[1], accent[2]], startPoint: .top, endPoint: .bottom))
             .shadow(color: .black, radius: 0, x: st.s(3), y: st.s(4))
-            .shadow(color: Color(hex: "#ff7a1a").opacity(0.8), radius: st.s(14))
+            .shadow(color: accent[2].opacity(0.8), radius: st.s(14))
     }
 }

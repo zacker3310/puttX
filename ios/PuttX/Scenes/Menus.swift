@@ -12,14 +12,14 @@ struct TitleView: View {
     @State private var pulse = false
     var body: some View {
         GeometryReader { g in
-            let u = g.size.height / 700
+            let u = g.size.height / 700, world = TitleWorld.today, accent = TitleWorld.accent(world)
             ZStack {
-                MetalTitleScene()
-                MetalLogo()
+                WorldTitleScene(world: world)
+                MetalLogo(accent: accent)
                     .position(x: g.size.width / 2, y: g.size.height * 0.25)
                     .popIn(0.1)
-                Button { app.go(.profiles) } label: { MoltenPlay() }
-                    .buttonStyle(MetalButtonStyle(radius: 34, size: CGSize(width: 300, height: 128)))
+                Button { app.go(.profiles) } label: { MoltenPlay(accent: accent) }
+                    .buttonStyle(MetalButtonStyle(radius: 34, size: CGSize(width: 300, height: 128), accent: accent))
                     .scaleEffect(pulse ? 1.04 : 1)
                     .position(x: g.size.width / 2, y: g.size.height / 2 + 170 * u)
                     .accessibilityLabel("play")

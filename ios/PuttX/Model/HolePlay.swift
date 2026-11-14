@@ -261,6 +261,16 @@ final class HolePlay {
         return was + (now - was) * min(1, acc / Sim.SIM_DT)
     }
 
+    /// the hole clock to draw the movers at: the same moment the ball is drawn at (between the last two
+    /// steps while it rolls, the leftover time ahead of the last step while it waits). Posed at `time`
+    /// itself the movers jump 3, 4 or 5 steps a frame as frames and steps fall out of line, and drift
+    /// from the smoothed ball they hit
+    var drawTime: Double {
+        let k = min(acc, Sim.SIM_DT)
+        if phase == .roll || phase == .drift { return prevBall == nil ? time : time - Sim.SIM_DT + k }
+        return phase == .aim ? time + k : time
+    }
+
     /// the putter meets the ball: the stroke turns the aim and sets the power
     func strike(_ s: Stroke) {
         guard phase == .aim else { swing = nil; return }

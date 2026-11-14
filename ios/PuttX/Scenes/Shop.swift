@@ -66,7 +66,7 @@ struct ShopView: View {
         Canvas { ctx, size in
             let w = size.width / 10
             for i in 0..<10 {
-                let c = i % 2 == 0 ? Toy.red : Color(hex: "#fff8ec")
+                let c = i % 2 == 0 ? Toy.red : Color(hex: "#3a3f49")
                 ctx.fill(Path(CGRect(x: CGFloat(i) * w, y: 0, width: w, height: size.height * 0.64)), with: .color(c))
                 ctx.fill(Path(ellipseIn: CGRect(x: CGFloat(i) * w, y: size.height * 0.64 - w / 2, width: w, height: w)), with: .color(c))
             }
@@ -117,7 +117,7 @@ struct ShopView: View {
                     else { ShopPreview(id: current, ball: app.progress.equipped["ball"] ?? "b1").id(current + (app.progress.equipped["ball"] ?? "")) }
                 }
                 .frame(width: st.s(340), height: st.s(previewH))
-                .background(RadialGradient(colors: [Color(hex: "#ffffff"), Color(hex: "#d6eef6"), Color(hex: "#a9d3e3")], center: UnitPoint(x: 0.5, y: 0.25), startRadius: 0, endRadius: st.s(260)))
+                .background(RadialGradient(colors: [Color(hex: "#6a717e"), Color(hex: "#30343d"), Color(hex: "#15171c")], center: UnitPoint(x: 0.5, y: 0.25), startRadius: 0, endRadius: st.s(260)))
                 .clipShape(RoundedRectangle(cornerRadius: st.s(Toy.rLg), style: .continuous))
                 .scaleEffect(nudge % 2 == 1 ? 1.03 : 1)
                 .padding(.top, st.s(10))
@@ -406,7 +406,7 @@ struct ShopPreview: UIViewRepresentable {
     let ball: String
     func makeUIView(context: Context) -> ARView {
         let v = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
-        v.environment.background = .color(UIColor(red: 0.87, green: 0.94, blue: 0.96, alpha: 1))
+        v.environment.background = .color(UIColor(red: 0.19, green: 0.2, blue: 0.24, alpha: 1))   // the dark studio, as the panel
         v.renderOptions.formUnion([.disableMotionBlur, .disableDepthOfField])
         context.coordinator.build(v, id: id, ball: ball)
         return v

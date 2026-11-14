@@ -78,12 +78,20 @@ struct HoleView: View {
                     .buttonStyle(ToyButtonStyle())
                     .accessibilityLabel("map")
                     .position(x: st.s(24 + 44), y: st.s(24 + 44))
-                HudChip(icon: .hole, value: "\(Catalog.number(of: play.hole.key))").fixedSize()
-                    .position(x: st.s(132) + st.s(76), y: st.s(30 + 38))
-                    .accessibilityLabel("hole \(Catalog.number(of: play.hole.key))")
-                HudChip(icon: .par, value: "\(play.hole.par)").fixedSize()
-                    .position(x: st.s(300) + st.s(66), y: st.s(30 + 38))
-                    .accessibilityLabel("par \(play.hole.par)")
+                // the hole and its par in one plate tucked beside home, so the top middle (where the cup
+                // usually is) stays clear
+                HStack(spacing: st.s(10)) {
+                    HudIconView(icon: .hole).frame(width: st.s(40), height: st.s(40))
+                    Text("\(Catalog.number(of: play.hole.key))").font(Toy.font(38, st)).foregroundStyle(Toy.inkStrong)
+                    Rectangle().fill(Toy.surfaceLine).frame(width: st.s(3), height: st.s(36))
+                    HudIconView(icon: .par).frame(width: st.s(40), height: st.s(40))
+                    Text("\(play.hole.par)").font(Toy.font(38, st)).foregroundStyle(Toy.inkStrong)
+                }
+                .padding(.leading, st.s(12)).padding(.trailing, st.s(18)).frame(height: st.s(68))
+                .toyCard(st, radius: Toy.rLg)
+                .fixedSize()
+                .position(x: st.s(128) + hudPlateW / 2, y: st.s(30 + 34))
+                .accessibilityElement(children: .ignore).accessibilityLabel("hole \(Catalog.number(of: play.hole.key)), par \(play.hole.par)")
                 HudChip(icon: .strokes, value: "\(min(play.round.strokes, Scoring.cap(play.hole)))").fixedSize()
                     .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
                     .accessibilityLabel("\(play.round.strokes) strokes")
@@ -96,7 +104,7 @@ struct HoleView: View {
                     }
                     .padding(.leading, st.s(12)).padding(.trailing, st.s(best == nil ? 12 : 18)).frame(height: st.s(76)).toyCard(st, radius: Toy.rLg)
                     .fixedSize()
-                    .position(x: geo.size.width - st.s(200 + 44), y: st.s(30 + 38))
+                    .position(x: geo.size.width - st.s(24 + 132 + 16 + (play.canTakeBack ? 104 : 0) + 50), y: st.s(30 + 38))
                     .accessibilityElement(children: .ignore).accessibilityLabel(play.practice ? "practice" : "hole of the day")
                 }
                 // the slope read, and in practice the guide
@@ -119,7 +127,8 @@ struct HoleView: View {
                     MulliganButton(tokens: play.practice ? nil : app.progress.mulligans) {
                         if play.practice { play.takeBack() } else if app.progress.spendMulligan() { play.takeBack(); app.save() }
                     }
-                    .position(x: st.s(452 + 44), y: st.s(24 + 44))
+                    // top right, beside the strokes, out of the cup's way
+                    .position(x: geo.size.width - st.s(24 + 132 + 16 + 44), y: st.s(24 + 44))
                     .transition(.scale.combined(with: .opacity))
                 }
                 if play.lostPop { LostPop().fixedSize().position(x: geo.size.width / 2, y: st.s(120 + 38)).allowsHitTesting(false) }
@@ -137,7 +146,7 @@ struct HoleView: View {
                     ReplayTag().frame(width: st.s(120), height: st.s(76)).position(x: geo.size.width / 2, y: st.s(24 + 38)).allowsHitTesting(false)
                 }
                 if app.party != nil {
-                    PartyChip(p: app.party!.player).position(x: st.s(452 + 50), y: st.s(30 + 38))
+                    PartyChip(p: app.party!.player).position(x: st.s(128) + hudPlateW + st.s(16 + 50), y: st.s(30 + 38))
                     PartyOverlay(key: play.hole.key).frame(width: geo.size.width, height: geo.size.height)
                 } else if play.phase == .done, let rec = play.record { DoneCard(play: play, rec: rec).frame(width: geo.size.width, height: geo.size.height) }
             }
@@ -153,6 +162,9 @@ struct HoleView: View {
         }
         .onDisappear { play.stop(); app.controllers.detach() }
     }
+
+    /// the hole and par plate's width, roughly: room for two numerals a side
+    private var hudPlateW: CGFloat { st.s(12 + 40 + 10 + 48 + 10 + 3 + 10 + 40 + 10 + 24 + 18) }
 
     private var hud: some View {
         HStack(spacing: st.s(14)) {
@@ -307,7 +319,7 @@ struct DoneCard: View {
             ZStack {
                 Toy.scrim.ignoresSafeArea()
                 card(score: score, stars: stars, diff: diff)
-                    .position(x: geo.size.width / 2, y: geo.size.height / 2 - st.s(44))
+                    .position(x: geo.size.width / 2, y: geo.size.height * 0.42)
                 // the way on, where a thumb rests: home bottom left, next bottom right, apart from the card
                 Button { app.go(.map(Catalog.course(of: play.hole.key))) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
                     .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")
@@ -329,47 +341,52 @@ struct DoneCard: View {
     }
 
     private func card(score: Int, stars: Int, diff: Int) -> some View {
-        VStack(spacing: st.s(14)) {
-            HStack(spacing: st.s(12)) {
-                ForEach(0..<3) { k in StarView(on: k < stars).frame(width: st.s(k == 1 ? 92 : 76)).offset(y: k == 1 ? -st.s(8) : 0).popIn(0.1 + Double(k) * 0.12) }
-            }
-            .onAppear { for k in 0..<stars { DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 + Double(k) * 0.12) { SFX.star(k) } } }
-            // the score against par on the left, the hole's goals on the right
-            HStack(spacing: st.s(28)) {
-                HStack(alignment: .center, spacing: st.s(18)) {
-                    Text("\(score)").font(Toy.font(96, st)).foregroundStyle(Toy.inkStrong)
+        // one plate in a row: the stars over the score against par, the hole's goals, and redo at the end,
+        // so it sits low and narrow and the hole stays in view round it
+        HStack(spacing: st.s(26)) {
+            VStack(spacing: st.s(6)) {
+                HStack(spacing: st.s(8)) {
+                    ForEach(0..<3) { k in StarView(on: k < stars).frame(width: st.s(k == 1 ? 66 : 54)).offset(y: k == 1 ? -st.s(6) : 0).popIn(0.1 + Double(k) * 0.12) }
+                }
+                .onAppear { for k in 0..<stars { DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 + Double(k) * 0.12) { SFX.star(k) } } }
+                HStack(alignment: .center, spacing: st.s(14)) {
+                    Text("\(score)").font(Toy.font(86, st)).foregroundStyle(Toy.inkStrong).fixedSize()
                         .accessibilityLabel("\(score) strokes")
-                    VStack(spacing: st.s(10)) {
+                    VStack(spacing: st.s(8)) {
                         Text(diff == 0 ? "±0" : diff > 0 ? "+\(diff)" : "\(diff)")
-                            .font(Toy.font(32, st)).foregroundStyle(.white)
-                            .padding(.horizontal, st.s(16)).frame(minWidth: st.s(84), minHeight: st.s(50))
+                            .font(Toy.font(28, st)).foregroundStyle(.white).fixedSize()
+                            .padding(.horizontal, st.s(14)).frame(minWidth: st.s(76), minHeight: st.s(44))
                             .background(Capsule().fill(diff < 0 ? Toy.green : diff == 0 ? Toy.blue : Toy.red))
                             .accessibilityLabel(diff == 0 ? "even" : diff > 0 ? "\(diff) over par" : "\(-diff) under par")
-                        Tally(value: "\(play.hole.par)") { Glyph.flag.image.resizable().scaledToFit() }.accessibilityLabel("par \(play.hole.par)")
+                        HStack(spacing: st.s(6)) {
+                            Glyph.flag.image.resizable().scaledToFit().frame(width: st.s(28), height: st.s(28))
+                            Text("\(play.hole.par)").font(Toy.font(28, st)).foregroundStyle(Toy.inkSoft)
+                        }
+                        .fixedSize().accessibilityLabel("par \(play.hole.par)")
                     }
                 }
-                if let g = play.goals {
-                    Rectangle().fill(Toy.surfaceLine).frame(width: st.s(3), height: st.s(110))
-                    GoalsRow(all: g.all, fresh: g.fresh)
-                }
             }
+            if let g = play.goals {
+                Rectangle().fill(Toy.steel).frame(width: st.s(3), height: st.s(120))
+                GoalsRow(all: g.all, fresh: g.fresh)
+            }
+            Rectangle().fill(Toy.steel).frame(width: st.s(3), height: st.s(120))
             IconButton(symbol: "arrow.counterclockwise", label: "play again") { app.retry(play) }
         }
-        .padding(.horizontal, st.s(44)).padding(.top, st.s(20)).padding(.bottom, st.s(26))
-        .frame(minWidth: st.s(660))
+        .padding(.leading, st.s(40)).padding(.trailing, st.s(30)).padding(.vertical, st.s(22))
         .fixedSize()
         .background(Dots())
         .toyCard(st, radius: Toy.rXl)
         // the bird this finish earned, on the card's left edge (src/game.js tallyHole)
-        .overlay(alignment: .leading) {
-            if let b = play.bird { BirdBadge(kind: b, diff: diff).offset(x: -st.s(64)).rotationEffect(.degrees(-8)) }
+        .overlay(alignment: .topLeading) {
+            if let b = play.bird { BirdBadge(kind: b, diff: diff).rotationEffect(.degrees(-8)).offset(x: -st.s(52), y: -st.s(34)) }
         }
         // coins won: a gold sticker slapped on the card's corner
         .overlay(alignment: .topTrailing) {
             if play.coinsWon > 0 {
                 HStack(spacing: st.s(6)) {
                     Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(44), height: st.s(44))
-                    Text("+\(play.coinsWon)").font(Toy.font(34, st)).foregroundStyle(Toy.inkStrong)
+                    Text("+\(play.coinsWon)").font(Toy.font(34, st)).foregroundStyle(Toy.inkDark)
                 }
                 .padding(.horizontal, st.s(14)).frame(height: st.s(64))
                 .background(Capsule().fill(Toy.yellow)).overlay(Capsule().strokeBorder(Toy.yellowLine, lineWidth: st.s(4)))
@@ -573,7 +590,8 @@ private struct PinLayer: View {
             let h = play.hole, b = play.ball
             PinTag(metres: hypot(h.cup.x - b.x, h.cup.z - b.z), riseCm: Int(((h.groundH(h.cup.x, h.cup.z) - b.y) * 100).rounded()))
                 .fixedSize()
-                .position(x: p.x - dx, y: p.y - st.s(22))
+                // under the cup when above it would tuck under the top bar's plates
+                .position(x: p.x - dx, y: p.y - st.s(22) < st.s(118) ? p.y + st.s(40) : p.y - st.s(22))
                 .allowsHitTesting(false)
         }
     }

@@ -85,7 +85,7 @@ struct CourseView: UIViewRepresentable {
             guard let rig else { return }
             // the hole steps here, on the frame it is drawn in
             if !snap { play.renderTick(dt) }
-            let h = play.hole, t = play.time
+            let h = play.hole, t = play.drawTime
             // the ball, the putter, the aim line and the power ring
             props.update(play, now: CACurrentMediaTime())
             let right = camera.transform.matrix.columns.0

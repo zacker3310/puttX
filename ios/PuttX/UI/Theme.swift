@@ -85,6 +85,13 @@ extension View {
     }
 }
 
+extension View {
+    /// a small dark glass label (a count, a score) that reads over any scene
+    func plaque(_ st: StageMetrics) -> some View {
+        background(Capsule().fill(.black.opacity(0.58))).overlay(Capsule().strokeBorder(Toy.surfaceLine.opacity(0.9), lineWidth: st.s(2)))
+    }
+}
+
 /// the faint polka dots on toybox panels
 struct Dots: View {
     @Environment(\.stage) private var st

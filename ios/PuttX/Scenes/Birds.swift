@@ -54,7 +54,7 @@ struct BirdBadge: View {
         let (fill, rim): (Color, Color) = kind == "eagle" ? (Color(hex: "#f3e2c2"), Toy.woodDeep) : kind == "alb" ? (Color(hex: "#e6defa"), Color(hex: "#7d6bb8")) : (Toy.yellow, Toy.yellowLine)
         HStack(spacing: st.s(2)) {
             BirdIcon(kind: kind).frame(width: st.s(60), height: st.s(60))
-            Text("\(diff)").font(Toy.font(30, st)).foregroundStyle(Toy.inkStrong)
+            Text("\(diff)").font(Toy.font(30, st)).foregroundStyle(Toy.inkDark)
         }
         .padding(.leading, st.s(4)).padding(.trailing, st.s(10)).padding(.vertical, st.s(4))
         .background(Capsule().fill(fill)).overlay(Capsule().strokeBorder(rim, lineWidth: st.s(4)))

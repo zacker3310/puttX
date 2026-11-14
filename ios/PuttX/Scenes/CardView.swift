@@ -52,8 +52,9 @@ struct CardView: View {
     /// the web's scorecard stock: cream paper, a ruled header, a red margin, pen-blue marks; rows
     /// as tall as the stage allows (47 px on the web), so two nines and the total always fit
     private var rowH: CGFloat { min(47, max(34, (st.h - 260) / 5.6)) }
-    private static let paper = Color(hex: "#fffdf3"), rule = Color(hex: "#e6dcc2"), head = Color(hex: "#f3ead2"), sub = Color(hex: "#f6efd9")
-    private static let margin = Color(hex: "#ef9a8a"), pen = Color(hex: "#2f5d8a"), edge = Color(hex: "#d9cfb4")
+    // a dark plate ruled in steel; the scores are written in a bright pen
+    private static let paper = Color(hex: "#22252c"), rule = Color(hex: "#3f444e"), head = Color(hex: "#2c3039"), sub = Color(hex: "#30343d")
+    private static let margin = Color(hex: "#ef7d6d"), pen = Color(hex: "#8fd3ff"), edge = Color(hex: "#6b727e")
 
     private func nine(_ ns: [Hole], from k: Int) -> some View {
         let cell = st.s(min(80, (st.w - 330) / 11)), lab = st.s(64), subW = st.s(112)

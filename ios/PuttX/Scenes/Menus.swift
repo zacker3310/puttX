@@ -152,7 +152,7 @@ struct WorldsView: View {
                 Button { app.go(.title) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
                     .buttonStyle(ToyButtonStyle()).accessibilityLabel("home")
                 extraChip(Catalog.bonus, .bonus, face: Color(hex: "#1d1240"), rim: Color(hex: "#ff3df2"), down: Color(hex: "#0b0620"), ink: Color(hex: "#2ef2ff"), glow: true, label: "bonus nine")
-                extraChip(Catalog.classic, .classic, face: Color(hex: "#e9efe6"), rim: Color(hex: "#9aa3ad"), down: Color(hex: "#6f7881"), ink: Color(hex: "#2e5a3a"), glow: false, label: "classic")
+                extraChip(Catalog.classic, .classic, face: Color(hex: "#3a3f49"), rim: Color(hex: "#c7ccd5"), down: Color(hex: "#101216"), ink: .white, glow: false, label: "classic")
                 Spacer()
                 Wallet()
                 // the pro shop
@@ -166,7 +166,7 @@ struct WorldsView: View {
     }
 
     private func worldCard(_ w: Int, _ f: Double) -> some View {
-        let open = app.open(course: w), look = app.looks[w]
+        let open = app.open(course: w), look = app.looks[w], accent = TitleWorld.accent(w)
         let stars = app.catalog.courses(ofWorld: w).reduce(0) { $0 + app.progress.stars(course: $1, catalog: app.catalog) }
         let shape = RoundedRectangle(cornerRadius: st.s(Toy.rXl * f), style: .continuous)
         return Button { if open { app.go(.world(w)) } } label: {
@@ -175,21 +175,33 @@ struct WorldsView: View {
                 WorldScene(look: look, horizon: 0.74, compact: true)
                     .saturation(open ? 1 : 0).opacity(open ? 1 : 0.55)
                     .background(Toy.mute)
-                VStack(spacing: st.s(10 * f)) {
-                    look.iconImage?.resizable().scaledToFit().frame(width: st.s(84 * f), height: st.s(84 * f))
-                        .frame(width: st.s(116 * f), height: st.s(116 * f))
-                        .background(Circle().fill(Color(hex: "#fffdf7").opacity(0.85)))
-                        .opacity(open ? 1 : 0.45)
-                    if open {
-                        HStack(spacing: st.s(4)) { StarView().frame(width: st.s(26 * f)); Text("\(stars)") }
-                            .font(Toy.font(26 * f, st)).foregroundStyle(Toy.inkStrong)
-                            .padding(.horizontal, st.s(12)).padding(.vertical, st.s(2))
-                            .background(Capsule().fill(Color(hex: "#fffdf7").opacity(0.9)))
+                // the world's emblem in a dark glass ring of its own colour, over the scene
+                look.iconImage?.resizable().scaledToFit().frame(width: st.s(78 * f), height: st.s(78 * f))
+                    .frame(width: st.s(112 * f), height: st.s(112 * f))
+                    .background(Circle().fill(.black.opacity(0.42)))
+                    .overlay(Circle().strokeBorder(open ? accent[1] : Toy.muteLine, lineWidth: st.s(4 * f)))
+                    .shadow(color: open ? accent[2].opacity(0.6) : .clear, radius: st.s(10 * f))
+                    .opacity(open ? 1 : 0.5)
+                    .frame(maxWidth: .infinity).padding(.top, st.s(40 * f))
+                // a metal band along the foot: the world's number, and its stars (or its lock)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    HStack(spacing: st.s(6 * f)) {
+                        Text("\(w)").font(Toy.font(28 * f, st)).foregroundStyle(open ? Toy.inkDark : Toy.inkSoft)
+                            .frame(width: st.s(44 * f), height: st.s(44 * f))
+                            .background(Circle().fill(open ? AnyShapeStyle(LinearGradient(colors: [accent[0], accent[1]], startPoint: .top, endPoint: .bottom)) : AnyShapeStyle(Toy.mute)))
+                        Spacer(minLength: 0)
+                        if open {
+                            StarView().frame(width: st.s(26 * f))
+                            Text("\(stars)").font(Toy.font(26 * f, st)).foregroundStyle(Toy.inkStrong).lineLimit(1).minimumScaleFactor(0.6)
+                        } else {
+                            Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(30 * f), height: st.s(30 * f))
+                        }
                     }
+                    .padding(.leading, st.s(10 * f)).padding(.trailing, st.s(16 * f)).frame(height: st.s(60 * f))
+                    .background(Toy.metal)
+                    .overlay(alignment: .top) { Rectangle().fill(Toy.steel).frame(height: st.s(3 * f)) }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                Text("\(w)").font(Toy.font(30 * f, st)).foregroundStyle(Toy.inkStrong).padding(.leading, st.s(12)).padding(.top, st.s(6))
-                if !open { Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(40 * f)).frame(maxWidth: .infinity, alignment: .topTrailing).padding(st.s(12)) }
             }
             .frame(width: st.s(200 * f), height: st.s(248 * f))
             .clipShape(shape)
@@ -306,7 +318,7 @@ struct WorldView: View {
         let kind: ToyKind = open ? (done ? .yellow : .go) : .locked
         return Button { if open { app.go(.map(c)) } } label: {
             Text("\(k + 1)").font(.system(size: st.s(80), weight: .black, design: .rounded))
-                .foregroundStyle(open && !done ? .white : (open ? Toy.inkStrong : Toy.inkSoft))
+                .foregroundStyle(open && !done ? .white : (open ? Toy.inkDark : Toy.inkSoft))
                 .frame(width: st.s(168), height: st.s(168))
                 .background(ZStack { Circle().fill(kind.face); Gloss(shape: Circle()).padding(st.s(8)) })
                 .overlay(Circle().strokeBorder(kind.rim, lineWidth: st.s(6)))
@@ -324,7 +336,7 @@ struct WorldView: View {
                         HStack(spacing: st.s(4)) { StarView().frame(width: st.s(24)); Text("\(app.progress.stars(course: c, catalog: app.catalog))/\(hs.count * 3)") }
                             .font(Toy.font(22, st)).foregroundStyle(Toy.inkStrong)
                             .padding(.horizontal, st.s(10)).padding(.vertical, st.s(2))
-                            .background(Capsule().fill(Color(hex: "#fffdf7").opacity(0.92)))
+                            .plaque(st)
                             .fixedSize().offset(y: st.s(44))
                     }
                 }

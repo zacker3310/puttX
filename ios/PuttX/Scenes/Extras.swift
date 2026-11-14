@@ -5,7 +5,7 @@ import SwiftUI
 import PuttXCore
 
 enum ExtraIcon {
-    case mulligan, bird, noWalls, goldBall, sun, flame, check, target
+    case mulligan, bird, noWalls, goldBall, sun, flame, check, target, calendar
 
     func draw(_ ctx: GraphicsContext, _ k: CGFloat, ink: Color = Toy.inkSoft) {
         func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: y * k) }
@@ -58,6 +58,11 @@ enum ExtraIcon {
             ctx.stroke(circle(32, 32, 26), with: .color(Toy.red), style: line(6))
             ctx.stroke(circle(32, 32, 15), with: .color(Toy.red), style: line(6))
             ctx.fill(circle(32, 32, 5), with: .color(Toy.red))
+        case .calendar:
+            let page = Path(roundedRect: CGRect(x: 8 * k, y: 12 * k, width: 48 * k, height: 44 * k), cornerRadius: 8 * k)
+            ctx.fill(page, with: .color(Color(hex: "#fffdf7"))); ctx.stroke(page, with: .color(Toy.woodDeep), style: line(5))
+            ctx.stroke(Path { $0.move(to: p(8, 24)); $0.addLine(to: p(56, 24)) }, with: .color(Toy.red), style: StrokeStyle(lineWidth: 10 * k))
+            ctx.stroke(Path { $0.move(to: p(20, 6)); $0.addLine(to: p(20, 16)); $0.move(to: p(44, 6)); $0.addLine(to: p(44, 16)) }, with: .color(Toy.woodDeep), style: line(5))
         case .check:
             ctx.stroke(Path { $0.addLines([p(14, 33), p(27, 46), p(51, 19)]) }, with: .color(.white), style: line(9))
         }

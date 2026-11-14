@@ -98,7 +98,7 @@ struct ProfilesView: View {
                 .frame(width: st.s(300), height: st.s(cardH))
                 .modifier(ProfileCard(state: !used ? .empty : n == app.slot ? .last : .plain))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressDown())
             .accessibilityLabel("profile \(n)")
             if used {
                 HStack(spacing: st.s(20)) {
@@ -154,7 +154,7 @@ struct WorldsView: View {
                 Spacer()
                 Wallet()
                 // the pro shop
-                Button { SFX.tap(); app.go(.shop) } label: { ShopGlyph().frame(width: st.s(62), height: st.s(62)) }
+                Button { app.go(.shop) } label: { ShopGlyph().frame(width: st.s(62), height: st.s(62)) }
                     .buttonStyle(ToyButtonStyle(kind: .yellow)).accessibilityLabel("pro shop")
                 IconButton(symbol: "gearshape.fill", label: "settings") { withAnimation(.spring(response: 0.3)) { settings = true } }
             }
@@ -191,7 +191,7 @@ struct WorldsView: View {
             .overlay(shape.strokeBorder(open ? Toy.surfaceLine : Toy.muteLine, lineWidth: st.s(6)))
             .background(shape.fill(Toy.shadow.opacity(0.14)).offset(y: st.s(6)))
         }
-        .buttonStyle(PressDown())
+        .buttonStyle(PressDown(locked: !open))
         .accessibilityLabel("world \(w)")
     }
 
@@ -209,8 +209,10 @@ struct WorldsView: View {
             .background(shape.fill(down).offset(y: st.s(6)))
             .shadow(color: glow ? rim.opacity(0.8) : .clear, radius: glow ? st.s(8) : 0)
         }
-        .buttonStyle(PressDown())
-        .opacity(has ? 1 : 0.4)
+        .buttonStyle(PressDown(locked: !has))
+        .opacity(has ? 1 : 0)
+        .allowsHitTesting(has)
+        .accessibilityHidden(!has)
         .accessibilityLabel(label)
     }
 }
@@ -218,10 +220,16 @@ struct WorldsView: View {
 /// a card that presses down a little when touched
 struct PressDown: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// a locked thing boinks and stays put, as on the web
+    var locked = false
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.scaleEffect(configuration.isPressed && !reduceMotion ? 0.96 : 1)
+        configuration.label.scaleEffect(configuration.isPressed && !reduceMotion && !locked ? 0.96 : 1)
+            .offset(y: configuration.isPressed && !locked ? 4 : 0)
             .animation(.spring(response: 0.18, dampingFraction: 0.6), value: configuration.isPressed)
-            .onChange(of: configuration.isPressed) { _, down in if down { SFX.tap(); Haptics.tap() } }
+            .onChange(of: configuration.isPressed) { _, down in
+                guard down else { return }
+                if locked { SFX.boink() } else { SFX.tap(); Haptics.tap() }
+            }
     }
 }
 
@@ -333,7 +341,7 @@ struct WorldView: View {
                     }
                 }
         }
-        .buttonStyle(PressDown())
+        .buttonStyle(PressDown(locked: !open))
         .accessibilityLabel("course \(k + 1)")
     }
 }
@@ -359,16 +367,22 @@ struct MapView: View {
             HStack(spacing: st.s(16)) {
                 BackButton { app.go(app.catalog.isExtra(course) ? .worlds : .world(app.catalog.world(of: course))) }
                 badge
+                // lost balls found on this course
+                HStack(spacing: st.s(8)) {
+                    ExtraIconView(icon: .goldBall).frame(width: st.s(48), height: st.s(48))
+                    Text("\(holes.filter { app.progress.lost[$0.key] != nil }.count)/\(holes.count)").font(Toy.font(34, st)).foregroundStyle(Toy.inkStrong)
+                }
+                .padding(.leading, st.s(12)).padding(.trailing, st.s(20)).frame(height: st.s(76)).toyCard(st, radius: Toy.rLg)
+                .accessibilityElement(children: .ignore).accessibilityLabel("lost balls found, \(holes.filter { app.progress.lost[$0.key] != nil }.count) of \(holes.count)")
                 Spacer()
                 if app.open(course: course) {
-                    // practice: a target; nothing counts, every hole of the course is open
-                    Button { SFX.tap(); withAnimation { app.practice.toggle() } } label: { ExtraIconView(icon: .target).frame(width: st.s(56), height: st.s(56)) }
+                    // pass and play, then practice (a target: nothing counts, every hole open), as on the web
+                    Button { withAnimation(.spring(response: 0.3)) { picking = true } } label: { PartyGlyph().frame(width: st.s(64), height: st.s(64)) }
+                        .buttonStyle(ToyButtonStyle()).accessibilityLabel("pass and play")
+                    Button { withAnimation { app.practice.toggle() } } label: { ExtraIconView(icon: .target).frame(width: st.s(56), height: st.s(56)) }
                         .buttonStyle(ToyButtonStyle(kind: app.practice ? .yellow : .plain))
                         .accessibilityLabel("practice").accessibilityAddTraits(app.practice ? .isSelected : [])
-                    Button { SFX.tap(); withAnimation(.spring(response: 0.3)) { picking = true } } label: { PartyGlyph().frame(width: st.s(64), height: st.s(64)) }
-                        .buttonStyle(ToyButtonStyle()).accessibilityLabel("pass and play")
                 }
-                Wallet()
             }
             .padding(.horizontal, st.s(24)).padding(.top, st.s(24))
             if picking { PartyPick(course: course) { withAnimation { picking = false } }.transition(.opacity) }
@@ -406,7 +420,7 @@ struct MapView: View {
                 .overlay(alignment: .bottomLeading) { if crazy { Glyph.crazy.image.resizable().scaledToFit().frame(width: st.s(34)).offset(x: -st.s(12), y: st.s(10)) } }
                 .overlay(alignment: .topTrailing) { if !open { Glyph.lock.image.resizable().scaledToFit().frame(width: st.s(34)).offset(x: st.s(10), y: -st.s(10)) } }
         }
-        .buttonStyle(PressDown())
+        .buttonStyle(PressDown(locked: !open))
         .accessibilityLabel("hole \(i + 1)")
     }
 }

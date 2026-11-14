@@ -94,6 +94,18 @@ struct HoleView: View {
                 HudChip(icon: .strokes, value: "\(min(play.round.strokes, Scoring.cap(play.hole)))").fixedSize()
                     .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
                     .accessibilityLabel("\(play.round.strokes) strokes")
+                // the mode chip: practice (a target), the hole of the day (a calendar, with today's best)
+                if app.party == nil && (play.practice || play.daily != nil) {
+                    let best = play.daily != nil && app.progress.daily?.d == play.daily ? app.progress.daily?.best : nil
+                    HStack(spacing: st.s(6)) {
+                        ExtraIconView(icon: play.practice ? .target : .calendar).frame(width: st.s(46), height: st.s(46))
+                        if let best { Text("\(best)").font(Toy.font(40, st)).foregroundStyle(Toy.inkStrong) }
+                    }
+                    .padding(.leading, st.s(12)).padding(.trailing, st.s(best == nil ? 12 : 18)).frame(height: st.s(76)).toyCard(st, radius: Toy.rLg)
+                    .fixedSize()
+                    .position(x: geo.size.width - st.s(200 + 44), y: st.s(30 + 38))
+                    .accessibilityElement(children: .ignore).accessibilityLabel(play.practice ? "practice" : "hole of the day")
+                }
                 // the slope read, and in practice the guide
                 if aimUp {
                     Button { play.reading.toggle() } label: { ReadGlyph().frame(width: st.s(56), height: st.s(56)) }

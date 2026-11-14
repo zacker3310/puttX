@@ -33,7 +33,18 @@ struct SoundButton: View {
 /// the player's coins
 struct Wallet: View {
     @Environment(AppModel.self) private var app
-    var body: some View { Tally(value: "\(app.progress.coins)") { Glyph.coin.image.resizable().scaledToFit() }.accessibilityLabel("\(app.progress.coins) coins") }
+    @Environment(\.stage) private var st
+    /// a full HUD chip, as the web's #mapWallet: the coin and the count on a 76 px card
+    var body: some View {
+        HStack(spacing: st.s(10)) {
+            Glyph.coin.image.resizable().scaledToFit().frame(width: st.s(48), height: st.s(48))
+            Text("\(app.progress.coins)").font(Toy.font(44, st)).foregroundStyle(Toy.inkStrong)
+        }
+        .padding(.leading, st.s(14)).padding(.trailing, st.s(22))
+        .frame(height: st.s(76))
+        .toyCard(st, radius: Toy.rLg)
+        .accessibilityElement(children: .ignore).accessibilityLabel("\(app.progress.coins) coins")
+    }
 }
 
 /// a golf ball as the web draws it on a profile card: a band, a mark, a shine

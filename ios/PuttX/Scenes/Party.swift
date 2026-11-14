@@ -55,7 +55,7 @@ struct PartyPick: View {
             Toy.scrim.ignoresSafeArea().onTapGesture(perform: close)
             HStack(spacing: st.s(40)) {
                 ForEach(2...4, id: \.self) { n in
-                    Button { SFX.tap(); app.startParty(n, course: course) } label: {
+                    Button { app.startParty(n, course: course) } label: {
                         LazyVGrid(columns: [GridItem(.fixed(st.s(64))), GridItem(.fixed(st.s(64)))], spacing: st.s(8)) {
                             ForEach(0..<n, id: \.self) { PartyBall(p: $0, size: st.s(64)) }
                         }
@@ -87,6 +87,7 @@ struct PartyOverlay: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture { app.partyGo() }
+                .onAppear { SFX.tap() }
                 .task { try? await Task.sleep(for: .seconds(1.6)); app.partyGo() }
                 .accessibilityAddTraits(.isButton).accessibilityLabel("next player")
             } else if party.board == key, let sc = party.scores[key] {
@@ -106,7 +107,8 @@ struct PartyOverlay: View {
                         HStack(spacing: st.s(60)) {
                             Button { app.endParty(); app.go(.map(party.course)) } label: { HudIconView(icon: .home).frame(width: st.s(48), height: st.s(48)) }
                                 .buttonStyle(ToyButtonStyle()).accessibilityLabel("map")
-                            IconButton(symbol: "play.fill", kind: .go, label: "next hole") { app.partyNext(after: key) }
+                            Button { app.partyNext(after: key) } label: { Image(systemName: "play.fill").font(.system(size: st.s(40), weight: .black)) }
+                                .buttonStyle(ToyButtonStyle(kind: .go, size: CGSize(width: 140, height: 88))).accessibilityLabel("next hole")
                         }
                         .padding(.top, st.s(20))
                     }

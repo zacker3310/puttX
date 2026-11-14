@@ -1,7 +1,10 @@
 // PlayerProgress (src/game.js 2g): bests and stars only ever go up; finishing a course opens the next
 // course of its world, and finishing every hole of a world opens the next world.
 
-public struct HoleRecord: Sendable, Codable, Equatable { public var best: Int, stars: Int }
+public struct HoleRecord: Sendable, Codable, Equatable {
+    public var best: Int, stars: Int
+    public init(best: Int, stars: Int) { self.best = best; self.stars = stars }
+}
 
 public struct PlayerProgress: Sendable, Codable, Equatable {
     public var v = 2

@@ -24,6 +24,9 @@ final class PlayProps {
     private let goldRing: ModelEntity
     /// the ghost of your best run, see-through
     private let ghost: ModelEntity
+    private var ghostGuide = false
+    /// the slope read's arrows, built when it is first turned on
+    private var read: ModelEntity?
 
     static let PUTTER_SCALE: Float = 0.83, BACK_M = 0.36, GAP = 0.006, HEAD_W = 0.17, HEAD_D = 0.052, HEAD_H = 0.042
 
@@ -92,6 +95,14 @@ final class PlayProps {
         shadow.scale = SIMD3(repeating: Float(1 + up * 6))
 
         ghost.isEnabled = play.ghostVisible
+        // the guide is green, your best is sky blue
+        let guide = play.ghost?.auto == true
+        if guide != ghostGuide, var m = ghost.model?.materials.first as? UnlitMaterial {
+            ghostGuide = guide
+            m.color.tint = guide ? UIColor(red: 0.62, green: 0.95, blue: 0.63, alpha: 1) : UIColor(red: 0.75, green: 0.9, blue: 0.96, alpha: 1)
+            ghost.model?.materials = [m]
+        }
+        updateRead(play)
         if let g = play.ghost, ghost.isEnabled { ghost.position = SIMD3(Float(g.ball.x), Float(g.ball.y + Sim.BALL_R), Float(g.ball.z)) }
         // the lost ball, until it is found
         if let s = play.lostSpot, !play.lostGot, play.phase != .done {
@@ -237,6 +248,64 @@ final class PlayProps {
         let g = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB)!, colors: [UIColor(white: 0, alpha: 0.55).cgColor, UIColor(white: 0, alpha: 0.25).cgColor, UIColor(white: 0, alpha: 0).cgColor] as CFArray, locations: [0, 0.6, 1])!
         ctx.drawRadialGradient(g, startCenter: CGPoint(x: 32, y: 32), startRadius: 0, endCenter: CGPoint(x: 32, y: 32), endRadius: 32, options: [])
         return ctx.makeImage()!
+    }
+
+    /// the slope read (src/game.js setRead): an arrow every 28 cm over the green pointing downhill,
+    /// longer and redder where it is steeper; none near the walls or on the flat
+    private func updateRead(_ play: HolePlay) {
+        if !play.reading { read?.isEnabled = false; return }
+        if read == nil {
+            let h = play.hole, B = Terrain.bounds(h), step = 0.28
+            var pos: [SIMD3<Float>] = [], idx: [UInt32] = [], col: [SIMD4<Float>] = []
+            let shape: [SIMD2<Float>] = [[-0.018, -0.06], [0.018, -0.06], [0.018, 0.02], [0.045, 0.02], [0, 0.07], [-0.045, 0.02], [-0.018, 0.02]]
+            let tris: [UInt32] = [0, 1, 2, 0, 2, 6, 3, 4, 5]
+            var x = B.x0 + step / 2
+            while x < B.x1 {
+                var z = B.z0 + step / 2
+                while z < B.z1 {
+                    defer { z += step }
+                    guard h.onFloor(x, z), !h.segs.contains(where: { s in let p = closestOnSeg(s.ax, s.az, s.bx, s.bz, x, z); return hypot(x - p.0, z - p.1) < 0.12 }) else { continue }
+                    let (gx, gz) = h.groundGrad(x, z), m = hypot(gx, gz)
+                    guard m > 0.012 else { continue }
+                    let a = Float(atan2(-gx, -gz)), sc = Float(0.7 + min(1.3, m * 6)), y = Float(h.groundH(x, z) + 0.012)
+                    let hue = 0.33 - min(0.33, m * 1.6), c = UIColor(hue: hue, saturation: 0.85, brightness: 0.9, alpha: 1)
+                    var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, al: CGFloat = 0; c.getRed(&r, green: &g, blue: &b, alpha: &al)
+                    let base = UInt32(pos.count)
+                    for v in shape {
+                        // the shape lies flat, its tip toward +z, turned to point down the slope
+                        let px = v.x * sc, pz = v.y * sc
+                        pos.append(SIMD3(Float(x) + px * cos(a) + pz * sin(a), y, Float(z) - px * sin(a) + pz * cos(a)))
+                        col.append(SIMD4(Float(r), Float(g), Float(b), 1))
+                    }
+                    idx += tris.map { $0 + base }
+                }
+                x += step
+            }
+            guard !pos.isEmpty else { return }
+            // one mesh per colour band is plenty: bucket the arrows by hue into a few unlit materials
+            var d = MeshDescriptor(); d.positions = MeshBuffers.Positions(pos); d.primitives = .triangles(idx)
+            var mats: [UnlitMaterial] = []
+            var parts: [MeshDescriptor] = []
+            let buckets = 6
+            for k in 0..<buckets {
+                var bi: [UInt32] = []
+                for t in stride(from: 0, to: idx.count, by: 3) {
+                    let c = col[Int(idx[t])], hueK = min(buckets - 1, Int((1 - c.x + c.y) / 2 * Float(buckets)))
+                    if hueK == k { bi += [idx[t], idx[t + 1], idx[t + 2]] }
+                }
+                guard !bi.isEmpty else { continue }
+                var dd = d; dd.primitives = .triangles(bi); dd.materials = .allFaces(UInt32(mats.count))
+                let i = bi[0], c = col[Int(i)]
+                var m = UnlitMaterial(color: UIColor(red: CGFloat(c.x), green: CGFloat(c.y), blue: CGFloat(c.z), alpha: 1))
+                m.blending = .transparent(opacity: 0.85); m.faceCulling = .none
+                mats.append(m); parts.append(dd)
+            }
+            guard let mesh = try? MeshResource.generate(from: parts) else { return }
+            let e = ModelEntity(mesh: mesh, materials: mats)
+            root.addChild(e)
+            read = e
+        }
+        read?.isEnabled = true
     }
 
     /// a flat ring lying on the ground

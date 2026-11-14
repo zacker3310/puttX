@@ -89,6 +89,7 @@ final class AppModel {
     func go(_ r: Route) {
         // leaving the holes and the card ends a party
         switch r { case .hole, .card: break; default: party = nil }
+        switch r { case .hole, .map, .card: break; default: practice = false }
         if case .hole(let key) = r, let h = catalog.hole(key) {
             let c = Catalog.course(of: key), lk = look(c), p = HolePlay(hole: h, look: lk)
             // the hole's sound: its borders, its world's birds and crickets, water or wind, the bell at the end
@@ -102,6 +103,8 @@ final class AppModel {
             p.lostGot = progress.lost[key] != nil
             p.setGhost(progress.ghosts[key])
             p.gear = (progress.equipped["putter"] ?? "p1", progress.equipped["ball"] ?? "b1")
+            p.practice = practice && party == nil
+            if p.practice { p.lostGot = true }
             if let party {
                 // a plain ball in the player's colour, no ghost, no lost ball, no mulligans
                 p.party = true; p.lostGot = true; p.setGhost(nil)
@@ -119,6 +122,8 @@ final class AppModel {
     func look(_ course: Int) -> CourseLook { progress.neon ? looks[course].night() : looks[course] }
 
     // MARK: pass and play
+    /// practice mode, chosen on a course's map: nothing counts, every open course's holes are open
+    var practice = false
     /// the party on this device, if one is playing
     var party: Party?
     func startParty(_ n: Int, course c: Int) {
@@ -153,7 +158,8 @@ final class AppModel {
     /// a hole finished: bank it with its goals (and the daily hole), and say where the player goes next
     func finished(_ play: HolePlay, score: Int) -> HoleRecord {
         let h = play.hole, prevBest = progress.holes[h.key]?.best
-        if party != nil {
+        if party != nil || play.practice {
+            if play.practice { return HoleRecord(best: score, stars: Scoring.stars(score, h.par)) }
             // nothing is saved in a party
             withAnimation(.spring(response: 0.3)) { party!.finish(h.key, score: score) }
             return HoleRecord(best: score, stars: 0)

@@ -49,7 +49,7 @@ final class HolePlay {
     private(set) var touched = false
     /// the ghost: your best run of this hole, stroke for stroke. When you strike putt k it strikes its
     /// putt k from where its own ball lies, on the same physics (src/game.js 6b)
-    struct Ghost { var log: [[Double]]; var k = 0; var ball: Ball; var live = false; var t = 0.0; var done = false; var from: Vec2? }
+    struct Ghost { var log: [[Double]]; var k = 0; var ball: Ball; var live = false; var t = 0.0; var done = false; var from: Vec2?; var auto = false; var wait = 0.0 }
     private(set) var ghost: Ghost?
     func setGhost(_ log: [[Double]]?) {
         guard let log, !log.isEmpty, log.allSatisfy({ $0.count == 3 && $0.allSatisfy(\.isFinite) }) else { ghost = nil; return }
@@ -64,10 +64,16 @@ final class HolePlay {
         ghost = g
     }
     private func stepGhost() {
+        // the guide plays its whole line by itself, with a breath between putts
+        if var g = ghost, g.auto, !g.live, !g.done, g.k < g.log.count {
+            g.wait -= Sim.SIM_DT; ghost = g
+            if g.wait <= 0 { ghostPutt(g.k) }
+            return
+        }
         guard var g = ghost, g.live else { return }
         let end = hole.step(&g.ball, g.t); g.t += Sim.SIM_DT; g.ball.hits.removeAll(keepingCapacity: true)
         if let end {
-            g.live = false
+            g.live = false; g.wait = 0.6
             if end == .sunk { g.done = true }
             if end == .oob { let f = g.from ?? Vec2(g.ball.x, g.ball.z); g.ball = Ball(hole, f.x, f.z) }
             else if end == .stop { let r = hole.restSpot(g.ball.x, g.ball.z); g.ball = Ball(hole, r.x, r.z) }
@@ -130,6 +136,18 @@ final class HolePlay {
     }
     /// the goals met at the finish (bits), and which were new
     var goals: (all: Int, fresh: Int)?
+    /// practice: nothing counts, mulligans are free, and the guide can show the proven line
+    var practice = false
+    var canGuide: Bool { practice && !party && phase == .aim && intro == nil && !hole.data.sol.isEmpty }
+    /// show me: a green ghost plays the hole's proven line (its par, by the solver) from the tee
+    func showGuide() {
+        guard canGuide else { return }
+        ghost = Ghost(log: hole.data.sol.map { [$0[0], $0[1], $0.count > 2 ? $0[2] : 0] }, ball: Ball(hole, hole.tee.x, hole.tee.z), auto: true)
+        ghostPutt(0)
+        SFX.tubeOut()
+    }
+    /// the slope read: arrows over the green pointing downhill
+    var reading = false
     /// pass and play: no mulligans; the ball wears the player's colour
     var party = false
     var ballTint: String?
@@ -236,7 +254,7 @@ final class HolePlay {
         from = round.at
         log.append([a, p, time])
         run = PuttRun(hole, from: from, angle: a, power: p, t0: time)
-        ghostPutt(log.count - 1)
+        if ghost?.auto != true { ghostPutt(log.count - 1) }
         hitsHeard = 0
         phase = .roll
     }

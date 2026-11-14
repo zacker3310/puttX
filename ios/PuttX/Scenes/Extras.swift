@@ -5,7 +5,7 @@ import SwiftUI
 import PuttXCore
 
 enum ExtraIcon {
-    case mulligan, bird, noWalls, goldBall, sun, flame, check
+    case mulligan, bird, noWalls, goldBall, sun, flame, check, target
 
     func draw(_ ctx: GraphicsContext, _ k: CGFloat, ink: Color = Toy.inkSoft) {
         func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: y * k) }
@@ -53,6 +53,11 @@ enum ExtraIcon {
                 $0.addArc(center: p(32, 48), radius: 8 * k, startAngle: .degrees(0), endAngle: .degrees(180), clockwise: false)
                 $0.addCurve(to: p(33, 30), control1: p(24, 42), control2: p(30, 40)); $0.closeSubpath()
             }, with: .color(Toy.yellow))
+        case .target:
+            ctx.fill(circle(32, 32, 26), with: .color(Color(hex: "#fffdf7")))
+            ctx.stroke(circle(32, 32, 26), with: .color(Toy.red), style: line(6))
+            ctx.stroke(circle(32, 32, 15), with: .color(Toy.red), style: line(6))
+            ctx.fill(circle(32, 32, 5), with: .color(Toy.red))
         case .check:
             ctx.stroke(Path { $0.addLines([p(14, 33), p(27, 46), p(51, 19)]) }, with: .color(.white), style: line(9))
         }
@@ -70,19 +75,20 @@ struct ExtraIconView: View {
 /// take the last putt back for a token: blue, with the tokens left on a badge (practice: infinite)
 struct MulliganButton: View {
     @Environment(\.stage) private var st
-    let tokens: Int
+    /// tokens left; nil in practice (free)
+    let tokens: Int?
     let action: () -> Void
     var body: some View {
         Button(action: action) { ExtraIconView(icon: .mulligan).frame(width: st.s(52), height: st.s(52)) }
             .buttonStyle(ToyButtonStyle(kind: .blue))
             .overlay(alignment: .bottomTrailing) {
-                Text("\(tokens)").font(Toy.font(20, st)).foregroundStyle(Toy.inkStrong)
+                Text(tokens.map { "\($0)" } ?? "\u{221E}").font(Toy.font(20, st)).foregroundStyle(Toy.inkStrong)
                     .frame(minWidth: st.s(34), minHeight: st.s(34)).padding(.horizontal, st.s(4))
                     .background(Capsule().fill(Toy.surface)).overlay(Capsule().strokeBorder(Toy.blueLine, lineWidth: st.s(3)))
                     .offset(x: st.s(10), y: st.s(10))
                     .allowsHitTesting(false)
             }
-            .accessibilityLabel("take the last putt back, \(tokens) left")
+            .accessibilityLabel("take the last putt back" + (tokens.map { ", \($0) left" } ?? ""))
     }
 }
 
@@ -198,5 +204,32 @@ struct ReplayTag: View {
             ctx.stroke(Path(ellipseIn: CGRect(x: 8 * k, y: 8 * k, width: 48 * k, height: 48 * k)), with: .color(.white), lineWidth: 5 * k)
         }
         .aspectRatio(1, contentMode: .fit).accessibilityLabel("replay")
+    }
+}
+
+/// the slope read: a hill with arrows running down it
+struct ReadGlyph: View {
+    var body: some View {
+        Canvas { ctx, s in
+            let k = s.width / 64
+            func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: y * k) }
+            ctx.stroke(Path { $0.move(to: p(8, 44)); $0.addQuadCurve(to: p(56, 44), control: p(32, 20)) }, with: .color(Toy.green), style: StrokeStyle(lineWidth: 6 * k, lineCap: .round))
+            ctx.stroke(Path { $0.addLines([p(20, 22), p(14, 34), p(26, 32)]); $0.move(to: p(44, 22)); $0.addLines([p(44, 22), p(50, 34), p(38, 32)]) }, with: .color(Color(hex: "#5a4634")), style: StrokeStyle(lineWidth: 5 * k, lineCap: .round, lineJoin: .round))
+        }
+        .aspectRatio(1, contentMode: .fit).accessibilityHidden(true)
+    }
+}
+/// show me the line: a dashed green ball with a question mark
+struct GuideGlyph: View {
+    var body: some View {
+        Canvas { ctx, s in
+            let k = s.width / 64
+            func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * k, y: y * k) }
+            let c = Path(ellipseIn: CGRect(x: 10 * k, y: 16 * k, width: 40 * k, height: 40 * k))
+            ctx.fill(c, with: .color(Color(hex: "#cdeac6"))); ctx.stroke(c, with: .color(Toy.green), style: StrokeStyle(lineWidth: 5 * k, dash: [7 * k, 5 * k]))
+            ctx.stroke(Path { $0.move(to: p(25, 30)); $0.addQuadCurve(to: p(32, 22), control: p(25, 22)); $0.addQuadCurve(to: p(39, 29), control: p(39, 22)); $0.addQuadCurve(to: p(32, 36), control: p(39, 34)); $0.addLine(to: p(32, 41)) }, with: .color(Color(hex: "#3f7a3a")), style: StrokeStyle(lineWidth: 5 * k, lineCap: .round))
+            ctx.fill(Path(ellipseIn: CGRect(x: 28.5 * k, y: 45.5 * k, width: 7 * k, height: 7 * k)), with: .color(Color(hex: "#3f7a3a")))
+        }
+        .aspectRatio(1, contentMode: .fit).accessibilityHidden(true)
     }
 }

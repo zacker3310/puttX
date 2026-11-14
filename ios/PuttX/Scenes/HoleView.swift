@@ -83,10 +83,23 @@ struct HoleView: View {
                 HudChip(icon: .strokes, value: "\(min(play.round.strokes, Scoring.cap(play.hole)))").fixedSize()
                     .position(x: geo.size.width - st.s(24 + 66), y: st.s(30 + 38))
                     .accessibilityLabel("\(play.round.strokes) strokes")
+                // the slope read, and in practice the guide
+                if play.phase == .aim || play.phase == .roll || play.phase == .drift {
+                    Button { play.reading.toggle(); SFX.tap() } label: { ReadGlyph().frame(width: st.s(56), height: st.s(56)) }
+                        .buttonStyle(ToyButtonStyle(kind: play.reading ? .go : .plain))
+                        .accessibilityLabel("read the slope").accessibilityAddTraits(play.reading ? .isSelected : [])
+                        .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(232 + 44))
+                }
+                if play.canGuide {
+                    Button { play.showGuide() } label: { GuideGlyph().frame(width: st.s(56), height: st.s(56)) }
+                        .buttonStyle(ToyButtonStyle())
+                        .accessibilityLabel("show me the line")
+                        .position(x: lefty ? geo.size.width - st.s(24 + 44) : st.s(24 + 44), y: geo.size.height - st.s(336 + 44))
+                }
                 // the mulligan: the last putt back, for a token
-                if play.canTakeBack && play.phase == .aim && play.intro == nil && app.progress.mulligans > 0 {
-                    MulliganButton(tokens: app.progress.mulligans) {
-                        if app.progress.spendMulligan() { play.takeBack(); app.save() }
+                if play.canTakeBack && play.phase == .aim && play.intro == nil && (play.practice || app.progress.mulligans > 0) {
+                    MulliganButton(tokens: play.practice ? nil : app.progress.mulligans) {
+                        if play.practice { play.takeBack() } else if app.progress.spendMulligan() { play.takeBack(); app.save() }
                     }
                     .position(x: st.s(556 + 44), y: st.s(24 + 44))
                     .transition(.scale.combined(with: .opacity))

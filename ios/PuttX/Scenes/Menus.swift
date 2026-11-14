@@ -356,6 +356,10 @@ struct MapView: View {
                 badge
                 Spacer()
                 if app.open(course: course) {
+                    // practice: a target; nothing counts, every hole of the course is open
+                    Button { SFX.tap(); withAnimation { app.practice.toggle() } } label: { ExtraIconView(icon: .target).frame(width: st.s(56), height: st.s(56)) }
+                        .buttonStyle(ToyButtonStyle(kind: app.practice ? .yellow : .plain))
+                        .accessibilityLabel("practice").accessibilityAddTraits(app.practice ? .isSelected : [])
                     Button { SFX.tap(); withAnimation(.spring(response: 0.3)) { picking = true } } label: { PartyGlyph().frame(width: st.s(64), height: st.s(64)) }
                         .buttonStyle(ToyButtonStyle()).accessibilityLabel("pass and play")
                 }
@@ -379,7 +383,8 @@ struct MapView: View {
     }
 
     private func node(_ h: Hole, _ i: Int) -> some View {
-        let rec = app.progress.holes[h.key], open = app.unlocked(h.key), crazy = h.data.crazy
+        let rec = app.progress.holes[h.key], crazy = h.data.crazy
+        let open = app.unlocked(h.key) || (app.practice && app.open(course: course))
         let kind: ToyKind = open ? (rec == nil ? .go : .plain) : .locked
         return Button { if open { app.go(.hole(h.key)) } } label: {
             Text("\(i + 1)").font(Toy.font(40, st)).foregroundStyle(open ? (rec == nil ? .white : Toy.inkStrong) : Toy.inkSoft)
